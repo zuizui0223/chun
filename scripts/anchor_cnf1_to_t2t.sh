@@ -67,31 +67,44 @@ if [[ -n "$GFF" && -s "$GFF" ]]; then
   sha256sum "$GFF" > "$OUTDIR/gff.sha256"
 fi
 
-# Fetch the exact experimentally characterized CnFLS cDNA accession.
+# Preserve the published full-length cDNA, but compare CDS-to-CDS. The earlier
+# 78% query coverage was caused by UTR sequence in the full-length cDNA, not by
+# a weak genomic match. NCBI's fasta_cds_na view uses the accession's annotated
+# CDS feature and therefore tests coding-region coverage directly.
 curl -L --fail --retry 3 \
   "https://eutils.ncbi.nlm.nih.gov/entrez/eutils/efetch.fcgi?db=nuccore&id=${QUERY}&rettype=fasta&retmode=text" \
-  -o "$OUTDIR/${QUERY}.fasta"
-if ! grep -q '^>' "$OUTDIR/${QUERY}.fasta"; then
-  echo "Failed to recover FASTA for $QUERY" >&2
+  -o "$OUTDIR/${QUERY}.full_cDNA.fasta"
+curl -L --fail --retry 3 \
+  "https://eutils.ncbi.nlm.nih.gov/entrez/eutils/efetch.fcgi?db=nuccore&id=${QUERY}&rettype=fasta_cds_na&retmode=text" \
+  -o "$OUTDIR/${QUERY}.CDS.fasta"
+
+if ! grep -q '^>' "$OUTDIR/${QUERY}.full_cDNA.fasta"; then
+  echo "Failed to recover full cDNA FASTA for $QUERY" >&2
   exit 3
 fi
-sha256sum "$OUTDIR/${QUERY}.fasta" > "$OUTDIR/query.sha256"
+if [[ "$(grep -c '^>' "$OUTDIR/${QUERY}.CDS.fasta" || true)" -ne 1 ]]; then
+  echo "Expected exactly one annotated CDS feature for $QUERY" >&2
+  cat "$OUTDIR/${QUERY}.CDS.fasta" >&2 || true
+  exit 4
+fi
+sha256sum "$OUTDIR/${QUERY}.full_cDNA.fasta" > "$OUTDIR/query_full_cDNA.sha256"
+sha256sum "$OUTDIR/${QUERY}.CDS.fasta" > "$OUTDIR/query_CDS.sha256"
 
 makeblastdb -in "$CDS_FASTA" -dbtype nucl -out "$OUTDIR/cds_db" >/dev/null
 blastn \
-  -query "$OUTDIR/${QUERY}.fasta" \
+  -query "$OUTDIR/${QUERY}.CDS.fasta" \
   -db "$OUTDIR/cds_db" \
-  -evalue 1e-20 \
-  -perc_identity 60 \
-  -qcov_hsp_perc 50 \
+  -evalue 1e-30 \
+  -perc_identity 70 \
+  -qcov_hsp_perc 70 \
   -max_target_seqs 100 \
-  -outfmt '6 qseqid sseqid pident length mismatch gapopen qstart qend sstart send evalue bitscore qcovs' \
-  > "$OUTDIR/${QUERY}_vs_T2T_cds.tsv"
+  -outfmt '6 qseqid sseqid pident length mismatch gapopen qstart qend sstart send evalue bitscore qcovs qlen slen' \
+  > "$OUTDIR/${QUERY}_CDS_vs_T2T_CDS.tsv"
 
-python - "$OUTDIR/${QUERY}_vs_T2T_cds.tsv" "$OUTDIR/cnf1_anchor_summary.csv" "$ANNOTATION_SOURCE" <<'PY'
+python - "$OUTDIR/${QUERY}_CDS_vs_T2T_CDS.tsv" "$OUTDIR/cnf1_anchor_summary.csv" "$ANNOTATION_SOURCE" <<'PY'
 import csv, sys
 src, out, annotation_source = sys.argv[1:]
-fields = ['qseqid','sseqid','pident','length','mismatch','gapopen','qstart','qend','sstart','send','evalue','bitscore','qcovs']
+fields = ['qseqid','sseqid','pident','length','mismatch','gapopen','qstart','qend','sstart','send','evalue','bitscore','qcovs','qlen','slen']
 rows=[]
 with open(src, newline='', encoding='utf-8') as h:
     for r in csv.DictReader(h, delimiter='\t', fieldnames=fields):
@@ -108,16 +121,19 @@ with open(out,'w',newline='',encoding='utf-8') as h:
     w.writeheader(); w.writerows(rows)
 top=rows[0]
 print(f"annotation_source={annotation_source}")
-print(f"top_hit={top['sseqid']} pident={top['pident']} qcovs={top['qcovs']} bitscore={top['bitscore']}")
+print(
+    f"top_hit={top['sseqid']} pident={top['pident']} qcovs={top['qcovs']} "
+    f"qlen={top['qlen']} slen={top['slen']} bitscore={top['bitscore']}"
+)
 print(f"candidate_hits={len(rows)}")
-# This is an annotation anchor, not a final orthology call. Still require a
-# strong near-full-length top match before locus IDs are admitted downstream.
-if float(top['pident']) < 85 or float(top['qcovs']) < 80:
-    raise SystemExit('Top T2T CDS hit is too weak for a confident CnFLS1 annotation anchor')
+# Same-species annotation anchor: demand a near-complete, high-identity CDS
+# match. This is deliberately stricter than the preliminary homology search.
+if float(top['pident']) < 95 or float(top['qcovs']) < 95:
+    raise SystemExit('Top T2T CDS hit is too weak for a confident CnFLS1 CDS anchor')
 PY
 
 if [[ -n "$GFF" && -s "$GFF" ]]; then
   cp "$GFF" "$OUTDIR/reference_annotation.gff3"
 fi
 
-echo "CnFLS1 T2T anchor gate completed for $QUERY using $ANNOTATION_SOURCE"
+echo "CnFLS1 CDS-to-CDS T2T anchor gate completed for $QUERY using $ANNOTATION_SOURCE"
