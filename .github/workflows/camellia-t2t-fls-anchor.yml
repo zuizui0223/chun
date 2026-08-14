@@ -1,0 +1,50 @@
+name: Camellia T2T FLS anchor
+
+on:
+  pull_request:
+    paths:
+      - 'scripts/anchor_cnf1_to_t2t.sh'
+      - 'data/pigment_pathway_targets_v0_1.csv'
+      - '.github/workflows/camellia-t2t-fls-anchor.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  fls-anchor:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install BLAST+
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq ncbi-blast+
+
+      - name: Anchor experimentally validated CnFLS1 cDNA to the public T2T annotation
+        run: |
+          bash scripts/anchor_cnf1_to_t2t.sh
+
+      - name: Summarize anchor
+        run: |
+          echo '### Camellia nitidissima T2T FLS anchor' >> "$GITHUB_STEP_SUMMARY"
+          echo '' >> "$GITHUB_STEP_SUMMARY"
+          echo '- query: `JF343560.1` (experimentally characterized CnFLS/CnFLS1 cDNA)' >> "$GITHUB_STEP_SUMMARY"
+          echo '- assembly: `GCA_049201075.1`' >> "$GITHUB_STEP_SUMMARY"
+          echo '' >> "$GITHUB_STEP_SUMMARY"
+          echo '```csv' >> "$GITHUB_STEP_SUMMARY"
+          head -n 11 build/camellia_t2t_fls_anchor/cnf1_anchor_summary.csv >> "$GITHUB_STEP_SUMMARY"
+          echo '```' >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Upload T2T anchor audit
+        uses: actions/upload-artifact@v4
+        with:
+          name: camellia-t2t-fls-anchor
+          path: |
+            build/camellia_t2t_fls_anchor/cnf1_anchor_summary.csv
+            build/camellia_t2t_fls_anchor/JF343560.1_vs_GCA_049201075.1_cds.tsv
+            build/camellia_t2t_fls_anchor/reference_files.txt
+            build/camellia_t2t_fls_anchor/datasets_version.txt
+          if-no-files-found: error
