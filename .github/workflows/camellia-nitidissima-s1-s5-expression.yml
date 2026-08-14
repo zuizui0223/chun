@@ -1,14 +1,10 @@
 name: Camellia nitidissima S1-S5 expression
 
+# Intentionally manual: this workflow downloads and requantifies all 15 public
+# flower libraries. Cheap provenance/input gates remain automatic; this heavy
+# scientific execution is rerun only when its inputs are intentionally changed.
 on:
   workflow_dispatch:
-  pull_request:
-    paths:
-      - 'data/camellia_srp112181_admitted_manifest_v0_1.csv'
-      - 'data/camellia_nitidissima_fls_anchor_v0_1.csv'
-      - 'scripts/run_camellia_nitidissima_s1_s5_expression.sh'
-      - 'scripts/summarize_camellia_fls_expression.py'
-      - '.github/workflows/camellia-nitidissima-s1-s5-expression.yml'
 
 permissions:
   contents: read
