@@ -37,7 +37,7 @@ jobs:
             --manifest-dir build/cnf2_manifest/sra \
             --out-dir build/cnf2_manifest/biosample
 
-      - name: Audit the 15-sample design without inventing stage labels
+      - name: Audit full BioProject and admit the 15-run five-stage petal subset
         run: |
           python scripts/audit_cnf2_prjna909942.py \
             --runinfo build/cnf2_manifest/sra/SEQ007_PRJNA909942_runinfo.csv \
@@ -54,11 +54,11 @@ jobs:
             cat build/cnf2_manifest/audit/prjna909942_audit_summary.json >> "$GITHUB_STEP_SUMMARY"
             echo '```' >> "$GITHUB_STEP_SUMMARY"
           fi
-          if [ -f build/cnf2_manifest/audit/prjna909942_compact_manifest.csv ]; then
+          if [ -f build/cnf2_manifest/audit/prjna909942_cnf2_stage_subset.csv ]; then
             echo '' >> "$GITHUB_STEP_SUMMARY"
-            echo '#### Compact run/sample manifest' >> "$GITHUB_STEP_SUMMARY"
+            echo '#### Admitted five-stage petal subset' >> "$GITHUB_STEP_SUMMARY"
             echo '```csv' >> "$GITHUB_STEP_SUMMARY"
-            cat build/cnf2_manifest/audit/prjna909942_compact_manifest.csv >> "$GITHUB_STEP_SUMMARY"
+            cat build/cnf2_manifest/audit/prjna909942_cnf2_stage_subset.csv >> "$GITHUB_STEP_SUMMARY"
             echo '```' >> "$GITHUB_STEP_SUMMARY"
           fi
 
