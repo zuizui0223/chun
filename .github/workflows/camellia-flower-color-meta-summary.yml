@@ -28,4 +28,4 @@ jobs:
             data/camellia_flower_color_mechanism_meta_v0_1.csv \
             --output /tmp/meta_summary.csv
       - name: Verify frozen summary
-        run: diff -u data/camellia_flower_color_mechanism_meta_summary_v0_1.csv /tmp/meta_summary.csv
+        run: diff --strip-trailing-cr -u data/camellia_flower_color_mechanism_meta_summary_v0_1.csv /tmp/meta_summary.csv
