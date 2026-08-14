@@ -1,0 +1,54 @@
+name: Camellia CnFLS1 locus context
+
+on:
+  workflow_dispatch:
+  pull_request:
+    paths:
+      - 'data/camellia_nitidissima_fls_anchor_v0_1.csv'
+      - 'scripts/extract_gwh_locus_context.py'
+      - '.github/workflows/camellia-cnf1-locus-context.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  locus:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Fetch authoritative GWH GFF3
+        run: |
+          mkdir -p build/cnf1_locus
+          curl -L --fail --retry 3 \
+            'https://download.cncb.ac.cn/gwh/Plants/Camellia_nitidissima_Camellia_nitidissima_GWHFILD00000000.1/GWHFILD00000000.1.gff.gz' \
+            -o build/cnf1_locus/GWHFILD00000000.1.gff.gz
+          gzip -dc build/cnf1_locus/GWHFILD00000000.1.gff.gz \
+            > build/cnf1_locus/GWHFILD00000000.1.gff
+          sha256sum build/cnf1_locus/GWHFILD00000000.1.gff \
+            > build/cnf1_locus/gff.sha256
+
+      - name: Resolve the experimentally anchored transcript to its gene context
+        run: |
+          python scripts/extract_gwh_locus_context.py \
+            --gff build/cnf1_locus/GWHFILD00000000.1.gff \
+            --transcript GWHTFILD024733.1 \
+            --out build/cnf1_locus/cnf1_locus_context.csv
+
+      - name: Report locus context
+        run: |
+          echo '### CnFLS1 T2T locus context' >> "$GITHUB_STEP_SUMMARY"
+          echo '' >> "$GITHUB_STEP_SUMMARY"
+          echo '```csv' >> "$GITHUB_STEP_SUMMARY"
+          cat build/cnf1_locus/cnf1_locus_context.csv >> "$GITHUB_STEP_SUMMARY"
+          echo '```' >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Upload locus audit
+        uses: actions/upload-artifact@v4
+        with:
+          name: camellia-cnf1-locus-context
+          path: |
+            build/cnf1_locus/cnf1_locus_context.csv
+            build/cnf1_locus/gff.sha256
+          if-no-files-found: error
