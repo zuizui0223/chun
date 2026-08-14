@@ -1,0 +1,71 @@
+name: Camellia CnFLS2 public manifest
+
+on:
+  pull_request:
+    paths:
+      - 'data/public_sequence_seeds_v0_1.csv'
+      - 'scripts/fetch_sra_runinfo.py'
+      - 'scripts/fetch_biosample_metadata.py'
+      - 'scripts/audit_cnf2_prjna909942.py'
+      - '.github/workflows/camellia-cnf2-public-manifest.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  manifest:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Resolve PRJNA909942 to run-level SRA metadata
+        run: |
+          python scripts/fetch_sra_runinfo.py \
+            --seeds data/public_sequence_seeds_v0_1.csv \
+            --out-dir build/cnf2_manifest/sra \
+            --include-status admit_cnf2
+
+      - name: Resolve linked BioSample provenance
+        run: |
+          python scripts/fetch_biosample_metadata.py \
+            --manifest-dir build/cnf2_manifest/sra \
+            --out-dir build/cnf2_manifest/biosample
+
+      - name: Audit the 15-sample design without inventing stage labels
+        run: |
+          python scripts/audit_cnf2_prjna909942.py \
+            --runinfo build/cnf2_manifest/sra/SEQ007_PRJNA909942_runinfo.csv \
+            --biosample-records build/cnf2_manifest/biosample/biosample_records.csv \
+            --biosample-attributes build/cnf2_manifest/biosample/biosample_attributes_long.csv \
+            --out-dir build/cnf2_manifest/audit
+
+      - name: Report audit
+        if: always()
+        run: |
+          echo '### PRJNA909942 CnFLS2 public-data audit' >> "$GITHUB_STEP_SUMMARY"
+          if [ -f build/cnf2_manifest/audit/prjna909942_audit_summary.json ]; then
+            echo '```json' >> "$GITHUB_STEP_SUMMARY"
+            cat build/cnf2_manifest/audit/prjna909942_audit_summary.json >> "$GITHUB_STEP_SUMMARY"
+            echo '```' >> "$GITHUB_STEP_SUMMARY"
+          fi
+          if [ -f build/cnf2_manifest/audit/prjna909942_compact_manifest.csv ]; then
+            echo '' >> "$GITHUB_STEP_SUMMARY"
+            echo '#### Compact run/sample manifest' >> "$GITHUB_STEP_SUMMARY"
+            echo '```csv' >> "$GITHUB_STEP_SUMMARY"
+            cat build/cnf2_manifest/audit/prjna909942_compact_manifest.csv >> "$GITHUB_STEP_SUMMARY"
+            echo '```' >> "$GITHUB_STEP_SUMMARY"
+          fi
+
+      - name: Upload audit
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: camellia-cnf2-public-manifest
+          path: build/cnf2_manifest
+          if-no-files-found: error
