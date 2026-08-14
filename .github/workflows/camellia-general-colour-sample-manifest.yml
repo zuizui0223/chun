@@ -1,0 +1,23 @@
+name: Camellia general colour sample manifest
+
+on:
+  push:
+    paths:
+      - 'data/camellia_general_colour_admitted_sample_manifest_v0_1.csv'
+      - 'scripts/validate_camellia_general_colour_sample_manifest.py'
+      - '.github/workflows/camellia-general-colour-sample-manifest.yml'
+  pull_request:
+    paths:
+      - 'data/camellia_general_colour_admitted_sample_manifest_v0_1.csv'
+      - 'scripts/validate_camellia_general_colour_sample_manifest.py'
+      - '.github/workflows/camellia-general-colour-sample-manifest.yml'
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: python scripts/validate_camellia_general_colour_sample_manifest.py data/camellia_general_colour_admitted_sample_manifest_v0_1.csv
