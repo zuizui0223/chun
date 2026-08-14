@@ -1,0 +1,44 @@
+name: Cirsium colour-history input gate
+
+on:
+  pull_request:
+    paths:
+      - 'data/cirsium_published_topology_constraints_v0_1.csv'
+      - 'data/cirsium_visible_colour_states_v0_1.csv'
+      - 'data/cirsium_divergence_time_constraints_v0_1.csv'
+      - 'scripts/validate_cirsium_colour_history_inputs.py'
+      - '.github/workflows/cirsium-colour-history-input-gate.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  gate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Validate topology, colour states, polymorphism, and node-age constraints
+        run: |
+          python scripts/validate_cirsium_colour_history_inputs.py
+
+      - name: Report readiness without overclaiming ancestral state
+        run: |
+          echo '### Cirsium visible-colour history readiness' >> "$GITHUB_STEP_SUMMARY"
+          echo '' >> "$GITHUB_STEP_SUMMARY"
+          echo '```json' >> "$GITHUB_STEP_SUMMARY"
+          cat build/cirsium_colour_history/readiness.json >> "$GITHUB_STEP_SUMMARY"
+          echo '```' >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Upload readiness artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: cirsium-colour-history-readiness
+          path: build/cirsium_colour_history/readiness.json
+          if-no-files-found: error
