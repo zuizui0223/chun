@@ -9,7 +9,7 @@ The v0.2 evidence table contains 12 mechanistic study records grouped into 8 ind
 Three descriptive layers are frozen:
 
 1. all literature study records;
-2. records with public raw sequence data;
+2. records whose raw sequence resource is currently publicly resolvable/admissible;
 3. independence-cluster consensus.
 
 The authoritative inputs/outputs are:
@@ -17,6 +17,7 @@ The authoritative inputs/outputs are:
 - `data/camellia_flower_color_mechanism_meta_v0_2.csv`
 - `scripts/summarize_camellia_flower_color_mechanism_meta_v0_2.py`
 - `data/camellia_flower_color_mechanism_meta_summary_v0_2.csv`
+- `data/camellia_general_colour_admitted_sample_manifest_v0_1.csv`
 
 ## Results
 
@@ -24,7 +25,7 @@ The authoritative inputs/outputs are:
 
 Among study records that make a directional comparison, **10/10** report higher anthocyanin in the more red/pink state.
 
-The same direction is retained when restricted to public-raw studies (**8/8**) and after collapsing dependent records to independence clusters (**6/6 informative clusters**).
+The same direction is retained when restricted to currently public/resolvable raw studies (**7/7**) and after collapsing dependent records to independence clusters (**6/6 informative clusters**).
 
 This is the strongest current recurrent result.
 
@@ -32,13 +33,13 @@ It does not imply that all red flowers have the same chemistry. The genus-wide a
 
 ### 2. The downstream anthocyanin branch repeatedly strengthens in redder states
 
-For studies that directly resolve this direction, **6/6 study records**, **4/4 public-raw records**, and **4/4 informative independence clusters** report stronger downstream anthocyanin-side deployment in the more red state.
+For studies that directly resolve this direction, **6/6 study records**, **4/4 currently public/resolvable raw records**, and **4/4 informative independence clusters** report stronger downstream anthocyanin-side deployment in the more red state.
 
 The recurrent nodes include `DFR`, `ANS/LDOX`, glycosylation steps and associated transcriptional regulators, although not every study measures the same genes.
 
 ### 3. Less-red, white or yellow states repeatedly strengthen competing deployment
 
-Among directly interpretable comparisons, **6/6 study records**, **4/4 public-raw records**, and **5/5 informative independence clusters** report stronger deployment of at least one competing branch in the less-red/white/yellow direction.
+Among directly interpretable comparisons, **6/6 study records**, **4/4 currently public/resolvable raw records**, and **5/5 informative independence clusters** report stronger deployment of at least one competing branch in the less-red/white/yellow direction.
 
 Examples include:
 
@@ -50,7 +51,7 @@ The exact competing branch is not universal. The recurrent signal is **flux redi
 
 ### 4. Regulatory or pathway-flux explanations recur across all current systems
 
-All 12 included study records and all 8 independence clusters contain evidence for regulatory or pathway-allocation differences associated with visible colour.
+All 12 included study records and all 8 independence clusters contain evidence for regulatory or pathway-allocation differences associated with visible colour. Among the eight study records whose raw resource is currently public/resolvable, all eight also point in this direction.
 
 This category includes different evidence classes:
 
@@ -108,6 +109,23 @@ The directional synthesis does not distinguish among:
 
 Those alternatives require the phylogenetic and raw-data layers below.
 
+## Public-data admission achieved for the NCBI subset
+
+The NCBI-accessible colour datasets have now been resolved to concrete run-level metadata and frozen in `data/camellia_general_colour_admitted_sample_manifest_v0_1.csv`.
+
+Current admitted/resolved NCBI subset:
+
+- `SRP112181`: 15 *C. nitidissima* flower-development runs;
+- `PRJNA597123`: 15 pink *C. sinensis* runs (five stages × three replicates);
+- `PRJNA597289`: 15 white *C. sinensis* runs (five stages × three replicates);
+- `PRJNA757193`: 15 *C. japonica* bud-sport runs (five groups × three replicates; three control-colour samples remain explicitly unresolved);
+- `PRJNA913600`: six *C. japonica* petal-sector runs (pink three + red three);
+- `PRJNA1136134`: nine cross-species runs (red, white and yellow, three replicates each).
+
+That is **75 run-level RNA-seq records**. Seventy-two currently have explicit colour-state mappings; three control samples in the bud-sport study remain colour-unresolved rather than being guessed.
+
+The oil-camellia paper states `PRJNA859399`, but live NCBI SRA resolution returns zero RunInfo rows as of the audit date. This is recorded as provenance conflict `META007` and that study remains usable at literature level but is excluded from raw-read pooling until the archive issue is resolved.
+
 ## Next quantitative layer: standardized raw-data meta-transcriptomics
 
 The next goal is to replace directional votes with comparable effect sizes derived from public raw data.
@@ -128,7 +146,21 @@ Primary modules:
 - selected MYB/bHLH/WD40/WRKY regulatory modules;
 - carotenoid module for yellow systems.
 
-`data/camellia_meta_sra_seeds_v0_1.csv` now defines the NCBI-accessible subset for run-level manifest resolution. CRA/GSA/GEO resources remain provider-specific and must be admitted through separate provenance routes rather than being forced through NCBI SRA tooling.
+CRA/GSA/GEO resources remain provider-specific and must be admitted through separate provenance routes rather than being forced through NCBI SRA tooling.
+
+## Exploratory exact sign synthesis
+
+A dependence-collapsed exact sign analysis is frozen in `data/camellia_direction_sign_meta_v0_1.csv`.
+
+Under a symmetric 50:50 directional null:
+
+- higher anthocyanin in the more-red state: 6/6 informative independence clusters, exact two-sided `P = 0.03125`;
+- stronger downstream anthocyanin deployment in the more-red state: 4/4, `P = 0.125`;
+- stronger competing-branch deployment in the less-red/white/yellow state: 5/5, `P = 0.0625`;
+- regulatory/flux evidence associated with the colour contrast: 8/8, `P = 0.0078125`;
+- structural-gene loss not required: 3/3 informative clusters, `P = 0.25`.
+
+These P-values quantify **directional recurrence in this selected literature**, not the natural frequency of mechanisms and not an unbiased publication-level meta-effect.
 
 ## Next phylogenetic layer
 
@@ -148,7 +180,7 @@ This must be repeated across nuclear-tree and model uncertainty (ER/SYM/ARD and,
 
 1. The molecular state of the inferred white MRCA is unknown.
 2. A machine-readable, locally reproducible 237-accession nuclear tree with branch lengths has not yet been frozen from the 2026 genus-wide study.
-3. Public raw RNA-seq exists for multiple colour systems, but sample-level harmonization is incomplete.
+3. Public raw RNA-seq now has a frozen NCBI run-level subset, but ortholog/expression harmonization is not yet complete and CRA/GSA/GEO provider-specific inputs remain to be admitted.
 4. Wild macroevolutionary transitions and horticultural/mechanistic accessibility must remain separate inferential levels.
 5. Pollinator studies are not yet numerous/standardized enough for a simple colour-category pooled effect; spectrum/UV, nectar and season must be incorporated.
 6. Identical visible yellow or red states can have different pigment composition, so visible-colour and mechanistic-state analyses must be run separately.
