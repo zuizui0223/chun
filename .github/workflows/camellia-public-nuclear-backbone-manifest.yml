@@ -1,0 +1,35 @@
+name: Camellia public nuclear backbone manifest
+
+on:
+  push:
+    paths:
+      - 'data/camellia_phylogeny_public_seeds_v0_1.csv'
+      - 'scripts/fetch_sra_runinfo.py'
+      - '.github/workflows/camellia-public-nuclear-backbone-manifest.yml'
+  pull_request:
+    paths:
+      - 'data/camellia_phylogeny_public_seeds_v0_1.csv'
+      - 'scripts/fetch_sra_runinfo.py'
+      - '.github/workflows/camellia-public-nuclear-backbone-manifest.yml'
+  workflow_dispatch:
+
+jobs:
+  resolve:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: |
+          mkdir -p /tmp/camellia-phylogeny-manifest
+          python scripts/fetch_sra_runinfo.py \
+            --seeds data/camellia_phylogeny_public_seeds_v0_1.csv \
+            --out-dir /tmp/camellia-phylogeny-manifest \
+            --include-status phylogeny_candidate
+          cat /tmp/camellia-phylogeny-manifest/manifest_fetch_summary.csv
+      - uses: actions/upload-artifact@v4
+        with:
+          name: camellia-public-nuclear-backbone-manifest
+          path: /tmp/camellia-phylogeny-manifest
+          if-no-files-found: error
