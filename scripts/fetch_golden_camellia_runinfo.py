@@ -1,10 +1,14 @@
 #!/usr/bin/env python3
-"""Resolve the 20 public golden-Camellia SRR accessions to live SRA metadata.
+"""Resolve and validate the 20 public golden-Camellia SRR accessions.
 
-The 2025 phylotranscriptomic paper deposited one leaf RNA-seq run per named
-accession/species rather than exposing a study accession in the article table.
-This resolver keys the live NCBI metadata to the frozen paper Table 1 mapping
-and refuses substitutions, missing runs, or duplicate SRRs.
+The source table freezes three different identities instead of collapsing them:
+
+- the taxon label published in Xie et al. (2025);
+- the current NCBI SRA ScientificName/BioSample provenance;
+- the later taxonomic-independence assessment used by this project.
+
+This script refuses silent archive drift. A change in SRR, BioProject,
+BioSample, or ScientificName must be re-audited before downstream use.
 """
 
 from __future__ import annotations
@@ -20,6 +24,10 @@ import urllib.request
 
 EUTILS = "https://eutils.ncbi.nlm.nih.gov/entrez/eutils"
 USER_AGENT = "chun-flower-colour/0.1 (golden Camellia public backbone audit)"
+EXPECTED_PROJECT = "PRJNA1050624"
+EXPECTED_MODEL = "Illumina HiSeq 2500"
+EXPECTED_LAYOUT = "PAIRED"
+EXPECTED_SOURCE = "TRANSCRIPTOMIC"
 
 
 def request_text(endpoint: str, params: dict[str, str], retries: int = 4) -> str:
@@ -76,6 +84,15 @@ def write_csv(path: pathlib.Path, rows: list[dict[str, str]]) -> None:
         writer.writerows(rows)
 
 
+def frozen_equal(
+    failures: list[str], *, code: str, field: str, frozen: str, live: str
+) -> None:
+    if frozen.strip() != live.strip():
+        failures.append(
+            f"{code}: live SRA {field} changed from frozen {frozen!r} to {live!r}"
+        )
+
+
 def main() -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument("--table", required=True, type=pathlib.Path)
@@ -101,15 +118,57 @@ def main() -> int:
         if live.get("Run", "") != srr:
             failures.append(f"{srr}: live RunInfo resolved to {live.get('Run', '')!r}")
             continue
+
+        code = paper["code"].strip()
+        frozen_equal(
+            failures,
+            code=code,
+            field="BioProject",
+            frozen=paper.get("bioproject", ""),
+            live=live.get("BioProject", ""),
+        )
+        frozen_equal(
+            failures,
+            code=code,
+            field="BioSample",
+            frozen=paper.get("biosample", ""),
+            live=live.get("BioSample", ""),
+        )
+        frozen_equal(
+            failures,
+            code=code,
+            field="ScientificName",
+            frozen=paper.get("sra_scientific_name", ""),
+            live=live.get("ScientificName", ""),
+        )
+
+        if live.get("BioProject", "") != EXPECTED_PROJECT:
+            failures.append(
+                f"{code}: expected common BioProject {EXPECTED_PROJECT}, got {live.get('BioProject','')!r}"
+            )
+        if live.get("Model", "") != EXPECTED_MODEL:
+            failures.append(
+                f"{code}: expected archive model {EXPECTED_MODEL}, got {live.get('Model','')!r}"
+            )
+        if live.get("LibraryLayout", "") != EXPECTED_LAYOUT:
+            failures.append(
+                f"{code}: expected paired libraries, got {live.get('LibraryLayout','')!r}"
+            )
+        if live.get("LibrarySource", "") != EXPECTED_SOURCE:
+            failures.append(
+                f"{code}: expected transcriptomic source, got {live.get('LibrarySource','')!r}"
+            )
+
         resolved.append(
             {
                 "code": paper["code"],
                 "published_taxon": paper["published_taxon"],
+                "archive_taxon_status": paper["archive_taxon_status"],
+                "taxonomic_independence_status": paper["taxonomic_independence_status"],
+                "taxonomic_note": paper["taxonomic_note"],
                 "original_habitat": paper["original_habitat"],
                 "country_or_region": paper["country_or_region"],
                 "soil_type": paper["soil_type"],
-                "taxonomic_independence_status": paper["taxonomic_independence_status"],
-                "taxonomic_note": paper["taxonomic_note"],
                 **live,
             }
         )
@@ -132,9 +191,16 @@ def main() -> int:
     biosamples = {row.get("BioSample", "") for row in resolved if row.get("BioSample", "")}
     models = sorted({row.get("Model", "") for row in resolved if row.get("Model", "")})
     layouts = sorted({row.get("LibraryLayout", "") for row in resolved if row.get("LibraryLayout", "")})
-    tissues = sorted({row.get("LibrarySource", "") for row in resolved if row.get("LibrarySource", "")})
+    sources = sorted({row.get("LibrarySource", "") for row in resolved if row.get("LibrarySource", "")})
+    exact = sum(1 for row in source if row.get("archive_taxon_status", "") == "exact")
     print(f"Resolved {len(resolved)} runs; BioProjects={projects}")
-    print(f"Unique BioSamples={len(biosamples)}; models={models}; layouts={layouts}; sources={tissues}")
+    print(
+        f"Unique BioSamples={len(biosamples)}; models={models}; layouts={layouts}; sources={sources}"
+    )
+    print(
+        f"Archive taxonomy: {exact}/20 exact published-name matches; remaining labels are "
+        "preserved as explicit taxonomy/nomenclature conflicts rather than overwritten."
+    )
     return 0
 
 
