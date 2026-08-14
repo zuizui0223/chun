@@ -7,6 +7,7 @@ on:
       - 'data/cirsium_run_taxon_audit_v0_1.csv'
       - 'data/public_sequence_metadata_conflicts_v0_1.csv'
       - 'scripts/fetch_sra_runinfo.py'
+      - 'scripts/fetch_biosample_metadata.py'
       - 'scripts/validate_sra_manifest_expectations.py'
       - '.github/workflows/public-sequence-manifest-gate.yml'
   workflow_dispatch:
@@ -17,7 +18,7 @@ permissions:
 jobs:
   manifest-gate:
     runs-on: ubuntu-latest
-    timeout-minutes: 15
+    timeout-minutes: 20
     steps:
       - uses: actions/checkout@v4
 
@@ -37,6 +38,12 @@ jobs:
           python scripts/validate_sra_manifest_expectations.py \
             --manifest-dir build/sra_manifests
 
+      - name: Fetch linked BioSample provenance
+        run: |
+          python scripts/fetch_biosample_metadata.py \
+            --manifest-dir build/sra_manifests \
+            --out-dir build/biosample_metadata
+
       - name: Summarize resolved runs
         if: always()
         run: |
@@ -48,11 +55,17 @@ jobs:
           else
             echo 'Manifest fetch did not produce a summary.' >> "$GITHUB_STEP_SUMMARY"
           fi
+          if [ -f build/biosample_metadata/biosample_records.csv ]; then
+            echo '' >> "$GITHUB_STEP_SUMMARY"
+            echo 'BioSample provenance records were recovered and included in the artifact.' >> "$GITHUB_STEP_SUMMARY"
+          fi
 
       - name: Upload frozen manifest candidate
         if: always()
         uses: actions/upload-artifact@v4
         with:
           name: public-sequence-manifest-candidate
-          path: build/sra_manifests
+          path: |
+            build/sra_manifests
+            build/biosample_metadata
           if-no-files-found: warn
