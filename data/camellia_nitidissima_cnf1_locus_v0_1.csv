@@ -1,0 +1,2 @@
+query_accession,anchored_transcript,protein_accession,gene_id,gene_accession,seqid,start,end,strand,exon_count,cds_count,intron_count,annotation_source,gff_sha256,workflow_run,artifact_id,artifact_digest,claim_status
+JF343560.1,GWHTFILD024733.1,GWHPFILD024733.1,Cpet08g10500,GWHGFILD020646.1,GWHFILD00000008.1,108431979,108443986,+,3,3,2,NGDC_GWH:GWHFILD00000000.1,9f4da82cb538bd9149512e29c396eb06f4b95eba15ff74e4ceb9c13227e3c07b,31769614230,9207625097,sha256:de872b550eca768600c3096dbd696d10eb9e9e811ab8ce54daebcde95be50451,admit_CnFLS1_T2T_locus
