@@ -1,0 +1,60 @@
+name: Golden Camellia public backbone
+
+on:
+  pull_request:
+    paths:
+      - 'data/golden_camellia_20_transcriptomes_v0_1.csv'
+      - 'scripts/fetch_golden_camellia_runinfo.py'
+      - '.github/workflows/golden-camellia-public-backbone.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  public-backbone:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Resolve the 20 published SRRs against live NCBI SRA
+        run: |
+          python scripts/fetch_golden_camellia_runinfo.py \
+            --table data/golden_camellia_20_transcriptomes_v0_1.csv \
+            --out build/golden_camellia/golden_camellia_20_live_runinfo.csv
+
+      - name: Summarize public yellow-lineage backbone
+        run: |
+          python - <<'PY'
+          import csv
+          from collections import Counter
+          p='build/golden_camellia/golden_camellia_20_live_runinfo.csv'
+          rows=list(csv.DictReader(open(p, newline='', encoding='utf-8')))
+          if len(rows) != 20:
+              raise SystemExit(f'expected 20 live rows, got {len(rows)}')
+          projects=Counter(r.get('BioProject','') for r in rows)
+          sci=Counter(r.get('ScientificName','') for r in rows)
+          tax=Counter(r.get('taxonomic_independence_status','') for r in rows)
+          vietnam=[r for r in rows if r.get('country_or_region') == 'Vietnam']
+          if len(vietnam) < 1:
+              raise SystemExit('Southeast Asian/Vietnam anchor disappeared from frozen table')
+          with open('/tmp/summary.md','w',encoding='utf-8') as h:
+              h.write('### Public 20-golden-Camellia transcriptome backbone\n\n')
+              h.write(f'- live SRR rows: **{len(rows)}**\n')
+              h.write(f'- BioProject(s): `{dict(projects)}`\n')
+              h.write(f'- Vietnam anchor(s): **{len(vietnam)}**\n')
+              h.write(f'- taxonomic-independence states: `{dict(tax)}`\n')
+              h.write(f'- SRA ScientificName states: **{len(sci)} unique**\n')
+          PY
+          cat /tmp/summary.md >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Upload live metadata audit
+        uses: actions/upload-artifact@v4
+        with:
+          name: golden-camellia-public-backbone
+          path: build/golden_camellia
