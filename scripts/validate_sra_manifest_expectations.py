@@ -113,7 +113,12 @@ def validate_archive_model_snapshot(
 
 
 def validate_camellia_stage_structure(manifest_rows: list[dict[str, str]]) -> list[str]:
-    """Validate the 5 x 3 archive grouping without inventing an S1-S5 mapping."""
+    """Validate the five archive groups x three replicates in RunInfo.
+
+    RunInfo itself does not explain the biological stage meaning; the subsequent
+    BioSample provenance gate independently verifies that groups 10/6/7/8/9 map
+    to stage1/stage2/stage3/stage4/stage5.
+    """
 
     failures: list[str] = []
     pattern = re.compile(r"^(?P<group>\d+)_rep(?P<rep>[123])$")
@@ -146,12 +151,10 @@ def validate_camellia_stage_structure(manifest_rows: list[dict[str, str]]) -> li
             )
 
     if not failures:
+        print("SEQ002: RunInfo structure is five numeric groups (6-10) x three replicates.")
         print(
-            "SEQ002: archive structure is five numeric groups (6-10) x three replicates."
-        )
-        print(
-            "SEQ002 IMPORTANT: this validates replicate structure only. The biological "
-            "mapping from archive groups 6-10 to publication stages S1-S5 is NOT established."
+            "SEQ002: biological S1-S5 meaning is verified later from BioSample dev_stage, "
+            "not inferred from these numeric RunInfo labels."
         )
     return failures
 
@@ -161,7 +164,7 @@ def validate_conflict_registry(path: pathlib.Path) -> list[str]:
     if not rows:
         return [f"metadata conflict registry missing or empty: {path}"]
     ids = {row.get("conflict_id", "").strip() for row in rows}
-    required = {"META001", "META002", "META003", "META004"}
+    required = {"META001", "META002", "META003", "META004", "META005", "META006"}
     missing = sorted(required - ids)
     if missing:
         return [f"metadata conflict registry lacks required entries: {missing}"]
