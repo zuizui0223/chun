@@ -1,4 +1,4 @@
-name: Camellia CnFLS1 locus context
+name: Camellia FLS-family locus context
 
 on:
   workflow_dispatch:
@@ -20,35 +20,67 @@ jobs:
 
       - name: Fetch authoritative GWH GFF3
         run: |
-          mkdir -p build/cnf1_locus
+          mkdir -p build/fls_loci
           curl -L --fail --retry 3 \
             'https://download.cncb.ac.cn/gwh/Plants/Camellia_nitidissima_Camellia_nitidissima_GWHFILD00000000.1/GWHFILD00000000.1.gff.gz' \
-            -o build/cnf1_locus/GWHFILD00000000.1.gff.gz
-          gzip -dc build/cnf1_locus/GWHFILD00000000.1.gff.gz \
-            > build/cnf1_locus/GWHFILD00000000.1.gff
-          sha256sum build/cnf1_locus/GWHFILD00000000.1.gff \
-            > build/cnf1_locus/gff.sha256
+            -o build/fls_loci/GWHFILD00000000.1.gff.gz
+          gzip -dc build/fls_loci/GWHFILD00000000.1.gff.gz \
+            > build/fls_loci/GWHFILD00000000.1.gff
+          sha256sum build/fls_loci/GWHFILD00000000.1.gff \
+            > build/fls_loci/gff.sha256
 
-      - name: Resolve the experimentally anchored transcript to its gene context
+      - name: Resolve all three anchored FLS-family transcripts to gene context
         run: |
-          python scripts/extract_gwh_locus_context.py \
-            --gff build/cnf1_locus/GWHFILD00000000.1.gff \
-            --transcript GWHTFILD024733.1 \
-            --out build/cnf1_locus/cnf1_locus_context.csv
+          for tx in GWHTFILD024733.1 GWHTFILD005297.1 GWHTFILD024731.1; do
+            python scripts/extract_gwh_locus_context.py \
+              --gff build/fls_loci/GWHFILD00000000.1.gff \
+              --transcript "$tx" \
+              --out "build/fls_loci/${tx}_locus_context.csv"
+          done
+
+      - name: Build one locus summary
+        run: |
+          python - <<'PY'
+          import csv, glob
+          rows=[]
+          for path in sorted(glob.glob('build/fls_loci/GWHTFILD*_locus_context.csv')):
+              data=list(csv.DictReader(open(path, newline='', encoding='utf-8')))
+              genes=[r for r in data if r['relation']=='gene']
+              txs=[r for r in data if r['relation']=='transcript']
+              if len(genes)!=1 or not txs:
+                  raise SystemExit(f'{path}: expected one gene and >=1 transcript record')
+              g=genes[0]
+              anchored=data[0]['anchored_transcript']
+              rows.append({
+                  'anchored_transcript': anchored,
+                  'gene_id': g['ID'],
+                  'seqid': g['seqid'],
+                  'start': g['start'],
+                  'end': g['end'],
+                  'strand': g['strand'],
+                  'feature_count': len(data),
+              })
+          if len(rows)!=3:
+              raise SystemExit(f'expected 3 FLS-family loci, found {len(rows)}')
+          with open('build/fls_loci/fls_family_locus_summary.csv','w',newline='',encoding='utf-8') as h:
+              w=csv.DictWriter(h,fieldnames=list(rows[0]))
+              w.writeheader(); w.writerows(rows)
+          PY
 
       - name: Report locus context
         run: |
-          echo '### CnFLS1 T2T locus context' >> "$GITHUB_STEP_SUMMARY"
+          echo '### C. nitidissima T2T FLS-family locus context' >> "$GITHUB_STEP_SUMMARY"
           echo '' >> "$GITHUB_STEP_SUMMARY"
           echo '```csv' >> "$GITHUB_STEP_SUMMARY"
-          cat build/cnf1_locus/cnf1_locus_context.csv >> "$GITHUB_STEP_SUMMARY"
+          cat build/fls_loci/fls_family_locus_summary.csv >> "$GITHUB_STEP_SUMMARY"
           echo '```' >> "$GITHUB_STEP_SUMMARY"
 
       - name: Upload locus audit
         uses: actions/upload-artifact@v4
         with:
-          name: camellia-cnf1-locus-context
+          name: camellia-fls-family-locus-context
           path: |
-            build/cnf1_locus/cnf1_locus_context.csv
-            build/cnf1_locus/gff.sha256
+            build/fls_loci/fls_family_locus_summary.csv
+            build/fls_loci/GWHTFILD*_locus_context.csv
+            build/fls_loci/gff.sha256
           if-no-files-found: error
