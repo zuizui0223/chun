@@ -6,9 +6,12 @@ on:
       - 'data/public_sequence_seeds_v0_1.csv'
       - 'data/cirsium_run_taxon_audit_v0_1.csv'
       - 'data/public_sequence_metadata_conflicts_v0_1.csv'
+      - 'data/cirsium_prjna1311153_admitted_manifest_v0_1.csv'
+      - 'data/camellia_srp112181_admitted_manifest_v0_1.csv'
       - 'scripts/fetch_sra_runinfo.py'
       - 'scripts/fetch_biosample_metadata.py'
       - 'scripts/validate_sra_manifest_expectations.py'
+      - 'scripts/validate_admitted_sample_manifests.py'
       - '.github/workflows/public-sequence-manifest-gate.yml'
   workflow_dispatch:
 
@@ -44,6 +47,12 @@ jobs:
             --manifest-dir build/sra_manifests \
             --out-dir build/biosample_metadata
 
+      - name: Validate frozen scientific sample manifests
+        run: |
+          python scripts/validate_admitted_sample_manifests.py \
+            --manifest-dir build/sra_manifests \
+            --biosample-dir build/biosample_metadata
+
       - name: Summarize resolved runs
         if: always()
         run: |
@@ -59,6 +68,8 @@ jobs:
             echo '' >> "$GITHUB_STEP_SUMMARY"
             echo 'BioSample provenance records were recovered and included in the artifact.' >> "$GITHUB_STEP_SUMMARY"
           fi
+          echo '' >> "$GITHUB_STEP_SUMMARY"
+          echo 'Frozen manifests: Cirsium 25 leaf runs; Camellia 15 flower runs with BioSample-backed S1-S5 mapping.' >> "$GITHUB_STEP_SUMMARY"
 
       - name: Upload frozen manifest candidate
         if: always()
