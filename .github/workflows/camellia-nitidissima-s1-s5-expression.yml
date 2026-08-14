@@ -1,0 +1,61 @@
+name: Camellia nitidissima S1-S5 expression
+
+on:
+  workflow_dispatch:
+  pull_request:
+    paths:
+      - 'data/camellia_srp112181_admitted_manifest_v0_1.csv'
+      - 'data/camellia_nitidissima_fls_anchor_v0_1.csv'
+      - 'scripts/run_camellia_nitidissima_s1_s5_expression.sh'
+      - 'scripts/summarize_camellia_fls_expression.py'
+      - '.github/workflows/camellia-nitidissima-s1-s5-expression.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  quantify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 180
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Salmon and SRA Toolkit
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq salmon sra-toolkit
+          salmon --version
+          fasterq-dump --version
+
+      - name: Requantify the 15 admitted flower libraries against the T2T transcriptome
+        run: |
+          bash scripts/run_camellia_nitidissima_s1_s5_expression.sh
+
+      - name: Report T2T-anchored FLS expression
+        run: |
+          echo '### C. nitidissima S1-S5 T2T expression' >> "$GITHUB_STEP_SUMMARY"
+          echo '' >> "$GITHUB_STEP_SUMMARY"
+          echo 'All 15 public flower libraries were quantified against the primary GWH T2T transcript annotation.' >> "$GITHUB_STEP_SUMMARY"
+          echo '' >> "$GITHUB_STEP_SUMMARY"
+          echo '#### Anchored FLS transcripts by stage' >> "$GITHUB_STEP_SUMMARY"
+          echo '```csv' >> "$GITHUB_STEP_SUMMARY"
+          cat build/camellia_nitidissima_s1_s5_expression/results/fls_expression_by_stage.csv >> "$GITHUB_STEP_SUMMARY"
+          echo '```' >> "$GITHUB_STEP_SUMMARY"
+          echo '' >> "$GITHUB_STEP_SUMMARY"
+          echo '#### Mapping summary' >> "$GITHUB_STEP_SUMMARY"
+          echo '```csv' >> "$GITHUB_STEP_SUMMARY"
+          cat build/camellia_nitidissima_s1_s5_expression/results/library_mapping_summary.csv >> "$GITHUB_STEP_SUMMARY"
+          echo '```' >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Upload expression audit
+        uses: actions/upload-artifact@v4
+        with:
+          name: camellia-nitidissima-s1-s5-expression
+          path: |
+            build/camellia_nitidissima_s1_s5_expression/results
+            build/camellia_nitidissima_s1_s5_expression/salmon_version.txt
+            build/camellia_nitidissima_s1_s5_expression/sra_toolkit_version.txt
+            build/camellia_nitidissima_s1_s5_expression/reference/RNA.sha256
+            build/camellia_nitidissima_s1_s5_expression/quant/*/quant.sf
+            build/camellia_nitidissima_s1_s5_expression/quant/*/aux_info/meta_info.json
+          if-no-files-found: error
