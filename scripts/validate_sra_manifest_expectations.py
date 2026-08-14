@@ -1,11 +1,19 @@
 #!/usr/bin/env python3
-"""Validate focal public SRA manifests before they become scientific inputs."""
+"""Validate focal public SRA manifests before they become scientific inputs.
+
+This gate intentionally separates archive consistency from biological meaning.
+A manifest can be internally stable while still carrying a known conflict with
+publication metadata; such conflicts are frozen in
+``data/public_sequence_metadata_conflicts_v0_1.csv`` and must not be silently
+resolved by downstream code.
+"""
 
 from __future__ import annotations
 
 import argparse
 import csv
 import pathlib
+import re
 
 EXPECTED = {
     # Chang et al. 2026 report 25 newly sequenced samples; the other 12 samples
@@ -13,6 +21,16 @@ EXPECTED = {
     "SEQ001": {"min_runs": 25, "expected_runs": 25},
     # Zhou et al. 2017: five flower stages x three biological replicates.
     "SEQ002": {"min_runs": 15, "expected_runs": 15},
+}
+
+# These are the current SRA RunInfo values, not an assertion that the archive
+# value is biologically/methodologically correct. In particular, SEQ001 is a
+# known publication-vs-archive conflict: the paper reports NovaSeq whereas the
+# current SRA records say MiniSeq. Freezing the live value makes future archive
+# edits visible instead of silently changing the analysis provenance.
+EXPECTED_ARCHIVE_MODELS = {
+    "SEQ001": {"Illumina MiniSeq"},
+    "SEQ002": {"Illumina HiSeq 2500"},
 }
 
 
@@ -74,6 +92,83 @@ def validate_cirsium_taxon_audit(
     return failures
 
 
+def validate_archive_model_snapshot(
+    seed_id: str, manifest_rows: list[dict[str, str]]
+) -> list[str]:
+    observed = {row.get("Model", "").strip() for row in manifest_rows if row.get("Model", "").strip()}
+    expected = EXPECTED_ARCHIVE_MODELS[seed_id]
+    if observed != expected:
+        return [
+            f"{seed_id}: SRA Model metadata changed: observed={sorted(observed)}, "
+            f"frozen={sorted(expected)}; re-audit publication/archive provenance"
+        ]
+    print(f"{seed_id}: current SRA Model snapshot frozen as {sorted(observed)}")
+    if seed_id == "SEQ001":
+        print(
+            "SEQ001 WARNING: publication reports Illumina NovaSeq, while current SRA "
+            "RunInfo reports Illumina MiniSeq. Conflict remains unresolved; neither "
+            "value may silently overwrite the other."
+        )
+    return []
+
+
+def validate_camellia_stage_structure(manifest_rows: list[dict[str, str]]) -> list[str]:
+    """Validate the 5 x 3 archive grouping without inventing an S1-S5 mapping."""
+
+    failures: list[str] = []
+    pattern = re.compile(r"^(?P<group>\d+)_rep(?P<rep>[123])$")
+    groups: dict[str, set[str]] = {}
+    unparsed: list[str] = []
+
+    for row in manifest_rows:
+        label = (row.get("LibraryName") or row.get("SampleName") or "").strip()
+        match = pattern.match(label)
+        if not match:
+            unparsed.append(label)
+            continue
+        groups.setdefault(match.group("group"), set()).add(match.group("rep"))
+
+    if unparsed:
+        failures.append(f"SEQ002: unparsed LibraryName labels: {sorted(unparsed)}")
+
+    expected_groups = {"6", "7", "8", "9", "10"}
+    if set(groups) != expected_groups:
+        failures.append(
+            f"SEQ002: SRA developmental group labels changed: observed={sorted(groups)}, "
+            f"frozen={sorted(expected_groups)}"
+        )
+
+    for group in sorted(groups):
+        if groups[group] != {"1", "2", "3"}:
+            failures.append(
+                f"SEQ002: archive group {group} has replicate labels {sorted(groups[group])}; "
+                "expected rep1, rep2, rep3"
+            )
+
+    if not failures:
+        print(
+            "SEQ002: archive structure is five numeric groups (6-10) x three replicates."
+        )
+        print(
+            "SEQ002 IMPORTANT: this validates replicate structure only. The biological "
+            "mapping from archive groups 6-10 to publication stages S1-S5 is NOT established."
+        )
+    return failures
+
+
+def validate_conflict_registry(path: pathlib.Path) -> list[str]:
+    rows = read_rows(path)
+    if not rows:
+        return [f"metadata conflict registry missing or empty: {path}"]
+    ids = {row.get("conflict_id", "").strip() for row in rows}
+    required = {"META001", "META002", "META003", "META004"}
+    missing = sorted(required - ids)
+    if missing:
+        return [f"metadata conflict registry lacks required entries: {missing}"]
+    print(f"Metadata conflict registry loaded: {len(rows)} entries")
+    return []
+
+
 def main() -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument("--manifest-dir", required=True, type=pathlib.Path)
@@ -81,6 +176,11 @@ def main() -> int:
         "--cirsium-taxon-audit",
         type=pathlib.Path,
         default=pathlib.Path("data/cirsium_run_taxon_audit_v0_1.csv"),
+    )
+    parser.add_argument(
+        "--metadata-conflicts",
+        type=pathlib.Path,
+        default=pathlib.Path("data/public_sequence_metadata_conflicts_v0_1.csv"),
     )
     args = parser.parse_args()
 
@@ -112,9 +212,14 @@ def main() -> int:
                 f"{seed_id}: {duplicate_rows} duplicate/non-unique run rows; inspect RunInfo"
             )
         print(f"{seed_id}: {len(runs)} unique runs in {matches[0].name}")
+        failures.extend(validate_archive_model_snapshot(seed_id, rows))
+
+    failures.extend(validate_conflict_registry(args.metadata_conflicts))
 
     if "SEQ001" in manifests:
         failures.extend(validate_cirsium_taxon_audit(manifests["SEQ001"], args.cirsium_taxon_audit))
+    if "SEQ002" in manifests:
+        failures.extend(validate_camellia_stage_structure(manifests["SEQ002"]))
 
     if failures:
         print("\nManifest admission gate FAILED:")
@@ -122,7 +227,14 @@ def main() -> int:
             print(f"- {item}")
         return 1
 
-    print("Manifest admission gate passed for all focal datasets and frozen taxon mappings.")
+    print(
+        "Manifest admission gate passed for run counts, frozen archive metadata, "
+        "Cirsium taxon mappings, and Camellia replicate structure."
+    )
+    print(
+        "Known biological/provenance conflicts remain explicit and must be resolved "
+        "before the corresponding downstream claim is admitted."
+    )
     return 0
 
 
