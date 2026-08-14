@@ -4,6 +4,8 @@ on:
   pull_request:
     paths:
       - 'data/public_sequence_seeds_v0_1.csv'
+      - 'data/cirsium_run_taxon_audit_v0_1.csv'
+      - 'data/public_sequence_metadata_conflicts_v0_1.csv'
       - 'scripts/fetch_sra_runinfo.py'
       - 'scripts/validate_sra_manifest_expectations.py'
       - '.github/workflows/public-sequence-manifest-gate.yml'
@@ -30,7 +32,7 @@ jobs:
             --out-dir build/sra_manifests \
             --include-status admit
 
-      - name: Validate literature-to-SRA sample expectations
+      - name: Validate run counts, archive metadata, and provenance gates
         run: |
           python scripts/validate_sra_manifest_expectations.py \
             --manifest-dir build/sra_manifests
