@@ -1,0 +1,5 @@
+summary_type,group,n_species,value_1_name,value_1,value_2_name,value_2,value_3_name,value_3
+spearman,n_points_vs_max_abs_loo_q05,50,rho,-0.5204686190,p_value,0.0001068561,,
+binned_stability,n_5_9,10,median_max_abs_loo_q05_C,0.610,mean_max_abs_loo_q05_C,0.9935,p90_max_abs_loo_q05_C,2.241
+binned_stability,n_10_19,13,median_max_abs_loo_q05_C,0.670,mean_max_abs_loo_q05_C,1.150769,p90_max_abs_loo_q05_C,2.249
+binned_stability,n_20_plus,27,median_max_abs_loo_q05_C,0.285,mean_max_abs_loo_q05_C,0.350926,p90_max_abs_loo_q05_C,0.707
