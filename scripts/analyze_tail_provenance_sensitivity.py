@@ -2,16 +2,20 @@
 """Separate occurrence provenance from lower-tail estimator stability.
 
 The input is the retained per-occurrence CHELSA table from the Fan2026 GBIF
-workflow.  Record exclusions are explicit in a versioned evidence ledger and
-are applied cumulatively as sensitivity stages; the raw table is never silently
+workflow. Record exclusions are explicit in a versioned evidence ledger and are
+applied cumulatively as sensitivity stages; the raw table is never silently
 mutated.
 
 Outputs:
 - A/W BIO6 comparisons under staged provenance gates;
 - sample-size sensitivity after the strongest admitted gate;
-- leave-one-record-out leverage of each species' BIO6 q05.
+- leave-one-record-out leverage of each species' BIO6 q05;
+- transparent provisional boundary-admission tiers;
+- fixed-n resampling to separate unequal sampling from colour-state contrasts.
 
-This is an admission/robustness analysis, not a phylogenetic causal model.
+The admission tiers are diagnostics, not biological truth thresholds. They are
+used to expose ascertainment/coverage loss before any phylogenetic branch-event
+model is attempted.
 """
 from __future__ import annotations
 
@@ -72,8 +76,8 @@ def summarize(df: pd.DataFrame) -> pd.DataFrame:
 
 
 def permutation_test(
-    x: pd.Series,
-    y: pd.Series,
+    x: pd.Series | np.ndarray,
+    y: pd.Series | np.ndarray,
     n: int = 100_000,
     seed: int = 20260815,
 ) -> tuple[float, float, float]:
@@ -109,6 +113,7 @@ def main() -> None:
     ap.add_argument("--flags", type=Path, required=True)
     ap.add_argument("--out-dir", type=Path, required=True)
     ap.add_argument("--permutations", type=int, default=100_000)
+    ap.add_argument("--fixed-n-replicates", type=int, default=5_000)
     args = ap.parse_args()
 
     points = pd.read_csv(args.thermal_points)
@@ -220,8 +225,138 @@ def main() -> None:
             }
         )
 
-    pd.DataFrame(loo_rows).to_csv(
-        args.out_dir / "q05_leave_one_record_stability.csv", index=False
+    loo = pd.DataFrame(loo_rows)
+    loo.to_csv(args.out_dir / "q05_leave_one_record_stability.csv", index=False)
+
+    # Diagnostic admission tiers. These thresholds are intentionally explicit
+    # and must not be mistaken for universally validated biological cutoffs.
+    admission = loo.copy()
+    admission["provisional_minimum_gate_n20_loo1C"] = (
+        (admission["n_points"] >= 20)
+        & (admission["max_abs_loo_q05_change_C"] <= 1.0)
+    )
+    admission["provisional_strong_gate_n40_loo0_5C"] = (
+        (admission["n_points"] >= 40)
+        & (admission["max_abs_loo_q05_change_C"] <= 0.5)
+    )
+    admission["minimum_gate_reason"] = np.where(
+        admission["provisional_minimum_gate_n20_loo1C"],
+        "pass",
+        np.where(
+            admission["n_points"] < 20,
+            "n_points_lt_20",
+            "q05_loo_gt_1C",
+        ),
+    )
+    admission["strong_gate_reason"] = np.where(
+        admission["provisional_strong_gate_n40_loo0_5C"],
+        "pass",
+        np.where(
+            admission["n_points"] < 40,
+            "n_points_lt_40",
+            "q05_loo_gt_0_5C",
+        ),
+    )
+    admission.to_csv(args.out_dir / "boundary_admission_tiers.csv", index=False)
+
+    admission_summary = []
+    for gi, (gate_name, col) in enumerate(
+        (
+            ("minimum_n20_loo1C", "provisional_minimum_gate_n20_loo1C"),
+            ("strong_n40_loo0_5C", "provisional_strong_gate_n40_loo0_5C"),
+        )
+    ):
+        for state in ("A", "W", "Y"):
+            sub = admission[admission["colour_state"] == state]
+            admission_summary.append(
+                {
+                    "gate": gate_name,
+                    "summary_type": "retention",
+                    "state_or_test": state,
+                    "n_total": len(sub),
+                    "n_pass": int(sub[col].sum()),
+                    "pass_fraction": sub[col].mean(),
+                    "difference_A_minus_W": "",
+                    "two_sided_p": "",
+                }
+            )
+        sub = admission[
+            admission[col] & admission["colour_state"].isin(["A", "W"])
+        ]
+        A = sub.loc[sub["colour_state"] == "A", "bio6_q05"]
+        W = sub.loc[sub["colour_state"] == "W", "bio6_q05"]
+        diff, p_two, _ = permutation_test(
+            A,
+            W,
+            n=args.permutations,
+            seed=20261000 + gi,
+        )
+        admission_summary.append(
+            {
+                "gate": gate_name,
+                "summary_type": "AW_q05_test",
+                "state_or_test": "A_vs_W",
+                "n_total": len(sub),
+                "n_pass": "",
+                "pass_fraction": "",
+                "difference_A_minus_W": diff,
+                "two_sided_p": p_two,
+            }
+        )
+    pd.DataFrame(admission_summary).to_csv(
+        args.out_dir / "boundary_admission_summary.csv", index=False
+    )
+
+    # Equalize occurrence sample size among taxa already having >=20 S3-cleaned
+    # points. The resampling interval captures occurrence-sampling uncertainty;
+    # it is not a phylogenetic confidence interval.
+    eligible = [
+        (taxon, g)
+        for taxon, g in current.groupby("taxon", sort=True)
+        if len(g) >= 20 and g["colour_state"].iloc[0] in ("A", "W")
+    ]
+    rng = np.random.default_rng(20260815)
+    fixed_metrics = ("bio6_q05", "bio6_min", "bio6_lower20_mean")
+    diffs = {m: [] for m in fixed_metrics}
+    for _ in range(args.fixed_n_replicates):
+        by_state = {
+            "A": {m: [] for m in fixed_metrics},
+            "W": {m: [] for m in fixed_metrics},
+        }
+        for _, g in eligible:
+            b = np.asarray(g["bio6"], float)
+            sample = rng.choice(b, size=20, replace=False)
+            state = g["colour_state"].iloc[0]
+            by_state[state]["bio6_q05"].append(np.quantile(sample, 0.05))
+            by_state[state]["bio6_min"].append(np.min(sample))
+            by_state[state]["bio6_lower20_mean"].append(
+                np.sort(sample)[:4].mean()
+            )
+        for metric in fixed_metrics:
+            diffs[metric].append(
+                np.mean(by_state["A"][metric]) - np.mean(by_state["W"][metric])
+            )
+
+    fixed_rows = []
+    nA = sum(g["colour_state"].iloc[0] == "A" for _, g in eligible)
+    nW = sum(g["colour_state"].iloc[0] == "W" for _, g in eligible)
+    for metric, values in diffs.items():
+        values = np.asarray(values, float)
+        fixed_rows.append(
+            {
+                "metric": metric,
+                "n_species_A": nA,
+                "n_species_W": nW,
+                "sampled_points_per_species": 20,
+                "n_replicates": args.fixed_n_replicates,
+                "mean_difference_A_minus_W": values.mean(),
+                "q025": np.quantile(values, 0.025),
+                "q975": np.quantile(values, 0.975),
+                "fraction_A_lower": np.mean(values < 0),
+            }
+        )
+    pd.DataFrame(fixed_rows).to_csv(
+        args.out_dir / "fixed_n20_tail_resampling.csv", index=False
     )
 
 
