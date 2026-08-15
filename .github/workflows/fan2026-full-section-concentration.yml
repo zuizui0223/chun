@@ -1,0 +1,79 @@
+name: Fan 2026 full colour-section concentration
+
+on:
+  pull_request:
+    paths:
+      - 'scripts/build_fan2026_species_colour_seed.py'
+      - 'scripts/analyze_fan2026_full_section_concentration.py'
+      - '.github/workflows/fan2026-full-section-concentration.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  analyze:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install dependencies
+        run: python -m pip install --disable-pip-version-check openpyxl numpy
+      - name: Acquire Fan 2026 Data S1
+        run: |
+          mkdir -p build/fan_full/package build/fan_full/result
+          curl --fail --location --retry 3 'https://www.ncbi.nlm.nih.gov/pmc/utils/oa/oa.fcgi?id=PMC12946509' -o build/fan_full/oa.xml
+          python - <<'PY'
+          import xml.etree.ElementTree as ET
+          from pathlib import Path
+          root=ET.fromstring(Path('build/fan_full/oa.xml').read_bytes())
+          links=[x.attrib.get('href','') for x in root.findall('.//link') if x.attrib.get('format')=='tgz']
+          if len(links)!=1: raise SystemExit(f'unexpected OA links {links}')
+          u=links[0]
+          if u.startswith('ftp://ftp.ncbi.nlm.nih.gov/'):
+              u='https://ftp.ncbi.nlm.nih.gov/'+u.split('ftp://ftp.ncbi.nlm.nih.gov/',1)[1]
+          Path('build/fan_full/url').write_text(u+'\n')
+          PY
+          u=$(cat build/fan_full/url)
+          if ! curl --fail --location --retry 3 --retry-all-errors "$u" -o build/fan_full/a.tgz; then
+            u2=$(python - <<'PY'
+          from pathlib import Path
+          u=Path('build/fan_full/url').read_text().strip(); m='https://ftp.ncbi.nlm.nih.gov/pub/pmc/'
+          print(u.replace(m,m+'deprecated/',1) if u.startswith(m) and '/deprecated/' not in u else u)
+          PY
+          )
+            curl --fail --location --retry 3 --retry-all-errors "$u2" -o build/fan_full/a.tgz
+          fi
+          tar -xzf build/fan_full/a.tgz -C build/fan_full/package
+          xlsx=$(find build/fan_full/package -type f -iname '*s002*.xlsx' | head -n 1)
+          test -n "$xlsx"
+          cp "$xlsx" build/fan_full/DataS1.xlsx
+      - name: Build deterministic species seed
+        run: |
+          python scripts/build_fan2026_species_colour_seed.py \
+            build/fan_full/DataS1.xlsx \
+            --output build/fan_full/fan_species_colour_seed.csv \
+            --audit build/fan_full/seed_audit.json
+      - name: Run count-controlled concentration test
+        run: |
+          python scripts/analyze_fan2026_full_section_concentration.py \
+            build/fan_full/fan_species_colour_seed.csv \
+            --output build/fan_full/result/state_concentration.csv \
+            --section-table build/fan_full/result/section_table.csv \
+            --permutations 100000 --seed 20260815
+      - name: Report
+        run: |
+          echo '### Seed audit' >> "$GITHUB_STEP_SUMMARY"
+          cat build/fan_full/seed_audit.json >> "$GITHUB_STEP_SUMMARY"
+          echo '### Count-controlled state concentration' >> "$GITHUB_STEP_SUMMARY"
+          cat build/fan_full/result/state_concentration.csv >> "$GITHUB_STEP_SUMMARY"
+          echo '### Section table' >> "$GITHUB_STEP_SUMMARY"
+          cat build/fan_full/result/section_table.csv >> "$GITHUB_STEP_SUMMARY"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: fan2026-full-colour-section-concentration
+          path: build/fan_full
+          if-no-files-found: error
