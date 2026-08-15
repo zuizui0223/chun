@@ -20,32 +20,55 @@ jobs:
         with:
           python-version: '3.12'
       - run: python -m pip install --disable-pip-version-check openpyxl
-      - name: Download open-access Wiley Data S1
+      - name: Acquire open-access supporting data
         run: |
           mkdir -p build/fan2026_datas1
-          url='https://onlinelibrary.wiley.com/action/downloadSupplement?doi=10.1111%2Fpbi.70442&file=pbi70442-sup-0002-DataS1.xlsx'
-          curl --fail --location --retry 3 --retry-all-errors \
-            -A 'Mozilla/5.0 chun-public-data-audit/0.1' \
-            "$url" -o build/fan2026_datas1/DataS1.xlsx
-          python - <<'PY'
+          wiley='https://onlinelibrary.wiley.com/action/downloadSupplement?doi=10.1111%2Fpbi.70442&file=pbi70442-sup-0002-DataS1.xlsx'
+          if curl --fail --location --retry 1 -A 'Mozilla/5.0 chun-public-data-audit/0.2' "$wiley" -o build/fan2026_datas1/DataS1.xlsx; then
+            python - <<'PY'
           from pathlib import Path
           p=Path('build/fan2026_datas1/DataS1.xlsx')
-          print('bytes',p.stat().st_size)
           if p.read_bytes()[:2] != b'PK':
-              raise SystemExit('download is not an XLSX/ZIP file')
+              raise SystemExit('Wiley response is not an XLSX/ZIP file')
+          print('Wiley Data S1 bytes',p.stat().st_size)
           PY
-      - name: Inventory supporting workbook
+          else
+            rm -f build/fan2026_datas1/DataS1.xlsx
+            echo 'Wiley direct supplement returned an access error; using official PMC supplementary-material API.'
+          fi
+          curl --fail --location --retry 3 \
+            'https://www.ncbi.nlm.nih.gov/research/bionlp/RESTful/supplmat.cgi/bioc_json/PMC12946509/list' \
+            -o build/fan2026_datas1/pmc_supplement_list.json
+          curl --fail --location --retry 3 \
+            'https://www.ncbi.nlm.nih.gov/research/bionlp/RESTful/supplmat_relevant.cgi/bioc_json/PMC12946509/PBI-24-1725-s002.xlsx' \
+            -o build/fan2026_datas1/PBI-24-1725-s002.bioc.json
+          python - <<'PY'
+          from pathlib import Path
+          for p in [Path('build/fan2026_datas1/pmc_supplement_list.json'), Path('build/fan2026_datas1/PBI-24-1725-s002.bioc.json')]:
+              print(p.name, p.stat().st_size, 'bytes')
+              print(p.read_text(encoding='utf-8',errors='replace')[:2000])
+          PY
+      - name: Inventory downloaded XLSX when available
         run: |
-          python scripts/audit_fan2026_datas1.py \
-            build/fan2026_datas1/DataS1.xlsx \
-            --out-dir build/fan2026_datas1/extracted
+          if [ -f build/fan2026_datas1/DataS1.xlsx ]; then
+            python scripts/audit_fan2026_datas1.py \
+              build/fan2026_datas1/DataS1.xlsx \
+              --out-dir build/fan2026_datas1/extracted
+          fi
       - name: Report
         if: always()
         run: |
+          echo '### Fan 2026 supporting-data audit' >> "$GITHUB_STEP_SUMMARY"
           if [ -f build/fan2026_datas1/extracted/sheet_inventory.csv ]; then
-            echo '### Fan 2026 Data S1 inventory' >> "$GITHUB_STEP_SUMMARY"
+            echo '#### XLSX inventory' >> "$GITHUB_STEP_SUMMARY"
             echo '```csv' >> "$GITHUB_STEP_SUMMARY"
             cat build/fan2026_datas1/extracted/sheet_inventory.csv >> "$GITHUB_STEP_SUMMARY"
+            echo '```' >> "$GITHUB_STEP_SUMMARY"
+          fi
+          if [ -f build/fan2026_datas1/pmc_supplement_list.json ]; then
+            echo '#### PMC supplementary list' >> "$GITHUB_STEP_SUMMARY"
+            echo '```json' >> "$GITHUB_STEP_SUMMARY"
+            cat build/fan2026_datas1/pmc_supplement_list.json >> "$GITHUB_STEP_SUMMARY"
             echo '```' >> "$GITHUB_STEP_SUMMARY"
           fi
       - uses: actions/upload-artifact@v4
