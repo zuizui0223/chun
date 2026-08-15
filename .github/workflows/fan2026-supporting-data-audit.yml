@@ -20,41 +20,59 @@ jobs:
         with:
           python-version: '3.12'
       - run: python -m pip install --disable-pip-version-check openpyxl
-      - name: Acquire open-access supporting data
+      - name: Acquire open-access Data S1 through PMC OA package
         run: |
-          mkdir -p build/fan2026_datas1
-          wiley='https://onlinelibrary.wiley.com/action/downloadSupplement?doi=10.1111%2Fpbi.70442&file=pbi70442-sup-0002-DataS1.xlsx'
-          if curl --fail --location --retry 1 -A 'Mozilla/5.0 chun-public-data-audit/0.2' "$wiley" -o build/fan2026_datas1/DataS1.xlsx; then
-            python - <<'PY'
-          from pathlib import Path
-          p=Path('build/fan2026_datas1/DataS1.xlsx')
-          if p.read_bytes()[:2] != b'PK':
-              raise SystemExit('Wiley response is not an XLSX/ZIP file')
-          print('Wiley Data S1 bytes',p.stat().st_size)
-          PY
-          else
-            rm -f build/fan2026_datas1/DataS1.xlsx
-            echo 'Wiley direct supplement returned an access error; using official PMC supplementary-material API.'
-          fi
+          mkdir -p build/fan2026_datas1/package
           curl --fail --location --retry 3 \
-            'https://www.ncbi.nlm.nih.gov/research/bionlp/RESTful/supplmat.cgi/bioc_json/PMC12946509/list' \
-            -o build/fan2026_datas1/pmc_supplement_list.json
-          curl --fail --location --retry 3 \
-            'https://www.ncbi.nlm.nih.gov/research/bionlp/RESTful/supplmat_relevant.cgi/bioc_json/PMC12946509/PBI-24-1725-s002.xlsx' \
-            -o build/fan2026_datas1/PBI-24-1725-s002.bioc.json
+            'https://www.ncbi.nlm.nih.gov/pmc/utils/oa/oa.fcgi?id=PMC12946509' \
+            -o build/fan2026_datas1/oa_record.xml
           python - <<'PY'
           from pathlib import Path
-          for p in [Path('build/fan2026_datas1/pmc_supplement_list.json'), Path('build/fan2026_datas1/PBI-24-1725-s002.bioc.json')]:
-              print(p.name, p.stat().st_size, 'bytes')
-              print(p.read_text(encoding='utf-8',errors='replace')[:2000])
+          import xml.etree.ElementTree as ET
+          p=Path('build/fan2026_datas1/oa_record.xml')
+          root=ET.fromstring(p.read_bytes())
+          links=root.findall('.//link')
+          tgz=[x.attrib.get('href','') for x in links if x.attrib.get('format')=='tgz']
+          if len(tgz)!=1:
+              raise SystemExit(f'expected one PMC OA tgz link, observed {tgz}; response={p.read_text(errors="replace")[:2000]}')
+          href=tgz[0]
+          if href.startswith('ftp://ftp.ncbi.nlm.nih.gov/'):
+              href='https://ftp.ncbi.nlm.nih.gov/'+href.split('ftp://ftp.ncbi.nlm.nih.gov/',1)[1]
+          Path('build/fan2026_datas1/package_url.txt').write_text(href+'\n')
+          print('OA package',href)
           PY
-      - name: Inventory downloaded XLSX when available
-        run: |
-          if [ -f build/fan2026_datas1/DataS1.xlsx ]; then
-            python scripts/audit_fan2026_datas1.py \
-              build/fan2026_datas1/DataS1.xlsx \
-              --out-dir build/fan2026_datas1/extracted
+          url=$(cat build/fan2026_datas1/package_url.txt)
+          if ! curl --fail --location --retry 3 --retry-all-errors "$url" -o build/fan2026_datas1/PMC12946509.tar.gz; then
+            # April 2026 PMC transition moved legacy FTP paths under deprecated/.
+            deprecated=$(python - <<'PY'
+          from pathlib import Path
+          u=Path('build/fan2026_datas1/package_url.txt').read_text().strip()
+          marker='https://ftp.ncbi.nlm.nih.gov/pub/pmc/'
+          print(u.replace(marker,marker+'deprecated/',1) if u.startswith(marker) and '/deprecated/' not in u else u)
+          PY
+          )
+            curl --fail --location --retry 3 --retry-all-errors "$deprecated" -o build/fan2026_datas1/PMC12946509.tar.gz
           fi
+          tar -xzf build/fan2026_datas1/PMC12946509.tar.gz -C build/fan2026_datas1/package
+          find build/fan2026_datas1/package -type f -maxdepth 3 -printf '%P\n' | sort | tee build/fan2026_datas1/package_file_list.txt
+          candidate=$(find build/fan2026_datas1/package -type f \( -iname '*s002*.xlsx' -o -iname '*DataS1*.xlsx' \) | head -n 1)
+          if [ -z "$candidate" ]; then
+            echo 'Data S1 XLSX not present in OA package.' >&2
+            exit 2
+          fi
+          cp "$candidate" build/fan2026_datas1/DataS1.xlsx
+          python - <<'PY'
+          from pathlib import Path
+          p=Path('build/fan2026_datas1/DataS1.xlsx')
+          print('Data S1 bytes',p.stat().st_size)
+          if p.read_bytes()[:2] != b'PK':
+              raise SystemExit('OA package Data S1 is not an XLSX/ZIP file')
+          PY
+      - name: Inventory supporting workbook
+        run: |
+          python scripts/audit_fan2026_datas1.py \
+            build/fan2026_datas1/DataS1.xlsx \
+            --out-dir build/fan2026_datas1/extracted
       - name: Report
         if: always()
         run: |
@@ -65,10 +83,10 @@ jobs:
             cat build/fan2026_datas1/extracted/sheet_inventory.csv >> "$GITHUB_STEP_SUMMARY"
             echo '```' >> "$GITHUB_STEP_SUMMARY"
           fi
-          if [ -f build/fan2026_datas1/pmc_supplement_list.json ]; then
-            echo '#### PMC supplementary list' >> "$GITHUB_STEP_SUMMARY"
-            echo '```json' >> "$GITHUB_STEP_SUMMARY"
-            cat build/fan2026_datas1/pmc_supplement_list.json >> "$GITHUB_STEP_SUMMARY"
+          if [ -f build/fan2026_datas1/package_file_list.txt ]; then
+            echo '#### OA package files' >> "$GITHUB_STEP_SUMMARY"
+            echo '```' >> "$GITHUB_STEP_SUMMARY"
+            cat build/fan2026_datas1/package_file_list.txt >> "$GITHUB_STEP_SUMMARY"
             echo '```' >> "$GITHUB_STEP_SUMMARY"
           fi
       - uses: actions/upload-artifact@v4
