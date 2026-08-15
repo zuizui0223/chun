@@ -31,9 +31,10 @@ def binom_two_sided(k: int, n: int, p: float = 0.5) -> float:
 
 
 def beta_tail_gt_half(alpha: int, beta: int) -> float:
-    # For integer alpha/beta, P(Beta(alpha,beta)>0.5) equals a binomial tail.
+    # For integer alpha/beta and x=0.5:
+    # P(Beta(alpha,beta)>0.5) = P(Binomial(alpha+beta-1,0.5) <= alpha-1).
     n = alpha + beta - 1
-    return sum(math.comb(n, j) * 0.5**n for j in range(alpha, n+1))
+    return sum(math.comb(n, j) * 0.5**n for j in range(0, alpha))
 
 
 def main() -> int:
