@@ -12,66 +12,45 @@ permissions:
 jobs:
   audit:
     runs-on: ubuntu-latest
-    timeout-minutes: 15
+    timeout-minutes: 8
     steps:
       - uses: actions/checkout@v4
-      - name: Download representative Wu/TPIA assemblies
+      - name: Download one representative Wu/TPIA assembly
         run: |
-          mkdir -p build/wu_format/download build/wu_format/extracted
-          python - <<'PY'
-          import csv, pathlib, urllib.parse, urllib.request
-          # Representative source-table lineages / colours in the current programme.
-          taxa = [
-            ('Camellia pilosperma','Camellia pilosperma.zip'),
-            ('Camellia reticulata','Camellia reticulata.zip'),
-            ('Camellia euphlebia','Camellia euphlebia.zip'),
-          ]
-          base='https://tpia.teaplants.cn/web/Download/Transcriptome_data/'
-          out=pathlib.Path('build/wu_format/download')
-          for tax,fn in taxa:
-              url=base+urllib.parse.quote(fn)
-              req=urllib.request.Request(url,headers={'User-Agent':'Mozilla/5.0 chun-backbone-format-audit/0.1'})
-              with urllib.request.urlopen(req,timeout=120) as r:
-                  data=r.read()
-              p=out/fn.replace(' ','_')
-              p.write_bytes(data)
-              print(tax, len(data), url)
-          PY
-      - name: Inventory archives and sequence types
+          mkdir -p build/wu_format/download
+          # Use the live All-assemblies endpoint rather than the slower bulk endpoint.
+          # C. albo-sericea is PRJNA665925 and its advertised assembly is relatively small.
+          curl --fail --location --retry 2 --retry-all-errors \
+            --connect-timeout 15 --max-time 180 \
+            'https://tpia.teaplants.cn/web/All_assemblies/Fasta/194_Camellia%20albo-sericea.zip' \
+            -o build/wu_format/download/Camellia_albo-sericea.zip
+          ls -lh build/wu_format/download/Camellia_albo-sericea.zip
+      - name: Inventory archive and sequence types
         run: |
           python - <<'PY'
           from pathlib import Path
-          import zipfile, gzip, json, re, shutil
-          root=Path('build/wu_format')
-          result=[]
-          for zp in sorted((root/'download').glob('*')):
-              rec={'archive':zp.name,'bytes':zp.stat().st_size,'members':[]}
-              try:
-                  z=zipfile.ZipFile(zp)
-              except Exception as e:
-                  rec['zip_error']=str(e); result.append(rec); continue
-              dest=root/'extracted'/zp.stem; dest.mkdir(parents=True,exist_ok=True)
+          import zipfile, gzip, json
+          zp=Path('build/wu_format/download/Camellia_albo-sericea.zip')
+          rec={'archive':zp.name,'bytes':zp.stat().st_size,'members':[]}
+          with zipfile.ZipFile(zp) as z:
               for info in z.infolist():
                   if info.is_dir(): continue
                   name=info.filename
                   member={'name':name,'bytes_uncompressed':info.file_size}
-                  # Read only first 1 MiB to classify without unnecessary extraction.
-                  with z.open(info) as fh: head=fh.read(1024*1024)
+                  with z.open(info) as fh: head=fh.read(min(info.file_size,1024*1024))
                   if name.lower().endswith('.gz'):
                       try: head=gzip.decompress(head)
                       except Exception: pass
                   txt=head.decode('utf-8',errors='ignore')
                   headers=[ln for ln in txt.splitlines() if ln.startswith('>')][:3]
                   seq=''.join(ln.strip() for ln in txt.splitlines() if ln and not ln.startswith('>'))[:5000].upper()
-                  letters=set(seq)-set('NX-?')
                   dna_frac=(sum(c in 'ACGT' for c in seq)/len(seq)) if seq else None
                   member['first_headers']=headers
                   member['dna_fraction_first5k']=dna_frac
                   member['classification']='nucleotide_like' if dna_frac is not None and dna_frac>0.95 else ('protein_or_other' if seq else 'non_fasta_or_empty')
                   rec['members'].append(member)
-              result.append(rec)
-          (root/'inventory.json').write_text(json.dumps(result,indent=2)+'\n')
-          print(json.dumps(result,indent=2))
+          Path('build/wu_format/inventory.json').write_text(json.dumps(rec,indent=2)+'\n')
+          print(json.dumps(rec,indent=2))
           PY
       - name: Report
         if: always()
