@@ -61,7 +61,6 @@ def main():
             for key in numeric:
                 r[key] = float(c[key])
 
-    # Shared A/W sections only; Y is not used in this contrast.
     by_section = {}
     for i, r in enumerate(rows):
         if r.get("colour_state") not in {"A", "W"}:
@@ -80,13 +79,18 @@ def main():
         ("core4_with_provenance_clean_coldtail", [0, 1, 2, 3]),
     ]
     out = []
-    rng = np.random.default_rng(args.seed)
 
     for metric_id, cols in metric_sets:
+        # Reset the RNG for every declared metric set so results remain stable if
+        # another metric set is inserted or reordered later.
+        rng = np.random.default_rng(args.seed)
         use_idx = [i for s in shared for i in by_section[s]]
         distances = {}
         for i in use_idx:
-            same = [j for j, r in enumerate(rows) if r["section_norm"] == rows[i]["section_norm"] and j != i]
+            same = [
+                j for j, r in enumerate(rows)
+                if r["section_norm"] == rows[i]["section_norm"] and j != i
+            ]
             centroid = z_all[np.ix_(same, cols)].mean(axis=0)
             distances[i] = float(np.sqrt(((z_all[i, cols] - centroid) ** 2).sum()))
 
