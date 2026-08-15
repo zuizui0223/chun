@@ -1,0 +1,2 @@
+metric_set,shared_sections,n_shared_sections,n_species,n_A,n_W,n_same_colour_pairs,n_different_colour_pairs,mean_same_colour_distance,mean_different_colour_distance,different_minus_same,one_sided_p_diff_greater,two_sided_p,permutations,seed,claim_ceiling
+bio1_median;bio6_median;bio1_iqr,camellia;paracamellia,2,26,14,12,133,24,2.3566800847,1.8847494890,-0.4719305957,0.9288907111,0.1848581514,100000,20260815,traditional-section history-proxy screen; no lower-tail climate estimator; not a nuclear phylogenetic/event-order test
