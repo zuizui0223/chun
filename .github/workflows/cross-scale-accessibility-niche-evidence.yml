@@ -1,0 +1,31 @@
+name: Cross-scale accessibility-niche evidence
+
+on:
+  pull_request:
+    paths:
+      - 'data/camellia_direction_sign_meta_v0_1.csv'
+      - 'data/macro_colour_environment_evidence_summary_v0_1.csv'
+      - 'data/cross_scale_evidence_contrast_v0_1.csv'
+      - 'scripts/contrast_micro_macro_evidence.py'
+      - '.github/workflows/cross-scale-accessibility-niche-evidence.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  reproduce-cross-scale:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Recompute cross-scale contrast
+        run: |
+          python scripts/contrast_micro_macro_evidence.py \
+            --micro data/camellia_direction_sign_meta_v0_1.csv \
+            --macro data/macro_colour_environment_evidence_summary_v0_1.csv \
+            --output /tmp/cross_scale.csv
+      - name: Verify frozen result
+        run: diff -u data/cross_scale_evidence_contrast_v0_1.csv /tmp/cross_scale.csv
