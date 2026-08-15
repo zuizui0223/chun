@@ -11,6 +11,7 @@ on:
       - 'scripts/run_camellia_gbif_chelsa_thermal.py'
       - 'scripts/audit_gbif_tail_provenance.py'
       - 'scripts/analyze_tail_provenance_sensitivity.py'
+      - 'scripts/analyze_boundary_observation_uncertainty.py'
       - 'data/camellia_tail_provenance_flags_v0_1.csv'
       - '.github/workflows/fan2026-gbif-chelsa-thermal.yml'
   workflow_dispatch:
@@ -116,11 +117,18 @@ jobs:
             --flags data/camellia_tail_provenance_flags_v0_1.csv \
             --out-dir build/fan_macro/result/tail_sensitivity \
             --permutations 50000
+      - name: Propagate boundary observation uncertainty
+        run: |
+          python scripts/analyze_boundary_observation_uncertainty.py \
+            build/fan_macro/result/thermal_points.csv \
+            --flags data/camellia_tail_provenance_flags_v0_1.csv \
+            --out-dir build/fan_macro/result/boundary_uncertainty \
+            --replicates 5000
       - name: Report
         if: always()
         run: |
           echo '### Fan 2026 species-scale thermal analysis' >> "$GITHUB_STEP_SUMMARY"
-          for f in fan_species_colour_seed_audit.json fan_colour_geography_tests.csv result/analysis_summary.json result/colour_pairwise_thermal_tests.csv result/section_blocked_colour_tests.csv result/tail_sensitivity/tail_provenance_scenario_tests.csv result/tail_sensitivity/tail_sample_size_sensitivity.csv; do
+          for f in fan_species_colour_seed_audit.json fan_colour_geography_tests.csv result/analysis_summary.json result/colour_pairwise_thermal_tests.csv result/section_blocked_colour_tests.csv result/tail_sensitivity/tail_provenance_scenario_tests.csv result/tail_sensitivity/tail_sample_size_sensitivity.csv result/tail_sensitivity/boundary_admission_summary.csv result/boundary_uncertainty/boundary_q05_aw_uncertainty_summary.csv; do
             if [ -f "build/fan_macro/$f" ]; then
               echo "#### $f" >> "$GITHUB_STEP_SUMMARY"
               echo '```' >> "$GITHUB_STEP_SUMMARY"
