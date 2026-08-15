@@ -1,0 +1,35 @@
+name: Camellia visible-state section concentration
+
+on:
+  push:
+    paths:
+      - 'data/fan2026_chelsa_species_compact_v0_1.csv'
+      - 'data/camellia_visible_state_section_concentration_v0_1.csv'
+      - 'scripts/analyze_visible_state_section_concentration.py'
+      - '.github/workflows/visible-state-section-concentration.yml'
+  pull_request:
+    paths:
+      - 'data/fan2026_chelsa_species_compact_v0_1.csv'
+      - 'data/camellia_visible_state_section_concentration_v0_1.csv'
+      - 'scripts/analyze_visible_state_section_concentration.py'
+      - '.github/workflows/visible-state-section-concentration.yml'
+
+jobs:
+  reproduce:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install dependency
+        run: python -m pip install --disable-pip-version-check numpy
+      - name: Recompute frozen result
+        run: |
+          python scripts/analyze_visible_state_section_concentration.py \
+            data/fan2026_chelsa_species_compact_v0_1.csv \
+            --output /tmp/section_concentration.csv \
+            --permutations 100000 \
+            --seed 20260815
+      - name: Check frozen output
+        run: diff -u data/camellia_visible_state_section_concentration_v0_1.csv /tmp/section_concentration.csv
