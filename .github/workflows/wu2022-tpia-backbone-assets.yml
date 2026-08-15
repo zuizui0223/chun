@@ -4,6 +4,7 @@ on:
   pull_request:
     paths:
       - 'scripts/audit_wu2022_tpia_backbone_assets.py'
+      - 'scripts/build_wu2022_tpia_preferred_manifest_v2.py'
       - 'scripts/fetch_sra_runinfo.py'
       - 'data/camellia_phylogeny_public_seeds_v0_1.csv'
       - '.github/workflows/wu2022-tpia-backbone-assets.yml'
@@ -39,7 +40,7 @@ jobs:
             'https://onlinelibrary.wiley.com/action/downloadSupplement?doi=10.1111%2Ftpj.15799&file='+name,
             'https://onlinelibrary.wiley.com/doi/suppl/10.1111/tpj.15799/supinfo/'+name,
           ]
-          s=requests.Session(); s.headers['User-Agent']='Mozilla/5.0 chun-public-backbone-audit/0.2'
+          s=requests.Session(); s.headers['User-Agent']='Mozilla/5.0 chun-public-backbone-audit/0.3'
           errors=[]
           for u in urls:
               try:
@@ -60,7 +61,7 @@ jobs:
               },indent=2)+'\n')
               print('publisher workbook unavailable; continuing with SRA taxon evidence')
           PY
-      - name: Crosswalk public Wu taxa to TPIA assemblies
+      - name: Crosswalk public Wu taxa to TPIA catalogs
         run: |
           args=(
             --sra-runinfo build/wu2022_tpia/sra/CPHY001_PRJNA665925_runinfo.csv
@@ -70,6 +71,15 @@ jobs:
             args+=(--supp-xlsx build/wu2022_tpia/TableS1-S18.xlsx)
           fi
           python scripts/audit_wu2022_tpia_backbone_assets.py "${args[@]}"
+      - name: Build provenance-safe preferred assembly manifest
+        run: |
+          python scripts/build_wu2022_tpia_preferred_manifest_v2.py \
+            --run-taxa build/wu2022_tpia/audit/prjna665925_run_taxa.csv \
+            --allassemblies build/wu2022_tpia/audit/tpia_allassemblies_catalog.csv \
+            --bulk build/wu2022_tpia/audit/tpia_transcriptome_bulk_catalog.csv \
+            --aliases build/wu2022_tpia/audit/wu2022_archive_tpia_alias_crosswalk.csv \
+            --output build/wu2022_tpia/audit/wu2022_preferred_assembly_manifest_v2.csv \
+            --summary build/wu2022_tpia/audit/preferred_manifest_v2_summary.json
       - name: Report
         if: always()
         run: |
@@ -79,8 +89,8 @@ jobs:
             build/wu2022_tpia/supplement_url.txt \
             build/wu2022_tpia/sra/manifest_fetch_summary.csv \
             build/wu2022_tpia/audit/summary.json \
-            build/wu2022_tpia/audit/wu2022_tpia_species_crosswalk.csv \
-            build/wu2022_tpia/audit/tpia_transcriptome_bulk_catalog.csv; do
+            build/wu2022_tpia/audit/preferred_manifest_v2_summary.json \
+            build/wu2022_tpia/audit/wu2022_preferred_assembly_manifest_v2.csv; do
             if [ -f "$f" ]; then
               echo "#### $f" >> "$GITHUB_STEP_SUMMARY"
               echo '```' >> "$GITHUB_STEP_SUMMARY"
