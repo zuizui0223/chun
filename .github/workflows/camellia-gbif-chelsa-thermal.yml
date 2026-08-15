@@ -1,0 +1,60 @@
+name: Camellia GBIF CHELSA thermal niche
+
+on:
+  pull_request:
+    paths:
+      - 'data/camellia_macro_niche_taxa_v0_1.csv'
+      - 'scripts/run_camellia_gbif_worldclim_niche.py'
+      - 'scripts/run_camellia_gbif_chelsa_thermal.py'
+      - '.github/workflows/camellia-gbif-chelsa-thermal.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  thermal:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: python -m pip install --disable-pip-version-check numpy requests rasterio
+      - name: Download CHELSA BIO1 and BIO6
+        run: |
+          mkdir -p build/chelsa build/camellia_thermal
+          base='https://os.zhdk.cloud.switch.ch/chelsav2/GLOBAL/climatologies/1981-2010/bio'
+          for b in 1 6; do
+            file="CHELSA_bio${b}_1981-2010_V.2.1.tif"
+            curl --fail --location --retry 3 --retry-all-errors --connect-timeout 20 --max-time 300 \
+              "$base/$file" -o "build/chelsa/$file"
+            test -s "build/chelsa/$file"
+          done
+      - name: Run thermal niche screen
+        run: |
+          python scripts/run_camellia_gbif_chelsa_thermal.py \
+            --taxa data/camellia_macro_niche_taxa_v0_1.csv \
+            --bio1 build/chelsa/CHELSA_bio1_1981-2010_V.2.1.tif \
+            --bio6 build/chelsa/CHELSA_bio6_1981-2010_V.2.1.tif \
+            --out-dir build/camellia_thermal \
+            --min-points 5 --cap-points 120
+      - name: Report
+        if: always()
+        run: |
+          echo '### Camellia CHELSA thermal niche result' >> "$GITHUB_STEP_SUMMARY"
+          for f in analysis_summary.json species_thermal_niches.csv A_vs_Y_thermal_tests.csv japonica_rusticana_thermal_pair.csv occurrence_filter_audit.csv; do
+            if [ -f "build/camellia_thermal/$f" ]; then
+              echo "#### $f" >> "$GITHUB_STEP_SUMMARY"
+              echo '```' >> "$GITHUB_STEP_SUMMARY"
+              cat "build/camellia_thermal/$f" >> "$GITHUB_STEP_SUMMARY"
+              echo '```' >> "$GITHUB_STEP_SUMMARY"
+            fi
+          done
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: camellia-gbif-chelsa-thermal
+          path: build/camellia_thermal
+          if-no-files-found: error
