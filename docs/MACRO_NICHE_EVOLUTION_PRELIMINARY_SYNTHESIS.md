@@ -1,200 +1,193 @@
 # Macro niche evolution: preliminary synthesis generated from chun results
 
-## 1. Separate published conclusions from chun discoveries
+## 1. Keep source conclusions separate from chun discoveries
 
 ### Published conclusions used as inputs
 
-- Fan et al. 2026 (`10.1111/pbi.70442`) reconstruct white as the most likely ancestral **visible** flower colour of *Camellia* and show that yellow taxa are geographically concentrated near the putative southwestern China–northern Vietnam ancestral region, while red and white states are geographically broader.
-- Wang et al. 2022 (`10.1093/jpe/rtab083`) show across 7,673 Chinese woody species that red/blue-purple flower classes are relatively enriched in colder, drier, more seasonal and higher-UV parts of China; after phylogenetic/regional correction, red frequency is negatively associated with warmth index and positively with UV-B.
-- Koski & Ashman 2016 (`10.1111/nph.13921`) show across 177 Potentilleae species that quantitative UV-absorbing floral pigmentation is greater at higher altitude and lower temperature, with positive UV-B association.
-- Shrestha et al. 2014 (`10.1111/1365-2745.12185`) show greater floral colour diversity in a high-elevation Himalayan assemblage and elevated colour-evolution rates in several high-elevation lineages.
-- Tai et al. 2020 (`10.3389/fpls.2020.582784`) show that high-altitude Taiwanese floras are strongly phylogenetically structured, while floral colour hue/contrast have weak phylogenetic signal and are better interpreted through pollinator visual ecology than a simple abiotic colour gradient.
-- Short et al. 2021 (`10.3389/fpls.2021.617815`) show an important scale-dependent counterexample: abiotic variables predict anthocyanin polymorphism within monkeyflower species, but phylogenetically corrected flower-colour/environment coevolution is not supported across two radiations.
+- Fan et al. 2026 reconstruct white as the most likely ancestral **visible** flower colour of *Camellia* and show that yellow taxa are geographically concentrated near the putative southwestern China–northern Vietnam ancestral region, while red and white states are geographically broader.
+- Wang et al. 2022 show across 7,673 Chinese woody species that anthocyanin-associated red/blue-purple flower classes are relatively enriched in colder, drier, more seasonal and higher-UV parts of China; after phylogenetic/regional correction, red frequency is negatively associated with warmth index and positively associated with UV-B.
+- Koski & Ashman 2016 show across 177 Potentilleae species that quantitative UV-absorbing floral pigmentation is greater at higher altitude and lower temperature, with positive UV-B association; an OU correlation structure fit better than BM for this trait-environment relationship.
+- Shrestha et al. 2014 show that floral colour diversity is greater in the high-elevation subalpine Himalayan assemblage and that several lineages leading to high-elevation taxa show greater absolute/rate of colour evolution.
+- Tai et al. 2020 show that high-elevation Taiwanese floras are phylogenetically clustered while bee-vision floral colour has weak phylogenetic signal; their results do not reduce to a simple abiotic pigmentation gradient.
+- Short et al. 2021 show that anthocyanin frequency can track abiotic stress within polymorphic monkeyflower species, but across two radiations there is no phylogenetically corrected evidence for joint evolution of flower colour and environmental affinity.
+- Abe et al. 2021/2024 provide a close *Camellia* counterexample: snow-adapted *C. rusticana* is slightly lighter-flowered than warm-coastal *C. japonica* despite both being red, and the two lineages show long-term ecological differentiation.
+- Cheng et al. 2022 place a major *Camellia* diversification-rate shift near the warm Mid-Miocene Climatic Optimum; this is temporal context, not proof of climatic causation.
 
-These are source-level conclusions. None by itself demonstrates that anthocyanin enabled *Camellia* to invade cold environments.
+These are source-level results. None by itself establishes the cross-scale mechanism proposed below.
 
-## 2. chun preliminary macro result: micro–macro decoupling
+## 2. chun preliminary macro result
 
-Recoding the independent studies around one causal question produces a more informative result than a simple `cold -> red` rule.
+The current evidence ledger is `data/macro_flower_colour_environment_synthesis_v0_1.csv` and the conservative reproducible summary is `data/macro_colour_environment_evidence_summary_v0_1.csv`.
 
-### Positive macro signals
+For the **strict direct proposition** that stronger floral pigmentation is a general cold/high-UV enabling trait, only comparable directional evidence units are counted:
 
-- stronger floral pigmentation can be associated with cold/high-altitude/high-UV environments;
-- high-elevation assemblages can show increased floral colour disparity or evolutionary rate.
+- support: 2;
+- macro-null: 1;
+- explicit counterexample: 1.
 
-### Counter-signals
+Therefore:
 
-- floral colour patterns can instead track pollinator visual structure;
-- a strong environment–anthocyanin relationship within species can disappear at macroevolutionary scale after phylogenetic correction.
+- support fraction = **2/4 = 0.50**;
+- exact two-sided binomial test against 0.5 = **P = 1.0**;
+- with a Beta(1,1) prior, posterior `P(support rate > 0.5) = 0.50`.
 
-Therefore the current **chun preliminary discovery** is:
+A sensitivity analysis dropping the macro-null radiation but retaining the explicit opposing *Camellia* pair gives support 2/3 and still no directional evidence (`P = 1.0`; posterior `P(rate > 0.5)=0.6875`).
 
-> **Environmental responsiveness of a pigment state at the micro scale is not sufficient to produce long-term colour–niche coupling. Macroevolutionary coupling appears to require an additional persistence/filtering process.**
+### Conclusion from the strict macro synthesis
 
-This result changes the primary problem. The question is not simply whether anthocyanin is beneficial in cold environments. It is:
+> **The present macro evidence does not support floral anthocyanin/redness as a universal cold- or high-UV niche-enabling innovation.**
 
-> **Why do molecularly accessible and environmentally responsive pigment variants become persistent macroevolutionary transitions in some lineages but remain transient or phylogenetically local in others?**
+This is a `chun` synthesis result, because it emerges from deliberately combining supporting, null and opposing comparative evidence under one pre-declared question.
 
-## 3. Link to the micro result already generated by chun
+A broader but heterogeneous signal remains: environmental transitions—especially high elevation, UV regime and pollinator turnover—often coincide with floral-colour reorganisation or increased colour lability. Because the endpoints differ, this broader pattern is descriptive rather than a pooled effect size.
 
-The micro/mechanistic meta-analysis independently found that *Camellia* repeatedly changes visible colour through a limited set of regulatory/flux nodes rather than repeated wholesale pathway destruction/reconstruction.
+## 3. Cross-scale result generated by chun
 
-The combined repository-level pattern is therefore:
+The micro/mechanistic analysis is much more consistent than the macro cold-enabler signal:
 
-`molecular accessibility -> repeatedly generated pigment variation`
+- regulatory/flux recurrence: 8/8 informative independence clusters;
+- anthocyanin increase in the red/pink direction: 6/6 informative clusters;
+- strict macro cold/high-UV enabler evidence: 2/4 direct evidence units.
 
-but
+Using Beta(1,1) evidence-rate diagnostics:
 
-`generated variation != automatically persistent macroevolutionary niche shift`.
+- `P(micro regulatory/flux recurrence > macro cold-enabler support) = 177/182 = 0.972527`;
+- `P(micro anthocyanin-direction recurrence > macro cold-enabler support) = 21/22 = 0.954545`.
 
-This motivates a generation-versus-filtering framework.
+These are **not estimates of biological mechanism frequency** because the underlying literature is selected and heterogeneous. They are a formal diagnostic of a repository-level asymmetry:
 
-## 4. Primary hypothesis: accessibility × ecological filtering
+> **Pigment-network states are reproducibly easy to generate/redeploy at the mechanistic scale, but their translation into a particular climatic adaptation is conditional rather than universal.**
+
+This is currently the strongest micro-to-macro preliminary result of `chun`.
+
+## 4. Problem generated by the result
+
+The problem is no longer:
+
+> Is anthocyanin a cold-adaptation pigment?
+
+The data reject that as a universal macro explanation.
+
+The stronger problem is:
+
+> **Why does high molecular accessibility of floral pigment states translate into persistent macroevolutionary niche association in some lineages/environments, but not others?**
+
+This separates two processes:
+
+1. **variation generation** — which pigment states are easy to reach because of network architecture;
+2. **ecological persistence/filtering** — which reachable states are retained under climate, light, pollinator and geographic conditions.
+
+## 5. Primary hypothesis: accessibility × ecological filtering
 
 ### HN5 — Accessibility-filter interaction
 
-Molecular accessibility biases which pigment states are generated. Climate, geographic opportunity, pollinator environment and correlated whole-plant physiology determine which of those accessible states persist, spread and become associated with macroevolutionary niche shifts.
+Molecular accessibility biases which pigment phenotypes are repeatedly generated. Climate, light regime, pollinator sensory environment and geography determine which of those variants persist, spread and become visible as macroevolutionary trait–niche associations.
 
-#### Predictions
+Conceptually:
 
-- micro-accessible pigment modules should be over-represented among macro colour transitions;
-- accessibility alone should predict transition generation better than long-term persistence;
-- persistent transitions should show an interaction between accessibility and ecological opportunity;
-- the same micro-accessible state may show strong environmental association in one radiation but no macro coupling in another;
-- state-dependent niche effects should weaken when geographic opportunity or hidden ecological regimes explain the same branches.
+`micro molecular accessibility -> recurrent phenotype generation -> ecological filtering -> persistence/range expansion -> macro pattern`
 
-## 5. Anthocyanin-enabled cold/UV expansion as a falsifiable special case
+### Predictions
 
-### HN1 — Anthocyanin-enabled cold/UV niche expansion
+- micro-accessible pigment modules should be reused on macro colour-transition branches more often than matched pathway background genes;
+- climatic niche shifts should not universally follow one visible colour state;
+- the sign/magnitude of niche association should depend on environmental and pollinator context;
+- state-dependent niche models should improve only in subsets/branches where ecological filters align with pigment function;
+- close relatives can occupy different climatic niches without a corresponding increase in floral redness, as already suggested by the *C. japonica–C. rusticana* comparison.
 
-Lineages that up-regulate floral anthocyanin deployment may have a higher probability or magnitude of movement into colder, higher-UV or more seasonal climatic niches.
+## 6. Secondary hypotheses retained for direct testing
 
-This remains worth testing because two independent macro datasets show cold/high-UV pigmentation associations and the *Camellia* micro analysis shows repeated accessibility of anthocyanin deployment. It is **not** the default conclusion because the monkeyflower counterexample shows that micro environmental association need not become macroevolutionary coupling.
+### HN1 — Conditional anthocyanin-enabled cold/UV expansion
 
-#### Predictions
+Anthocyanin deployment may enable cold/high-UV niche expansion in **some** lineages or environments, but it is no longer treated as the general explanation.
 
-- W -> A transitions precede or coincide with negative thermal-niche shifts more often than expected under null histories;
-- anthocyanin-state lineages show colder lower-tail niche limits and/or broader cold-side niches after phylogeny and geography are controlled;
-- mechanistic anthocyanin module scores predict niche shifts better than human-visible red labels;
-- climatic niche rate or optimum changes near pigment-transition branches.
-
-#### Falsifiers
-
-- cold-niche shifts systematically precede pigment shifts;
-- colour adds no predictive value beyond clade/geography;
-- mechanistic anthocyanin scores fail even when visible red correlates with climate;
-- equally cold niche expansion repeatedly occurs without the predicted pigment deployment.
-
-## 6. Competing hypotheses
-
-### HN0 — Historical sorting only
-
-Colour and climate covary because clades originated in different regions. The association disappears after ancestral range, geography and phylogeny are controlled.
+Required evidence is branch-level: W->A or low->high anthocyanin transitions must precede/coincide with negative thermal-niche shifts more often than expected under null histories.
 
 ### HN2 — Stress-induced follower
 
-Cold/UV niche movement occurs first; pigment deployment is a secondary response after entry into the new environment.
+Cold/UV niche entry occurs first and floral pigment change follows as a secondary response.
 
 ### HN3 — Pollinator-mediated climate coupling
 
-Climate alters seasonal pollinator reliability or pollinator community composition, which then selects floral spectral states. Apparent colour–climate coupling is mediated by pollination ecology.
+Climate alters pollinator communities or seasonal reliability; flower colour then changes primarily through sensory selection.
 
 ### HN4 — Dual-function co-option
 
-The same flavonoid network is selected for both abiotic protection and pollinator signalling. Pigment chemistry should then predict climate better than human-visible hue.
+The same flavonoid network is filtered simultaneously by abiotic stress and pollinator signalling. This predicts stronger relationships for mechanistic pigment modules than for human-visible hue.
 
-## 7. Existing niche-evolution models
+### HN0 — Historical sorting
 
-### Brownian Motion (BM)
+Colour and climate covary only because clades occupy different ancestral regions; the association disappears after phylogeny and geography are controlled.
 
-Unconstrained diffusion baseline for continuous niche traits.
+## 7. Existing niche-evolution models and the actual method gap
 
-### Ornstein–Uhlenbeck (OU)
+### Baseline models
 
-Adds attraction toward one or more optima. Multi-regime OU can model pigment-state-associated niche optima, but OU support alone is not proof of adaptation or stabilizing selection.
+- **BM — Brownian Motion:** unconstrained diffusion; neutral comparative baseline.
+- **OU — Ornstein–Uhlenbeck:** attraction toward an optimum; OU support alone is not proof of adaptation.
+- **EB — Early Burst:** declining evolutionary rate through time; useful for tempo, not a pigment-causality test.
+- **BBM — Bounded Brownian Motion:** diffusion between bounds; important for separating environmental limits from OU-like attraction.
+- multirate BM / multi-regime OU: allow rates or optima to differ among regimes.
 
-### Early Burst (EB)
+### Existing discrete–continuous joint methods
 
-Allows evolutionary rate to decline through time. Useful as a radiation-tempo baseline, but whole-clade EB does not identify pigment-enabled ecological expansion.
+State-dependent and joint discrete/continuous models already exist, including approaches such as MuSSCRat and hOUwie. Therefore the `chun` gap is **not** “no model can connect a discrete trait to continuous niche evolution.”
 
-### Bounded Brownian Motion (BBM)
+### Gap specific to chun
 
-The likely “Brownian something” relevant here is **Bounded Brownian Motion**: Brownian diffusion between reflective bounds. It is useful for distinguishing hard environmental limits from apparent OU-like attraction to an optimum.
+The missing integration is:
 
-### Existing state-dependent/joint approaches
+> **empirically measured molecular accessibility -> macro reuse probability -> direction/timing of multidimensional niche shift -> ecological persistence**
 
-The project must **not** claim that discrete-state-dependent niche models are absent. Relevant existing approaches include:
+Existing BM/OU/state-dependent analyses can serve as components/baselines, but the distinctive predictor is the **micro-derived accessibility score** rather than an arbitrary colour regime alone.
 
-- multirate BM and multi-regime OU;
-- **MuSSCRat**, which allows discrete states to influence continuous-trait evolutionary rates while modelling background rate variation;
-- **hOUwie** and related joint discrete/continuous models that integrate uncertainty in discrete regimes rather than treating one stochastic map as fixed;
-- SURFACE and related OU shift/convergence methods;
-- Pagel lambda/kappa/delta, white-noise and hidden-state sensitivity models.
+## 8. Immediate Camellia macro analysis
 
-## 8. The narrower methodological gap relevant to chun
+### M8 — species climatic niche matrix
 
-Existing methods can already ask whether a discrete state changes a continuous-trait rate or optimum. The unresolved integration specific to this programme is:
+A conservative wild-taxon seed table is frozen in `data/camellia_macro_niche_taxa_v0_1.csv`.
 
-`measured molecular accessibility`
-`-> pigment-transition probability`
-`-> pigment-first vs niche-first temporal order`
-`-> multidimensional niche movement`
-`-> persistence under geographic/ecological bounds`.
+The reproducible workflow `Camellia GBIF WorldClim macro niche`:
 
-The distinctive components are:
+- queries GBIF only in predeclared native countries;
+- requires coordinates and no GBIF geospatial issue;
+- excludes explicit cultivated/non-native/living-specimen records and high coordinate uncertainty;
+- spatially thins to one record per 0.1° cell;
+- extracts WorldClim 2.1 BIO1, BIO4, BIO6, BIO12 and BIO15;
+- estimates species centroids, cold tails and breadth;
+- treats species rather than occurrence records as replicate units.
 
-1. **continuous mechanistic accessibility**, estimated from the micro meta-analysis rather than a categorical colour label;
-2. **directional lead-lag**, explicitly contrasting pigment-first, niche-first and synchronous histories;
-3. **multidimensional niche response**, including centroid, cold-tail limit, breadth, seasonality and UV exposure;
-4. **geographic opportunity/bounds**, distinguishing adaptive attraction from climates simply unavailable to the lineage;
-5. **reticulation sensitivity** in *Camellia*;
-6. **micro-to-macro node reuse**, asking whether the same labile network nodes predict species-level transitions.
+This first screen is intentionally not phylogenetically corrected. Its role is to decide whether a simple visible A(red/pink) versus Y(yellow) climatic signal exists strongly enough to justify heavier state-dependent modelling.
 
-The immediate task is to determine whether combinations of existing joint/state-dependent models plus event-centred statistics are sufficient. A new stochastic model is justified only if these cannot represent the causal contrast.
+### M9 — phylogenetic signal and model comparison
 
-## 9. Immediate Camellia analyses
+For admitted nuclear-tree taxa compare BM, OU, EB, BBM, multirate BM and pigment-regime OU for thermal/precipitation niche axes.
 
-### M8 — Species climatic niche matrix
+### M10 — event-centred niche-shift analysis
 
-For every taxon joinable to admitted nuclear trees:
+On stochastic colour histories, pool pre/post branch changes in thermal niche, BIO6 cold limits, seasonality and niche breadth around W->A, A->W, W->Y and Y->W events.
 
-- clean native GBIF occurrences;
-- extract CHELSA/WorldClim climate plus elevation and suitable UV/light proxies;
-- estimate niche centroid, lower/upper tails and breadth;
-- preserve geographic availability/background information.
+### M11 — trait-first versus niche-first
 
-### M9 — Baseline niche-process comparison
+Compare histories where pigment transitions precede niche shifts, follow them, or occur synchronously.
 
-For each major niche axis compare BM, OU, EB, BBM, multirate BM and pigment-regime OU. Use fit as process phenomenology, not proof of adaptation.
+### M12 — micro -> macro -> niche
 
-### M10 — State-dependent niche evolution
+Test the full programme:
 
-Use multirate/joint state-dependent models to test whether pigment states alter climatic niche rate and/or optimum while including hidden/background rate variation.
+`micro accessibility score -> macro node/module reuse -> climatic niche-shift magnitude/persistence`.
 
-### M11 — Event-centred lead-lag analysis
+## 9. Current claim boundary
 
-Across stochastic histories, quantify whether W -> A and other pigment transitions precede, coincide with or follow cold-side niche shifts. This is more diagnostic than present-day correlation.
+Supported now:
 
-### M12 — Micro -> macro -> niche enrichment
-
-Estimate a micro-accessibility score for pigment modules, then test:
-
-`micro accessibility -> macro reuse probability -> climatic shift magnitude / persistence`.
-
-Include interactions with climate opportunity and pollinator regime.
-
-## 10. Claim boundary
-
-Supported now as a **chun preliminary synthesis**:
-
-> Floral pigmentation can correlate with cold/high-UV environments, but strong micro-scale environment–pigment associations do not necessarily persist at macroevolutionary scale. Combined with the repeated molecular accessibility already found in *Camellia*, this points to an accessibility × ecological-filter framework rather than a universal cold-anthocyanin rule.
+> *Camellia* pigment regulation is repeatedly accessible at micro/mechanistic scales, but a literature-wide macro synthesis does not support floral redness/anthocyanin as a universal cold-niche enabling trait. The resulting cross-scale asymmetry supports an accessibility-plus-ecological-filter model rather than a single climate-adaptation explanation.
 
 Not yet supported:
 
-- anthocyanin caused cold-climate colonisation in *Camellia*;
-- red flowers are universally cold-adapted;
-- OU support demonstrates adaptation;
-- floral pigment rather than correlated leaf/whole-plant physiology causes stress tolerance;
-- a new niche-evolution stochastic model is required.
+- a branch-level causal effect of anthocyanin on *Camellia* cold colonisation;
+- a specific OU optimum for red/yellow/white lineages;
+- a definitive lead-lag direction between pigment and niche change;
+- a claim that floral pigment rather than correlated leaf/whole-plant physiology drives abiotic tolerance.
 
-The decisive next result is a branch-level, multi-tree lead-lag analysis linking pigment-state transitions to climatic niche movement while controlling geographic opportunity and hidden ecological regimes.
+The decisive next result is the *Camellia*-specific species/branch niche analysis now being executed from public occurrence and climate data.
