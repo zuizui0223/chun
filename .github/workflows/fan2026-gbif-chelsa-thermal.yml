@@ -10,6 +10,8 @@ on:
       - 'scripts/run_camellia_gbif_worldclim_niche.py'
       - 'scripts/run_camellia_gbif_chelsa_thermal.py'
       - 'scripts/audit_gbif_tail_provenance.py'
+      - 'scripts/analyze_tail_provenance_sensitivity.py'
+      - 'data/camellia_tail_provenance_flags_v0_1.csv'
       - '.github/workflows/fan2026-gbif-chelsa-thermal.yml'
   workflow_dispatch:
 
@@ -25,7 +27,7 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
-      - run: python -m pip install --disable-pip-version-check openpyxl numpy requests rasterio
+      - run: python -m pip install --disable-pip-version-check openpyxl numpy pandas requests rasterio
       - name: Acquire Fan 2026 Data S1 from PMC OA package
         run: |
           mkdir -p build/fan_macro/package build/chelsa build/fan_macro/result
@@ -107,11 +109,18 @@ jobs:
             build/fan_macro/result/thermal_points.csv \
             --output build/fan_macro/result/coldtail_provenance_audit.csv \
             --k 3
+      - name: Run staged provenance and estimator sensitivity
+        run: |
+          python scripts/analyze_tail_provenance_sensitivity.py \
+            build/fan_macro/result/thermal_points.csv \
+            --flags data/camellia_tail_provenance_flags_v0_1.csv \
+            --out-dir build/fan_macro/result/tail_sensitivity \
+            --permutations 50000
       - name: Report
         if: always()
         run: |
           echo '### Fan 2026 species-scale thermal analysis' >> "$GITHUB_STEP_SUMMARY"
-          for f in fan_species_colour_seed_audit.json fan_colour_geography_tests.csv result/analysis_summary.json result/colour_pairwise_thermal_tests.csv result/section_blocked_colour_tests.csv; do
+          for f in fan_species_colour_seed_audit.json fan_colour_geography_tests.csv result/analysis_summary.json result/colour_pairwise_thermal_tests.csv result/section_blocked_colour_tests.csv result/tail_sensitivity/tail_provenance_scenario_tests.csv result/tail_sensitivity/tail_sample_size_sensitivity.csv; do
             if [ -f "build/fan_macro/$f" ]; then
               echo "#### $f" >> "$GITHUB_STEP_SUMMARY"
               echo '```' >> "$GITHUB_STEP_SUMMARY"
