@@ -40,30 +40,11 @@ def norm_section(value: str) -> str:
     return ";".join(sorted(parts))
 
 
-def pair_stat(rows, z, states, sections, indices):
-    same = []
-    diff = []
-    per_section = {}
-    for sec in sorted(set(sections[i] for i in indices)):
-        ids = [i for i in indices if sections[i] == sec]
-        s_same = []
-        s_diff = []
-        for i, j in itertools.combinations(ids, 2):
-            d = float(np.linalg.norm(z[i] - z[j]))
-            if states[i] == states[j]:
-                same.append(d); s_same.append(d)
-            else:
-                diff.append(d); s_diff.append(d)
-        per_section[sec] = {
-            "n_pairs_same": len(s_same),
-            "n_pairs_diff": len(s_diff),
-            "mean_same": float(np.mean(s_same)) if s_same else None,
-            "mean_diff": float(np.mean(s_diff)) if s_diff else None,
-        }
-    if not same or not diff:
+def stat_from_pair_arrays(states, pair_i, pair_j, distances):
+    is_diff = states[pair_i] != states[pair_j]
+    if not np.any(is_diff) or np.all(is_diff):
         raise SystemExit("Need both same-colour and different-colour within-section pairs")
-    stat = float(np.mean(diff) - np.mean(same))
-    return stat, same, diff, per_section
+    return float(distances[is_diff].mean() - distances[~is_diff].mean())
 
 
 def main():
@@ -88,14 +69,17 @@ def main():
     sections = np.asarray([r["section_norm"] for r in rows], dtype=object)
 
     shared = sorted(s for s in set(sections) if set(states[sections == s]) == {"A", "W"})
-    indices = [i for i, s in enumerate(sections) if s in shared]
-    obs, same, diff, per_section = pair_stat(rows, z, states, sections, indices)
+    shared_ids = {sec: np.where(sections == sec)[0] for sec in shared}
 
+    pair_i = []
+    pair_j = []
+    pair_sec = []
     pair_rows = []
     for sec in shared:
-        ids = [i for i in indices if sections[i] == sec]
+        ids = shared_ids[sec].tolist()
         for i, j in itertools.combinations(ids, 2):
             d = float(np.linalg.norm(z[i] - z[j]))
+            pair_i.append(i); pair_j.append(j); pair_sec.append(sec)
             pair_rows.append({
                 "section": sec,
                 "taxon1": rows[i]["taxon"],
@@ -105,29 +89,46 @@ def main():
                 "pair_type": "different_colour" if states[i] != states[j] else "same_colour",
                 "climate_distance_core3": f"{d:.10f}",
             })
+    pair_i = np.asarray(pair_i, dtype=int)
+    pair_j = np.asarray(pair_j, dtype=int)
+    distances = np.asarray([float(r["climate_distance_core3"]) for r in pair_rows], dtype=float)
+
+    obs = stat_from_pair_arrays(states, pair_i, pair_j, distances)
+    obs_diff = states[pair_i] != states[pair_j]
+    same = distances[~obs_diff]
+    diff = distances[obs_diff]
+
+    per_section = {}
+    for sec in shared:
+        m = np.asarray([s == sec for s in pair_sec], dtype=bool)
+        dmask = obs_diff & m
+        smask = (~obs_diff) & m
+        per_section[sec] = {
+            "n_pairs_same": int(smask.sum()),
+            "n_pairs_diff": int(dmask.sum()),
+            "mean_same": float(distances[smask].mean()) if np.any(smask) else None,
+            "mean_diff": float(distances[dmask].mean()) if np.any(dmask) else None,
+        }
 
     rng = np.random.default_rng(args.seed)
-    ge = 0
     perm_stats = np.empty(args.permutations, dtype=float)
     for b in range(args.permutations):
         perm = states.copy()
-        for sec in shared:
-            ids = np.where(sections == sec)[0]
+        for sec, ids in shared_ids.items():
             perm[ids] = rng.permutation(perm[ids])
-        ps, _, _, _ = pair_stat(rows, z, perm, sections, indices)
-        perm_stats[b] = ps
-        if ps >= obs - 1e-15:
-            ge += 1
-    p_one = (ge + 1) / (args.permutations + 1)
+        perm_stats[b] = stat_from_pair_arrays(perm, pair_i, pair_j, distances)
+
+    p_one = (int(np.sum(perm_stats >= obs - 1e-15)) + 1) / (args.permutations + 1)
     p_two = (int(np.sum(np.abs(perm_stats) >= abs(obs) - 1e-15)) + 1) / (args.permutations + 1)
+    used = np.unique(np.concatenate([pair_i, pair_j]))
 
     result = [{
         "metric_set": ";".join(metrics),
         "shared_sections": ";".join(shared),
         "n_shared_sections": len(shared),
-        "n_species": len(indices),
-        "n_A": int(np.sum(states[indices] == "A")),
-        "n_W": int(np.sum(states[indices] == "W")),
+        "n_species": len(used),
+        "n_A": int(np.sum(states[used] == "A")),
+        "n_W": int(np.sum(states[used] == "W")),
         "n_same_colour_pairs": len(same),
         "n_different_colour_pairs": len(diff),
         "mean_same_colour_distance": f"{np.mean(same):.10f}",
@@ -156,7 +157,7 @@ def main():
             "no evidence that visible A/W differences mark greater climatic divergence within shared sections"
         ),
     }, indent=2) + "\n", encoding="utf-8")
-    print(json.dumps(json.loads(args.summary.read_text()), indent=2))
+    print(args.summary.read_text())
 
 
 if __name__ == "__main__":
