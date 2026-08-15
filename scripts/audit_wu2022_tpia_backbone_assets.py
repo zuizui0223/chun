@@ -3,8 +3,10 @@
 
 This is a provenance/crosswalk gate, not a phylogenetic reconstruction. It joins
 public taxon evidence from PRJNA665925 RunInfo and, when available, publisher
-Table S1 to the live TPIA `selectAllassemblies` catalog and records which taxa
-expose downloadable transcriptome assembly ZIPs.
+Table S1 to the live TPIA assembly and bulk-download catalogs.
+
+Important: ARCHIVE_TPIA_CROSSWALK below is a study-specific archive-to-resource
+crosswalk. It is NOT asserted as a general taxonomic synonym list.
 """
 from __future__ import annotations
 
@@ -19,6 +21,22 @@ from urllib.parse import quote
 import requests
 from openpyxl import load_workbook
 
+# Same Wu 2022 / PRJNA665925 resource represented with orthographic or
+# infraspecific-name differences between NCBI RunInfo and TPIA.
+ARCHIVE_TPIA_CROSSWALK = {
+    "Camellia albosericea": ("Camellia albo-sericea", "same_project_orthographic_variant"),
+    "Camellia apolyodonta": ("Camellia apolydonta", "same_project_orthographic_variant"),
+    "Camellia kissii": ("Camellia kissi", "same_project_orthographic_variant"),
+    "Camellia leyensis": ("Camellia leyeensis", "same_project_orthographic_variant"),
+    "Camellia pingguoensis": ("Camellia pinggaoensis", "same_project_orthographic_variant"),
+    "Camellia stichoclada": ("Camellia stictoclada", "same_project_orthographic_variant"),
+    # NCBI ScientificName includes the infraspecific name; TPIA exposes the
+    # infraspecific epithet as the assembly name. This is a resource crosswalk,
+    # not a taxonomic synonym assertion.
+    "Camellia henryana": ("Camellia trichocarpa", "same_project_infraspecific_epithet_resource_name"),
+    "Camellia pyxidiacea": ("Camellia rubituberculata", "same_project_infraspecific_epithet_resource_name"),
+}
+
 
 def clean(x):
     return "" if x is None else re.sub(r"\s+", " ", str(x).replace("\xa0", " ").strip())
@@ -30,6 +48,13 @@ def norm_taxon(x: str) -> str:
     x = re.sub(r"\s+", " ", x)
     m = re.search(r"\bCamellia\s+([A-Za-z][A-Za-z-]+)", x, re.I)
     return f"Camellia {m.group(1).lower()}" if m else ""
+
+
+def display_taxon(x: str) -> str:
+    t = norm_taxon(x)
+    if not t: return ""
+    g, e = t.split(" ", 1)
+    return f"{g} {e}"
 
 
 def extract_table_s1_taxa(xlsx: Path):
@@ -66,7 +91,7 @@ def extract_table_s1_taxa(xlsx: Path):
         if not any(vals): continue
         vals += [""] * (len(unique_header) - len(vals))
         rec = dict(zip(unique_header, vals[:len(unique_header)]))
-        found = sorted({t for v in vals if (t := norm_taxon(v))})
+        found = sorted({t for v in vals if (t := display_taxon(v))})
         rec["_normalized_camellia_taxa"] = ";".join(found)
         taxa.update(found); out_rows.append(rec)
     return ws.title, unique_header + ["_normalized_camellia_taxa"], out_rows, sorted(taxa)
@@ -78,7 +103,7 @@ def extract_sra_taxa(path: Path):
     taxa = set(); out = []
     for r in rows:
         sci = clean(r.get("ScientificName") or r.get("scientific_name") or r.get("Organism"))
-        tax = norm_taxon(sci)
+        tax = display_taxon(sci)
         if tax: taxa.add(tax)
         out.append({
             "Run": clean(r.get("Run")),
@@ -104,6 +129,16 @@ def write_csv(path: Path, rows, fields=None):
     with path.open("w", newline="", encoding="utf-8") as fh:
         w = csv.DictWriter(fh, fieldnames=fields, extrasaction="ignore")
         w.writeheader(); w.writerows(rows)
+
+
+def bulk_assembly_taxon(description: str, filename: str) -> str:
+    text = clean(description)
+    m = re.match(r"(?i)^transcriptome assembly of\s+(Camellia\s+.+)$", text)
+    if m: return display_taxon(m.group(1))
+    # fallback for filename forms like Camellia_foo_Trans.fas.gz
+    x = re.sub(r"(?i)(?:_Trans\.fas\.gz|\.zip|\.fas\.gz|\.gz)$", "", clean(filename))
+    x = x.replace("_", " ")
+    return display_taxon(x)
 
 
 def main():
@@ -132,7 +167,7 @@ def main():
         sra_rows_n = len(rows); sra_taxa_n = len(taxa)
     source_taxa = sorted(source_taxa)
 
-    sess = requests.Session(); sess.headers.update({"User-Agent": "Mozilla/5.0 chun-public-backbone-audit/0.2"})
+    sess = requests.Session(); sess.headers.update({"User-Agent": "Mozilla/5.0 chun-public-backbone-audit/0.3"})
     catalog = fetch_json(sess, args.tpia_base.rstrip("/") + "/selectAllassemblies")
     if isinstance(catalog, dict):
         for key in ("data", "rows", "result"):
@@ -141,7 +176,7 @@ def main():
 
     catrows = []; bytax = defaultdict(list)
     for r in catalog:
-        name = clean(r.get("name")); tax = norm_taxon(name); zip_url = ""
+        name = clean(r.get("name")); tax = display_taxon(name); zip_url = ""
         if r.get("hasZipFile"):
             zip_url = args.tpia_base.rstrip("/") + "/web/All_assemblies/Fasta/" + quote(f"{r.get('ID')}_{name}.zip", safe="_")
         row = {k: clean(v) for k, v in r.items()}
@@ -154,22 +189,80 @@ def main():
     if isinstance(bulk, dict):
         for key in ("data", "rows", "result"):
             if isinstance(bulk.get(key), list): bulk = bulk[key]; break
-    if isinstance(bulk, list): write_csv(out / "tpia_transcriptome_bulk_catalog.csv", [{k: clean(v) for k, v in r.items()} for r in bulk])
-    else: (out / "tpia_transcriptome_bulk_raw.json").write_text(json.dumps(bulk, ensure_ascii=False, indent=2) + "\n")
+    bulk_rows = []; bulk_by_tax = defaultdict(list)
+    if isinstance(bulk, list):
+        for r in bulk:
+            row = {k: clean(v) for k, v in r.items()}
+            tax = bulk_assembly_taxon(row.get("description", ""), row.get("fileName", ""))
+            is_assembly = row.get("description", "").lower().startswith("transcriptome assembly of camellia")
+            url = ""
+            if is_assembly and row.get("fileName"):
+                url = args.tpia_base.rstrip("/") + "/web/Download/Transcriptome_data/" + quote(row["fileName"])
+            row.update({"normalized_taxon": tax, "is_transcriptome_assembly": str(bool(is_assembly)), "bulk_download_url": url})
+            bulk_rows.append(row)
+            if tax and is_assembly: bulk_by_tax[tax].append(row)
+        write_csv(out / "tpia_transcriptome_bulk_catalog.csv", bulk_rows)
+    else:
+        (out / "tpia_transcriptome_bulk_raw.json").write_text(json.dumps(bulk, ensure_ascii=False, indent=2) + "\n")
 
-    cross = []; missing = []
-    for tax in source_taxa:
-        hits = bytax.get(tax, []); ziphits = [h for h in hits if h.get("assembly_zip_url")]
-        if not hits: missing.append(tax)
+    alias_rows = []
+    cross = []; unresolved = []
+    preferred = []
+    for source_tax in source_taxa:
+        query_tax = source_tax
+        match_basis = "exact_archive_tpia_species_name"
+        if source_tax in ARCHIVE_TPIA_CROSSWALK:
+            query_tax, match_basis = ARCHIVE_TPIA_CROSSWALK[source_tax]
+            alias_rows.append({"source_archive_taxon": source_tax, "tpia_resource_taxon": query_tax, "match_basis": match_basis, "scope": "Wu2022_PRJNA665925_to_TPIA_only"})
+        cat_hits = bytax.get(query_tax, [])
+        cat_zip_hits = [h for h in cat_hits if h.get("assembly_zip_url")]
+        bulk_hits = bulk_by_tax.get(query_tax, [])
+        # Prefer bulk catalog because it exposes explicit file name + advertised size;
+        # otherwise use the live all-assemblies ZIP URL.
+        if bulk_hits:
+            choice = sorted(bulk_hits, key=lambda x: (0 if x.get("sourceData") == "PRJNA665925" else 1, x.get("no", "")))[0]
+            preferred_url = choice.get("bulk_download_url", "")
+            preferred_name = choice.get("fileName", "")
+            preferred_size = choice.get("size", "")
+            preferred_source = "tpia_bulk_transcriptome_catalog"
+        elif cat_zip_hits:
+            choice = sorted(cat_zip_hits, key=lambda x: (0 if x.get("sourceData") == "PRJNA665925" else 1, x.get("ID", "")))[0]
+            preferred_url = choice.get("assembly_zip_url", "")
+            preferred_name = f"{choice.get('ID')}_{choice.get('name')}.zip"
+            preferred_size = ""
+            preferred_source = "tpia_selectAllassemblies"
+        else:
+            preferred_url = preferred_name = preferred_size = preferred_source = ""
+            unresolved.append(source_tax)
+
         cross.append({
-            "source_taxon": tax,
-            "tpia_match_count": len(hits),
-            "tpia_names": ";".join(sorted({h.get("name", "") for h in hits})),
-            "zip_match_count": len(ziphits),
-            "zip_urls": ";".join(h["assembly_zip_url"] for h in ziphits),
-            "status": "downloadable_assembly" if ziphits else ("catalog_only_no_zip" if hits else "missing_from_tpia_catalog"),
+            "source_taxon": source_tax,
+            "tpia_resource_taxon": query_tax,
+            "match_basis": match_basis,
+            "tpia_catalog_match_count": len(cat_hits),
+            "tpia_catalog_zip_count": len(cat_zip_hits),
+            "tpia_bulk_assembly_count": len(bulk_hits),
+            "preferred_assembly_source": preferred_source,
+            "preferred_assembly_file": preferred_name,
+            "preferred_assembly_size_advertised": preferred_size,
+            "preferred_assembly_url": preferred_url,
+            "status": "downloadable_assembly" if preferred_url else "unresolved_no_public_assembly",
         })
+        if preferred_url:
+            preferred.append({
+                "source_taxon": source_tax,
+                "resource_taxon": query_tax,
+                "match_basis": match_basis,
+                "assembly_source": preferred_source,
+                "assembly_file": preferred_name,
+                "advertised_size": preferred_size,
+                "assembly_url": preferred_url,
+                "analysis_role": "species_level_nuclear_backbone_input",
+                "claim_ceiling": "Wu2022 resource crosswalk; one assembly per species-level SRA taxon; not exact reconstruction of all 116 paper tips",
+            })
+    write_csv(out / "wu2022_archive_tpia_alias_crosswalk.csv", alias_rows, ["source_archive_taxon","tpia_resource_taxon","match_basis","scope"])
     write_csv(out / "wu2022_tpia_species_crosswalk.csv", cross)
+    write_csv(out / "wu2022_preferred_assembly_manifest.csv", preferred)
 
     summary = {
         "source": "+".join(source_parts),
@@ -178,14 +271,17 @@ def main():
         "table_s1_sheet": table_sheet,
         "table_s1_rows": table_rows_n,
         "sra_runinfo_rows": sra_rows_n,
-        "sra_unique_camellia_taxa": sra_taxa_n,
-        "source_unique_camellia_taxa": len(source_taxa),
+        "sra_unique_camellia_species_level_taxa": sra_taxa_n,
+        "source_unique_camellia_species_level_taxa": len(source_taxa),
         "tpia_catalog_rows": len(catrows),
-        "tpia_unique_camellia_taxa": len(bytax),
-        "source_taxa_with_tpia_catalog_match": sum(1 for r in cross if int(r["tpia_match_count"]) > 0),
-        "source_taxa_with_downloadable_zip": sum(1 for r in cross if int(r["zip_match_count"]) > 0),
-        "missing_source_taxa": missing,
-        "claim_ceiling": "asset/crosswalk gate only; species-level reconstruction may omit duplicated cultivated-tea tips; no topology or transition inference",
+        "tpia_unique_camellia_species_level_taxa": len(bytax),
+        "tpia_bulk_rows": len(bulk_rows),
+        "tpia_bulk_transcriptome_assemblies": sum(1 for r in bulk_rows if r.get("is_transcriptome_assembly") == "True"),
+        "archive_tpia_explicit_crosswalk_rows": len(alias_rows),
+        "source_taxa_with_downloadable_preferred_assembly": len(preferred),
+        "unresolved_source_taxa": unresolved,
+        "coverage_fraction": len(preferred) / len(source_taxa) if source_taxa else None,
+        "claim_ceiling": "asset/crosswalk gate only; one assembly per PRJNA665925 species-level taxon; duplicated cultivated-tea paper tips omitted unless separately crosswalked; no topology or transition inference",
     }
     (out / "summary.json").write_text(json.dumps(summary, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
     print(json.dumps(summary, ensure_ascii=False, indent=2))
