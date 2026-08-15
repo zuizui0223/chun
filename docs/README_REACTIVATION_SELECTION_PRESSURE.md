@@ -4,11 +4,13 @@ Current synthesis: `REACTIVATION_SELECTION_PRESSURE_PRELIMINARY_SYNTHESIS.md`.
 
 Machine-readable evidence separation: `../data/reactivation_selection_pressure_evidence_map_v0_1.csv`.
 
-Competing-model preliminary screen: `../data/reactivation_selection_pressure_hypothesis_screen_v0_1.csv`.
+Latest competing-model preliminary screen: `../data/reactivation_selection_pressure_hypothesis_screen_v0_2.csv`.
 
 Problem registry generated from `chun` results: `../data/reactivation_selection_pressure_problem_registry_v0_1.csv`.
 
 Count-controlled historical concentration result: `../data/camellia_visible_state_section_concentration_v0_1.csv` with reproducer `../scripts/analyze_visible_state_section_concentration.py`.
+
+Section-relative climatic-novelty screen: `../data/camellia_section_relative_niche_displacement_v0_1.csv` with reproducer `../scripts/analyze_section_relative_niche_displacement.py`.
 
 Inference order:
 
