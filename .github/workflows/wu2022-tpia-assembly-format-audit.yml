@@ -1,0 +1,88 @@
+name: Wu 2022 TPIA assembly format audit
+
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/wu2022-tpia-assembly-format-audit.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - name: Download representative Wu/TPIA assemblies
+        run: |
+          mkdir -p build/wu_format/download build/wu_format/extracted
+          python - <<'PY'
+          import csv, pathlib, urllib.parse, urllib.request
+          # Representative source-table lineages / colours in the current programme.
+          taxa = [
+            ('Camellia pilosperma','Camellia pilosperma.zip'),
+            ('Camellia reticulata','Camellia reticulata.zip'),
+            ('Camellia euphlebia','Camellia euphlebia.zip'),
+          ]
+          base='https://tpia.teaplants.cn/web/Download/Transcriptome_data/'
+          out=pathlib.Path('build/wu_format/download')
+          for tax,fn in taxa:
+              url=base+urllib.parse.quote(fn)
+              req=urllib.request.Request(url,headers={'User-Agent':'Mozilla/5.0 chun-backbone-format-audit/0.1'})
+              with urllib.request.urlopen(req,timeout=120) as r:
+                  data=r.read()
+              p=out/fn.replace(' ','_')
+              p.write_bytes(data)
+              print(tax, len(data), url)
+          PY
+      - name: Inventory archives and sequence types
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import zipfile, gzip, json, re, shutil
+          root=Path('build/wu_format')
+          result=[]
+          for zp in sorted((root/'download').glob('*')):
+              rec={'archive':zp.name,'bytes':zp.stat().st_size,'members':[]}
+              try:
+                  z=zipfile.ZipFile(zp)
+              except Exception as e:
+                  rec['zip_error']=str(e); result.append(rec); continue
+              dest=root/'extracted'/zp.stem; dest.mkdir(parents=True,exist_ok=True)
+              for info in z.infolist():
+                  if info.is_dir(): continue
+                  name=info.filename
+                  member={'name':name,'bytes_uncompressed':info.file_size}
+                  # Read only first 1 MiB to classify without unnecessary extraction.
+                  with z.open(info) as fh: head=fh.read(1024*1024)
+                  if name.lower().endswith('.gz'):
+                      try: head=gzip.decompress(head)
+                      except Exception: pass
+                  txt=head.decode('utf-8',errors='ignore')
+                  headers=[ln for ln in txt.splitlines() if ln.startswith('>')][:3]
+                  seq=''.join(ln.strip() for ln in txt.splitlines() if ln and not ln.startswith('>'))[:5000].upper()
+                  letters=set(seq)-set('NX-?')
+                  dna_frac=(sum(c in 'ACGT' for c in seq)/len(seq)) if seq else None
+                  member['first_headers']=headers
+                  member['dna_fraction_first5k']=dna_frac
+                  member['classification']='nucleotide_like' if dna_frac is not None and dna_frac>0.95 else ('protein_or_other' if seq else 'non_fasta_or_empty')
+                  rec['members'].append(member)
+              result.append(rec)
+          (root/'inventory.json').write_text(json.dumps(result,indent=2)+'\n')
+          print(json.dumps(result,indent=2))
+          PY
+      - name: Report
+        if: always()
+        run: |
+          echo '### Representative TPIA assembly archive inventory' >> "$GITHUB_STEP_SUMMARY"
+          echo '```json' >> "$GITHUB_STEP_SUMMARY"
+          cat build/wu_format/inventory.json >> "$GITHUB_STEP_SUMMARY" || true
+          echo '```' >> "$GITHUB_STEP_SUMMARY"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: wu2022-tpia-assembly-format-audit
+          path: build/wu_format/inventory.json
+          if-no-files-found: error
