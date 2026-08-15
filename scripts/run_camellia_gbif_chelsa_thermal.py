@@ -6,7 +6,7 @@ It deliberately restricts climate to mean annual temperature (BIO1) and minimum
 temperature of the coldest month (BIO6), and treats species as replicate units.
 """
 from __future__ import annotations
-import argparse, csv, json, math, pathlib, time
+import argparse, json, pathlib, time
 from collections import Counter
 import numpy as np
 import rasterio
@@ -53,6 +53,12 @@ def main():
         taxon=seed['taxon'].strip(); m=gbif_match(taxon); matches.append({**seed,**m})
         if not m['usageKey']:
             audit.append({'taxon':taxon,'status':'no_gbif_match'}); continue
+        # Hard admission gate: a requested species must resolve at species rank.
+        # Synonym status is acceptable, but HIGHERRANK genus matches are not.
+        if str(m.get('rank','')).upper() != 'SPECIES':
+            audit.append({'taxon':taxon,'gbif_taxon_key':m['usageKey'],'matched_scientific_name':m.get('scientificName',''),'matched_rank':m.get('rank',''),'match_type':m.get('matchType',''),'status':'reject_non_species_gbif_match'})
+            print(taxon,'REJECT',m.get('rank'),m.get('scientificName'),flush=True)
+            continue
         key=int(m['usageKey']); raw=[]; total=0
         for country in [x.strip() for x in seed['native_country_codes'].split(';') if x.strip()]:
             rr,n=fetch_occurrences(key,country,3000); raw.extend(rr); total+=n
@@ -78,13 +84,13 @@ def main():
     for metric in ('bio1_median','bio6_median','bio6_q05','bio1_iqr'):
         aa=[float(r[metric]) for r in species if r['colour_state']=='A']; yy=[float(r[metric]) for r in species if r['colour_state']=='Y']
         if len(aa)>=2 and len(yy)>=2:
-            x=exact_label_permutation(aa,yy); tests.append({'metric':metric,'n_A':len(aa),'n_Y':len(yy),'A_mean':float(np.mean(aa)),'Y_mean':float(np.mean(yy)),**x,'scope':'species-level exact permutation; native-country GBIF filtering; not phylogenetically corrected'})
+            x=exact_label_permutation(aa,yy); tests.append({'metric':metric,'n_A':len(aa),'n_Y':len(yy),'A_mean':float(np.mean(aa)),'Y_mean':float(np.mean(yy)),**x,'scope':'species-level exact permutation; native-country GBIF filtering; species-rank GBIF match required; not phylogenetically corrected'})
     write_csv(a.out_dir/'A_vs_Y_thermal_tests.csv',tests)
     bt={r['taxon']:r for r in species}; pair=[]
     if 'Camellia japonica' in bt and 'Camellia rusticana' in bt:
         for metric in ('bio1_median','bio6_median','bio6_q05'):
             pair.append({'metric':metric,'japonica':bt['Camellia japonica'][metric],'rusticana':bt['Camellia rusticana'][metric],'rusticana_minus_japonica':float(bt['Camellia rusticana'][metric])-float(bt['Camellia japonica'][metric])})
     write_csv(a.out_dir/'japonica_rusticana_thermal_pair.csv',pair)
-    summary={'n_taxa_seeded':len(taxa),'n_species_admitted':len(species),'admitted_by_colour':dict(Counter(r['colour_state'] for r in species)),'thermal_provider':'CHELSA v2.1 1981-2010 BIO1/BIO6','claim_ceiling':'direct preliminary species-level thermal association; not phylogenetically corrected or causal'}
+    summary={'n_taxa_seeded':len(taxa),'n_species_admitted':len(species),'admitted_by_colour':dict(Counter(r['colour_state'] for r in species)),'thermal_provider':'CHELSA v2.1 1981-2010 BIO1/BIO6','taxonomic_gate':'GBIF match must resolve at SPECIES rank; synonyms allowed; higher-rank matches rejected','claim_ceiling':'direct preliminary species-level thermal association; not phylogenetically corrected or causal'}
     (a.out_dir/'analysis_summary.json').write_text(json.dumps(summary,indent=2)+'\n'); print(json.dumps(summary,indent=2))
 if __name__=='__main__': main()
