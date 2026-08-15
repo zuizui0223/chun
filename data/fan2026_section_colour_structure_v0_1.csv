@@ -1,0 +1,2 @@
+n_species,n_sections,pearson_chi2,degrees_freedom,asymptotic_p,cramers_v,permutations,permutation_p,seed,interpretation
+98,17,178.64589673913042,32,2.717572153781199e-22,0.9547034392062794,100000,0.000009999900001,20260815,"strong traditional-section/colour structure; section is a taxonomic-history proxy, not a nuclear phylogeny"
