@@ -1,0 +1,7 @@
+pattern_class,n_independent_inputs,direction,examples,chun_interpretation,claim_ceiling
+cold_highUV_pigmentation_support,2,support,"Chinese woody plants; Potentilleae","floral pigmentation can repeatedly increase toward colder/high-UV environments","association only; no trait-before-niche causality"
+high_elevation_colour_lability,1,support,"central Nepal Himalaya","high elevation can coincide with increased floral colour disparity/evolutionary rate","does not isolate anthocyanin mechanism"
+pollinator_structured_high_elevation_colour,1,mixed,"Taiwan flora","high-elevation colour structure need not be a direct abiotic pigment response","pollinator/community assembly alternatives remain open"
+micro_environment_association_macro_null,1,counterexample,"monkeyflower radiations","environment-responsive anthocyanin polymorphism can fail to become macroevolutionary colour-niche coupling","supports micro-macro decoupling and need for persistence/filtering"
+camellia_geographic_expansion_pattern,1,unresolved,"Fan 2026 Camellia","yellow remains southern/ancestral while red-white are broader; direct climatic test still missing","cannot infer cold adaptation from geography alone"
+overall_preliminary_result,6,mixed,"all inputs","accessibility generates variation but macro coupling appears conditional on ecological/geographic filtering","accessibility_x_filter is preferred general hypothesis; cold-anthocyanin expansion remains special-case hypothesis"
