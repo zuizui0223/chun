@@ -1,0 +1,1 @@
+Issue to track generation versus persistence decomposition; see docs/IDEA_GENERATION_PERSISTENCE_DECOMPOSITION.md
