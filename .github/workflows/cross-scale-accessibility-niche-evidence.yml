@@ -27,5 +27,16 @@ jobs:
             --micro data/camellia_direction_sign_meta_v0_1.csv \
             --macro data/macro_colour_environment_evidence_summary_v0_1.csv \
             --output /tmp/cross_scale.csv
-      - name: Verify frozen result
-        run: diff -u data/cross_scale_evidence_contrast_v0_1.csv /tmp/cross_scale.csv
+      - name: Verify frozen result semantically
+        run: |
+          python - <<'PY'
+          import csv
+          def rows(p):
+              with open(p, newline='', encoding='utf-8-sig') as f:
+                  return list(csv.DictReader(f))
+          frozen=rows('data/cross_scale_evidence_contrast_v0_1.csv')
+          fresh=rows('/tmp/cross_scale.csv')
+          if frozen != fresh:
+              raise SystemExit(f'cross-scale result differs\nfrozen={frozen}\nfresh={fresh}')
+          print(f'cross-scale result reproduced: {len(frozen)} rows')
+          PY
