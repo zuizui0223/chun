@@ -1,0 +1,93 @@
+name: Fan 2026 species-scale GBIF CHELSA thermal
+
+on:
+  pull_request:
+    paths:
+      - 'scripts/build_fan2026_species_colour_seed.py'
+      - 'scripts/run_fan2026_gbif_chelsa_thermal.py'
+      - 'scripts/run_camellia_gbif_worldclim_niche.py'
+      - 'scripts/run_camellia_gbif_chelsa_thermal.py'
+      - '.github/workflows/fan2026-gbif-chelsa-thermal.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  thermal:
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: python -m pip install --disable-pip-version-check openpyxl numpy requests rasterio
+      - name: Acquire Fan 2026 Data S1 from PMC OA package
+        run: |
+          mkdir -p build/fan_macro/package build/chelsa build/fan_macro/result
+          curl --fail --location --retry 3 'https://www.ncbi.nlm.nih.gov/pmc/utils/oa/oa.fcgi?id=PMC12946509' -o build/fan_macro/oa.xml
+          python - <<'PY'
+          import xml.etree.ElementTree as ET
+          from pathlib import Path
+          root=ET.fromstring(Path('build/fan_macro/oa.xml').read_bytes())
+          links=[x.attrib.get('href','') for x in root.findall('.//link') if x.attrib.get('format')=='tgz']
+          if len(links)!=1: raise SystemExit(f'unexpected OA links {links}')
+          u=links[0]
+          if u.startswith('ftp://ftp.ncbi.nlm.nih.gov/'):
+              u='https://ftp.ncbi.nlm.nih.gov/'+u.split('ftp://ftp.ncbi.nlm.nih.gov/',1)[1]
+          Path('build/fan_macro/url').write_text(u+'\n')
+          PY
+          u=$(cat build/fan_macro/url)
+          if ! curl --fail --location --retry 3 --retry-all-errors "$u" -o build/fan_macro/a.tgz; then
+            u2=$(python - <<'PY'
+          from pathlib import Path
+          u=Path('build/fan_macro/url').read_text().strip(); m='https://ftp.ncbi.nlm.nih.gov/pub/pmc/'
+          print(u.replace(m,m+'deprecated/',1) if u.startswith(m) and '/deprecated/' not in u else u)
+          PY
+          )
+            curl --fail --location --retry 3 --retry-all-errors "$u2" -o build/fan_macro/a.tgz
+          fi
+          tar -xzf build/fan_macro/a.tgz -C build/fan_macro/package
+          xlsx=$(find build/fan_macro/package -type f -iname '*s002*.xlsx' | head -n 1)
+          test -n "$xlsx"
+          cp "$xlsx" build/fan_macro/DataS1.xlsx
+      - name: Build deterministic species colour seed
+        run: |
+          python scripts/build_fan2026_species_colour_seed.py \
+            build/fan_macro/DataS1.xlsx \
+            --output build/fan_macro/fan_species_colour_seed.csv \
+            --audit build/fan_macro/fan_species_colour_seed_audit.json
+      - name: Download CHELSA BIO1 and BIO6
+        run: |
+          base='https://os.zhdk.cloud.switch.ch/chelsav2/GLOBAL/climatologies/1981-2010/bio'
+          for b in 1 6; do
+            f="CHELSA_bio${b}_1981-2010_V.2.1.tif"
+            curl --fail --location --retry 3 --retry-all-errors --connect-timeout 20 --max-time 300 "$base/$f" -o "build/chelsa/$f"
+          done
+      - name: Run 106-species GBIF CHELSA thermal analysis
+        run: |
+          python scripts/run_fan2026_gbif_chelsa_thermal.py \
+            --taxa build/fan_macro/fan_species_colour_seed.csv \
+            --bio1 build/chelsa/CHELSA_bio1_1981-2010_V.2.1.tif \
+            --bio6 build/chelsa/CHELSA_bio6_1981-2010_V.2.1.tif \
+            --out-dir build/fan_macro/result \
+            --min-points 5 --cap-points 80 --gbif-cap-per-country 1000
+      - name: Report
+        if: always()
+        run: |
+          echo '### Fan 2026 species-scale thermal analysis' >> "$GITHUB_STEP_SUMMARY"
+          for f in fan_species_colour_seed_audit.json result/analysis_summary.json result/colour_pairwise_thermal_tests.csv result/section_blocked_colour_tests.csv; do
+            if [ -f "build/fan_macro/$f" ]; then
+              echo "#### $f" >> "$GITHUB_STEP_SUMMARY"
+              echo '```' >> "$GITHUB_STEP_SUMMARY"
+              cat "build/fan_macro/$f" >> "$GITHUB_STEP_SUMMARY"
+              echo '```' >> "$GITHUB_STEP_SUMMARY"
+            fi
+          done
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: fan2026-species-scale-thermal
+          path: build/fan_macro
+          if-no-files-found: error
