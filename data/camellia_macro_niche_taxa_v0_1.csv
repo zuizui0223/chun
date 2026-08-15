@@ -1,0 +1,12 @@
+taxon,colour_state,pigment_proxy,native_country_codes,source_basis,source_doi_or_registry,analysis_role,notes
+Camellia japonica,A,anthocyanin_like_red,JP,"wild red species; pollination and colour evidence",10.1016/j.pld.2020.12.009;SRC_CAM_2026_TE,core,"Japan only to reduce cultivated-range contamination"
+Camellia rusticana,A,anthocyanin_like_red,JP,"wild red species; snowy-range sister comparison",10.1016/j.pld.2020.12.009;10.1002/ece3.70721,core,"critical cold-niche counterexample; Japanese native records only"
+Camellia pilosperma,W,white,CN,"basal white taxon in Fan 2026 framework",SRC_CAM_2026_TE,core,"root-anchor phenotype; China records only"
+Camellia chrysanthoides,Y,yellow_anthocyanin_suppressed,CN,"yellow taxon with MYB60-linked suppression evidence",SRC_CAM_2026_TE,core,"visible yellow; yellow pigment chemistry itself unresolved"
+Camellia nitidissima,Y,flavonol_plus_carotenoid_yellow,CN,"strong taxon-specific pigment chemistry",10.3389/fpls.2017.01545;10.1186/s12870-024-05332-w,core,"Guangxi-centered golden yellow species"
+Camellia longruiensis,Y,flavonol_supported_yellow,CN,"WRKY23-FLS functional evidence",10.1016/j.indcrop.2026.123200,core,"southern China karst"
+Camellia cucphuongensis,Y,visible_yellow,VN,"distinct yellow nuclear trajectory",10.1016/j.indcrop.2026.123200,core,"chemistry unresolved; Vietnam records only"
+Camellia flava,Y,visible_yellow,VN,"distinct yellow nuclear trajectory",10.1016/j.indcrop.2026.123200,core,"chemistry unresolved; Vietnam records only"
+Camellia petelotii,Y,visible_yellow,CN;VN,"yellow/golden wild species with direct bird-exclusion study",10.3732/ajb.1600428,secondary,"country filter spans southern China and northern Vietnam; taxonomic matching audited at runtime"
+Camellia pubipetala,Y,visible_yellow,CN,"Sect. Chrysantha yellow-group wild species",10.1111/1442-1984.12247,secondary,"Guangxi karst"
+Camellia perpetua,Y,visible_yellow,CN,"golden-camellia lineage with seasonal bird/bee comparison",10.1016/j.flora.2025.152727,secondary,"Guangxi karst; long flowering season"
