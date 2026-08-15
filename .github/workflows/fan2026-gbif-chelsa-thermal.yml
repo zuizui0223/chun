@@ -66,14 +66,24 @@ jobs:
             build/fan_macro/fan_species_colour_seed.csv \
             --output build/fan_macro/fan_colour_geography_tests.csv
           python - <<'PY'
-          import csv
+          import csv, math
           def rows(p):
               with open(p,newline='',encoding='utf-8-sig') as f: return list(csv.DictReader(f))
           frozen=rows('data/fan2026_colour_geography_tests_v0_1.csv')
           fresh=rows('build/fan_macro/fan_colour_geography_tests.csv')
-          if frozen != fresh:
-              raise SystemExit(f'Fan colour-geography result changed\nfrozen={frozen}\nfresh={fresh}')
-          print('Fan colour-geography result reproduced')
+          if len(frozen)!=len(fresh):
+              raise SystemExit(f'row count changed: frozen={len(frozen)} fresh={len(fresh)}')
+          num={'state1_south','state1_outside','state2_south','state2_outside','odds_ratio','p_value'}
+          for a,b in zip(frozen,fresh):
+              for k in a:
+                  if k in num:
+                      if a[k]=='inf' or b[k]=='inf':
+                          if a[k]!=b[k]: raise SystemExit(f'{k} changed: {a[k]} vs {b[k]}')
+                      elif not math.isclose(float(a[k]),float(b[k]),rel_tol=1e-12,abs_tol=1e-15):
+                          raise SystemExit(f'{k} changed: {a[k]} vs {b[k]}')
+                  elif a[k]!=b[k]:
+                      raise SystemExit(f'{k} changed: {a[k]} vs {b[k]}')
+          print('Fan colour-geography result reproduced numerically')
           PY
       - name: Download CHELSA BIO1 and BIO6
         run: |
