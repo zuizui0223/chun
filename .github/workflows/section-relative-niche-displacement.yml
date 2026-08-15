@@ -1,0 +1,38 @@
+name: Camellia section-relative niche displacement
+
+on:
+  push:
+    paths:
+      - 'data/fan2026_chelsa_species_compact_v0_1.csv'
+      - 'data/camellia_coldtail_provenance_sensitivity_v0_1.csv'
+      - 'data/camellia_section_relative_niche_displacement_v0_1.csv'
+      - 'scripts/analyze_section_relative_niche_displacement.py'
+      - '.github/workflows/section-relative-niche-displacement.yml'
+  pull_request:
+    paths:
+      - 'data/fan2026_chelsa_species_compact_v0_1.csv'
+      - 'data/camellia_coldtail_provenance_sensitivity_v0_1.csv'
+      - 'data/camellia_section_relative_niche_displacement_v0_1.csv'
+      - 'scripts/analyze_section_relative_niche_displacement.py'
+      - '.github/workflows/section-relative-niche-displacement.yml'
+
+jobs:
+  reproduce:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install dependency
+        run: python -m pip install --disable-pip-version-check numpy
+      - name: Recompute frozen result
+        run: |
+          python scripts/analyze_section_relative_niche_displacement.py \
+            data/fan2026_chelsa_species_compact_v0_1.csv \
+            data/camellia_coldtail_provenance_sensitivity_v0_1.csv \
+            --output /tmp/niche_displacement.csv \
+            --permutations 100000 \
+            --seed 20260815
+      - name: Check frozen output
+        run: diff -u data/camellia_section_relative_niche_displacement_v0_1.csv /tmp/niche_displacement.csv
