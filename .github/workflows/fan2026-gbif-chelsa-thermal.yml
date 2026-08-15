@@ -4,6 +4,8 @@ on:
   pull_request:
     paths:
       - 'scripts/build_fan2026_species_colour_seed.py'
+      - 'scripts/analyze_fan2026_colour_geography.py'
+      - 'data/fan2026_colour_geography_tests_v0_1.csv'
       - 'scripts/run_fan2026_gbif_chelsa_thermal.py'
       - 'scripts/run_camellia_gbif_worldclim_niche.py'
       - 'scripts/run_camellia_gbif_chelsa_thermal.py'
@@ -58,6 +60,21 @@ jobs:
             build/fan_macro/DataS1.xlsx \
             --output build/fan_macro/fan_species_colour_seed.csv \
             --audit build/fan_macro/fan_species_colour_seed_audit.json
+      - name: Quantify source geography
+        run: |
+          python scripts/analyze_fan2026_colour_geography.py \
+            build/fan_macro/fan_species_colour_seed.csv \
+            --output build/fan_macro/fan_colour_geography_tests.csv
+          python - <<'PY'
+          import csv
+          def rows(p):
+              with open(p,newline='',encoding='utf-8-sig') as f: return list(csv.DictReader(f))
+          frozen=rows('data/fan2026_colour_geography_tests_v0_1.csv')
+          fresh=rows('build/fan_macro/fan_colour_geography_tests.csv')
+          if frozen != fresh:
+              raise SystemExit(f'Fan colour-geography result changed\nfrozen={frozen}\nfresh={fresh}')
+          print('Fan colour-geography result reproduced')
+          PY
       - name: Download CHELSA BIO1 and BIO6
         run: |
           base='https://os.zhdk.cloud.switch.ch/chelsav2/GLOBAL/climatologies/1981-2010/bio'
@@ -77,7 +94,7 @@ jobs:
         if: always()
         run: |
           echo '### Fan 2026 species-scale thermal analysis' >> "$GITHUB_STEP_SUMMARY"
-          for f in fan_species_colour_seed_audit.json result/analysis_summary.json result/colour_pairwise_thermal_tests.csv result/section_blocked_colour_tests.csv; do
+          for f in fan_species_colour_seed_audit.json fan_colour_geography_tests.csv result/analysis_summary.json result/colour_pairwise_thermal_tests.csv result/section_blocked_colour_tests.csv; do
             if [ -f "build/fan_macro/$f" ]; then
               echo "#### $f" >> "$GITHUB_STEP_SUMMARY"
               echo '```' >> "$GITHUB_STEP_SUMMARY"
