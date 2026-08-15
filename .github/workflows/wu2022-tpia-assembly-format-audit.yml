@@ -18,36 +18,39 @@ jobs:
       - name: Download one representative Wu/TPIA assembly
         run: |
           mkdir -p build/wu_format/download
-          # Use the live All-assemblies endpoint rather than the slower bulk endpoint.
-          # C. albo-sericea is PRJNA665925 and its advertised assembly is relatively small.
           curl --fail --location --retry 2 --retry-all-errors \
             --connect-timeout 15 --max-time 180 \
             'https://tpia.teaplants.cn/web/All_assemblies/Fasta/194_Camellia%20albo-sericea.zip' \
             -o build/wu_format/download/Camellia_albo-sericea.zip
-          ls -lh build/wu_format/download/Camellia_albo-sericea.zip
       - name: Inventory archive and sequence types
         run: |
           python - <<'PY'
           from pathlib import Path
-          import zipfile, gzip, json
+          import zipfile, gzip, json, hashlib
           zp=Path('build/wu_format/download/Camellia_albo-sericea.zip')
-          rec={'archive':zp.name,'bytes':zp.stat().st_size,'members':[]}
+          rec={'archive':zp.name,'bytes':zp.stat().st_size,'sha256':hashlib.sha256(zp.read_bytes()).hexdigest(),'members':[]}
           with zipfile.ZipFile(zp) as z:
               for info in z.infolist():
                   if info.is_dir(): continue
                   name=info.filename
-                  member={'name':name,'bytes_uncompressed':info.file_size}
-                  with z.open(info) as fh: head=fh.read(min(info.file_size,1024*1024))
-                  if name.lower().endswith('.gz'):
-                      try: head=gzip.decompress(head)
-                      except Exception: pass
-                  txt=head.decode('utf-8',errors='ignore')
-                  headers=[ln for ln in txt.splitlines() if ln.startswith('>')][:3]
-                  seq=''.join(ln.strip() for ln in txt.splitlines() if ln and not ln.startswith('>'))[:5000].upper()
-                  dna_frac=(sum(c in 'ACGT' for c in seq)/len(seq)) if seq else None
+                  member={'name':name,'inner_gzip_bytes':info.file_size}
+                  with z.open(info) as raw:
+                      if name.lower().endswith('.gz'):
+                          with gzip.GzipFile(fileobj=raw, mode='rb') as dec:
+                              head=dec.read(1024*1024)
+                      else:
+                          head=raw.read(1024*1024)
+                  txt=head.decode('utf-8',errors='replace')
+                  lines=txt.splitlines()
+                  headers=[ln for ln in lines if ln.startswith('>')][:3]
+                  seq=''.join(ln.strip() for ln in lines if ln and not ln.startswith('>'))[:10000].upper()
+                  dna_frac=(sum(c in 'ACGTUN' for c in seq)/len(seq)) if seq else None
+                  aa_frac=(sum(c in 'ABCDEFGHIKLMNPQRSTVWXYZ*' for c in seq)/len(seq)) if seq else None
                   member['first_headers']=headers
-                  member['dna_fraction_first5k']=dna_frac
-                  member['classification']='nucleotide_like' if dna_frac is not None and dna_frac>0.95 else ('protein_or_other' if seq else 'non_fasta_or_empty')
+                  member['first_sequence_chars']=seq[:120]
+                  member['dna_fraction_first10k']=dna_frac
+                  member['aa_alphabet_fraction_first10k']=aa_frac
+                  member['classification']='nucleotide_fasta' if dna_frac is not None and dna_frac>0.95 else ('protein_fasta' if aa_frac is not None and aa_frac>0.95 else 'other_or_unparsed')
                   rec['members'].append(member)
           Path('build/wu_format/inventory.json').write_text(json.dumps(rec,indent=2)+'\n')
           print(json.dumps(rec,indent=2))
