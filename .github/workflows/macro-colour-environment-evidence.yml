@@ -25,5 +25,16 @@ jobs:
           python scripts/summarize_macro_colour_environment_evidence.py \
             data/macro_flower_colour_environment_synthesis_v0_1.csv \
             --output /tmp/macro_summary.csv
-      - name: Verify frozen summary
-        run: diff -u data/macro_colour_environment_evidence_summary_v0_1.csv /tmp/macro_summary.csv
+      - name: Verify frozen summary semantically
+        run: |
+          python - <<'PY'
+          import csv
+          def rows(p):
+              with open(p, newline='', encoding='utf-8-sig') as f:
+                  return list(csv.DictReader(f))
+          frozen=rows('data/macro_colour_environment_evidence_summary_v0_1.csv')
+          fresh=rows('/tmp/macro_summary.csv')
+          if frozen != fresh:
+              raise SystemExit(f'macro evidence result differs\nfrozen={frozen}\nfresh={fresh}')
+          print(f'macro evidence result reproduced: {len(frozen)} rows')
+          PY
