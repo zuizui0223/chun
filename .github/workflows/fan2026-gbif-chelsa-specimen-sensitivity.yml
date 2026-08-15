@@ -1,0 +1,77 @@
+name: Fan 2026 specimen-only CHELSA sensitivity
+
+on:
+  pull_request:
+    paths:
+      - 'scripts/build_fan2026_species_colour_seed.py'
+      - 'scripts/run_fan2026_gbif_chelsa_thermal.py'
+      - 'scripts/run_camellia_gbif_worldclim_niche.py'
+      - 'scripts/run_camellia_gbif_chelsa_thermal.py'
+      - '.github/workflows/fan2026-gbif-chelsa-specimen-sensitivity.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  specimen:
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: python -m pip install --disable-pip-version-check openpyxl numpy requests rasterio
+      - name: Acquire Fan Data S1 and species seed
+        run: |
+          mkdir -p build/specimen/package build/chelsa build/specimen/result
+          curl --fail --location --retry 3 'https://www.ncbi.nlm.nih.gov/pmc/utils/oa/oa.fcgi?id=PMC12946509' -o build/specimen/oa.xml
+          python - <<'PY'
+          import xml.etree.ElementTree as ET
+          from pathlib import Path
+          root=ET.fromstring(Path('build/specimen/oa.xml').read_bytes())
+          links=[x.attrib.get('href','') for x in root.findall('.//link') if x.attrib.get('format')=='tgz']
+          if len(links)!=1: raise SystemExit(links)
+          u=links[0]
+          if u.startswith('ftp://ftp.ncbi.nlm.nih.gov/'): u='https://ftp.ncbi.nlm.nih.gov/'+u.split('ftp://ftp.ncbi.nlm.nih.gov/',1)[1]
+          Path('build/specimen/url').write_text(u+'\n')
+          PY
+          u=$(cat build/specimen/url)
+          if ! curl --fail --location --retry 3 --retry-all-errors "$u" -o build/specimen/a.tgz; then
+            u2=$(python - <<'PY'
+          from pathlib import Path
+          u=Path('build/specimen/url').read_text().strip(); m='https://ftp.ncbi.nlm.nih.gov/pub/pmc/'
+          print(u.replace(m,m+'deprecated/',1) if u.startswith(m) and '/deprecated/' not in u else u)
+          PY
+          )
+            curl --fail --location --retry 3 --retry-all-errors "$u2" -o build/specimen/a.tgz
+          fi
+          tar -xzf build/specimen/a.tgz -C build/specimen/package
+          xlsx=$(find build/specimen/package -type f -iname '*s002*.xlsx' | head -n 1); test -n "$xlsx"; cp "$xlsx" build/specimen/DataS1.xlsx
+          python scripts/build_fan2026_species_colour_seed.py build/specimen/DataS1.xlsx --output build/specimen/seed.csv --audit build/specimen/seed_audit.json
+      - name: Download CHELSA BIO1 BIO6
+        run: |
+          base='https://os.zhdk.cloud.switch.ch/chelsav2/GLOBAL/climatologies/1981-2010/bio'
+          for b in 1 6; do f="CHELSA_bio${b}_1981-2010_V.2.1.tif"; curl --fail --location --retry 3 --retry-all-errors --connect-timeout 20 --max-time 300 "$base/$f" -o "build/chelsa/$f"; done
+      - name: Run specimen-only sensitivity
+        run: |
+          python scripts/run_fan2026_gbif_chelsa_thermal.py \
+            --taxa build/specimen/seed.csv \
+            --bio1 build/chelsa/CHELSA_bio1_1981-2010_V.2.1.tif \
+            --bio6 build/chelsa/CHELSA_bio6_1981-2010_V.2.1.tif \
+            --out-dir build/specimen/result \
+            --record-mode specimen_only --min-points 5 --cap-points 80 --gbif-cap-per-country 1000
+      - name: Report
+        if: always()
+        run: |
+          echo '### Fan 2026 specimen-only sensitivity' >> "$GITHUB_STEP_SUMMARY"
+          for f in result/analysis_summary.json result/colour_pairwise_thermal_tests.csv result/section_blocked_colour_tests.csv; do
+            if [ -f "build/specimen/$f" ]; then echo "#### $f" >> "$GITHUB_STEP_SUMMARY"; echo '```' >> "$GITHUB_STEP_SUMMARY"; cat "build/specimen/$f" >> "$GITHUB_STEP_SUMMARY"; echo '```' >> "$GITHUB_STEP_SUMMARY"; fi
+          done
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: fan2026-specimen-only-thermal
+          path: build/specimen
+          if-no-files-found: error
