@@ -9,6 +9,7 @@ on:
       - 'scripts/run_fan2026_gbif_chelsa_thermal.py'
       - 'scripts/run_camellia_gbif_worldclim_niche.py'
       - 'scripts/run_camellia_gbif_chelsa_thermal.py'
+      - 'scripts/audit_gbif_tail_provenance.py'
       - '.github/workflows/fan2026-gbif-chelsa-thermal.yml'
   workflow_dispatch:
 
@@ -100,6 +101,12 @@ jobs:
             --bio6 build/chelsa/CHELSA_bio6_1981-2010_V.2.1.tif \
             --out-dir build/fan_macro/result \
             --min-points 5 --cap-points 80 --gbif-cap-per-country 1000
+      - name: Audit cold-tail occurrence provenance
+        run: |
+          python scripts/audit_gbif_tail_provenance.py \
+            build/fan_macro/result/thermal_points.csv \
+            --output build/fan_macro/result/coldtail_provenance_audit.csv \
+            --k 3
       - name: Report
         if: always()
         run: |
