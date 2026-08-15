@@ -1,0 +1,41 @@
+name: Camellia within-section colour-climate coupling
+
+on:
+  pull_request:
+    paths:
+      - 'data/fan2026_chelsa_species_compact_v0_1.csv'
+      - 'scripts/analyze_within_section_colour_climate_coupling.py'
+      - '.github/workflows/camellia-within-section-colour-climate-coupling.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  analyze:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install dependency
+        run: python -m pip install --disable-pip-version-check numpy
+      - name: Run history-proxy coupling screen
+        run: |
+          mkdir -p build/within_section_colour_climate
+          python scripts/analyze_within_section_colour_climate_coupling.py \
+            data/fan2026_chelsa_species_compact_v0_1.csv \
+            --output build/within_section_colour_climate/result.csv \
+            --pairs-output build/within_section_colour_climate/pairs.csv \
+            --summary build/within_section_colour_climate/summary.json \
+            --permutations 100000 \
+            --seed 20260815
+      - name: Report
+        run: |
+          cat build/within_section_colour_climate/summary.json >> "$GITHUB_STEP_SUMMARY"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: camellia-within-section-colour-climate-coupling
+          path: build/within_section_colour_climate
+          if-no-files-found: error
