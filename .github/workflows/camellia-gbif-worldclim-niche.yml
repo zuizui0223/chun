@@ -22,6 +22,27 @@ jobs:
           python-version: '3.12'
       - name: Install analysis dependencies
         run: python -m pip install --disable-pip-version-check numpy requests rasterio
+      - name: Fetch WorldClim 2.1 with official-host fallback
+        run: |
+          mkdir -p build/worldclim build/camellia_macro_niche
+          target=build/worldclim/wc2.1_10m_bio.zip
+          primary='https://geodata.ucdavis.edu/climate/worldclim/2_1/base/wc2.1_10m_bio.zip'
+          fallback='https://biogeo.ucdavis.edu/data/worldclim/v2.1/base/wc2.1_10m_bio.zip'
+          if ! curl --fail --location --retry 3 --retry-all-errors --connect-timeout 20 --max-time 180 "$primary" -o "$target"; then
+            rm -f "$target"
+            curl --fail --location --retry 3 --retry-all-errors --connect-timeout 20 --max-time 240 "$fallback" -o "$target"
+          fi
+          python - <<'PY'
+          import zipfile
+          p='build/worldclim/wc2.1_10m_bio.zip'
+          with zipfile.ZipFile(p) as z:
+              names=set(z.namelist())
+          required={f'wc2.1_10m_bio_{x}.tif' for x in (1,4,6,12,15)}
+          missing=sorted(required-names)
+          if missing:
+              raise SystemExit(f'WorldClim archive missing required rasters: {missing}')
+          print(f'WorldClim archive verified: {len(names)} members')
+          PY
       - name: Build GBIF + WorldClim species niche matrix
         run: |
           python scripts/run_camellia_gbif_worldclim_niche.py \
