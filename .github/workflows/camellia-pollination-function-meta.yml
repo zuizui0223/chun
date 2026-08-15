@@ -1,0 +1,35 @@
+name: Camellia pollination-function meta diagnostic
+
+on:
+  pull_request:
+    paths:
+      - 'data/camellia_pollination_function_meta_v0_2.csv'
+      - 'scripts/analyze_camellia_pollination_function_meta.py'
+      - '.github/workflows/camellia-pollination-function-meta.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  analyze:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Run diagnostic
+        run: |
+          mkdir -p build/camellia_pollination_function
+          python scripts/analyze_camellia_pollination_function_meta.py \
+            data/camellia_pollination_function_meta_v0_2.csv \
+            --summary-output build/camellia_pollination_function/summary.json \
+            --hue-output build/camellia_pollination_function/by_hue.csv
+      - name: Report
+        run: cat build/camellia_pollination_function/summary.json >> "$GITHUB_STEP_SUMMARY"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: camellia-pollination-function-meta
+          path: build/camellia_pollination_function
+          if-no-files-found: error
