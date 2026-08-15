@@ -1,6 +1,7 @@
 taxon,colour_state,pigment_proxy,native_country_codes,source_basis,source_doi_or_registry,analysis_role,notes
 Camellia japonica,A,anthocyanin_like_red,JP,"wild red species; pollination and colour evidence",10.1016/j.pld.2020.12.009;SRC_CAM_2026_TE,core,"Japan only to reduce cultivated-range contamination"
 Camellia rusticana,A,anthocyanin_like_red,JP,"wild red species; snowy-range sister comparison",10.1016/j.pld.2020.12.009;10.1002/ece3.70721,core,"critical cold-niche counterexample; Japanese native records only"
+Camellia amplexicaulis,A,anthocyanin_like_red,VN,"red-flowered taxon in public red/yellow/white molecular comparison; accepted native range N Vietnam",10.1007/s10725-025-01335-1;POWO_2026,core,"warm/subtropical red counterweight; currently assessed extinct in the wild, so historical specimen records only and explicit cultivated filtering are required"
 Camellia pilosperma,W,white,CN,"basal white taxon in Fan 2026 framework",SRC_CAM_2026_TE,core,"root-anchor phenotype; China records only"
 Camellia chrysanthoides,Y,yellow_anthocyanin_suppressed,CN,"yellow taxon with MYB60-linked suppression evidence",SRC_CAM_2026_TE,core,"visible yellow; yellow pigment chemistry itself unresolved"
 Camellia nitidissima,Y,flavonol_plus_carotenoid_yellow,CN,"strong taxon-specific pigment chemistry",10.3389/fpls.2017.01545;10.1186/s12870-024-05332-w,core,"Guangxi-centered golden yellow species"
