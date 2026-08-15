@@ -6,6 +6,8 @@ Machine-readable evidence separation: `../data/reactivation_selection_pressure_e
 
 Competing-model preliminary screen: `../data/reactivation_selection_pressure_hypothesis_screen_v0_1.csv`.
 
+Problem registry generated from `chun` results: `../data/reactivation_selection_pressure_problem_registry_v0_1.csv`.
+
 Count-controlled historical concentration result: `../data/camellia_visible_state_section_concentration_v0_1.csv` with reproducer `../scripts/analyze_visible_state_section_concentration.py`.
 
 Inference order:
