@@ -1,16 +1,23 @@
 #!/usr/bin/env python3
 """Species-scale thermal analysis for the Fan et al. 2026 Camellia colour table.
 
-Input is the deterministic species-level seed created from Data S1.  GBIF
-records are restricted to source-provenance countries, filtered/thinned, and
-sampled against local CHELSA BIO1/BIO6 rasters.  Species are the replicate units.
+Input is the deterministic species-level seed created from Data S1. GBIF records
+are restricted to source-provenance countries, filtered/thinned, and sampled
+against local CHELSA BIO1/BIO6 rasters. Species are the replicate units.
+
+Two record modes are supported:
+- wildlike: the main filter set (specimens/material plus observations after
+  explicit cultivation/non-native/geospatial filtering);
+- specimen_only: a stricter sensitivity retaining PRESERVED_SPECIMEN,
+  MATERIAL_SAMPLE and MATERIAL_CITATION only.
+
 Pairwise colour-state tests use exact permutations when feasible and a fixed-seed
-Monte Carlo permutation otherwise.  A section-stratified sensitivity test is
-also reported; section is only a coarse taxonomic block, not a substitute for a
+Monte Carlo permutation otherwise. A section-stratified sensitivity test is also
+reported; section is only a coarse taxonomic block, not a substitute for a
 nuclear phylogeny.
 """
 from __future__ import annotations
-import argparse, csv, json, math, pathlib, time
+import argparse, json, math, pathlib, time
 from collections import Counter, defaultdict
 import numpy as np
 from run_camellia_gbif_worldclim_niche import (
@@ -18,7 +25,7 @@ from run_camellia_gbif_worldclim_niche import (
 )
 from run_camellia_gbif_chelsa_thermal import sample_one, systematic_cap
 
-STATES=("A","W","Y")
+SPECIMEN_BASIS={"PRESERVED_SPECIMEN","MATERIAL_SAMPLE","MATERIAL_CITATION"}
 
 def summarize(seed, rows):
     out={k:seed.get(k,"") for k in ("taxon","colour_state","pigment_proxy","section","areas","n_source_accessions","source_color_values")}
@@ -41,12 +48,22 @@ def perm_test(x,y,seed=20260815,nmc=100000):
         for i in range(nmc):
             idx=rng.choice(len(vals),size=nx,replace=False); mask=np.zeros(len(vals),bool); mask[idx]=True; d[i]=vals[mask].mean()-vals[~mask].mean()
         method=f"monte_carlo_seed_{seed}"; nperm=nmc
-    p2=float((np.sum(np.abs(d)>=abs(obs)-1e-12)+(0 if method=="exact" else 1))/(len(d)+(0 if method=="exact" else 1)))
-    pl=float((np.sum(d<=obs+1e-12)+(0 if method=="exact" else 1))/(len(d)+(0 if method=="exact" else 1)))
+    add=0 if method=="exact" else 1
+    p2=float((np.sum(np.abs(d)>=abs(obs)-1e-12)+add)/(len(d)+add))
+    pl=float((np.sum(d<=obs+1e-12)+add)/(len(d)+add))
     return obs,p2,pl,nperm,method,ncomb
 
 def main():
-    ap=argparse.ArgumentParser(); ap.add_argument('--taxa',type=pathlib.Path,required=True); ap.add_argument('--bio1',type=pathlib.Path,required=True); ap.add_argument('--bio6',type=pathlib.Path,required=True); ap.add_argument('--out-dir',type=pathlib.Path,required=True); ap.add_argument('--min-points',type=int,default=5); ap.add_argument('--cap-points',type=int,default=80); ap.add_argument('--gbif-cap-per-country',type=int,default=1000); a=ap.parse_args(); a.out_dir.mkdir(parents=True,exist_ok=True)
+    ap=argparse.ArgumentParser()
+    ap.add_argument('--taxa',type=pathlib.Path,required=True)
+    ap.add_argument('--bio1',type=pathlib.Path,required=True)
+    ap.add_argument('--bio6',type=pathlib.Path,required=True)
+    ap.add_argument('--out-dir',type=pathlib.Path,required=True)
+    ap.add_argument('--min-points',type=int,default=5)
+    ap.add_argument('--cap-points',type=int,default=80)
+    ap.add_argument('--gbif-cap-per-country',type=int,default=1000)
+    ap.add_argument('--record-mode',choices=('wildlike','specimen_only'),default='wildlike')
+    a=ap.parse_args(); a.out_dir.mkdir(parents=True,exist_ok=True)
     taxa=read_csv(a.taxa); species=[]; audit=[]; matches=[]; point_rows=[]; raster_meta={}
     for seed in taxa:
         taxon=seed['taxon']; m=gbif_match(taxon); matches.append({**seed,**m})
@@ -57,7 +74,10 @@ def main():
             rr,n=fetch_occurrences(int(m['usageKey']),country,a.gbif_cap_per_country); raw.extend(rr); total+=n
         raw=list({str(r.get('key',i)):r for i,r in enumerate(raw)}.values()); reasons=Counter(); clean=[]
         for r in raw:
-            ok,reason=keep_occurrence(r); reasons[reason]+=1
+            ok,reason=keep_occurrence(r)
+            if ok and a.record_mode=='specimen_only' and str(r.get('basisOfRecord','')).upper() not in SPECIMEN_BASIS:
+                ok=False; reason='non_specimen_basis_sensitivity'
+            reasons[reason]+=1
             if ok: clean.append(r)
         pts=systematic_cap(thin_records(clean),a.cap_points)
         if len(pts)<a.min_points:
@@ -65,15 +85,13 @@ def main():
         b1,m1=sample_one(a.bio1,pts); b6,m6=sample_one(a.bio6,pts); raster_meta={'bio1':m1,'bio6':m6}; clim=[]
         for i,r in enumerate(pts):
             if b1[i] is None or b6[i] is None: continue
-            q={'taxon':taxon,'colour_state':seed['colour_state'],'section':seed.get('section',''),'gbif_key':r.get('key',''),'latitude':r['decimalLatitude'],'longitude':r['decimalLongitude'],'bio1':b1[i],'bio6':b6[i]}; clim.append(q); point_rows.append(q)
+            q={'taxon':taxon,'colour_state':seed['colour_state'],'section':seed.get('section',''),'gbif_key':r.get('key',''),'basisOfRecord':r.get('basisOfRecord',''),'latitude':r['decimalLatitude'],'longitude':r['decimalLongitude'],'bio1':b1[i],'bio6':b6[i]}; clim.append(q); point_rows.append(q)
         if len(clim)>=a.min_points: species.append(summarize(seed,clim)); status='admit'
         else: status='insufficient_climate_points'
         audit.append({'taxon':taxon,'gbif_total':total,'n_fetched':len(raw),'n_clean':len(clean),'n_thinned_capped':len(pts),'n_climate':len(clim),'filter_reasons_json':json.dumps(dict(reasons),sort_keys=True),'status':status})
-        print(f"{taxon}: {status} total={total} clean={len(clean)} thin={len(pts)}",flush=True); time.sleep(.05)
+        print(f"{taxon}: {status} total={total} clean={len(clean)} thin={len(pts)} mode={a.record_mode}",flush=True); time.sleep(.05)
     write_csv(a.out_dir/'gbif_taxon_matches.csv',matches); write_csv(a.out_dir/'occurrence_filter_audit.csv',audit); write_csv(a.out_dir/'thermal_points.csv',point_rows); write_csv(a.out_dir/'species_thermal_niches.csv',species); (a.out_dir/'chelsa_metadata.json').write_text(json.dumps(raster_meta,indent=2)+'\n')
-    tests=[]
-    metrics=('bio1_median','bio6_median','bio6_q05','bio1_iqr')
-    pairs=(('A','W'),('A','Y'),('W','Y'))
+    tests=[]; metrics=('bio1_median','bio6_median','bio6_q05','bio1_iqr'); pairs=(('A','W'),('A','Y'),('W','Y'))
     for metric in metrics:
         for s1,s2 in pairs:
             x=[float(r[metric]) for r in species if r['colour_state']==s1]; y=[float(r[metric]) for r in species if r['colour_state']==s2]
@@ -81,9 +99,6 @@ def main():
                 obs,p2,pl,nperm,method,ncomb=perm_test(x,y)
                 tests.append({'metric':metric,'state1':s1,'state2':s2,'n_state1':len(x),'n_state2':len(y),'mean_state1':float(np.mean(x)),'mean_state2':float(np.mean(y)),'difference_state1_minus_state2':obs,'two_sided_p':p2,'one_sided_p_state1_lower':pl,'test_method':method,'n_permutations':nperm,'total_label_combinations':str(ncomb)})
     write_csv(a.out_dir/'colour_pairwise_thermal_tests.csv',tests)
-
-    # Coarse section-block sensitivity: for each pair/metric, compute section-level
-    # mean differences only in sections containing both states, then exact sign test.
     section_rows=[]
     for metric in metrics:
         for s1,s2 in pairs:
@@ -101,6 +116,6 @@ def main():
                 else: p2=1.0
                 section_rows.append({'metric':metric,'state1':s1,'state2':s2,'n_shared_sections':len(diffs),'n_nonzero_sections':n,'n_sections_state1_lower':k,'two_sided_exact_sign_p':p2,'mean_section_difference':float(np.mean([d for _,d,_,_ in diffs])),'section_differences_json':json.dumps([{'section':s,'difference':d,'n1':n1,'n2':n2} for s,d,n1,n2 in diffs],ensure_ascii=False)})
     write_csv(a.out_dir/'section_blocked_colour_tests.csv',section_rows)
-    summary={'n_seed_species':len(taxa),'n_admitted_species':len(species),'admitted_states':dict(Counter(r['colour_state'] for r in species)),'climate':'CHELSA v2.1 BIO1/BIO6','gbif':'source-country constrained; cultivated/non-native/high-uncertainty filtering; 0.1-degree thinning; max points per species capped','claim_ceiling':'species-scale taxon-blocked thermal association; section-block is a coarse sensitivity, not nuclear phylogenetic correction'}
+    summary={'n_seed_species':len(taxa),'n_admitted_species':len(species),'admitted_states':dict(Counter(r['colour_state'] for r in species)),'record_mode':a.record_mode,'climate':'CHELSA v2.1 BIO1/BIO6','gbif':'source-country constrained; cultivation/non-native/high-uncertainty filtering; 0.1-degree thinning; max points capped','claim_ceiling':'species-scale thermal association; section-block is a coarse sensitivity, not nuclear phylogenetic correction'}
     (a.out_dir/'analysis_summary.json').write_text(json.dumps(summary,indent=2)+'\n'); print(json.dumps(summary,indent=2))
 if __name__=='__main__': main()
