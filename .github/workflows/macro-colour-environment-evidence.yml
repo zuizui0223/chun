@@ -1,0 +1,29 @@
+name: Macro colour-environment evidence synthesis
+
+on:
+  pull_request:
+    paths:
+      - 'data/macro_flower_colour_environment_synthesis_v0_1.csv'
+      - 'data/macro_colour_environment_evidence_summary_v0_1.csv'
+      - 'scripts/summarize_macro_colour_environment_evidence.py'
+      - '.github/workflows/macro-colour-environment-evidence.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  reproduce-summary:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Recompute macro evidence summary
+        run: |
+          python scripts/summarize_macro_colour_environment_evidence.py \
+            data/macro_flower_colour_environment_synthesis_v0_1.csv \
+            --output /tmp/macro_summary.csv
+      - name: Verify frozen summary
+        run: diff -u data/macro_colour_environment_evidence_summary_v0_1.csv /tmp/macro_summary.csv
