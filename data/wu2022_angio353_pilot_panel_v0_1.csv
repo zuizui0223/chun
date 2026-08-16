@@ -1,21 +1,21 @@
-taxon,colour_state,section,tpia_id,tpia_resource_name,assembly_url,panel_role
-Camellia azalea,A,sect. Camellia,172,Camellia azalea,https://tpia.teaplants.cn/web/All_assemblies/Fasta/172_Camellia%20azalea.zip,A_major_section
-Camellia pentapetala,A,sect. Camellia,184,Camellia pentapetala,https://tpia.teaplants.cn/web/All_assemblies/Fasta/184_Camellia%20pentapetala.zip,A_major_section
-Camellia reticulata,A,sect. Camellia,169,Camellia reticulata,https://tpia.teaplants.cn/web/All_assemblies/Fasta/169_Camellia%20reticulata.zip,A_major_section
-Camellia saluenensis,A,sect. Camellia,193,Camellia saluenensis,https://tpia.teaplants.cn/web/All_assemblies/Fasta/193_Camellia%20saluenensis.zip,A_major_section
-Camellia subintegra,A,sect. Camellia,190,Camellia subintegra,https://tpia.teaplants.cn/web/All_assemblies/Fasta/190_Camellia%20subintegra.zip,A_major_section
-Camellia villosa,A,sect. Camellia,183,Camellia villosa,https://tpia.teaplants.cn/web/All_assemblies/Fasta/183_Camellia%20villosa.zip,A_major_section
-Camellia brevistyla,A,sect. Paracamellia,201,Camellia brevistyla,https://tpia.teaplants.cn/web/All_assemblies/Fasta/201_Camellia%20brevistyla.zip,A_outside_major_section
-Camellia rubituberculata,A,sect. Tuberculatae,229,Camellia rubituberculata,https://tpia.teaplants.cn/web/All_assemblies/Fasta/229_Camellia%20rubituberculata.zip,A_outside_major_section
-Camellia euphlebia,Y,sect. Chrysantha,239,Camellia euphlebia,https://tpia.teaplants.cn/web/All_assemblies/Fasta/239_Camellia%20euphlebia.zip,Y_major_section
-Camellia impressinervis,Y,sect. Chrysantha,240,Camellia impressinervis,https://tpia.teaplants.cn/web/All_assemblies/Fasta/240_Camellia%20impressinervis.zip,Y_major_section
-Camellia pingguoensis,Y,sect. Chrysantha,238,Camellia pinggaoensis,https://tpia.teaplants.cn/web/All_assemblies/Fasta/238_Camellia%20pinggaoensis.zip,Y_major_section_resource_crosswalk
-Camellia luteoflora,Y,sect. Luteoflora,230,Camellia luteoflora,https://tpia.teaplants.cn/web/All_assemblies/Fasta/230_Camellia%20luteoflora.zip,Y_outside_major_section
-Camellia albogigas,W,sect. Archecamellia,192,Camellia albogigas,https://tpia.teaplants.cn/web/All_assemblies/Fasta/192_Camellia%20albogigas.zip,W_history_reference
-Camellia pilosperma,W,sect. Corallina,182,Camellia pilosperma,https://tpia.teaplants.cn/web/All_assemblies/Fasta/182_Camellia%20pilosperma.zip,W_history_reference
-Camellia crapnelliana,W,sect. Furfuracea,159,Camellia crapnelliana,https://tpia.teaplants.cn/web/All_assemblies/Fasta/159_Camellia%20crapnelliana.zip,W_history_reference
-Camellia oleifera,W,sect. Paracamellia,200,Camellia oleifera,https://tpia.teaplants.cn/web/All_assemblies/Fasta/200_Camellia%20oleifera.zip,W_same_section_A_reference
-Camellia sinensis,W,sect. Thea,143,Camellia sinensis var. assamica 'ZJ',https://tpia.teaplants.cn/web/All_assemblies/Fasta/143_Camellia%20sinensis%20var.%20assamica%20%27ZJ%27.zip,W_history_reference
-Camellia szechuanensis,W,sect. Pseudocamellia,209,Camellia szechuanensis,https://tpia.teaplants.cn/web/All_assemblies/Fasta/209_Camellia%20szechuanensis.zip,W_history_reference
-Camellia tuberculata,W,sect. Tuberculatae,224,Camellia tuberculata,https://tpia.teaplants.cn/web/All_assemblies/Fasta/224_Camellia%20tuberculata.zip,W_same_section_A_reference
-Camellia yunnanensis,W,sect. Stereocarpus,189,Camellia yunnanensis,https://tpia.teaplants.cn/web/All_assemblies/Fasta/189_Camellia%20yunnanensis.zip,W_history_reference
+taxon,colour_state,section,tpia_id,tpia_resource_name,assembly_url,panel_role,admission_status,provenance_note
+Camellia azalea,A,sect. Camellia,172,Camellia azalea,https://tpia.teaplants.cn/web/All_assemblies/Fasta/172_Camellia%20azalea.zip,A_major_section,admit,
+Camellia pentapetala,A,sect. Camellia,184,Camellia pentapetala,https://tpia.teaplants.cn/web/All_assemblies/Fasta/184_Camellia%20pentapetala.zip,A_major_section,admit,
+Camellia reticulata,A,sect. Camellia,169,Camellia reticulata,https://tpia.teaplants.cn/web/All_assemblies/Fasta/169_Camellia%20reticulata.zip,A_major_section,admit,
+Camellia saluenensis,A,sect. Camellia,193,Camellia saluenensis,https://tpia.teaplants.cn/web/All_assemblies/Fasta/193_Camellia%20saluenensis.zip,A_major_section,admit,
+Camellia subintegra,A,sect. Camellia,190,Camellia subintegra,https://tpia.teaplants.cn/web/All_assemblies/Fasta/190_Camellia%20subintegra.zip,A_major_section,admit,
+Camellia villosa,A,sect. Camellia,183,Camellia villosa,https://tpia.teaplants.cn/web/All_assemblies/Fasta/183_Camellia%20villosa.zip,A_major_section,admit,
+Camellia brevistyla,A,sect. Paracamellia,201,Camellia brevistyla,https://tpia.teaplants.cn/web/All_assemblies/Fasta/201_Camellia%20brevistyla.zip,A_outside_major_section,admit,
+Camellia rubituberculata,A,sect. Tuberculatae,229,Camellia rubituberculata,https://tpia.teaplants.cn/web/All_assemblies/Fasta/229_Camellia%20rubituberculata.zip,A_outside_major_section,admit,
+Camellia euphlebia,Y,sect. Chrysantha,239,Camellia euphlebia,https://tpia.teaplants.cn/web/All_assemblies/Fasta/239_Camellia%20euphlebia.zip,Y_major_section,quarantine,"TPIA ID-bound ZIP SHA256 collides exactly with C. pilosperma although catalog metadata and NCBI SRA run differ; exclude until independently reconstructed from SRR19266673"
+Camellia impressinervis,Y,sect. Chrysantha,240,Camellia impressinervis,https://tpia.teaplants.cn/web/All_assemblies/Fasta/240_Camellia%20impressinervis.zip,Y_major_section,admit,
+Camellia pingguoensis,Y,sect. Chrysantha,238,Camellia pinggaoensis,https://tpia.teaplants.cn/web/All_assemblies/Fasta/238_Camellia%20pinggaoensis.zip,Y_major_section_resource_crosswalk,admit,
+Camellia luteoflora,Y,sect. Luteoflora,230,Camellia luteoflora,https://tpia.teaplants.cn/web/All_assemblies/Fasta/230_Camellia%20luteoflora.zip,Y_outside_major_section,admit,
+Camellia albogigas,W,sect. Archecamellia,192,Camellia albogigas,https://tpia.teaplants.cn/web/All_assemblies/Fasta/192_Camellia%20albogigas.zip,W_history_reference,admit,
+Camellia pilosperma,W,sect. Corallina,182,Camellia pilosperma,https://tpia.teaplants.cn/web/All_assemblies/Fasta/182_Camellia%20pilosperma.zip,W_history_reference,quarantine,"TPIA ID-bound ZIP SHA256 collides exactly with C. euphlebia although catalog metadata and NCBI SRA run differ; exclude until independently reconstructed from SRR19266674"
+Camellia crapnelliana,W,sect. Furfuracea,159,Camellia crapnelliana,https://tpia.teaplants.cn/web/All_assemblies/Fasta/159_Camellia%20crapnelliana.zip,W_history_reference,admit,
+Camellia oleifera,W,sect. Paracamellia,200,Camellia oleifera,https://tpia.teaplants.cn/web/All_assemblies/Fasta/200_Camellia%20oleifera.zip,W_same_section_A_reference,admit,
+Camellia sinensis,W,sect. Thea,143,Camellia sinensis var. assamica 'ZJ',https://tpia.teaplants.cn/web/All_assemblies/Fasta/143_Camellia%20sinensis%20var.%20assamica%20%27ZJ%27.zip,W_history_reference,admit,
+Camellia szechuanensis,W,sect. Pseudocamellia,209,Camellia szechuanensis,https://tpia.teaplants.cn/web/All_assemblies/Fasta/209_Camellia%20szechuanensis.zip,W_history_reference,admit,
+Camellia tuberculata,W,sect. Tuberculatae,224,Camellia tuberculata,https://tpia.teaplants.cn/web/All_assemblies/Fasta/224_Camellia%20tuberculata.zip,W_same_section_A_reference,admit,
+Camellia yunnanensis,W,sect. Stereocarpus,189,Camellia yunnanensis,https://tpia.teaplants.cn/web/All_assemblies/Fasta/189_Camellia%20yunnanensis.zip,W_history_reference,admit,
