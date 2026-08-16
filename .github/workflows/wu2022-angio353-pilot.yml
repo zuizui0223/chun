@@ -42,7 +42,7 @@ jobs:
           diamond makedb \
             --in build/wu_angio353/targets/Angiosperms353.FAA \
             --db build/wu_angio353/targets/Angiosperms353
-      - name: Download and provenance-audit 20 ID-bound TPIA assemblies
+      - name: Download and provenance-audit admitted ID-bound TPIA assemblies
         run: |
           python scripts/download_tpia_panel_assemblies.py \
             --panel data/wu2022_angio353_pilot_panel_v0_1.csv \
@@ -123,6 +123,7 @@ jobs:
           echo '### Wu/TPIA Angiosperms353 pilot' >> "$GITHUB_STEP_SUMMARY"
           for f in \
             build/wu_angio353/assemblies/download_summary.json \
+            build/wu_angio353/assemblies/quarantined_taxa.csv \
             build/wu_angio353/markers/summary.json \
             build/wu_angio353/concat_summary.json \
             build/wu_angio353/tree/engine.txt \
@@ -143,6 +144,7 @@ jobs:
           mkdir -p build/wu_angio353/result_artifact
           cp -f build/wu_angio353/assemblies/archive_provenance.csv build/wu_angio353/result_artifact/ 2>/dev/null || true
           cp -f build/wu_angio353/assemblies/download_summary.json build/wu_angio353/result_artifact/ 2>/dev/null || true
+          cp -f build/wu_angio353/assemblies/quarantined_taxa.csv build/wu_angio353/result_artifact/ 2>/dev/null || true
           cp -f build/wu_angio353/markers/best_hits.csv build/wu_angio353/result_artifact/ 2>/dev/null || true
           cp -f build/wu_angio353/markers/locus_occupancy.csv build/wu_angio353/result_artifact/ 2>/dev/null || true
           cp -f build/wu_angio353/markers/summary.json build/wu_angio353/result_artifact/ 2>/dev/null || true
