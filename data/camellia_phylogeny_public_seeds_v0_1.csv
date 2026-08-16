@@ -1,0 +1,2 @@
+seed_id,system,taxon,accession,accession_type,tissue_or_scope,expected_role,admission_status,source_doi,notes
+CPHY001,Camellia,"116 Camellia plants + Polyspora speciosa outgroup",PRJNA665925,BioProject,transcriptomes,"independent public nuclear backbone from 405 low-copy core genes",phylogeny_candidate,10.1111/tpj.15799,"Primary fully public backup for M3 tree-sensitivity analyses; article reports 116 Camellia plants plus Polyspora and nine additional cultivated-tea datasets downloaded separately. Freeze actual run/taxon manifest before reconstruction."

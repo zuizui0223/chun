@@ -1,0 +1,107 @@
+name: Wu 2022 TPIA backbone assets
+
+on:
+  pull_request:
+    paths:
+      - 'scripts/audit_wu2022_tpia_backbone_assets.py'
+      - 'scripts/build_wu2022_tpia_preferred_manifest_v2.py'
+      - 'scripts/fetch_sra_runinfo.py'
+      - 'data/camellia_phylogeny_public_seeds_v0_1.csv'
+      - '.github/workflows/wu2022-tpia-backbone-assets.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: python -m pip install --disable-pip-version-check requests openpyxl
+      - name: Resolve PRJNA665925 public RunInfo
+        run: |
+          mkdir -p build/wu2022_tpia/sra build/wu2022_tpia/audit
+          python scripts/fetch_sra_runinfo.py \
+            --seeds data/camellia_phylogeny_public_seeds_v0_1.csv \
+            --out-dir build/wu2022_tpia/sra \
+            --include-status phylogeny_candidate
+      - name: Try publisher Table S1-S18 workbook
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import requests, zipfile, io, json
+          name='tpj15799-sup-0002-TableS1-S18.xlsx'
+          urls=[
+            'https://onlinelibrary.wiley.com/action/downloadSupplement?doi=10.1111%2Ftpj.15799&file='+name,
+            'https://onlinelibrary.wiley.com/doi/suppl/10.1111/tpj.15799/supinfo/'+name,
+          ]
+          s=requests.Session(); s.headers['User-Agent']='Mozilla/5.0 chun-public-backbone-audit/0.3'
+          errors=[]
+          for u in urls:
+              try:
+                  r=s.get(u,timeout=120,allow_redirects=True)
+                  if r.status_code==200 and r.content[:2]==b'PK':
+                      zipfile.ZipFile(io.BytesIO(r.content)).testzip()
+                      Path('build/wu2022_tpia/TableS1-S18.xlsx').write_bytes(r.content)
+                      Path('build/wu2022_tpia/supplement_url.txt').write_text(r.url+'\n')
+                      print('publisher workbook recovered',len(r.content),'bytes')
+                      break
+                  errors.append((u,r.status_code,r.headers.get('content-type'),len(r.content)))
+              except Exception as e: errors.append((u,type(e).__name__,str(e)))
+          else:
+              Path('build/wu2022_tpia/supplement_fetch_status.json').write_text(json.dumps({
+                  'status':'publisher_blocked_or_unavailable',
+                  'errors':errors,
+                  'decision':'continue with reproducible PRJNA665925 RunInfo species set; do not infer missing cultivated-tea duplicate tips'
+              },indent=2)+'\n')
+              print('publisher workbook unavailable; continuing with SRA taxon evidence')
+          PY
+      - name: Crosswalk public Wu taxa to TPIA catalogs
+        run: |
+          args=(
+            --sra-runinfo build/wu2022_tpia/sra/CPHY001_PRJNA665925_runinfo.csv
+            --out-dir build/wu2022_tpia/audit
+          )
+          if [ -f build/wu2022_tpia/TableS1-S18.xlsx ]; then
+            args+=(--supp-xlsx build/wu2022_tpia/TableS1-S18.xlsx)
+          fi
+          python scripts/audit_wu2022_tpia_backbone_assets.py "${args[@]}"
+      - name: Build provenance-safe preferred assembly manifest
+        run: |
+          python scripts/build_wu2022_tpia_preferred_manifest_v2.py \
+            --run-taxa build/wu2022_tpia/audit/prjna665925_run_taxa.csv \
+            --allassemblies build/wu2022_tpia/audit/tpia_allassemblies_catalog.csv \
+            --bulk build/wu2022_tpia/audit/tpia_transcriptome_bulk_catalog.csv \
+            --aliases build/wu2022_tpia/audit/wu2022_archive_tpia_alias_crosswalk.csv \
+            --output build/wu2022_tpia/audit/wu2022_preferred_assembly_manifest_v2.csv \
+            --summary build/wu2022_tpia/audit/preferred_manifest_v2_summary.json
+      - name: Report
+        if: always()
+        run: |
+          echo '### Wu 2022 TPIA backbone asset gate' >> "$GITHUB_STEP_SUMMARY"
+          for f in \
+            build/wu2022_tpia/supplement_fetch_status.json \
+            build/wu2022_tpia/supplement_url.txt \
+            build/wu2022_tpia/sra/manifest_fetch_summary.csv \
+            build/wu2022_tpia/audit/summary.json \
+            build/wu2022_tpia/audit/preferred_manifest_v2_summary.json \
+            build/wu2022_tpia/audit/wu2022_preferred_assembly_manifest_v2.csv; do
+            if [ -f "$f" ]; then
+              echo "#### $f" >> "$GITHUB_STEP_SUMMARY"
+              echo '```' >> "$GITHUB_STEP_SUMMARY"
+              head -c 30000 "$f" >> "$GITHUB_STEP_SUMMARY"
+              echo >> "$GITHUB_STEP_SUMMARY"
+              echo '```' >> "$GITHUB_STEP_SUMMARY"
+            fi
+          done
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: wu2022-tpia-backbone-assets
+          path: build/wu2022_tpia
+          if-no-files-found: error

@@ -1,0 +1,5 @@
+metric,state1,state2,n_shared_sections,n_nonzero_sections,n_sections_state1_lower,two_sided_exact_sign_p,mean_section_difference
+bio1_median,A,W,2,2,1,1.0,0.15000000000000036
+bio6_median,A,W,2,2,1,1.0,-0.053125000000001865
+bio6_q05,A,W,2,2,1,1.0,-1.5646874999999798
+bio1_iqr,A,W,2,2,2,0.5,-0.3838541666666402

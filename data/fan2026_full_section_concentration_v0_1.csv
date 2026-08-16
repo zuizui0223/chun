@@ -1,0 +1,4 @@
+visible_state,n_species,n_sections_total,observed_section_breadth,expected_section_breadth,lower_tail_breadth_p,observed_section_entropy,expected_section_entropy,lower_tail_entropy_p,permutations,seed,interpretation,claim_ceiling
+A,25,17,4,9.56800000,0.0000199998,0.4987584659,2.0117394044,0.0000099999,100000,20260815,more section-concentrated than expected for state sample size,Fan2026 traditional-section proxy; not a nuclear phylogeny or transition-rate estimate
+W,56,17,13,13.47993000,0.4964850351,2.0017315595,2.1858948223,0.0269297307,100000,20260815,no count-controlled evidence of excess section concentration,Fan2026 traditional-section proxy; not a nuclear phylogeny or transition-rate estimate
+Y,17,17,4,8.04510000,0.0012999870,0.7902347553,1.8928629272,0.0000099999,100000,20260815,more section-concentrated than expected for state sample size,Fan2026 traditional-section proxy; not a nuclear phylogeny or transition-rate estimate

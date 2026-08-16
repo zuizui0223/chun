@@ -1,0 +1,4 @@
+analysis,n_evidence_units,n_support,n_null,n_oppose,support_fraction,exact_two_sided_p_under_0_5,beta11_p_support_rate_gt_0_5,interpretation
+strict_universal_cold_uv_enabler,4,2,1,1,0.500000,1.00000000,0.50000000,tests whether direct macro evidence consistently supports floral pigmentation as a cold/high-UV enabler; null and counterexample evidence count against universality
+directional_only_excluding_macro_null,3,2,0,1,0.666667,1.00000000,0.68750000,sensitivity analysis excluding a macro-null radiation but retaining explicit opposing evidence
+broader_environment_associated_colour_reorganization,8,3,1,1,,,,"descriptive only: includes heterogeneous endpoints such as colour disparity, pollinator structure and Camellia geography; not pooled statistically"

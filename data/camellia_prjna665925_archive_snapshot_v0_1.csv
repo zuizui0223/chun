@@ -1,0 +1,2 @@
+snapshot_date,bioproject,sra_uid_count,run_count,camellia_run_count,outgroup_run_count,unique_scientific_names,outgroup,workflow_run,artifact_id,artifact_digest,status,interpretation
+2026-08-14,PRJNA665925,109,109,108,1,105,Polyspora speciosa,31784279765,9212861686,sha256:4817fda1a461c0ace5f9c68d44ee61aa2d93c04e5a36134284173b3c5d2f3cbc,frozen_archive_snapshot,"Current SRA BioProject snapshot is a reproducible nuclear-data core but is not silently equated with the paper's full 116-Camellia phylogenetic tip set; Table S1/external-dataset crosswalk remains required."

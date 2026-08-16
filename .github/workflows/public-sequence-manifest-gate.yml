@@ -1,0 +1,82 @@
+name: Public sequence manifest gate
+
+on:
+  pull_request:
+    paths:
+      - 'data/public_sequence_seeds_v0_1.csv'
+      - 'data/cirsium_run_taxon_audit_v0_1.csv'
+      - 'data/public_sequence_metadata_conflicts_v0_1.csv'
+      - 'data/cirsium_prjna1311153_admitted_manifest_v0_1.csv'
+      - 'data/camellia_srp112181_admitted_manifest_v0_1.csv'
+      - 'scripts/fetch_sra_runinfo.py'
+      - 'scripts/fetch_biosample_metadata.py'
+      - 'scripts/validate_sra_manifest_expectations.py'
+      - 'scripts/validate_admitted_sample_manifests.py'
+      - '.github/workflows/public-sequence-manifest-gate.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  manifest-gate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Fetch focal admitted SRA RunInfo
+        run: |
+          python scripts/fetch_sra_runinfo.py \
+            --seeds data/public_sequence_seeds_v0_1.csv \
+            --out-dir build/sra_manifests \
+            --include-status admit
+
+      - name: Validate run counts, archive metadata, and provenance gates
+        run: |
+          python scripts/validate_sra_manifest_expectations.py \
+            --manifest-dir build/sra_manifests
+
+      - name: Fetch linked BioSample provenance
+        run: |
+          python scripts/fetch_biosample_metadata.py \
+            --manifest-dir build/sra_manifests \
+            --out-dir build/biosample_metadata
+
+      - name: Validate frozen scientific sample manifests
+        run: |
+          python scripts/validate_admitted_sample_manifests.py \
+            --manifest-dir build/sra_manifests \
+            --biosample-dir build/biosample_metadata
+
+      - name: Summarize resolved runs
+        if: always()
+        run: |
+          echo '### Public sequence manifest gate' >> "$GITHUB_STEP_SUMMARY"
+          if [ -f build/sra_manifests/manifest_fetch_summary.csv ]; then
+            echo '```csv' >> "$GITHUB_STEP_SUMMARY"
+            cat build/sra_manifests/manifest_fetch_summary.csv >> "$GITHUB_STEP_SUMMARY"
+            echo '```' >> "$GITHUB_STEP_SUMMARY"
+          else
+            echo 'Manifest fetch did not produce a summary.' >> "$GITHUB_STEP_SUMMARY"
+          fi
+          if [ -f build/biosample_metadata/biosample_records.csv ]; then
+            echo '' >> "$GITHUB_STEP_SUMMARY"
+            echo 'BioSample provenance records were recovered and included in the artifact.' >> "$GITHUB_STEP_SUMMARY"
+          fi
+          echo '' >> "$GITHUB_STEP_SUMMARY"
+          echo 'Frozen manifests: Cirsium 25 leaf runs; Camellia 15 flower runs with BioSample-backed S1-S5 mapping.' >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Upload frozen manifest candidate
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: public-sequence-manifest-candidate
+          path: |
+            build/sra_manifests
+            build/biosample_metadata
+          if-no-files-found: warn

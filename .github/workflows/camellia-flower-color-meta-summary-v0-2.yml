@@ -1,0 +1,31 @@
+name: Camellia flower-color directional meta summary v0.2
+
+on:
+  push:
+    paths:
+      - 'data/camellia_flower_color_mechanism_meta_v0_2.csv'
+      - 'data/camellia_flower_color_mechanism_meta_summary_v0_2.csv'
+      - 'scripts/summarize_camellia_flower_color_mechanism_meta_v0_2.py'
+      - '.github/workflows/camellia-flower-color-meta-summary-v0-2.yml'
+  pull_request:
+    paths:
+      - 'data/camellia_flower_color_mechanism_meta_v0_2.csv'
+      - 'data/camellia_flower_color_mechanism_meta_summary_v0_2.csv'
+      - 'scripts/summarize_camellia_flower_color_mechanism_meta_v0_2.py'
+      - '.github/workflows/camellia-flower-color-meta-summary-v0-2.yml'
+
+jobs:
+  reproduce-v0-2-summary:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Recompute dependence-aware directional summary
+        run: |
+          python scripts/summarize_camellia_flower_color_mechanism_meta_v0_2.py \
+            data/camellia_flower_color_mechanism_meta_v0_2.csv \
+            --output /tmp/meta_summary_v0_2.csv
+      - name: Verify frozen v0.2 summary
+        run: diff --strip-trailing-cr -u data/camellia_flower_color_mechanism_meta_summary_v0_2.csv /tmp/meta_summary_v0_2.csv

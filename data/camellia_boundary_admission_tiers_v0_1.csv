@@ -1,0 +1,50 @@
+taxon,colour_state,section,n_points,bio6_q05,max_abs_loo_q05_change_C,median_abs_loo_q05_change_C,provisional_minimum_gate_n20_loo1C,provisional_strong_gate_n40_loo0_5C,minimum_gate_reason,strong_gate_reason
+Camellia brevistyla,A,sect. Paracamellia,80,-0.31499999999994344,0.3349999999999594,0.06500000000000028,True,True,pass,pass
+Camellia chekiangoleosa,A,Sect. Camellia;sect. Camellia,43,0.06000000000001359,0.09000000000002051,0.005000000000001122,True,True,pass,pass
+Camellia edithae,A,sect. Camellia,23,2.880000000000024,0.3250000000000113,0.015000000000000568,True,False,pass,n_points_lt_40
+Camellia hongkongensis,A,Sect. Camellia;sect. Camellia,13,4.410000000000037,0.6449999999999898,0.00500000000000167,False,False,n_points_lt_20,n_points_lt_40
+Camellia japonica,A,Sect. Camellia;sect. Camellia,79,-4.779999999999944,0.1999999999999913,0.015000000000000568,True,True,pass,pass
+Camellia lapidea,A,sect. Camellia,42,1.065000000000012,0.2850000000000108,0.015000000000000568,True,True,pass,pass
+Camellia lucidissima,A,sect. Paracamellia,9,0.7500000000000266,1.0399999999999885,0.07499999999999929,False,False,n_points_lt_20,n_points_lt_40
+Camellia mairei,A,sect. Paracamellia,76,-0.499999999999968,0.7399999999999878,0.049999999999998934,True,False,pass,q05_loo_gt_0_5C
+Camellia pitardii var. yunnanica,A,sect. Camellia,5,-0.4699999999999749,0.35999999999999943,0.009999999999999787,False,False,n_points_lt_20,n_points_lt_40
+Camellia polyodonta,A,Sect. Camellia;sect. Camellia,80,0.3350000000000239,0.11500000000000199,0.005000000000000782,True,True,pass,pass
+Camellia reticulata,A,Sect. Camellia;sect. Camellia,80,-4.104999999999961,0.2049999999999983,0.015000000000000568,True,True,pass,pass
+Camellia saluenensis,A,sect. Camellia,69,-3.8499999999999535,1.569999999999994,0.12499999999999911,False,False,q05_loo_gt_1C,q05_loo_gt_0_5C
+Camellia semiserrata,A,sect. Camellia,39,0.10500000000002197,0.19500000000000295,0.010000000000000009,True,False,pass,n_points_lt_40
+Camellia subintegra,A,sect. Paracamellia,5,0.790000000000024,0.15000000000000213,0.010000000000000009,False,False,n_points_lt_20,n_points_lt_40
+Camellia chrysanthoides,W,sect. Chrysantha,5,8.81000000000002,0.29999999999999893,0.02999999999999936,False,False,n_points_lt_20,n_points_lt_40
+Camellia confusa,W,sect. Thea,10,2.910000000000026,4.959999999999983,0.43999999999999684,False,False,n_points_lt_20,n_points_lt_40
+Camellia cordifolia,W,sect. Theopsis,21,8.55,0.049999999999998934,0.0,True,False,pass,n_points_lt_40
+Camellia costei,W,sect. Paracamellia,36,3.215000000000032,0.4349999999999916,0.03500000000000014,True,False,pass,n_points_lt_40
+Camellia crapnelliana,W,sect. Camellia,80,5.150000000000028,0.20000000000000284,0.015000000000000568,True,True,pass,pass
+Camellia crassicolumna,W,sect. Thea,9,-0.30999999999997496,2.2499999999999987,0.02999999999999936,False,False,n_points_lt_20,n_points_lt_40
+Camellia drupifera,W,sect. Camellia,80,5.470000000000028,0.23000000000000398,0.010000000000000675,True,True,pass,pass
+Camellia fluviatilis,W,sect. Thea,14,3.5100000000000247,0.6799999999999997,0.020000000000000018,False,False,n_points_lt_20,n_points_lt_40
+Camellia formosensis,W,sect. Theopsis,10,6.745000000000026,1.9849999999999905,0.15500000000000025,False,False,n_points_lt_20,n_points_lt_40
+Camellia furfuracea,W,sect. Furfuracea,22,4.575000000000029,0.28500000000000014,0.020000000000000018,True,False,pass,n_points_lt_40
+Camellia grijsii,W,sect. Theopsis,80,3.740000000000028,0.23999999999999932,0.015000000000000124,True,True,pass,pass
+Camellia hengchunensis,W,sect. Camellia,13,8.410000000000025,0.360000000000003,0.03000000000000025,False,False,n_points_lt_20,n_points_lt_40
+Camellia kissii,W,sect. Paracamellia,80,4.060000000000028,0.12000000000000188,0.010000000000000231,True,True,pass,pass
+Camellia kwangsiensis,W,sect. Thea,6,3.800000000000026,1.6699999999999982,0.10999999999999988,False,False,n_points_lt_20,n_points_lt_40
+Camellia lawii,W,sect. Paracamellia,11,-0.7999999999999736,1.3599999999999985,0.055000000000000604,False,False,n_points_lt_20,n_points_lt_40
+Camellia lutchuensis,W,sect. Theopsis,27,-1.8899999999999713,0.9149999999999965,0.0600000000000005,True,False,pass,n_points_lt_40
+Camellia parafurfuracea,W,sect. Furfuracea,6,4.550000000000025,2.2399999999999984,0.14000000000000012,False,False,n_points_lt_20,n_points_lt_40
+Camellia parviflora,W,sect. Paracamellia,48,3.0900000000000256,0.15999999999999837,0.010000000000000231,True,True,pass,pass
+Camellia puniceiflora,W,sect. Camellia,23,2.710000000000024,0.18500000000000227,0.020000000000000018,True,False,pass,n_points_lt_40
+Camellia rhytidocarpa,W,sect. Tuberculatae,16,1.4250000000000262,0.4749999999999983,0.040000000000000036,False,False,n_points_lt_20,n_points_lt_40
+Camellia salicifolia,W,sect. Paracamellia,80,3.7550000000000283,0.14500000000000002,0.010000000000000231,True,True,pass,pass
+Camellia shensiensis,W,sect. Thea,12,-3.73999999999997,1.089999999999999,0.010000000000000231,False,False,n_points_lt_20,n_points_lt_40
+Camellia sinensis,W,sect. Thea,80,-4.374999999999965,0.17499999999999716,0.010000000000000231,True,True,pass,pass
+Camellia szechuanensis,W,sect. Thea,24,-0.2099999999999702,0.4100000000000006,0.03000000000000025,True,False,pass,n_points_lt_40
+Camellia tachangensis,W,sect. Thea,33,2.770000000000026,0.5199999999999991,0.029999999999999805,True,False,pass,n_points_lt_40
+Camellia taliensis,W,sect. Thea,14,-0.4049999999999736,2.3149999999999986,0.0649999999999995,False,False,n_points_lt_20,n_points_lt_40
+Camellia tsaii,W,sect. Paracamellia,34,2.2750000000000283,0.42499999999999716,0.025000000000000355,True,False,pass,n_points_lt_40
+Camellia tuberculata,W,sect. Tuberculatae,10,0.40000000000002656,0.6699999999999982,0.049999999999998934,False,False,n_points_lt_20,n_points_lt_40
+Camellia yunnanensis,W,sect. Thea,45,-0.5899999999999697,0.6849999999999987,0.040000000000000036,True,False,pass,q05_loo_gt_0_5C
+Camellia cuspidata,W,sect. Theopsis,80,3.9150000000000285,0.23499999999999943,0.015000000000000124,True,True,pass,pass
+Camellia pubipetala,W,sect. Eriandria,80,6.235000000000028,0.19500000000000028,0.01499999999999968,True,True,pass,pass
+Camellia yuhsienensis,W,sect. Paracamellia,38,2.4950000000000254,0.3450000000000002,0.025000000000000355,True,False,pass,n_points_lt_40
+Camellia albogigas,W,sect. Archecamellia,18,5.7150000000000265,0.6550000000000011,0.04499999999999993,False,False,n_points_lt_20,n_points_lt_40
+Camellia petelotii,Y,sect. Chrysantha,5,8.090000000000023,0.4300000000000015,0.040000000000000036,False,False,n_points_lt_20,n_points_lt_40
+Camellia nitidissima,Y,sect. Chrysantha,5,8.870000000000022,0.5100000000000016,0.040000000000000036,False,False,n_points_lt_20,n_points_lt_40

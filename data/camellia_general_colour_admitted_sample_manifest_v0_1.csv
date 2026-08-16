@@ -1,0 +1,76 @@
+seed_id,run,biosample,archive_sample_name,scientific_name,instrument,spots,bases,biological_group,visible_colour,developmental_stage,replicate,mapping_status,mapping_basis
+CMETA001,SRR5829595,SAMN07350690,7_rep1,Camellia nitidissima,Illumina HiSeq 2500,1000000,300000000,C_nitidissima_yellow_development,yellow,S3,1,resolved,existing admitted BioSample stage mapping
+CMETA001,SRR5829594,SAMN07350691,7_rep2,Camellia nitidissima,Illumina HiSeq 2500,1000000,300000000,C_nitidissima_yellow_development,yellow,S3,2,resolved,existing admitted BioSample stage mapping
+CMETA001,SRR5829593,SAMN07350688,6_rep2,Camellia nitidissima,Illumina HiSeq 2500,1000000,300000000,C_nitidissima_yellow_development,yellow,S2,2,resolved,existing admitted BioSample stage mapping
+CMETA001,SRR5829592,SAMN07350689,6_rep3,Camellia nitidissima,Illumina HiSeq 2500,1000000,300000000,C_nitidissima_yellow_development,yellow,S2,3,resolved,existing admitted BioSample stage mapping
+CMETA001,SRR5829591,SAMN07350686,10_rep3,Camellia nitidissima,Illumina HiSeq 2500,1000000,300000000,C_nitidissima_yellow_development,yellow,S1,3,resolved,existing admitted BioSample stage mapping
+CMETA001,SRR5829590,SAMN07350687,6_rep1,Camellia nitidissima,Illumina HiSeq 2500,1000000,300000000,C_nitidissima_yellow_development,yellow,S2,1,resolved,existing admitted BioSample stage mapping
+CMETA001,SRR5829589,SAMN07350684,10_rep1,Camellia nitidissima,Illumina HiSeq 2500,1000000,300000000,C_nitidissima_yellow_development,yellow,S1,1,resolved,existing admitted BioSample stage mapping
+CMETA001,SRR5829588,SAMN07350685,10_rep2,Camellia nitidissima,Illumina HiSeq 2500,1000000,300000000,C_nitidissima_yellow_development,yellow,S1,2,resolved,existing admitted BioSample stage mapping
+CMETA001,SRR5829587,SAMN07350692,7_rep3,Camellia nitidissima,Illumina HiSeq 2500,1000000,300000000,C_nitidissima_yellow_development,yellow,S3,3,resolved,existing admitted BioSample stage mapping
+CMETA001,SRR5829586,SAMN07350693,8_rep1,Camellia nitidissima,Illumina HiSeq 2500,1000000,300000000,C_nitidissima_yellow_development,yellow,S4,1,resolved,existing admitted BioSample stage mapping
+CMETA001,SRR5829585,SAMN07350698,9_rep3,Camellia nitidissima,Illumina HiSeq 2500,21844645,6553393500,C_nitidissima_yellow_development,yellow,S5,3,resolved,existing admitted BioSample stage mapping
+CMETA001,SRR5829584,SAMN07350694,8_rep2,Camellia nitidissima,Illumina HiSeq 2500,1000000,300000000,C_nitidissima_yellow_development,yellow,S4,2,resolved,existing admitted BioSample stage mapping
+CMETA001,SRR5829583,SAMN07350695,8_rep3,Camellia nitidissima,Illumina HiSeq 2500,1000000,300000000,C_nitidissima_yellow_development,yellow,S4,3,resolved,existing admitted BioSample stage mapping
+CMETA001,SRR5829582,SAMN07350696,9_rep1,Camellia nitidissima,Illumina HiSeq 2500,1000000,300000000,C_nitidissima_yellow_development,yellow,S5,1,resolved,existing admitted BioSample stage mapping
+CMETA001,SRR5829581,SAMN07350697,9_rep2,Camellia nitidissima,Illumina HiSeq 2500,1000000,300000000,C_nitidissima_yellow_development,yellow,S5,2,resolved,existing admitted BioSample stage mapping
+CMETA002,SRR10752667,SAMN13663796,BTP11,Camellia sinensis,Illumina HiSeq 2500,23668665,7057954060,BTP_pink,pink,S1,1,resolved,paper genotype/color + archive SampleName stage/replicate code
+CMETA002,SRR10752666,SAMN13663797,BTP12,Camellia sinensis,Illumina HiSeq 2500,26153281,7804636930,BTP_pink,pink,S1,2,resolved,paper genotype/color + archive SampleName stage/replicate code
+CMETA002,SRR10752665,SAMN13663806,BTP42,Camellia sinensis,Illumina HiSeq 2500,27381944,8125553048,BTP_pink,pink,S4,2,resolved,paper genotype/color + archive SampleName stage/replicate code
+CMETA002,SRR10752664,SAMN13663807,BTP43,Camellia sinensis,Illumina HiSeq 2500,31911343,9513539518,BTP_pink,pink,S4,3,resolved,paper genotype/color + archive SampleName stage/replicate code
+CMETA002,SRR10752663,SAMN13663808,BTP51,Camellia sinensis,Illumina HiSeq 2500,21561262,6436558604,BTP_pink,pink,S5,1,resolved,paper genotype/color + archive SampleName stage/replicate code
+CMETA002,SRR10752662,SAMN13663809,BTP52,Camellia sinensis,Illumina HiSeq 2500,23149731,6873130538,BTP_pink,pink,S5,2,resolved,paper genotype/color + archive SampleName stage/replicate code
+CMETA002,SRR10752661,SAMN13663810,BTP53,Camellia sinensis,Illumina HiSeq 2500,23033043,6867835118,BTP_pink,pink,S5,3,resolved,paper genotype/color + archive SampleName stage/replicate code
+CMETA002,SRR10752660,SAMN13663798,BTP13,Camellia sinensis,Illumina HiSeq 2500,23869766,7124268318,BTP_pink,pink,S1,3,resolved,paper genotype/color + archive SampleName stage/replicate code
+CMETA002,SRR10752659,SAMN13663799,BTP21,Camellia sinensis,Illumina HiSeq 2500,25455270,7579737926,BTP_pink,pink,S2,1,resolved,paper genotype/color + archive SampleName stage/replicate code
+CMETA002,SRR10752658,SAMN13663800,BTP22,Camellia sinensis,Illumina HiSeq 2500,31208670,9316682038,BTP_pink,pink,S2,2,resolved,paper genotype/color + archive SampleName stage/replicate code
+CMETA002,SRR10752657,SAMN13663801,BTP23,Camellia sinensis,Illumina HiSeq 2500,23867889,7096074108,BTP_pink,pink,S2,3,resolved,paper genotype/color + archive SampleName stage/replicate code
+CMETA002,SRR10752656,SAMN13663802,BTP31,Camellia sinensis,Illumina HiSeq 2500,31292398,9352405318,BTP_pink,pink,S3,1,resolved,paper genotype/color + archive SampleName stage/replicate code
+CMETA002,SRR10752655,SAMN13663803,BTP32,Camellia sinensis,Illumina HiSeq 2500,26972499,8016173786,BTP_pink,pink,S3,2,resolved,paper genotype/color + archive SampleName stage/replicate code
+CMETA002,SRR10752654,SAMN13663804,BTP33,Camellia sinensis,Illumina HiSeq 2500,27206056,8119153772,BTP_pink,pink,S3,3,resolved,paper genotype/color + archive SampleName stage/replicate code
+CMETA002,SRR10752653,SAMN13663805,BTP41,Camellia sinensis,Illumina HiSeq 2500,30166304,8954093392,BTP_pink,pink,S4,1,resolved,paper genotype/color + archive SampleName stage/replicate code
+CMETA003,SRR10758372,SAMN13671706,ZJW11,Camellia sinensis,Illumina HiSeq 2500,24401173,7272491122,ZJW_white,white,S1,1,resolved,paper genotype/color + archive SampleName stage/replicate code
+CMETA003,SRR10758371,SAMN13671707,ZJW12,Camellia sinensis,Illumina HiSeq 2500,21739300,6470253566,ZJW_white,white,S1,2,resolved,paper genotype/color + archive SampleName stage/replicate code
+CMETA003,SRR10758370,SAMN13671716,ZJW42,Camellia sinensis,Illumina HiSeq 2500,24301648,7234121756,ZJW_white,white,S4,2,resolved,paper genotype/color + archive SampleName stage/replicate code
+CMETA003,SRR10758369,SAMN13671717,ZJW43,Camellia sinensis,Illumina HiSeq 2500,24896357,7406220944,ZJW_white,white,S4,3,resolved,paper genotype/color + archive SampleName stage/replicate code
+CMETA003,SRR10758368,SAMN13671718,ZJW51,Camellia sinensis,Illumina HiSeq 2500,21291989,6355399448,ZJW_white,white,S5,1,resolved,paper genotype/color + archive SampleName stage/replicate code
+CMETA003,SRR10758367,SAMN13671719,ZJW52,Camellia sinensis,Illumina HiSeq 2500,22152462,6614402460,ZJW_white,white,S5,2,resolved,paper genotype/color + archive SampleName stage/replicate code
+CMETA003,SRR10758366,SAMN13671720,ZJW53,Camellia sinensis,Illumina HiSeq 2500,28163774,8376422666,ZJW_white,white,S5,3,resolved,paper genotype/color + archive SampleName stage/replicate code
+CMETA003,SRR10758365,SAMN13671708,ZJW13,Camellia sinensis,Illumina HiSeq 2500,21682289,6448733710,ZJW_white,white,S1,3,resolved,paper genotype/color + archive SampleName stage/replicate code
+CMETA003,SRR10758364,SAMN13671709,ZJW21,Camellia sinensis,Illumina HiSeq 2500,20915131,6229932294,ZJW_white,white,S2,1,resolved,paper genotype/color + archive SampleName stage/replicate code
+CMETA003,SRR10758363,SAMN13671710,ZJW22,Camellia sinensis,Illumina HiSeq 2500,22420616,6674212962,ZJW_white,white,S2,2,resolved,paper genotype/color + archive SampleName stage/replicate code
+CMETA003,SRR10758362,SAMN13671711,ZJW23,Camellia sinensis,Illumina HiSeq 2500,21883981,6513593344,ZJW_white,white,S2,3,resolved,paper genotype/color + archive SampleName stage/replicate code
+CMETA003,SRR10758361,SAMN13671712,ZJW31,Camellia sinensis,Illumina HiSeq 2500,20935452,6220494474,ZJW_white,white,S3,1,resolved,paper genotype/color + archive SampleName stage/replicate code
+CMETA003,SRR10758360,SAMN13671713,ZJW32,Camellia sinensis,Illumina HiSeq 2500,21362041,6362838760,ZJW_white,white,S3,2,resolved,paper genotype/color + archive SampleName stage/replicate code
+CMETA003,SRR10758359,SAMN13671714,ZJW33,Camellia sinensis,Illumina HiSeq 2500,23929435,7138488744,ZJW_white,white,S3,3,resolved,paper genotype/color + archive SampleName stage/replicate code
+CMETA003,SRR10758358,SAMN13671715,ZJW41,Camellia sinensis,Illumina HiSeq 2500,25751867,7692097820,ZJW_white,white,S4,1,resolved,paper genotype/color + archive SampleName stage/replicate code
+CMETA004,SRR17275291,SAMN24108776,CJ-1,Camellia japonica,Illumina HiSeq 2000,22737957,6804700914,CJ,unresolved_control_colour,,1,partial_colour_unresolved,paper cultivar/color mapping; CJ control colour not explicitly stated in searchable Methods text
+CMETA004,SRR17275290,SAMN24108777,CJ-2,Camellia japonica,Illumina HiSeq 2000,21605733,6465975190,CJ,unresolved_control_colour,,2,partial_colour_unresolved,paper cultivar/color mapping; CJ control colour not explicitly stated in searchable Methods text
+CMETA004,SRR17275289,SAMN24108786,FD-2,Camellia japonica,Illumina HiSeq 2000,27083472,8102257092,FD,pink,,2,resolved,paper cultivar/color mapping; CJ control colour not explicitly stated in searchable Methods text
+CMETA004,SRR17275288,SAMN24108787,FD-3,Camellia japonica,Illumina HiSeq 2000,25506238,7627874104,FD,pink,,3,resolved,paper cultivar/color mapping; CJ control colour not explicitly stated in searchable Methods text
+CMETA004,SRR17275287,SAMN24108788,YD-1,Camellia japonica,Illumina HiSeq 2000,27343186,8179725940,YD,white,,1,resolved,paper cultivar/color mapping; CJ control colour not explicitly stated in searchable Methods text
+CMETA004,SRR17275286,SAMN24108789,YD-2,Camellia japonica,Illumina HiSeq 2000,26955243,8068799242,YD,white,,2,resolved,paper cultivar/color mapping; CJ control colour not explicitly stated in searchable Methods text
+CMETA004,SRR17275285,SAMN24108790,YD-3,Camellia japonica,Illumina HiSeq 2000,25856510,7736063440,YD,white,,3,resolved,paper cultivar/color mapping; CJ control colour not explicitly stated in searchable Methods text
+CMETA004,SRR17275284,SAMN24108778,CJ-3,Camellia japonica,Illumina HiSeq 2000,20613778,6166381728,CJ,unresolved_control_colour,,3,partial_colour_unresolved,paper cultivar/color mapping; CJ control colour not explicitly stated in searchable Methods text
+CMETA004,SRR17275283,SAMN24108779,CD-1,Camellia japonica,Illumina HiSeq 2000,28529174,8532211188,CD,red,,1,resolved,paper cultivar/color mapping; CJ control colour not explicitly stated in searchable Methods text
+CMETA004,SRR17275282,SAMN24108780,CD-2,Camellia japonica,Illumina HiSeq 2000,26764230,8006185872,CD,red,,2,resolved,paper cultivar/color mapping; CJ control colour not explicitly stated in searchable Methods text
+CMETA004,SRR17275281,SAMN24108781,CD-3,Camellia japonica,Illumina HiSeq 2000,25191685,7538691040,CD,red,,3,resolved,paper cultivar/color mapping; CJ control colour not explicitly stated in searchable Methods text
+CMETA004,SRR17275280,SAMN24108782,JH-1,Camellia japonica,Illumina HiSeq 2000,27796589,8312786546,JH,dark_red,,1,resolved,paper cultivar/color mapping; CJ control colour not explicitly stated in searchable Methods text
+CMETA004,SRR17275279,SAMN24108783,JH-2,Camellia japonica,Illumina HiSeq 2000,26038844,7789099988,JH,dark_red,,2,resolved,paper cultivar/color mapping; CJ control colour not explicitly stated in searchable Methods text
+CMETA004,SRR17275278,SAMN24108784,JH-3,Camellia japonica,Illumina HiSeq 2000,26222810,7846421522,JH,dark_red,,3,resolved,paper cultivar/color mapping; CJ control colour not explicitly stated in searchable Methods text
+CMETA004,SRR17275277,SAMN24108785,FD-1,Camellia japonica,Illumina HiSeq 2000,26615812,7965989982,FD,pink,,1,resolved,paper cultivar/color mapping; CJ control colour not explicitly stated in searchable Methods text
+CMETA005,SRR22904727,SAMN32301774,Red3,Camellia japonica,Illumina NovaSeq 6000,23283127,6984938100,Red,red,,3,resolved,archive SampleName directly encodes petal region and replicate
+CMETA005,SRR22904726,SAMN32301769,Pink1,Camellia japonica,Illumina NovaSeq 6000,22563462,6769038600,Pink,pink,,1,resolved,archive SampleName directly encodes petal region and replicate
+CMETA005,SRR22904725,SAMN32301770,Pink2,Camellia japonica,Illumina NovaSeq 6000,22247324,6674197200,Pink,pink,,2,resolved,archive SampleName directly encodes petal region and replicate
+CMETA005,SRR22904724,SAMN32301771,Pink3,Camellia japonica,Illumina NovaSeq 6000,23924402,7177320600,Pink,pink,,3,resolved,archive SampleName directly encodes petal region and replicate
+CMETA005,SRR22904723,SAMN32301772,Red1,Camellia japonica,Illumina NovaSeq 6000,23194499,6958349700,Red,red,,1,resolved,archive SampleName directly encodes petal region and replicate
+CMETA005,SRR22904722,SAMN32301773,Red2,Camellia japonica,Illumina NovaSeq 6000,24180119,7254035700,Red,red,,2,resolved,archive SampleName directly encodes petal region and replicate
+CMETA006,SRR29846216,SAMN42503056,RD1,Camellia amplexicaulis,Illumina NovaSeq 6000,23195519,6958655700,RD,red,,1,resolved,archive SampleName and ScientificName directly match paper red/white/yellow groups
+CMETA006,SRR29846215,SAMN42503057,RD2,Camellia amplexicaulis,Illumina NovaSeq 6000,25851082,7755324600,RD,red,,2,resolved,archive SampleName and ScientificName directly match paper red/white/yellow groups
+CMETA006,SRR29846214,SAMN42503058,RD3,Camellia amplexicaulis,Illumina NovaSeq 6000,24403000,7320900000,RD,red,,3,resolved,archive SampleName and ScientificName directly match paper red/white/yellow groups
+CMETA006,SRR29846213,SAMN42503059,WH1,Camellia oleifera,Illumina NovaSeq 6000,24456757,7337027100,WH,white,,1,resolved,archive SampleName and ScientificName directly match paper red/white/yellow groups
+CMETA006,SRR29846212,SAMN42503060,WH2,Camellia oleifera,Illumina NovaSeq 6000,23970320,7191096000,WH,white,,2,resolved,archive SampleName and ScientificName directly match paper red/white/yellow groups
+CMETA006,SRR29846211,SAMN42503061,WH3,Camellia oleifera,Illumina NovaSeq 6000,24358573,7307571900,WH,white,,3,resolved,archive SampleName and ScientificName directly match paper red/white/yellow groups
+CMETA006,SRR29846210,SAMN42503062,YE1,Camellia petelotii,Illumina NovaSeq 6000,25305916,7591774800,YE,yellow,,1,resolved,archive SampleName and ScientificName directly match paper red/white/yellow groups
+CMETA006,SRR29846209,SAMN42503063,YE2,Camellia petelotii,Illumina NovaSeq 6000,22879281,6863784300,YE,yellow,,2,resolved,archive SampleName and ScientificName directly match paper red/white/yellow groups
+CMETA006,SRR29846208,SAMN42503064,YE3,Camellia petelotii,Illumina NovaSeq 6000,23923769,7177130700,YE,yellow,,3,resolved,archive SampleName and ScientificName directly match paper red/white/yellow groups

@@ -1,0 +1,35 @@
+name: TPIA bulk download registry audit
+
+on:
+  pull_request:
+    paths:
+      - 'scripts/audit_tpia_bulk_download_registry.py'
+      - '.github/workflows/tpia-bulk-download-registry-audit.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: python -m pip install --disable-pip-version-check requests
+      - name: Query TPIA public bulk download registry
+        run: |
+          mkdir -p build/tpia_bulk
+          python scripts/audit_tpia_bulk_download_registry.py --out-dir build/tpia_bulk
+      - name: Report candidates
+        run: |
+          echo '### TPIA bulk phylogeny/gene-family resources' >> "$GITHUB_STEP_SUMMARY"
+          echo '```json' >> "$GITHUB_STEP_SUMMARY";cat build/tpia_bulk/summary.json >> "$GITHUB_STEP_SUMMARY";echo '```' >> "$GITHUB_STEP_SUMMARY"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: tpia-bulk-download-registry-audit
+          path: build/tpia_bulk
+          if-no-files-found: error

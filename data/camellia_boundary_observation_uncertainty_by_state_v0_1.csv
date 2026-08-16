@@ -1,0 +1,4 @@
+colour_state,n_species,median_n_points,median_bootstrap_se,mean_bootstrap_se
+A,14,42.5,0.860943,1.038198
+W,34,17.5,0.880181,0.996438
+Y,2,5,0.672330,0.672330

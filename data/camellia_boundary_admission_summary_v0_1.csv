@@ -1,0 +1,9 @@
+gate,summary_type,state_or_test,n_total,n_pass,pass_fraction,difference_A_minus_W,two_sided_p
+minimum_n20_loo1C,retention,A,14,10,0.7142857143,,
+minimum_n20_loo1C,retention,W,34,16,0.4705882353,,
+minimum_n20_loo1C,retention,Y,2,0,0.0,,
+minimum_n20_loo1C,AW_q05_test,A_vs_W,26,,,-0.1559375,0.8792312077
+strong_n40_loo0_5C,retention,A,14,6,0.4285714286,,
+strong_n40_loo0_5C,retention,W,34,11,0.3235294118,,
+strong_n40_loo0_5C,retention,Y,2,0,0.0,,
+strong_n40_loo0_5C,AW_q05_test,A_vs_W,17,,,-0.7025757576,0.5913040869

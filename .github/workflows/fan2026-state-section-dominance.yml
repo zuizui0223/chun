@@ -1,0 +1,36 @@
+name: Fan 2026 state-section dominance
+
+on:
+  pull_request:
+    paths:
+      - 'data/fan2026_full_section_colour_table_v0_1.csv'
+      - 'scripts/analyze_fan2026_state_section_dominance.py'
+      - '.github/workflows/fan2026-state-section-dominance.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  analyze:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: python -m pip install --disable-pip-version-check numpy
+      - name: Run dominance diagnostic
+        run: |
+          mkdir -p build/fan_state_dominance
+          python scripts/analyze_fan2026_state_section_dominance.py \
+            data/fan2026_full_section_colour_table_v0_1.csv \
+            --output build/fan_state_dominance/result.csv \
+            --permutations 100000 --seed 20260815
+      - name: Report
+        run: cat build/fan_state_dominance/result.csv >> "$GITHUB_STEP_SUMMARY"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: fan2026-state-section-dominance
+          path: build/fan_state_dominance
+          if-no-files-found: error

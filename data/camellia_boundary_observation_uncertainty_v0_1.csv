@@ -1,0 +1,4 @@
+analysis,n_A,n_W,point_estimate_A_minus_W,q025,median,q975,fraction_A_lower,interpretation
+observed_S3,14,34,-0.483718487,,-0.483718487,,1,point estimate
+within_species_occurrence_bootstrap_centered,14,34,-0.483718487,-1.38977634,-0.454270038,0.191756748,0.91,occurrence-resampling uncertainty conditional on observed species set
+nested_species_plus_occurrence_bootstrap,14,34,-0.483718487,-2.20625716,-0.453246214,1.13991245,0.6998,adds nonphylogenetic species-resampling uncertainty; diagnostic only

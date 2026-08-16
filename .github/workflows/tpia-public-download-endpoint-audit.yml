@@ -1,0 +1,81 @@
+name: TPIA public download endpoint audit
+
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/tpia-public-download-endpoint-audit.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - name: Fetch public TPIA pages and assets
+        run: |
+          mkdir -p build/tpia_audit/assets
+          for page in download.html transcriptome.html; do
+            curl --fail --location --retry 3 -A 'Mozilla/5.0 chun-public-data-audit/0.1' \
+              "https://tpia.teaplants.cn/$page" -o "build/tpia_audit/$page"
+          done
+          python - <<'PY'
+          from pathlib import Path
+          from html.parser import HTMLParser
+          from urllib.parse import urljoin
+          class P(HTMLParser):
+              def __init__(self): super().__init__(); self.src=[]
+              def handle_starttag(self,tag,attrs):
+                  d=dict(attrs)
+                  if tag=='script' and d.get('src'): self.src.append(d['src'])
+          urls=[]
+          for fn in ('download.html','transcriptome.html'):
+              p=P(); p.feed(Path('build/tpia_audit/'+fn).read_text(encoding='utf-8',errors='ignore'))
+              for s in p.src:
+                  u=urljoin('https://tpia.teaplants.cn/'+fn,s)
+                  if u not in urls: urls.append(u)
+          Path('build/tpia_audit/script_urls.txt').write_text('\n'.join(urls)+'\n')
+          print('\n'.join(urls))
+          PY
+          i=0
+          while IFS= read -r u; do
+            i=$((i+1)); out="build/tpia_audit/assets/$(printf '%03d' "$i")_$(basename "${u%%\?*}")"
+            curl --fail --location --retry 2 -A 'Mozilla/5.0 chun-public-data-audit/0.1' "$u" -o "$out" || true
+          done < build/tpia_audit/script_urls.txt
+      - name: Find public data endpoints
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import re,json
+          root=Path('build/tpia_audit')
+          pats=re.compile(r'(?i)(ajax|fetch\(|\.php|download|transcript|assembly|fasta|unigene|gene.?family|ortholog|core.?gene)')
+          hits=[]
+          for p in [root/'download.html',root/'transcriptome.html',*sorted((root/'assets').glob('*'))]:
+              if not p.is_file() or p.stat().st_size>5_000_000: continue
+              txt=p.read_text(encoding='utf-8',errors='ignore')
+              lines=txt.splitlines()
+              for i,line in enumerate(lines,1):
+                  if pats.search(line):
+                      clean=re.sub(r'\s+',' ',line).strip()
+                      if len(clean)>1000: clean=clean[:1000]
+                      hits.append({'file':str(p.relative_to(root)),'line':i,'text':clean})
+          Path('build/tpia_audit/endpoint_hits.json').write_text(json.dumps(hits,ensure_ascii=False,indent=2)+'\n')
+          for h in hits[:300]: print(f"{h['file']}:{h['line']} {h['text']}")
+          PY
+      - name: Report
+        if: always()
+        run: |
+          echo '### TPIA public endpoint audit' >> "$GITHUB_STEP_SUMMARY"
+          echo '#### script URLs' >> "$GITHUB_STEP_SUMMARY"
+          echo '```' >> "$GITHUB_STEP_SUMMARY"; cat build/tpia_audit/script_urls.txt >> "$GITHUB_STEP_SUMMARY" || true; echo '```' >> "$GITHUB_STEP_SUMMARY"
+          echo '#### candidate endpoint lines' >> "$GITHUB_STEP_SUMMARY"
+          echo '```json' >> "$GITHUB_STEP_SUMMARY"; head -c 30000 build/tpia_audit/endpoint_hits.json >> "$GITHUB_STEP_SUMMARY" || true; echo >> "$GITHUB_STEP_SUMMARY"; echo '```' >> "$GITHUB_STEP_SUMMARY"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: tpia-public-download-endpoint-audit
+          path: build/tpia_audit
+          if-no-files-found: error

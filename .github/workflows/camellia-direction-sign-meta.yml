@@ -1,0 +1,31 @@
+name: Camellia direction sign meta-analysis
+
+on:
+  push:
+    paths:
+      - 'data/camellia_flower_color_mechanism_meta_v0_2.csv'
+      - 'data/camellia_direction_sign_meta_v0_1.csv'
+      - 'scripts/run_camellia_direction_sign_meta.py'
+      - '.github/workflows/camellia-direction-sign-meta.yml'
+  pull_request:
+    paths:
+      - 'data/camellia_flower_color_mechanism_meta_v0_2.csv'
+      - 'data/camellia_direction_sign_meta_v0_1.csv'
+      - 'scripts/run_camellia_direction_sign_meta.py'
+      - '.github/workflows/camellia-direction-sign-meta.yml'
+
+jobs:
+  exact-sign-synthesis:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Recompute exact sign synthesis
+        run: |
+          python scripts/run_camellia_direction_sign_meta.py \
+            data/camellia_flower_color_mechanism_meta_v0_2.csv \
+            --output /tmp/camellia_direction_sign_meta.csv
+      - name: Verify frozen result
+        run: diff --strip-trailing-cr -u data/camellia_direction_sign_meta_v0_1.csv /tmp/camellia_direction_sign_meta.csv

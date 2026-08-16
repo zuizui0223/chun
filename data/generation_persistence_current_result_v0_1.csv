@@ -1,0 +1,9 @@
+result_id,scope,value,interpretation
+GP_A_BREADTH,"Fan2026 full formal-section table","A n=25 in 4/17 sections; expected 9.568; breadth P=0.00002; entropy P<0.00001","A macro realization is strongly history-proxy concentrated"
+GP_Y_BREADTH,"Fan2026 full formal-section table","Y n=17 in 4/17 sections; expected 8.045; breadth P=0.00130; entropy P<0.00001","Y macro realization is strongly history-proxy concentrated"
+GP_W_BREADTH,"Fan2026 full formal-section table","W n=56 in 13/17 sections; expected 13.480; breadth P=0.496","W broad occurrence is not unusual for its larger sample size"
+GP_A_DOMINANCE,"Fan2026 full formal-section table","22/25 A=88% in sect. Camellia; expected max share 26.14%; P<0.00001","A extant distribution is dominated by one major historical section"
+GP_Y_DOMINANCE,"Fan2026 full formal-section table","13/17 Y=76.47% in sect. Chrysantha; expected max share 28.08%; P<0.00001","Y extant distribution is dominated by one major historical section"
+GP_W_DOMINANCE,"Fan2026 full formal-section table","15/56 W=26.79% in sect. Paracamellia; expected max share 23.77%; P=0.257","W has no excess one-section dominance"
+GP_MICRO_LINK,"mechanistic meta-analysis","regulatory/flux recurrence 8/8; red-direction anthocyanin 6/6","short-scale accessibility cannot be interpreted as macro origin frequency"
+GP_NEXT,"inference consequence","separate gain/redeployment hazard from persistence/loss and radiation/reticulation alternatives","primary nuclear event histories are the decisive next input"

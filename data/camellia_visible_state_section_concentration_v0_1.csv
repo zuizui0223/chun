@@ -1,0 +1,4 @@
+visible_state,n_species,n_observed_sections_total,observed_section_breadth,expected_section_breadth_under_label_shuffle,lower_tail_breadth_p,observed_section_entropy,expected_section_entropy_under_label_shuffle,lower_tail_entropy_p,permutations,seed,interpretation
+A,14,10,2,6.59279,0.0000299997,0.2573186405,1.6941726131,0.0000099999,100000,20260815,state is more section-concentrated than expected for its species count
+W,34,10,9,9.12673,0.6513634864,1.8968927879,1.9134473198,0.4134558654,100000,20260815,no count-controlled evidence of unusually low section breadth/entropy
+Y,2,10,1,1.84341,0.1565984340,0.0000000000,0.5846072636,0.1565984340,100000,20260815,no count-controlled evidence of unusually low section breadth/entropy; n=2 is severely underpowered

@@ -1,0 +1,63 @@
+name: TPIA Fan assembly overlap
+
+on:
+  pull_request:
+    paths:
+      - 'scripts/build_fan2026_species_colour_seed.py'
+      - 'scripts/audit_tpia_fan_assembly_overlap.py'
+      - '.github/workflows/tpia-fan-assembly-overlap.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  overlap:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: python -m pip install --disable-pip-version-check openpyxl requests
+      - name: Acquire Fan Data S1 and deterministic species seed
+        run: |
+          mkdir -p build/tpia_overlap/package build/tpia_overlap/result
+          curl --fail --location --retry 3 'https://www.ncbi.nlm.nih.gov/pmc/utils/oa/oa.fcgi?id=PMC12946509' -o build/tpia_overlap/oa.xml
+          python - <<'PY'
+          from pathlib import Path
+          import xml.etree.ElementTree as ET
+          root=ET.fromstring(Path('build/tpia_overlap/oa.xml').read_bytes())
+          links=[x.attrib.get('href','') for x in root.findall('.//link') if x.attrib.get('format')=='tgz']
+          if len(links)!=1: raise SystemExit(links)
+          u=links[0]
+          if u.startswith('ftp://ftp.ncbi.nlm.nih.gov/'):u='https://ftp.ncbi.nlm.nih.gov/'+u.split('ftp://ftp.ncbi.nlm.nih.gov/',1)[1]
+          Path('build/tpia_overlap/url').write_text(u+'\n')
+          PY
+          u=$(cat build/tpia_overlap/url)
+          if ! curl --fail --location --retry 3 --retry-all-errors "$u" -o build/tpia_overlap/a.tgz; then
+            u2=$(python - <<'PY'
+          from pathlib import Path
+          u=Path('build/tpia_overlap/url').read_text().strip();m='https://ftp.ncbi.nlm.nih.gov/pub/pmc/';print(u.replace(m,m+'deprecated/',1) if u.startswith(m) and '/deprecated/' not in u else u)
+          PY
+          ); curl --fail --location --retry 3 --retry-all-errors "$u2" -o build/tpia_overlap/a.tgz
+          fi
+          tar -xzf build/tpia_overlap/a.tgz -C build/tpia_overlap/package
+          xlsx=$(find build/tpia_overlap/package -type f -iname '*s002*.xlsx' | head -n1);test -n "$xlsx";cp "$xlsx" build/tpia_overlap/DataS1.xlsx
+          python scripts/build_fan2026_species_colour_seed.py build/tpia_overlap/DataS1.xlsx --output build/tpia_overlap/fan_seed.csv --audit build/tpia_overlap/fan_seed_audit.json
+      - name: Query TPIA public assembly registry
+        run: |
+          python scripts/audit_tpia_fan_assembly_overlap.py \
+            --fan-seed build/tpia_overlap/fan_seed.csv \
+            --out-dir build/tpia_overlap/result
+      - name: Report
+        run: |
+          echo '### TPIA × Fan assembly overlap' >> "$GITHUB_STEP_SUMMARY"
+          echo '```json' >> "$GITHUB_STEP_SUMMARY";cat build/tpia_overlap/result/summary.json >> "$GITHUB_STEP_SUMMARY";echo '```' >> "$GITHUB_STEP_SUMMARY"
+          echo '#### Overlap assemblies' >> "$GITHUB_STEP_SUMMARY";echo '```csv' >> "$GITHUB_STEP_SUMMARY";cat build/tpia_overlap/result/fan_overlap_assemblies.csv >> "$GITHUB_STEP_SUMMARY";echo '```' >> "$GITHUB_STEP_SUMMARY"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: tpia-fan-assembly-overlap
+          path: build/tpia_overlap
+          if-no-files-found: error

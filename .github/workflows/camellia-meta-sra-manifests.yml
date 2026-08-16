@@ -1,0 +1,37 @@
+name: Camellia general colour SRA manifests
+
+on:
+  push:
+    paths:
+      - 'data/camellia_meta_sra_seeds_v0_1.csv'
+      - 'scripts/fetch_sra_runinfo.py'
+      - '.github/workflows/camellia-meta-sra-manifests.yml'
+  pull_request:
+    paths:
+      - 'data/camellia_meta_sra_seeds_v0_1.csv'
+      - 'scripts/fetch_sra_runinfo.py'
+      - '.github/workflows/camellia-meta-sra-manifests.yml'
+  workflow_dispatch:
+
+jobs:
+  resolve-run-metadata:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Resolve all NCBI colour-meta seeds to SRA RunInfo
+        run: |
+          mkdir -p /tmp/camellia-meta-manifests
+          python scripts/fetch_sra_runinfo.py \
+            --seeds data/camellia_meta_sra_seeds_v0_1.csv \
+            --out-dir /tmp/camellia-meta-manifests \
+            --include-status meta_candidate
+      - name: Show resolved run counts
+        run: cat /tmp/camellia-meta-manifests/manifest_fetch_summary.csv
+      - uses: actions/upload-artifact@v4
+        with:
+          name: camellia-general-colour-sra-manifests
+          path: /tmp/camellia-meta-manifests
+          if-no-files-found: error

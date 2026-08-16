@@ -1,0 +1,5 @@
+metric,n_A,n_W,mean_A,mean_W,difference_A_minus_W,two_sided_p,one_sided_p_A_lower,test_method,n_permutations
+bio1_median,14,34,18.807143,18.647059,0.160084,0.805202,0.594884,monte_carlo_seed_20260815,100000
+bio6_median,14,34,4.225,4.786765,-0.561765,0.525645,0.265437,monte_carlo_seed_20260815,100000
+bio6_q05,14,34,-2.863571,-1.274265,-1.589307,0.251857,0.127539,monte_carlo_seed_20260815,100000
+bio1_iqr,14,34,2.807143,2.951471,-0.144328,0.705183,0.356266,monte_carlo_seed_20260815,100000

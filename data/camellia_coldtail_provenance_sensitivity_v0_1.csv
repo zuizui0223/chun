@@ -1,0 +1,7 @@
+scenario,taxon,n_points,bio1_median,bio6_median,bio6_q05,bio1_iqr,aw_coldtail_colour_r2,aw_coldtail_colour_p,aw_coldtail_section_r2,aw_coldtail_section_p
+original_country_only_filter,Camellia rhytidocarpa,18,17.9,2.0,-14.105,1.2,0.003322,0.697182,0.442361,0.001956
+original_country_only_filter,Camellia tuberculata,12,17.15,3.35,-16.415,3.4,0.003322,0.697182,0.442361,0.001956
+minimal_remove_two_shared_extreme_coordinates,Camellia rhytidocarpa,16,18.0,2.45,1.425,1.25,0.028369,0.252477,0.235114,0.189366
+minimal_remove_two_shared_extreme_coordinates,Camellia tuberculata,10,17.65,4.1,0.4,1.975,0.028369,0.252477,0.235114,0.189366
+strict_section_envelope_22.54_30.96N_103.83_111.76E,Camellia rhytidocarpa,15,17.95,2.05,1.42,1.3,0.02819,0.253997,0.234178,0.192133
+strict_section_envelope_22.54_30.96N_103.83_111.76E,Camellia tuberculata,5,17.45,2.65,0.21,3.2,0.02819,0.253997,0.234178,0.192133

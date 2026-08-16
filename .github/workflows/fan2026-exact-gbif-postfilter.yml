@@ -1,0 +1,43 @@
+name: Fan 2026 exact GBIF taxon postfilter
+
+on:
+  pull_request:
+    paths:
+      - 'data/fan2026_chelsa_species_compact_v0_1.csv'
+      - 'scripts/postfilter_exact_gbif_thermal_results.py'
+      - 'scripts/run_exact_postfilter_live.py'
+      - '.github/workflows/fan2026-exact-gbif-postfilter.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  exact:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: python -m pip install --disable-pip-version-check numpy requests rasterio
+      - name: Apply live GBIF exact-match and unique-key gate
+        run: |
+          python scripts/run_exact_postfilter_live.py \
+            --species data/fan2026_chelsa_species_compact_v0_1.csv \
+            --out-dir build/fan_exact
+      - name: Report exact-taxonomy result
+        run: |
+          echo '### Fan 2026 exact GBIF taxon postfilter' >> "$GITHUB_STEP_SUMMARY"
+          for f in exact/exact_match_summary.json exact/colour_pairwise_thermal_tests_exact.csv exact/section_blocked_colour_tests_exact.csv exact/rejected_taxa.csv; do
+            echo "#### $f" >> "$GITHUB_STEP_SUMMARY"
+            echo '```' >> "$GITHUB_STEP_SUMMARY"
+            cat "build/fan_exact/$f" >> "$GITHUB_STEP_SUMMARY"
+            echo '```' >> "$GITHUB_STEP_SUMMARY"
+          done
+      - uses: actions/upload-artifact@v4
+        with:
+          name: fan2026-exact-gbif-postfilter
+          path: build/fan_exact
+          if-no-files-found: error

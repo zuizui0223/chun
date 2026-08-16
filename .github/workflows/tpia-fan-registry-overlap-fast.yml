@@ -1,0 +1,62 @@
+name: TPIA Fan registry overlap fast
+
+on:
+  pull_request:
+    paths:
+      - 'scripts/build_fan2026_species_colour_seed.py'
+      - 'scripts/audit_tpia_fan_registry_overlap_fast.py'
+      - '.github/workflows/tpia-fan-registry-overlap-fast.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  overlap:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: python -m pip install --disable-pip-version-check openpyxl requests
+      - name: Acquire Fan Data S1 and species seed
+        run: |
+          mkdir -p build/tpia_fast/package build/tpia_fast/result
+          curl --fail --location --retry 3 'https://www.ncbi.nlm.nih.gov/pmc/utils/oa/oa.fcgi?id=PMC12946509' -o build/tpia_fast/oa.xml
+          python - <<'PY'
+          import xml.etree.ElementTree as ET
+          from pathlib import Path
+          root=ET.fromstring(Path('build/tpia_fast/oa.xml').read_bytes())
+          links=[x.attrib.get('href','') for x in root.findall('.//link') if x.attrib.get('format')=='tgz']
+          if len(links)!=1: raise SystemExit(links)
+          u=links[0]
+          if u.startswith('ftp://ftp.ncbi.nlm.nih.gov/'):u='https://ftp.ncbi.nlm.nih.gov/'+u.split('ftp://ftp.ncbi.nlm.nih.gov/',1)[1]
+          Path('build/tpia_fast/url').write_text(u+'\n')
+          PY
+          u=$(cat build/tpia_fast/url)
+          if ! curl --fail --location --retry 3 --retry-all-errors "$u" -o build/tpia_fast/a.tgz; then
+            u2=$(python - <<'PY'
+          from pathlib import Path
+          u=Path('build/tpia_fast/url').read_text().strip();m='https://ftp.ncbi.nlm.nih.gov/pub/pmc/';print(u.replace(m,m+'deprecated/',1) if u.startswith(m) and '/deprecated/' not in u else u)
+          PY
+          );curl --fail --location --retry 3 --retry-all-errors "$u2" -o build/tpia_fast/a.tgz
+          fi
+          tar -xzf build/tpia_fast/a.tgz -C build/tpia_fast/package
+          xlsx=$(find build/tpia_fast/package -type f -iname '*s002*.xlsx' | head -n1);test -n "$xlsx";cp "$xlsx" build/tpia_fast/DataS1.xlsx
+          python scripts/build_fan2026_species_colour_seed.py build/tpia_fast/DataS1.xlsx --output build/tpia_fast/fan_seed.csv --audit build/tpia_fast/fan_seed_audit.json
+      - name: Query TPIA registry only
+        run: |
+          python scripts/audit_tpia_fan_registry_overlap_fast.py \
+            --fan-seed build/tpia_fast/fan_seed.csv \
+            --out-dir build/tpia_fast/result
+      - name: Report
+        run: |
+          echo '### TPIA × Fan registry overlap' >> "$GITHUB_STEP_SUMMARY"
+          echo '```json' >> "$GITHUB_STEP_SUMMARY";cat build/tpia_fast/result/summary.json >> "$GITHUB_STEP_SUMMARY";echo '```' >> "$GITHUB_STEP_SUMMARY"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: tpia-fan-registry-overlap-fast
+          path: build/tpia_fast
+          if-no-files-found: error

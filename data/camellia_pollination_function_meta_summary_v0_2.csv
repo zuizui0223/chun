@@ -1,0 +1,13 @@
+metric,value,interpretation
+n_primary_evidence_taxa,7,"literature-ascertained primary-evidence seed; not a genus frequency sample"
+visible_state_counts,"A=2;W=2;Y=3","coarse visible states from current Camellia framework"
+pollinator_function_counts,"bird_dominant=3;insect_dominant=3;mixed_context_dependent=1","broad functional classes harmonized across heterogeneous study designs"
+mutual_information_nats,0.5334086351,"diagnostic association between visible hue and broad pollinator function"
+exact_unique_label_assignments,140,"all unique pollinator-class assignments preserving class totals"
+exact_association_p,0.4857142857,"association unresolved in the small ascertained seed; not evidence of independence"
+multitaxon_visible_states,3,"A W Y each have >=2 admitted taxa"
+multitaxon_visible_states_with_functional_heterogeneity,2,"A and Y contain >1 broad pollinator-functional class; W does not in the current two-taxon seed"
+fraction_multitaxon_visible_states_heterogeneous,0.6666666667,"diagnostic non-determinism; not a natural frequency estimate"
+taxa_with_environment_or_season_modulation,4,"C. petelotii; C. perpetua; C. japonica; C. sinensis show weather season or disturbance-linked changes in pollinator availability/weighting/pollen-flow context without visible-hue change"
+taxa_with_direct_spectral_sensory_evidence,2,"C. japonica and C. rusticana paired spectral/behavioral comparison"
+central_result,"visible hue is not a deterministic pollinator-functional state","supports latent biochemical/spectral/reward/phenology representation; does not prove reproductive niche drives macro colour transitions"

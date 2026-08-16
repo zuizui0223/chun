@@ -1,0 +1,49 @@
+name: DateLife BM OU EB niche sensitivity
+
+on:
+  pull_request:
+    paths:
+      - 'data/fan2026_chelsa_species_compact_v0_1.csv'
+      - 'scripts/run_datelife_niche_sensitivity.R'
+      - '.github/workflows/datelife-niche-sensitivity.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  sensitivity:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: r-lib/actions/setup-r@v2
+        with:
+          use-public-rspm: true
+      - name: Install phylogenetic packages
+        run: |
+          Rscript -e 'install.packages(c("ape","datelife","geiger","nlme"), repos="https://cloud.r-project.org", Ncpus=2)'
+      - name: Run synthetic-chronogram sensitivity
+        run: |
+          mkdir -p build/datelife_sensitivity
+          Rscript scripts/run_datelife_niche_sensitivity.R \
+            data/fan2026_chelsa_species_compact_v0_1.csv \
+            build/datelife_sensitivity
+      - name: Report
+        if: always()
+        run: |
+          echo '### DateLife BM/OU/EB sensitivity' >> "$GITHUB_STEP_SUMMARY"
+          for f in bm_ou_eb_model_fits.csv aw_brownian_pgls.csv summary.dput; do
+            if [ -f "build/datelife_sensitivity/$f" ]; then
+              echo "#### $f" >> "$GITHUB_STEP_SUMMARY"
+              echo '```' >> "$GITHUB_STEP_SUMMARY"
+              cat "build/datelife_sensitivity/$f" >> "$GITHUB_STEP_SUMMARY"
+              echo '```' >> "$GITHUB_STEP_SUMMARY"
+            fi
+          done
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: datelife-bm-ou-eb-sensitivity
+          path: build/datelife_sensitivity
+          if-no-files-found: warn
