@@ -54,5 +54,9 @@ jobs:
             build/creticulata_reported_effect/supplement_manifest.csv
             build/creticulata_reported_effect/table_inspection.csv
             build/creticulata_reported_effect/inspection_failures.json
-            build/creticulata_reported_effect/nested
+            build/creticulata_reported_effect/package/PMC9725097/Table1.xlsx
+            build/creticulata_reported_effect/package/PMC9725097/Table2.xlsx
+            build/creticulata_reported_effect/package/PMC9725097/Table3.xlsx
+            build/creticulata_reported_effect/package/PMC9725097/Table4.xlsx
+            build/creticulata_reported_effect/package/PMC9725097/Table5.xlsx
           if-no-files-found: error
