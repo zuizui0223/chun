@@ -1,9 +1,11 @@
 #!/usr/bin/env python3
-"""Download ID-bound TPIA panel assemblies, checksum them, and unwrap FASTA.gz.
+"""Download admitted ID-bound TPIA panel assemblies, checksum them, and unwrap FASTA.gz.
 
-Distinct taxa are required to have distinct outer ZIP SHA256 checksums. This hard
-provenance gate prevents the species-name bulk-endpoint collision discovered in
-the Wu/TPIA audit from silently entering the phylogeny pilot.
+Distinct admitted taxa are required to have distinct outer ZIP SHA256 checksums.
+Rows marked ``admission_status=quarantine`` are preserved in the panel as an
+audit trail but are never downloaded or propagated into the pilot tree. This
+hard provenance gate prevents the species-name/payload collisions discovered in
+the Wu/TPIA audit from silently entering phylogenetic inference.
 """
 from __future__ import annotations
 import argparse,csv,gzip,hashlib,json,re,sys,zipfile
@@ -14,9 +16,11 @@ import requests
 def slug(t): return re.sub(r'[^A-Za-z0-9]+','_',t).strip('_')
 def read_panel(p):
     with open(p,newline='',encoding='utf-8-sig') as f:return list(csv.DictReader(f))
+def admitted(rows):
+    return [r for r in rows if (r.get('admission_status') or 'admit').strip().lower()=='admit']
 def fetch(row,outdir,read_timeout,retries):
     tax=row['taxon'];url=row['assembly_url'];dest=outdir/(slug(tax)+'.zip')
-    s=requests.Session();s.headers['User-Agent']='Mozilla/5.0 chun-angio353-pilot/0.2'
+    s=requests.Session();s.headers['User-Agent']='Mozilla/5.0 chun-angio353-pilot/0.3'
     last=None
     for attempt in range(1,retries+1):
         try:
@@ -64,7 +68,9 @@ def unwrap(rec,download,outdir):
 
 def main():
     ap=argparse.ArgumentParser();ap.add_argument('--panel',type=Path,required=True);ap.add_argument('--out-dir',type=Path,required=True);ap.add_argument('--workers',type=int,default=8);ap.add_argument('--read-timeout',type=int,default=60);ap.add_argument('--retries',type=int,default=2);a=ap.parse_args()
-    panel=read_panel(a.panel);download=a.out_dir/'zips';fastas=a.out_dir/'fastas';download.mkdir(parents=True,exist_ok=True);fastas.mkdir(parents=True,exist_ok=True)
+    all_panel=read_panel(a.panel);panel=admitted(all_panel);quarantine=[r for r in all_panel if r not in panel]
+    if not panel: raise SystemExit('no admitted taxa in panel')
+    download=a.out_dir/'zips';fastas=a.out_dir/'fastas';download.mkdir(parents=True,exist_ok=True);fastas.mkdir(parents=True,exist_ok=True)
     rows=[]; errors=[]
     with ThreadPoolExecutor(max_workers=a.workers) as ex:
         fut={ex.submit(fetch,r,download,a.read_timeout,a.retries):r for r in panel}
@@ -80,10 +86,14 @@ def main():
     for r in rows:
         byhash.setdefault(r['zip_sha256'],[]).append(r['taxon'])
     collisions={h:t for h,t in byhash.items() if len(t)>1}
-    if collisions:raise SystemExit('distinct-taxon ZIP checksum collision: '+json.dumps(collisions))
+    if collisions:raise SystemExit('distinct admitted-taxon ZIP checksum collision: '+json.dumps(collisions))
     rows=[unwrap(r,download,fastas) for r in rows]
     with (a.out_dir/'archive_provenance.csv').open('w',newline='',encoding='utf-8') as f:
         w=csv.DictWriter(f,fieldnames=list(rows[0]));w.writeheader();w.writerows(rows)
-    summary={'n_taxa':len(rows),'unique_zip_sha256':len(byhash),'checksum_collisions':collisions,'total_zip_bytes':sum(r['zip_bytes'] for r in rows),'total_fasta_bytes':sum(r['fasta_bytes'] for r in rows),'read_timeout_seconds':a.read_timeout,'retries':a.retries,'claim_ceiling':'ID-bound TPIA panel payload provenance; no biological inference'}
+    qrows=[{'taxon':r.get('taxon',''),'colour_state':r.get('colour_state',''),'section':r.get('section',''),'tpia_id':r.get('tpia_id',''),'assembly_url':r.get('assembly_url',''),'admission_status':r.get('admission_status',''),'provenance_note':r.get('provenance_note','')} for r in quarantine]
+    if qrows:
+        with (a.out_dir/'quarantined_taxa.csv').open('w',newline='',encoding='utf-8') as f:
+            w=csv.DictWriter(f,fieldnames=list(qrows[0]));w.writeheader();w.writerows(qrows)
+    summary={'n_panel_rows':len(all_panel),'n_admitted_taxa':len(rows),'n_quarantined_taxa':len(quarantine),'quarantined_taxa':[r.get('taxon','') for r in quarantine],'unique_zip_sha256':len(byhash),'checksum_collisions':collisions,'total_zip_bytes':sum(r['zip_bytes'] for r in rows),'total_fasta_bytes':sum(r['fasta_bytes'] for r in rows),'read_timeout_seconds':a.read_timeout,'retries':a.retries,'claim_ceiling':'provenance-screened admitted ID-bound TPIA panel payloads; quarantined taxa excluded; no biological inference'}
     (a.out_dir/'download_summary.json').write_text(json.dumps(summary,indent=2)+'\n');print(json.dumps(summary,indent=2))
 if __name__=='__main__':main()
