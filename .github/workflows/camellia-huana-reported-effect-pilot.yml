@@ -1,0 +1,59 @@
+name: Camellia huana reported effect pilot
+
+on:
+  pull_request:
+    paths:
+      - 'scripts/fetch_pmc_oa_supplement_manifest.py'
+      - 'scripts/inspect_tabular_supplements.py'
+      - '.github/workflows/camellia-huana-reported-effect-pilot.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  audit-supplement:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install dependencies
+        run: python -m pip install --disable-pip-version-check requests openpyxl
+      - name: Fetch PMC12125916 OA package
+        run: |
+          python scripts/fetch_pmc_oa_supplement_manifest.py \
+            --pmcid PMC12125916 \
+            --out-dir build/chuana_reported_effect
+      - name: Inspect tabular supplements
+        run: |
+          python scripts/inspect_tabular_supplements.py \
+            --root build/chuana_reported_effect \
+            --output build/chuana_reported_effect/table_inspection.csv
+      - name: Report
+        if: always()
+        run: |
+          echo '### C. huana golden/red developmental quantitative supplement audit' >> "$GITHUB_STEP_SUMMARY"
+          for f in summary.json supplement_manifest.csv table_inspection.csv inspection_failures.json; do
+            if [ -f "build/chuana_reported_effect/$f" ]; then
+              echo "#### $f" >> "$GITHUB_STEP_SUMMARY"
+              echo '```' >> "$GITHUB_STEP_SUMMARY"
+              head -c 80000 "build/chuana_reported_effect/$f" >> "$GITHUB_STEP_SUMMARY"
+              echo >> "$GITHUB_STEP_SUMMARY"
+              echo '```' >> "$GITHUB_STEP_SUMMARY"
+            fi
+          done
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: camellia-huana-reported-effect-pilot
+          path: |
+            build/chuana_reported_effect/summary.json
+            build/chuana_reported_effect/supplement_manifest.csv
+            build/chuana_reported_effect/table_inspection.csv
+            build/chuana_reported_effect/inspection_failures.json
+            build/chuana_reported_effect/package
+            build/chuana_reported_effect/nested
+          if-no-files-found: error
