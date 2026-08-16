@@ -3,6 +3,7 @@ name: Camellia reticulata reported effect pilot
 on:
   pull_request:
     paths:
+      - 'data/creticulata_reported_effect_summary_v0_1.json'
       - 'scripts/fetch_pmc_oa_supplement_manifest.py'
       - 'scripts/inspect_tabular_supplements.py'
       - 'scripts/extract_creticulata_reported_pathway_effects.py'
@@ -39,6 +40,8 @@ jobs:
             --table1 build/creticulata_reported_effect/package/PMC9725097/Table1.xlsx \
             --table4 build/creticulata_reported_effect/package/PMC9725097/Table4.xlsx \
             --out-dir build/creticulata_reported_effect/effects
+      - name: Verify frozen quantitative summary
+        run: diff -u data/creticulata_reported_effect_summary_v0_1.json build/creticulata_reported_effect/effects/summary.json
       - name: Report
         if: always()
         run: |
@@ -62,6 +65,4 @@ jobs:
             build/creticulata_reported_effect/table_inspection.csv
             build/creticulata_reported_effect/inspection_failures.json
             build/creticulata_reported_effect/effects
-            build/creticulata_reported_effect/package/PMC9725097/Table1.xlsx
-            build/creticulata_reported_effect/package/PMC9725097/Table4.xlsx
           if-no-files-found: error
