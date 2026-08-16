@@ -1,0 +1,59 @@
+name: Fan 2026 quantitative pigment supplement audit
+
+on:
+  pull_request:
+    paths:
+      - 'scripts/fetch_pmc_oa_supplement_manifest.py'
+      - 'scripts/inspect_tabular_supplements.py'
+      - '.github/workflows/fan2026-quantitative-pigment-supplement-audit.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  audit-supplement:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install dependencies
+        run: python -m pip install --disable-pip-version-check requests openpyxl
+      - name: Fetch PMC12946509 OA package
+        run: |
+          python scripts/fetch_pmc_oa_supplement_manifest.py \
+            --pmcid PMC12946509 \
+            --out-dir build/fan2026_quant_pigment
+      - name: Inspect tabular supplements
+        run: |
+          python scripts/inspect_tabular_supplements.py \
+            --root build/fan2026_quant_pigment \
+            --output build/fan2026_quant_pigment/table_inspection.csv
+      - name: Report
+        if: always()
+        run: |
+          echo '### Fan 2026 quantitative pigment supplement audit' >> "$GITHUB_STEP_SUMMARY"
+          for f in summary.json supplement_manifest.csv table_inspection.csv inspection_failures.json; do
+            if [ -f "build/fan2026_quant_pigment/$f" ]; then
+              echo "#### $f" >> "$GITHUB_STEP_SUMMARY"
+              echo '```' >> "$GITHUB_STEP_SUMMARY"
+              head -c 100000 "build/fan2026_quant_pigment/$f" >> "$GITHUB_STEP_SUMMARY"
+              echo >> "$GITHUB_STEP_SUMMARY"
+              echo '```' >> "$GITHUB_STEP_SUMMARY"
+            fi
+          done
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: fan2026-quantitative-pigment-supplement-audit
+          path: |
+            build/fan2026_quant_pigment/summary.json
+            build/fan2026_quant_pigment/supplement_manifest.csv
+            build/fan2026_quant_pigment/table_inspection.csv
+            build/fan2026_quant_pigment/inspection_failures.json
+            build/fan2026_quant_pigment/package
+            build/fan2026_quant_pigment/nested
+          if-no-files-found: error
