@@ -54,4 +54,7 @@ jobs:
             build/csinensis_reported_effect/supplement_manifest.csv
             build/csinensis_reported_effect/table_inspection.csv
             build/csinensis_reported_effect/inspection_failures.json
+            build/csinensis_reported_effect/nested/molecules-25-00190-s001/Table S6.xlsx
+            build/csinensis_reported_effect/nested/molecules-25-00190-s001/Table S8.xlsx
+            build/csinensis_reported_effect/nested/molecules-25-00190-s001/Table S9.xlsx
           if-no-files-found: error
