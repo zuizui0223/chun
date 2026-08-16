@@ -3,6 +3,7 @@ name: Oil Camellia colour reported effect pilot
 on:
   pull_request:
     paths:
+      - 'data/oil_camellia_reported_effect_summary_v0_1.json'
       - 'scripts/fetch_pmc_oa_supplement_manifest.py'
       - 'scripts/inspect_tabular_supplements.py'
       - 'scripts/extract_oil_camellia_reported_metabolite_vector.py'
@@ -38,6 +39,8 @@ jobs:
           python scripts/extract_oil_camellia_reported_metabolite_vector.py \
             --table-s2 'build/oil_camellia_reported_effect/nested/12870_2023_4699_MOESM1_ESM/Table S2.xlsx' \
             --out-dir build/oil_camellia_reported_effect/effects
+      - name: Verify frozen quantitative summary
+        run: diff -u data/oil_camellia_reported_effect_summary_v0_1.json build/oil_camellia_reported_effect/effects/summary.json
       - name: Report
         if: always()
         run: |
