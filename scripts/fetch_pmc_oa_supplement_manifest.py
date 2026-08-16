@@ -2,20 +2,19 @@
 """Fetch a PMC Open Access article package and inventory supplementary files.
 
 The script uses the documented PMC OA Web Service to resolve the package URL,
-then inventories the extracted package and nested ZIP files with checksums. It
-is intended as a provenance gate before extracting reported quantitative tables.
+then inventories the extracted package and nested ZIP files with checksums. PMC
+moved legacy individual-article packages under /deprecated/ in 2026, so a 404
+from the API-returned legacy path is retried at that documented location.
 """
 from __future__ import annotations
 
 import argparse
 import csv
 import hashlib
-import io
 import json
 import tarfile
 import zipfile
 from pathlib import Path
-from urllib.parse import urlparse
 import xml.etree.ElementTree as ET
 
 import requests
@@ -44,6 +43,15 @@ def normalize_download_url(href: str) -> str:
     return href
 
 
+def download_candidates(url: str) -> list[str]:
+    candidates = [url]
+    marker = "/pub/pmc/oa_package/"
+    if marker in url:
+        candidates.append(url.replace(marker, "/pub/pmc/deprecated/oa_package/", 1))
+    # Deduplicate while preserving order.
+    return list(dict.fromkeys(candidates))
+
+
 def main() -> None:
     ap = argparse.ArgumentParser()
     ap.add_argument("--pmcid", required=True)
@@ -57,7 +65,7 @@ def main() -> None:
 
     api = "https://www.ncbi.nlm.nih.gov/pmc/utils/oa/oa.fcgi"
     s = requests.Session()
-    s.headers["User-Agent"] = "chun-camellia-meta/0.1 (public-data audit)"
+    s.headers["User-Agent"] = "chun-camellia-meta/0.2 (public-data audit)"
     r = s.get(api, params={"id": args.pmcid}, timeout=60)
     r.raise_for_status()
     root = ET.fromstring(r.text)
@@ -68,15 +76,28 @@ def main() -> None:
     tgz = next((x.attrib.get("href", "") for x in links if x.attrib.get("format") == "tgz"), "")
     if not tgz:
         raise SystemExit(f"No OA tgz package for {args.pmcid}")
-    url = normalize_download_url(tgz)
+    api_url = normalize_download_url(tgz)
 
     package = out / f"{args.pmcid}.tar.gz"
-    with s.get(url, stream=True, timeout=(20, 180)) as rr:
-        rr.raise_for_status()
-        with package.open("wb") as fh:
-            for chunk in rr.iter_content(1024 * 1024):
-                if chunk:
-                    fh.write(chunk)
+    attempts = []
+    used_url = None
+    for url in download_candidates(api_url):
+        try:
+            with s.get(url, stream=True, timeout=(20, 180)) as rr:
+                attempts.append({"url": url, "status": rr.status_code})
+                if rr.status_code != 200:
+                    continue
+                with package.open("wb") as fh:
+                    for chunk in rr.iter_content(1024 * 1024):
+                        if chunk:
+                            fh.write(chunk)
+                used_url = url
+                break
+        except Exception as exc:
+            attempts.append({"url": url, "error": f"{type(exc).__name__}: {exc}"})
+    if used_url is None:
+        (out / "download_attempts.json").write_text(json.dumps(attempts, indent=2) + "\n")
+        raise SystemExit(f"Could not download PMC OA package; attempts={attempts}")
 
     with tarfile.open(package, "r:gz") as tar:
         safe_extract_tar(tar, pkg_dir)
@@ -118,7 +139,9 @@ def main() -> None:
         "citation": rec.attrib.get("citation"),
         "license": rec.attrib.get("license"),
         "oa_package_original_href": tgz,
-        "oa_package_download_url": url,
+        "oa_package_api_url": api_url,
+        "oa_package_download_url": used_url,
+        "download_attempts": attempts,
         "package_sha256": sha256(package),
         "package_bytes": package.stat().st_size,
         "inventory_files": len(rows),
