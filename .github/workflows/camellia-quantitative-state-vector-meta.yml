@@ -1,0 +1,39 @@
+name: Camellia quantitative pigment state-vector meta
+
+on:
+  pull_request:
+    paths:
+      - 'data/csinensis_reported_effect_summary_v0_1.json'
+      - 'data/creticulata_reported_effect_summary_v0_1.json'
+      - 'data/cjaponica_reported_effect_summary_v0_1.json'
+      - 'data/quantitative_pigment_state_vector_systems_v0_1.csv'
+      - 'data/quantitative_pigment_state_vector_summary_v0_1.csv'
+      - 'scripts/summarize_quantitative_pigment_state_vector.py'
+      - '.github/workflows/camellia-quantitative-state-vector-meta.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  reproduce:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install scipy
+        run: python -m pip install --disable-pip-version-check scipy
+      - name: Recompute cross-system state-vector synthesis
+        run: |
+          python scripts/summarize_quantitative_pigment_state_vector.py \
+            --csin data/csinensis_reported_effect_summary_v0_1.json \
+            --cret data/creticulata_reported_effect_summary_v0_1.json \
+            --cjap data/cjaponica_reported_effect_summary_v0_1.json \
+            --systems-output /tmp/quant_systems.csv \
+            --summary-output /tmp/quant_summary.csv
+      - name: Verify frozen results
+        run: |
+          diff --strip-trailing-cr -u data/quantitative_pigment_state_vector_systems_v0_1.csv /tmp/quant_systems.csv
+          diff --strip-trailing-cr -u data/quantitative_pigment_state_vector_summary_v0_1.csv /tmp/quant_summary.csv
