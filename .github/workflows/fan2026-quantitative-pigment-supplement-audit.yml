@@ -3,8 +3,10 @@ name: Fan 2026 quantitative pigment supplement audit
 on:
   pull_request:
     paths:
+      - 'data/fan2026_anthocyanin_matrix_audit_v0_1.json'
       - 'scripts/fetch_pmc_oa_supplement_manifest.py'
       - 'scripts/inspect_tabular_supplements.py'
+      - 'scripts/audit_fan2026_anthocyanin_matrix.py'
       - '.github/workflows/fan2026-quantitative-pigment-supplement-audit.yml'
   workflow_dispatch:
 
@@ -32,11 +34,19 @@ jobs:
           python scripts/inspect_tabular_supplements.py \
             --root build/fan2026_quant_pigment \
             --output build/fan2026_quant_pigment/table_inspection.csv
+      - name: Audit Table S2 matrix and article-to-supplement admission mismatch
+        run: |
+          python scripts/audit_fan2026_anthocyanin_matrix.py \
+            --workbook build/fan2026_quant_pigment/package/PMC12946509/PBI-24-1725-s002.xlsx \
+            --article-expected-red-like-species 29 \
+            --output-dir build/fan2026_quant_pigment/anthocyanin_audit
+      - name: Verify frozen audit
+        run: diff -u data/fan2026_anthocyanin_matrix_audit_v0_1.json build/fan2026_quant_pigment/anthocyanin_audit/summary.json
       - name: Report
         if: always()
         run: |
           echo '### Fan 2026 quantitative pigment supplement audit' >> "$GITHUB_STEP_SUMMARY"
-          for f in summary.json supplement_manifest.csv table_inspection.csv inspection_failures.json; do
+          for f in summary.json supplement_manifest.csv table_inspection.csv inspection_failures.json anthocyanin_audit/summary.json anthocyanin_audit/species_row_summary.csv; do
             if [ -f "build/fan2026_quant_pigment/$f" ]; then
               echo "#### $f" >> "$GITHUB_STEP_SUMMARY"
               echo '```' >> "$GITHUB_STEP_SUMMARY"
@@ -54,6 +64,5 @@ jobs:
             build/fan2026_quant_pigment/supplement_manifest.csv
             build/fan2026_quant_pigment/table_inspection.csv
             build/fan2026_quant_pigment/inspection_failures.json
-            build/fan2026_quant_pigment/package
-            build/fan2026_quant_pigment/nested
+            build/fan2026_quant_pigment/anthocyanin_audit
           if-no-files-found: error
