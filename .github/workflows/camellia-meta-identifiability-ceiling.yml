@@ -1,0 +1,46 @@
+name: Camellia meta identifiability ceiling
+
+on:
+  pull_request:
+    paths:
+      - 'data/camellia_flower_color_mechanism_meta_v0_3.csv'
+      - 'data/camellia_flower_color_mechanism_meta_summary_v0_3.csv'
+      - 'data/mechanistic_meta_robustness_v0_1.csv'
+      - 'data/mechanistic_meta_leave_one_cluster_out_v0_1.csv'
+      - 'scripts/summarize_camellia_flower_color_mechanism_meta_v0_2.py'
+      - 'scripts/summarize_mechanistic_meta_robustness.py'
+      - '.github/workflows/camellia-meta-identifiability-ceiling.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  reproduce:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Recompute expanded dependence-aware summary
+        run: |
+          python scripts/summarize_camellia_flower_color_mechanism_meta_v0_2.py \
+            data/camellia_flower_color_mechanism_meta_v0_3.csv \
+            --output /tmp/meta_v0_3.csv
+          diff --strip-trailing-cr -u data/camellia_flower_color_mechanism_meta_summary_v0_3.csv /tmp/meta_v0_3.csv
+      - name: Recompute robustness and anti-circularity slices
+        run: |
+          python scripts/summarize_mechanistic_meta_robustness.py \
+            data/camellia_flower_color_mechanism_meta_v0_3.csv \
+            --summary-output /tmp/robustness.csv \
+            --loo-output /tmp/loo.csv
+          diff --strip-trailing-cr -u data/mechanistic_meta_robustness_v0_1.csv /tmp/robustness.csv
+          diff --strip-trailing-cr -u data/mechanistic_meta_leave_one_cluster_out_v0_1.csv /tmp/loo.csv
+      - name: Report
+        run: |
+          echo '### Expanded Camellia mechanism meta-analysis' >> "$GITHUB_STEP_SUMMARY"
+          echo '' >> "$GITHUB_STEP_SUMMARY"
+          echo '```csv' >> "$GITHUB_STEP_SUMMARY"
+          grep -E '^(all_independence_clusters|micro_only_excluding_GENUS_237|public_raw_only)' data/mechanistic_meta_robustness_v0_1.csv >> "$GITHUB_STEP_SUMMARY"
+          echo '```' >> "$GITHUB_STEP_SUMMARY"
