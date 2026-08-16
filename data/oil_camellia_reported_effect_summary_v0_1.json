@@ -1,0 +1,17 @@
+{
+  "independence_cluster": "OIL_CAMELLIA_MULTI",
+  "phenotype_order": "W=white; P=pink; CP=candy pink; R=red",
+  "taxon_provenance_status": "conflicted in source; taxon names not admitted for this analysis",
+  "n_metabolites": 372,
+  "anthocyanin_compounds": 27,
+  "flavonol_compounds": 83,
+  "PA_compounds": 26,
+  "anthocyanin_R_W_log2_total": 4.175572298591397,
+  "flavonol_R_W_log2_total": -2.244016018684052,
+  "PA_R_W_log2_total": 0.8759532274877706,
+  "anthocyanin_colour_order_rho": 0.950033737592567,
+  "flavonol_colour_order_rho": -0.7341169790488018,
+  "anthocyanin_minus_flavonol_R_W": 6.419588317275449,
+  "anthocyanin_minus_PA_R_W": 3.299619071103626,
+  "claim_ceiling": "one OIL_CAMELLIA_MULTI colour-material cluster; no species-level effect because source taxon naming is inconsistent"
+}
