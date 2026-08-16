@@ -5,6 +5,7 @@ on:
     paths:
       - 'scripts/fetch_pmc_oa_supplement_manifest.py'
       - 'scripts/inspect_tabular_supplements.py'
+      - 'scripts/extract_creticulata_reported_pathway_effects.py'
       - '.github/workflows/camellia-reticulata-reported-effect-pilot.yml'
   workflow_dispatch:
 
@@ -32,11 +33,17 @@ jobs:
           python scripts/inspect_tabular_supplements.py \
             --root build/creticulata_reported_effect \
             --output build/creticulata_reported_effect/table_inspection.csv
+      - name: Extract expression and metabolite state-vector effects
+        run: |
+          python scripts/extract_creticulata_reported_pathway_effects.py \
+            --table1 build/creticulata_reported_effect/package/PMC9725097/Table1.xlsx \
+            --table4 build/creticulata_reported_effect/package/PMC9725097/Table4.xlsx \
+            --out-dir build/creticulata_reported_effect/effects
       - name: Report
         if: always()
         run: |
-          echo '### C. reticulata red/pink/white supplement audit' >> "$GITHUB_STEP_SUMMARY"
-          for f in summary.json supplement_manifest.csv table_inspection.csv inspection_failures.json; do
+          echo '### C. reticulata red/pink/white quantitative supplement audit' >> "$GITHUB_STEP_SUMMARY"
+          for f in summary.json supplement_manifest.csv table_inspection.csv inspection_failures.json effects/summary.json effects/key_ufgt_gene_effects.csv effects/key_ufgt_module_effects.csv effects/broad_homolog_summary.csv effects/metabolite_class_effects.csv effects/metabolite_state_vector_contrasts.csv; do
             if [ -f "build/creticulata_reported_effect/$f" ]; then
               echo "#### $f" >> "$GITHUB_STEP_SUMMARY"
               echo '```' >> "$GITHUB_STEP_SUMMARY"
@@ -54,9 +61,7 @@ jobs:
             build/creticulata_reported_effect/supplement_manifest.csv
             build/creticulata_reported_effect/table_inspection.csv
             build/creticulata_reported_effect/inspection_failures.json
+            build/creticulata_reported_effect/effects
             build/creticulata_reported_effect/package/PMC9725097/Table1.xlsx
-            build/creticulata_reported_effect/package/PMC9725097/Table2.xlsx
-            build/creticulata_reported_effect/package/PMC9725097/Table3.xlsx
             build/creticulata_reported_effect/package/PMC9725097/Table4.xlsx
-            build/creticulata_reported_effect/package/PMC9725097/Table5.xlsx
           if-no-files-found: error
