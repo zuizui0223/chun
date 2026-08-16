@@ -3,6 +3,7 @@ name: Camellia japonica reported effect pilot
 on:
   pull_request:
     paths:
+      - 'data/cjaponica_reported_effect_summary_v0_1.json'
       - 'scripts/fetch_pmc_oa_supplement_manifest.py'
       - 'scripts/inspect_tabular_supplements.py'
       - 'scripts/extract_cjaponica_reported_metabolite_vector.py'
@@ -38,6 +39,8 @@ jobs:
           python scripts/extract_cjaponica_reported_metabolite_vector.py \
             --docx build/cjaponica_reported_effect/package/PMC8226227/Data_Sheet_1.docx \
             --out-dir build/cjaponica_reported_effect/effects
+      - name: Verify frozen quantitative summary
+        run: diff -u data/cjaponica_reported_effect_summary_v0_1.json build/cjaponica_reported_effect/effects/summary.json
       - name: Report
         if: always()
         run: |
