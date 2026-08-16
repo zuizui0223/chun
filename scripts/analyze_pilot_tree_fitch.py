@@ -3,7 +3,9 @@
 
 The Newick is midpoint-rooted only to traverse it; for unordered binary Fitch
 parsimony the minimum change score is root independent. Scores are reported for
-A vs non-A and Y vs non-Y. No gain/loss direction or reactivation is inferred.
+A vs non-A and Y vs non-Y. Panel rows marked ``admission_status=quarantine`` are
+excluded before tree-tip validation. No gain/loss direction or reactivation is
+inferred.
 """
 from __future__ import annotations
 import argparse,csv,json,re
@@ -12,7 +14,9 @@ from Bio import Phylo
 
 def slug(t): return re.sub(r'[^A-Za-z0-9]+','_',t).strip('_')
 def read_panel(p):
-    with open(p,newline='',encoding='utf-8-sig') as f:return list(csv.DictReader(f))
+    with open(p,newline='',encoding='utf-8-sig') as f:
+        rows=list(csv.DictReader(f))
+    return [r for r in rows if (r.get('admission_status') or 'admit').strip().lower()=='admit']
 def fitch(clade, states):
     if clade.is_terminal():
         if clade.name not in states: raise KeyError(clade.name)
@@ -50,11 +54,11 @@ def nearest_state_pairs(tree, panel, target_state):
 def main():
     ap=argparse.ArgumentParser();ap.add_argument('--tree',type=Path,required=True);ap.add_argument('--panel',type=Path,required=True);ap.add_argument('--output',type=Path,required=True);ap.add_argument('--pairs-output',type=Path,required=True);a=ap.parse_args()
     panel=read_panel(a.panel); bytip={slug(r['taxon']):r for r in panel}
+    if not bytip: raise SystemExit('no admitted taxa in panel')
     tree=Phylo.read(a.tree,'newick')
     tips={x.name for x in tree.get_terminals()}
     expected=set(bytip)
     if tips!=expected: raise SystemExit(f'tip mismatch missing={sorted(expected-tips)} extra={sorted(tips-expected)}')
-    # Root only for traversal. Fitch minimum for binary unordered states is root independent.
     try: tree.root_at_midpoint()
     except Exception: pass
     results=[]
@@ -62,7 +66,7 @@ def main():
         states={t:(1 if r['colour_state']==target else 0) for t,r in bytip.items()}
         rootset,score=fitch(tree.root,states)
         positive=[t for t,x in states.items() if x==1]
-        results.append({'contrast':f'{target}_vs_non{target}','n_positive':len(positive),'n_negative':len(states)-len(positive),'fitch_min_changes':score,'positive_monophyletic':is_monophyletic(tree,positive),'root_direction_inferred':False,'reactivation_inferred':False,'interpretation':('one-change topology-compatible' if score==1 else f'at least {score} state changes required on this pilot topology'),'claim_ceiling':'unrooted pilot topology; minimum unordered state changes only; no gain/loss direction, timing, selection or reactivation'})
+        results.append({'contrast':f'{target}_vs_non{target}','n_positive':len(positive),'n_negative':len(states)-len(positive),'fitch_min_changes':score,'positive_monophyletic':is_monophyletic(tree,positive),'root_direction_inferred':False,'reactivation_inferred':False,'interpretation':('one-change topology-compatible' if score==1 else f'at least {score} state changes required on this pilot topology'),'claim_ceiling':'unrooted provenance-screened pilot topology; quarantined payloads excluded; minimum unordered state changes only; no gain/loss direction, timing, selection or reactivation'})
     a.output.parent.mkdir(parents=True,exist_ok=True)
     with a.output.open('w',newline='',encoding='utf-8') as f:
         w=csv.DictWriter(f,fieldnames=list(results[0]));w.writeheader();w.writerows(results)
