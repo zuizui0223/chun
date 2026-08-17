@@ -1,0 +1,35 @@
+{
+  "source_study": "Feng2024_nitidissima_FLS2",
+  "source_doi": "10.1186/s12870-024-05332-w",
+  "source_transcript": "F01.PB8395",
+  "source_class": "CnFLS2",
+  "source_forward_primer": "AGCAATCACCACCGTCAAAGG",
+  "source_reverse_primer": "CTCTTAGACTCAGCATCCTTAGC",
+  "tested_targets": {
+    "CSA006950_to_CSS0007745": {
+      "sequence_bp": 1011,
+      "forward_best_mismatch": 5,
+      "reverse_best_mismatch": 4,
+      "paired_hit": false
+    },
+    "CSA008358_to_CSS0045924": {
+      "sequence_bp": 1020,
+      "forward_best_mismatch": 0,
+      "reverse_best_mismatch": 0,
+      "paired_hit": true,
+      "paired_total_mismatches": 0,
+      "predicted_amplicon_bp": 246,
+      "sequence_sha256": "7a95bf20bc6d50c03117edc44268da792da440b6dbc54fb602b4e43bfb4943fd"
+    },
+    "CnFLS1_JF343560.1": {
+      "sequence_bp": 1297,
+      "forward_best_mismatch": 5,
+      "reverse_best_mismatch": 3,
+      "paired_hit": false,
+      "sequence_sha256": "dbe56ec0352c6b23169c115b6cad0cffd572039432f0a82d98f63fd03b30b9f7"
+    }
+  },
+  "decision": "CSA008358/CSS0045924 is a unique exact local amplicon-compatible candidate for the author-classified CnFLS2 qRT-PCR target among the tested tea FLS paralogs and published CnFLS1 cDNA",
+  "new_chun_inference": "the early-stage pink-directed C. sinensis FLS locus CSA008358 is CnFLS2-like at the qRT-PCR amplicon, whereas the later white-directed CSA006950 is a distinct FLS paralog; some apparent developmental FLS sign switching can therefore reflect paralog substitution rather than reversal of one gene",
+  "claim_ceiling": "local exact primer/amplicon compatibility is strong paralog-hypothesis evidence but is not formal full-length orthology; full F01.PB8395 sequence plus gene-tree/synteny evidence is required before naming CSA008358/CSS0045924 the strict CnFLS2 ortholog"
+}

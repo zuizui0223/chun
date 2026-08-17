@@ -1,0 +1,17 @@
+source_class,source_transcript_id,qpcr_anchor,forward_primer,reverse_primer,source_location,interpretation,claim_boundary
+CnFLS1,F01.PB53224,no,,,Feng2024_Supplementary_Fig8,source transcript grouped by authors as CnFLS1,group membership is source evidence; no sequence orthology inferred
+CnFLS1,F01.PB58793,no,,,Feng2024_Supplementary_Fig8,source transcript grouped by authors as CnFLS1,group membership is source evidence; no sequence orthology inferred
+CnFLS1,F01.PB6032,no,,,Feng2024_Supplementary_Fig8,source transcript grouped by authors as CnFLS1,group membership is source evidence; no sequence orthology inferred
+CnFLS2,F01.PB57785,no,,,Feng2024_Supplementary_Fig8,source transcript grouped by authors as CnFLS2,group membership is source evidence; no sequence orthology inferred
+CnFLS2,F01.PB107898,no,,,Feng2024_Supplementary_Fig8,source transcript grouped by authors as CnFLS2,group membership is source evidence; no sequence orthology inferred
+CnFLS2,F01.PB59604,no,,,Feng2024_Supplementary_Fig8,source transcript grouped by authors as CnFLS2,group membership is source evidence; no sequence orthology inferred
+CnFLS2,F01.PB41677,no,,,Feng2024_Supplementary_Fig8,source transcript grouped by authors as CnFLS2,group membership is source evidence; no sequence orthology inferred
+CnFLS2,F01.PB49622,no,,,Feng2024_Supplementary_Fig8,source transcript grouped by authors as CnFLS2,group membership is source evidence; no sequence orthology inferred
+CnFLS2,F01.PB8395,yes,AGCAATCACCACCGTCAAAGG,CTCTTAGACTCAGCATCCTTAGC,Feng2024_Supplementary_Fig8_and_Table4,"source transcript grouped as CnFLS2 and independently assayed by qRT-PCR",primer can test amplicon compatibility but cannot substitute for full-length transcript sequence
+CnFLS2,F01.PB39893,no,,,Feng2024_Supplementary_Fig8,source transcript grouped by authors as CnFLS2,group membership is source evidence; no sequence orthology inferred
+CnFLS3,F01.PB4564,no,,,Feng2024_Supplementary_Fig8,source transcript grouped by authors as CnFLS3,group membership is source evidence; no sequence orthology inferred
+CnFLS3,F01.PB102531,no,,,Feng2024_Supplementary_Fig8,source transcript grouped by authors as CnFLS3,group membership is source evidence; no sequence orthology inferred
+CnFLS3,F01.PB53935,no,,,Feng2024_Supplementary_Fig8,source transcript grouped by authors as CnFLS3,group membership is source evidence; no sequence orthology inferred
+CnFLS4,F01.PB10952,no,,,Feng2024_Supplementary_Fig8,source transcript grouped by authors as CnFLS4,group membership is source evidence; no sequence orthology inferred
+CnFLS4,F01.PB4098,no,,,Feng2024_Supplementary_Fig8,source transcript grouped by authors as CnFLS4,group membership is source evidence; no sequence orthology inferred
+CnFLS4,F01.PB29531,no,,,Feng2024_Supplementary_Fig8,source transcript grouped by authors as CnFLS4,group membership is source evidence; no sequence orthology inferred

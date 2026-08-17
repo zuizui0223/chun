@@ -1,0 +1,12 @@
+source_unigene,candidate_feature,tpia_type,candidate_id,candidate_class,primary_anchor,reason_for_inclusion,claim_boundary
+Csng45659,DFR,Shuchazao1,TEA032730,CsDFRa,AB018685.1,"canonical experimentally established tea DFR from primary DFR-family study",candidate panel defined independently of primer result
+Csng45659,DFR,Shuchazao1,TEA023829,CsDFRb1,XM_028251603.1,"putative DFRb1 from primary DFR-family study",candidate panel defined independently of primer result
+Csng45659,DFR,Shuchazao1,TEA024758,CsDFRb2,XM_028243762.1,"putative DFRb2; also TPIA crosswalk target of CSA003949",candidate panel defined independently of primer result
+Csng45659,DFR,Shuchazao1,TEA024762,CsDFRb3,XM_028243764.1,"putative DFRb3 from primary DFR-family study",candidate panel defined independently of primer result
+Csng45659,DFR,Shuchazao1,TEA010588,CsDFRc,XM_028268820.1,"one CsDFRc locus from primary DFR-family study",candidate panel defined independently of primer result
+Csng45659,DFR,Shuchazao1,TEA022775,CsDFRc,XM_028268820.1,"second CsDFRc locus from primary DFR-family study",candidate panel defined independently of primer result
+Csng45659,DFR,Shuchazao1,TEA003656,CsDFRd,XM_028230958.1,"putative DFRd from primary DFR-family study",candidate panel defined independently of primer result
+Csng5035,LAR-like,Yunkang10,CSA014151,LAR_source_candidate,,"one of four genome-anchored LAR genes listed with Csng5035 in the source flower transcriptome",candidate panel defined independently of primer result
+Csng5035,LAR-like,Yunkang10,CSA014943,LAR_source_candidate,,"one of four genome-anchored LAR genes listed with Csng5035 in the source flower transcriptome",candidate panel defined independently of primer result
+Csng5035,LAR-like,Yunkang10,CSA019984,LAR_source_candidate,,"one of four genome-anchored LAR genes listed with Csng5035 in the source flower transcriptome",candidate panel defined independently of primer result
+Csng5035,LAR-like,Yunkang10,CSA018523,LAR_source_candidate,,"one of four genome-anchored LAR genes listed with Csng5035 in the source flower transcriptome",candidate panel defined independently of primer result
