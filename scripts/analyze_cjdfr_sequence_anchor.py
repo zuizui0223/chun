@@ -242,30 +242,42 @@ def main():
     pairwise = []
     for target in refs:
         accession, nt, aa = target["accession"], bn.get(target["accession"]), bp.get(target["accession"])
-        if aa is None:
-            raise RuntimeError(f"{accession}: no protein BLAST hit")
         pairwise.append({
             "query_accession": qacc, "reference_accession": accession,
             "reference_role": target["role"], "tea_locus": target["tea_locus"],
             "source_cluster": target["source_cluster"],
+            "nucleotide_comparison_status": "significant_local_hit" if nt else "no_significant_local_hit",
             "nucleotide_identity": f"{float(nt['pident']) / 100:.6f}" if nt else "",
             "nucleotide_query_coverage": f"{nt['qcov']:.6f}" if nt else "",
             "nucleotide_alignment_bp": nt["length"] if nt else "",
             "nucleotide_mismatches": nt["mismatch"] if nt else "",
             "nucleotide_gaps": nt["gaps"] if nt else "",
             "nucleotide_bitscore": nt["bitscore"] if nt else "",
-            "protein_identity": f"{float(aa['pident']) / 100:.6f}",
-            "protein_query_coverage": f"{aa['qcov']:.6f}",
-            "protein_alignment_aa": aa["length"], "protein_mismatches": aa["mismatch"],
-            "protein_gaps": aa["gaps"], "protein_bitscore": aa["bitscore"],
+            "protein_comparison_status": "significant_local_hit" if aa else "no_significant_local_hit",
+            "protein_identity": f"{float(aa['pident']) / 100:.6f}" if aa else "",
+            "protein_query_coverage": f"{aa['qcov']:.6f}" if aa else "",
+            "protein_alignment_aa": aa["length"] if aa else "",
+            "protein_mismatches": aa["mismatch"] if aa else "",
+            "protein_gaps": aa["gaps"] if aa else "",
+            "protein_bitscore": aa["bitscore"] if aa else "",
             "primary_source": target["primary_source"], "claim_boundary": target["claim_boundary"],
         })
-    pairwise.sort(key=lambda x: (float(x["protein_bitscore"]), float(x["protein_query_coverage"]), float(x["protein_identity"])), reverse=True)
+    pairwise.sort(
+        key=lambda x: (
+            float(x["protein_bitscore"]) if x["protein_bitscore"] else -1.0,
+            float(x["protein_query_coverage"]) if x["protein_query_coverage"] else -1.0,
+            float(x["protein_identity"]) if x["protein_identity"] else -1.0,
+        ),
+        reverse=True,
+    )
     for rank, row in enumerate(pairwise, 1):
-        row["protein_rank"] = rank
+        row["protein_rank"] = rank if row["protein_bitscore"] else ""
 
     assays = audit_assays(a.assays, full)
-    best, runner = pairwise[:2]
+    rankable = [x for x in pairwise if x["protein_bitscore"]]
+    if len(rankable) < 2:
+        raise RuntimeError("fewer than two significant protein comparisons")
+    best, runner = rankable[:2]
     pmargin = float(best["protein_identity"]) - float(runner["protein_identity"])
     nmargin = (
         float(best["nucleotide_identity"]) - float(runner["nucleotide_identity"])
@@ -281,6 +293,9 @@ def main():
         "analysis_version": "v0.1",
         "query": {"accession": qacc, "role": query["role"], "source_cluster": query["source_cluster"]},
         "candidate_count": len(refs),
+        "candidates_without_significant_protein_hit": sum(
+            not row["protein_bitscore"] for row in pairwise
+        ),
         "best_reference": {
             "accession": best["reference_accession"], "role": best["reference_role"],
             "tea_locus": best["tea_locus"], "protein_identity": float(best["protein_identity"]),
@@ -326,10 +341,11 @@ def main():
     ])
     write_csv(a.out_dir / "pairwise_summary.csv", pairwise, [
         "protein_rank", "query_accession", "reference_accession", "reference_role",
-        "tea_locus", "source_cluster", "nucleotide_identity",
-        "nucleotide_query_coverage", "nucleotide_alignment_bp", "nucleotide_mismatches",
-        "nucleotide_gaps", "nucleotide_bitscore", "protein_identity",
-        "protein_query_coverage", "protein_alignment_aa", "protein_mismatches",
+        "tea_locus", "source_cluster", "nucleotide_comparison_status",
+        "nucleotide_identity", "nucleotide_query_coverage", "nucleotide_alignment_bp",
+        "nucleotide_mismatches", "nucleotide_gaps", "nucleotide_bitscore",
+        "protein_comparison_status", "protein_identity", "protein_query_coverage",
+        "protein_alignment_aa", "protein_mismatches",
         "protein_gaps", "protein_bitscore", "primary_source", "claim_boundary",
     ])
     write_csv(a.out_dir / "assay_linkage.csv", assays, [
