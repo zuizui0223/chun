@@ -46,8 +46,17 @@ jobs:
             --workbook build/fan2026_quant_pigment/package/PMC12946509/PBI-24-1725-s002.xlsx \
             --article-expected-red-like-species 29 \
             --output-dir build/fan2026_quant_pigment/anthocyanin_audit
-      - name: Verify frozen audit
-        run: diff -u data/fan2026_anthocyanin_matrix_audit_v0_1.json build/fan2026_quant_pigment/anthocyanin_audit/summary.json
+      - name: Verify frozen audit semantically
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          frozen=json.loads(Path('data/fan2026_anthocyanin_matrix_audit_v0_1.json').read_text())
+          rebuilt=json.loads(Path('build/fan2026_quant_pigment/anthocyanin_audit/summary.json').read_text())
+          if frozen != rebuilt:
+              raise SystemExit('Frozen and rebuilt Fan anthocyanin audits differ semantically')
+          print('Frozen Fan anthocyanin audit matches rebuilt JSON semantically')
+          PY
       - name: Report
         if: always()
         run: |
