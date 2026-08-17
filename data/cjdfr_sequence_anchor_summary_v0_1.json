@@ -1,0 +1,53 @@
+{
+  "analysis_version": "v0.1",
+  "best_reference": {
+    "accession": "AB018685.1",
+    "nucleotide_identity": 0.99008,
+    "nucleotide_query_coverage": 1.0,
+    "protein_identity": 0.99005,
+    "protein_query_coverage": 1.0,
+    "role": "CsDFRa",
+    "tea_locus": "TEA032730"
+  },
+  "candidate_count": 6,
+  "candidates_without_significant_protein_hit": 1,
+  "claim_boundary": {
+    "not_supported": [
+      "identity of every later study's generic CjDFR target with AB524885.1",
+      "duplication age or species-tree orthology from pairwise similarity alone",
+      "equivalent biochemical function of all DFR-like copies",
+      "macro-transition enrichment or adaptive selection"
+    ],
+    "supported": [
+      "sequence-lineage classification of the public CjDFR partial cDNA",
+      "direct comparison against all six admitted tea DFR candidates",
+      "distinction from the source-resolved CSA003949/CsDFRb2 locus",
+      "published primer-to-sequence links where exact paired matches are recovered"
+    ]
+  },
+  "decision": "canonical_CsDFRa_like",
+  "decision_confidence": "strong",
+  "exact_paired_primer_links_to_query": 2,
+  "identity_margin_over_runner_up": {
+    "nucleotide": 0.29459,
+    "protein": 0.44005
+  },
+  "query": {
+    "accession": "AB524885.1",
+    "role": "CjDFR",
+    "source_cluster": "CJAPONICA"
+  },
+  "runner_up": {
+    "accession": "XM_028243764.1",
+    "nucleotide_identity": 0.69549,
+    "protein_identity": 0.55,
+    "role": "CsDFRb3"
+  },
+  "source_locus_contrast": {
+    "interpretation": "The public C. japonica CjDFR sequence and the sequence-resolved C. sinensis source locus CSA003949 occupy different tea DFR subclasses.",
+    "same_reference_role_as_query_best": false,
+    "source_locus": "CSA003949",
+    "source_reference_accession": "XM_028243762.1",
+    "source_subclass": "CsDFRb2"
+  }
+}
