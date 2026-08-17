@@ -89,11 +89,35 @@ Results:
 
 The target is therefore supported not only by sequence similarity but also by its position inside a strongly conserved local gene neighbourhood.
 
+### 2.6 PacBio source-read validation
+
+The admitted 1,020-bp candidate was queried directly against the F01 PacBio run `SRR22729450` using `blastn_vdb`, without converting the full archive.
+
+Results:
+
+- raw HSPs: **1,043**;
+- unique read hits returned: **1,000**;
+- reads admitted at identity >=80% and query coverage >=70%: **995**;
+- full-length-like reads with query coverage >=95%: **583**;
+- best single read: `SRR22729450.1253473.1`, **92.493%** identity and **100%** query coverage;
+- consensus query coverage: **100%**;
+- consensus identity to `GWHTFILD005297.1`: **99.705882%**;
+- median coverage per covered query position: **944 reads**;
+- minimum positional coverage: **393 reads**;
+- all **43** primer positions covered;
+- primer-consensus mismatches: **0**.
+
+Thus the unique GWH candidate is not merely an annotation-based inference: its complete sequence is strongly represented in the source F01 PacBio reads, including the exact published qRT-PCR primer sites.
+
 ## 3. New chun inference
 
-The combined primer, full-CDS, exact-crosswalk, protein-tree and local-synteny evidence supports:
+The combined source-primer, whole-annotation, full-CDS, PacBio-read, exact-crosswalk, protein-tree and local-synteny evidence supports:
 
-> `GWHTFILD005297.1 / GWHPFILD005297.1` and tea `CSA008358 / GWHPACFB016172` are strong same-paralog orthology counterparts in the CnFLS2-like lineage.
+> `GWHTFILD005297.1 / GWHPFILD005297.1` is the defensible public genome counterpart of the source `F01.PB8395` CnFLS2 target, and tea `CSA008358 / GWHPACFB016172` is its strongly supported same-paralog orthology counterpart.
+
+Because the SRA archive stores raw reads rather than the source assembler's `F01.PB8395` record label, literal identifier equality cannot be read directly from SRA. The combined provenance chain nevertheless resolves the biological target operationally:
+
+`F01.PB8395 source group + exact source primers + unique genome transcript + source-run read consensus`.
 
 The later white-directed tea locus `CSA006950` is a separate FLS paralog.
 
@@ -123,20 +147,23 @@ It also separates two macro hypotheses:
 2. **strict-node reuse** must be tested within resolved paralog lineages;
 3. macro convergence may use the same module through either the same paralog or different paralogs.
 
-The current result resolves one cross-species same-paralog pair, but it does not yet show that this node was independently reused on multiple macro flower-colour branches.
+The current result resolves one cross-species same-paralog pair and one source transcript counterpart. It does not yet show that this node was independently reused on multiple macro flower-colour branches.
 
-## 5. Remaining identification gate
+## 5. Remaining research gate
 
-The current result still does not prove that the genome annotation record is literally the source PacBio record:
+The micro-level CnFLS2 identity problem is now substantially resolved. The remaining hard problem has moved to the macro level:
 
-`F01.PB8395 = GWHTFILD005297.1`.
+- reconstruct independent flower-colour and biochemical-vector transitions on an admitted nuclear tree;
+- test whether the CnFLS2-like node or the broader flavonol module is repeatedly deployed on independent branches;
+- distinguish same-paralog reuse from module convergence by different paralogs;
+- only then relate repeated deployment to persistence, pollinator/sensory niche or conditional climate/light filtering.
 
-A targeted `blastn_vdb` workflow is querying `SRR22729450` directly with the admitted candidate and will recover raw-read/consensus support without converting the full 4.5-GB archive.
-
-Broader taxon sampling can later strengthen the family tree, but the two-species sequence/tree/local-synteny result is already sufficient to replace a gene-symbol-only FLS comparison with a defended same-paralog hypothesis.
+Broader Camellia FLS sampling can refine the family tree, but it is no longer required merely to distinguish `CSA008358` from `CSA006950` in this micro system.
 
 ## Claim boundary
 
-**Supported now:** a unique exact primer-compatible full-length candidate; a source-linked tea crosswalk; and strong sequence, tree and local-synteny support for the `GWHTFILD005297.1 <-> CSA008358` CnFLS2-like same-paralog orthology hypothesis.
+**Supported now:** a unique exact primer-compatible full-length candidate; strong F01 PacBio source-read support; a source-linked tea crosswalk; and strong sequence, tree and local-synteny support for the `GWHTFILD005297.1 <-> CSA008358` CnFLS2-like same-paralog orthology hypothesis.
 
-**Not supported now:** literal source-record equality with `F01.PB8395`; repeated strict-node reuse on independent macro branches; macro transition counts; or ecological selection pressure.
+**Operationally resolved:** the public genome counterpart of the source `F01.PB8395` CnFLS2 target, while preserving that the original assembled transcript label is absent from raw SRA records.
+
+**Not supported now:** repeated strict-node reuse on independent macro branches; macro transition counts; or ecological selection pressure.
