@@ -1,132 +1,169 @@
 # Orthology resolution pre-macro gate
 
-## Question
+## Current answer
 
-The micro-accessibility score v0.1 showed repeated evidence for FLS, ANS, DFR and ANR families. This document asks a stricter question before any macro transition result is inspected:
+Repeated Camellia pigment-module signals no longer collapse into one generic
+“same gene reused” category. The public-data audit now resolves two distinct
+implementation modes:
 
-> **Do those repeated gene symbols already represent the same sequence-resolved ortholog/paralog across independent Camellia systems?**
+1. **same-paralog lineage recurrence** — the CnFLS2-like lineage is supported
+   in two independent micro evidence clusters;
+2. **different-paralog implementation of the same module** — both DFR
+   clusters are sequence anchored, but one is CsDFRa-like and the other is
+   CsDFRb2.
 
-## Result
+These are micro-level accessibility results. Neither result demonstrates
+repeated deployment on independent macroevolutionary flower-colour branches.
 
-No.
+## Current feature-level gate
 
-At the current public-data resolution, **zero node features have the same sequence-resolved strict node demonstrated in two or more independent micro evidence clusters**.
+| feature | family recurrence clusters | anchored clusters | recurrent strict-node clusters | present macro-test state |
+|---|---:|---:|---:|---|
+| FLS | 3 | 2 | 2 | strict CnFLS2-like predictor available; one family-only cluster remains |
+| ANS/LDOX | 3 | 1 | 0 | family/module level only |
+| DFR | 2 | 2 | 0 | family level with a resolved different-node contrast |
+| ANR | 2 | 0 | 0 | family/module level only |
+| LAR | 1 | 0 | 0 | not recurrent |
+| UFGT | 1 | 0 | 0 | not recurrent |
+| MYB114 | 1 | 1 | 0 | resolved but not recurrent |
+| bHLH1 | 1 | 1 | 0 | resolved but not recurrent |
 
-This creates an important distinction:
+The machine-readable result is frozen in:
 
-- **module/family recurrence is already supported**;
-- **exact ortholog reuse is not yet demonstrated**.
+- `data/orthology_resolution_by_feature_v0_1.csv`;
+- `data/micro_accessibility_node_score_harmonized_v0_1.csv`.
 
-## Feature-level audit
+## FLS: same-paralog lineage recurrence
 
-### FLS
+### Source target recovery
 
-Family-level recurrence: **3 independent clusters** (`CSIN_WHITE_PINK`, `CNITIDISSIMA`, `CPERPETUA`).
+The author-classified *Camellia nitidissima* `F01.PB8395/CnFLS2` target is
+operationally resolved to:
 
-Resolution differs sharply among systems:
+`GWHTFILD005297.1 / GWHGFILD004416.1 / GWHPFILD005297.1`.
 
-- `C. sinensis`: `CSA008358` and `CSA006950` are different FLS-labelled source loci and even move in different developmental directions;
-- `C. nitidissima`: named sequence anchors exist. `CnFLS1 = LOC114301642 / XP_028071684 / MW010918.1`; `CnFLS2 = LOC114321369 / XP_028092149 / MW010919.1`, with `Cn03G0014790` crosswalking to the CnFLS2 protein anchor;
-- `C. perpetua`: current evidence identifies FLS as a yellow-development hub but no frozen sequence/locus anchor is yet available.
+The published primer pair selects one exact candidate among 42,697 public
+transcripts. The source F01 PacBio run supplies:
 
-Thus FLS is recurrent as a **module/family**, but `FLS=3` is an upper bound on exact node recurrence.
+- 995 admitted read hits;
+- 583 full-length-like reads;
+- 100% consensus query coverage;
+- 99.705882% consensus identity;
+- zero consensus mismatches across all primer positions.
 
-### ANS
+### Tea counterpart
 
-Family-level recurrence: **3 clusters** (`CSIN_WHITE_PINK`, `CRETICULATA`, `CSASANQUA`).
+The source-linked tea locus is frozen through the exact chain:
 
-- `C. sinensis`: current frozen evidence reports ANS involvement without a sequence-resolved source locus;
-- `C. reticulata`: multiple K05277/ANS-like homologs are present and show mixed directions; a named `CrANS` functional result anchors the family biologically but is not yet crosswalked to a cross-species sequence ortholog;
-- `C. sasanqua`: current evidence remains family-level.
+`CSA008358 / CSS0045924 -> GWHTACFB016172 / GWHPACFB016172`.
 
-Therefore ANS recurrence is real at family/module resolution but not yet an exact cross-species node recurrence.
+Its relationship to the recovered CnFLS2 target is supported by:
 
-### DFR
+- 98.824% identity across the complete 1,020-bp CDS;
+- 98.23% protein identity across 339 aa;
+- an exclusive sister pair in the admitted FLS family tree, support 0.977;
+- reciprocal-best target matching in local gene context;
+- eight additional non-target local reciprocal-best anchors;
+- conserved local order (`rho = 1.0`) and orientation.
 
-Family-level recurrence: **2 clusters** (`CSIN_WHITE_PINK`, `CJAPONICA`).
+The two clusters therefore share the strict micro-lineage label
+`CnFLS2_like_CSA008358`. The later white-directed tea locus `CSA006950` is a
+separate FLS paralog and is not folded into that node.
 
-- `C. sinensis`: at least three DFR-labelled source loci are recovered (`CSA003949`, `CSNG45659`, `CSNG38209`);
-- `C. japonica`: `CjDFR` is a functional target of `CjMYB114-CjbHLH1`, but the current registry does not freeze a sequence accession/source locus for CjDFR.
+The third FLS cluster, *C. perpetua*, remains family-only because its current
+source evidence does not freeze a sequence or locus anchor.
 
-The functional mechanism is strong, but the exact DFR orthology across the two systems remains unresolved.
+## DFR: resolved different-paralog contrast
 
-### ANR
+The public *C. japonica* partial CjDFR CDS `AB524885.1` was compared against
+all six admitted tea DFR-family candidates.
 
-Family-level recurrence: **2 clusters** (`CSIN_WHITE_PINK`, `CRETICULATA`).
+Its best match is canonical tea `CsDFRa / AB018685.1 / TEA032730`:
 
-- `C. sinensis`: source locus `CSA011986`;
-- `C. reticulata`: five K08695/ANR-like homologs are recovered and show mixed directions.
+- protein identity: 99.005%;
+- protein query coverage: 100%;
+- nucleotide identity: 99.008%;
+- nucleotide query coverage: 100%.
 
-The repeated family is not a resolved strict node.
+The runner-up is CsDFRb3 at 55.0% protein identity. The sequence-resolved
+white/pink tea source locus `CSA003949` is instead
+`TEA024758 / XM_028243762.1 / CsDFRb2`, with 53.883% protein identity to the
+partial CjDFR query and no significant nucleotide local hit under the frozen
+gate.
 
-### UFGT and LAR
+Two published CjDFR assays link exactly to `AB524885.1`; the 2015 qPCR primer
+pair reproduces its reported 167-bp amplicon.
 
-Each currently has only one strict micro independence cluster in the v0.1 recurrence ledger. Within those systems multiple source paralogs exist, so neither is currently eligible as a recurrent exact-node predictor.
+Thus both recurrent DFR clusters are anchored, but to different labels:
 
-### Named regulators
+- `CJAPONICA`: `CsDFRa_like_AB524885`;
+- `CSIN_WHITE_PINK`: `CsDFRb2_for_CSA003949`.
 
-`CjMYB114 = PP033112.1` and `CjbHLH1 = MZ614498.1` are sequence-resolved named functional regulators. However, each occurs in only one independent biological cluster. They are **strictly resolved but not recurrent**.
+DFR therefore enters the macro stage as a **module-level predictor with a
+resolved paralog-substitution contrast**, while its strict same-node predictor
+remains zero. The de novo tea unigenes `CSNG45659` and `CSNG38209`, and the
+2024 generic CjDFR promoter target, remain outside exact subclass assignment.
 
-## Important quarantine
+## ANS/LDOX and remaining families
 
-`C. sinensis` source locus `CSA011508` is reported as `LAR`, `FLAR`, and `LAR` across S8 stage sheets, while KEGG/Swiss-Prot annotation points to K05277 / leucoanthocyanidin dioxygenase / ANS-like function.
+`CSA011508` is now retained as a sequence-anchored
+`CSA011508_CsANS1_like` source locus through `TEA010322 / CSS0010687.1`.
+The conflicting later S8 LAR/FLAR labels remain visible in provenance rather
+than being allowed to overwrite the sequence/functional-class evidence.
 
-It remains `annotation_conflict_quarantined` and is excluded from strict LAR or ANS recurrence.
+The independent *C. reticulata* K05277 homolog set and the *C. sasanqua* ANS
+signal remain unlinked to strict sequence labels, so ANS/LDOX is still a
+family-level predictor.
 
-## Consequence for H_MICRO_MACRO_REUSE
+ANR remains unresolved across two clusters. LAR and UFGT each currently have
+only one admitted independence cluster, despite multiple within-system
+paralogs. `CjMYB114` and `CjbHLH1` are exact named sequence anchors but occur
+in one cluster each.
 
-The hypothesis must be split into two nested tests.
+## Consequence for the hypothesis architecture
 
-### Test 1 — module/vector reuse: ready first
+The held-out macro analysis must now compare three explicit alternatives:
 
-Use the already non-circular micro predictors:
+1. **same-node reuse** — represented by the recurrent CnFLS2-like micro
+   lineage;
+2. **module convergence by paralog substitution** — represented by the
+   CsDFRa-like versus CsDFRb2 DFR contrast;
+3. **family recurrence with unresolved node identity** — currently ANS/LDOX
+   and ANR.
 
-- anthocyanin-downstream accessibility;
-- flavonol accessibility;
-- PA accessibility;
-- carotenoid accessibility;
-- regulatory-module accessibility;
-- quantitative state-vector displacement directions.
+This is stronger than a gene-symbol count because it can distinguish whether
+a macro transition follows the same accessible molecular route, a different
+route inside the same pathway module, or only a coarse family-level pattern.
 
-Once independent nuclear transition branches are available, test whether macro transitions disproportionately move along micro-accessible **module/vector directions**.
+## Next public-data analysis
 
-### Test 2 — strict node reuse: not ready yet
+The next resolution target is ANS/LDOX:
 
-Before asking whether the *same gene* is reused, perform sequence-resolved orthology/paralogy mapping across the micro systems. A strict node enters the macro enrichment test only when the same resolved ortholog/paralog identity can be compared across independent systems.
+1. recover sequence or exact assay anchors for the *C. reticulata* K05277 set
+   and named CrANS target;
+2. resolve any public *C. sasanqua* ANS sequence or source-primer link;
+3. compare both with `CSA011508_CsANS1_like` without forcing one-to-one
+   orthology in a duplicated family.
 
-## New research implication
-
-This result prevents a common but consequential shortcut:
-
-> repeated annotation name ≠ repeated evolutionary node.
-
-The current evidence supports **network/module accessibility** more strongly than exact-gene reuse. Therefore the strongest near-term form of accessibility-biased macroevolution is a prediction about **repeated module/state-vector displacement**, not yet a prediction that the identical FLS/ANS/DFR ortholog is repeatedly selected.
-
-## Next public-data task
-
-Resolve sequence-level orthology for priority families:
-
-1. FLS/CnFLS1-3 and source-local FLS loci;
-2. ANS/LDOX/K05277 family;
-3. DFR paralogs;
-4. ANR/LAR;
-5. UFGT family;
-6. named MYB/bHLH regulators where homologous sequence data exist.
-
-Use public sequences/reference annotations where possible. Preserve one-to-many mappings rather than forcing reciprocal one-to-one orthology in duplicated families.
+After ANS/LDOX, proceed to ANR/LAR and then the UFGT family. Macro transition
+enrichment remains quarantined until an admitted independent nuclear tree and
+branch-level colour/state-vector reconstruction are available.
 
 ## Claim boundary
 
-Supported:
+Supported now:
 
-- family/module recurrence of FLS, ANS, DFR and ANR;
-- named within-species sequence anchors for some nodes/paralogs;
-- exact cross-species node recurrence is **currently unestablished**;
-- module/vector-level macro reuse is the valid first held-out test.
+- recurrent FLS, ANS/LDOX, DFR and ANR families at micro level;
+- one CnFLS2-like same-paralog lineage across two independent micro clusters;
+- a DFR recurrence in which both clusters are anchored to different paralog
+  subclasses;
+- a reproducible distinction between strict-node, resolved-different-node and
+  unresolved-family predictors.
 
-Not supported:
+Not supported now:
 
-- that FLS=3 or ANS=3 means the same ortholog evolved three times;
-- a universal exact-gene accessibility ranking;
-- preferential macro node reuse before sequence-level mapping;
-- any ecological selection inference from the family recurrence ranking.
+- repeated strict-node deployment on independent macro branches;
+- frequency or universality of paralog substitution across Camellia;
+- duplication age from pairwise similarity alone;
+- biochemical equivalence of every family member;
+- ecological adaptation, selection, persistence or pollinator causation.
