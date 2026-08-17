@@ -1,5 +1,10 @@
 #!/usr/bin/env python3
-"""Download provenance-frozen GWH annotations for the CnFLS2 synteny test."""
+"""Download provenance-frozen GWH annotations for the CnFLS2 synteny test.
+
+Transfers are written to temporary files, gzip-validated, and atomically moved
+into place. Transient incomplete reads from the public GWH download host are
+retried from scratch so network truncation cannot masquerade as data failure.
+"""
 from __future__ import annotations
 
 import argparse
@@ -7,6 +12,7 @@ import csv
 import gzip
 import hashlib
 import json
+import time
 from pathlib import Path
 
 import requests
@@ -20,28 +26,48 @@ def sha256(path: Path) -> str:
     return digest.hexdigest()
 
 
-def download(session: requests.Session, url: str, path: Path) -> dict[str, object]:
-    with session.get(url, stream=True, timeout=(30, 300)) as response:
-        response.raise_for_status()
-        path.parent.mkdir(parents=True, exist_ok=True)
-        with path.open("wb") as handle:
-            for block in response.iter_content(1024 * 1024):
-                if block:
-                    handle.write(block)
+def validate_gzip(path: Path) -> None:
     with path.open("rb") as handle:
-        magic = handle.read(2)
-    if magic != b"\x1f\x8b":
-        raise SystemExit(f"Downloaded file is not gzip: {path}")
-    # Fail early on a truncated gzip stream.
+        if handle.read(2) != b"\x1f\x8b":
+            raise OSError(f"Downloaded file is not gzip: {path}")
     with gzip.open(path, "rb") as handle:
         while handle.read(1024 * 1024):
             pass
-    return {
-        "url": url,
-        "local_path": str(path),
-        "bytes": path.stat().st_size,
-        "sha256": sha256(path),
-    }
+
+
+def download(session: requests.Session, url: str, path: Path, *, attempts: int = 5) -> dict[str, object]:
+    path.parent.mkdir(parents=True, exist_ok=True)
+    temporary = path.with_name(path.name + ".part")
+    errors: list[str] = []
+    for attempt in range(1, attempts + 1):
+        temporary.unlink(missing_ok=True)
+        try:
+            with session.get(url, stream=True, timeout=(30, 300)) as response:
+                response.raise_for_status()
+                expected_length = response.headers.get("Content-Length", "")
+                with temporary.open("wb") as handle:
+                    for block in response.iter_content(1024 * 1024):
+                        if block:
+                            handle.write(block)
+            if expected_length and temporary.stat().st_size != int(expected_length):
+                raise OSError(
+                    f"incomplete transfer: received {temporary.stat().st_size} of "
+                    f"{expected_length} compressed bytes"
+                )
+            validate_gzip(temporary)
+            temporary.replace(path)
+            return {
+                "url": url,
+                "local_path": str(path),
+                "bytes": path.stat().st_size,
+                "sha256": sha256(path),
+            }
+        except (requests.RequestException, OSError, EOFError, gzip.BadGzipFile) as exc:
+            errors.append(f"attempt {attempt}/{attempts}: {type(exc).__name__}: {exc}")
+            temporary.unlink(missing_ok=True)
+            if attempt < attempts:
+                time.sleep(min(20, 2**attempt))
+    raise RuntimeError(f"Failed to download and validate {url}: {' | '.join(errors)}")
 
 
 def main() -> None:
@@ -57,7 +83,7 @@ def main() -> None:
         raise SystemExit(f"Expected exactly two frozen sources, found {len(sources)}")
 
     session = requests.Session()
-    session.headers["User-Agent"] = "chun-cnfls2-synteny-download/0.1"
+    session.headers["User-Agent"] = "chun-cnfls2-synteny-download/0.2"
     manifest: list[dict[str, object]] = []
     for source in sources:
         role = source["role"]
