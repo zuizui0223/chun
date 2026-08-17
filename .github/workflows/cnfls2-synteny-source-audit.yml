@@ -3,6 +3,8 @@ name: CnFLS2 synteny source audit
 on:
   pull_request:
     paths:
+      - 'data/cnfls2_synteny_sources_v0_1.csv'
+      - 'data/cnfls2_synteny_source_summary_v0_1.json'
       - 'scripts/audit_cnfls2_synteny_sources.py'
       - '.github/workflows/cnfls2-synteny-source-audit.yml'
   workflow_dispatch:
@@ -25,11 +27,19 @@ jobs:
         run: |
           python scripts/audit_cnfls2_synteny_sources.py \
             --out-dir build/cnfls2_synteny_sources
+      - name: Verify frozen source gate
+        run: |
+          diff --strip-trailing-cr -u \
+            data/cnfls2_synteny_sources_v0_1.csv \
+            build/cnfls2_synteny_sources/assembly_sources.csv
+          diff --strip-trailing-cr -u \
+            data/cnfls2_synteny_source_summary_v0_1.json \
+            build/cnfls2_synteny_sources/summary.json
       - name: Report
         if: always()
         run: |
           echo '### CnFLS2 synteny source audit' >> "$GITHUB_STEP_SUMMARY"
-          for f in summary.json assembly_sources.csv request_attempts.json; do
+          for f in summary.json assembly_sources.csv request_attempts.json failures.json; do
             if [ -f "build/cnfls2_synteny_sources/$f" ]; then
               echo "#### $f" >> "$GITHUB_STEP_SUMMARY"
               echo '```' >> "$GITHUB_STEP_SUMMARY"
