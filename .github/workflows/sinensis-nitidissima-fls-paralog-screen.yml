@@ -1,0 +1,43 @@
+name: C sinensis vs C nitidissima FLS paralog screen
+
+on:
+  pull_request:
+    paths:
+      - 'scripts/compare_sinensis_nitidissima_fls_paralogs.py'
+      - '.github/workflows/sinensis-nitidissima-fls-paralog-screen.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  compare:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install dependencies
+        run: python -m pip install --disable-pip-version-check requests biopython
+      - name: Compare tea FLS loci with CnFLS1/2/3 protein anchors
+        run: python scripts/compare_sinensis_nitidissima_fls_paralogs.py --output-dir build/fls_paralog_screen
+      - name: Report
+        if: always()
+        run: |
+          for f in summary.json fls_pairwise_identity.csv; do
+            if [ -f build/fls_paralog_screen/$f ]; then
+              echo "### $f" >> "$GITHUB_STEP_SUMMARY"
+              echo '```' >> "$GITHUB_STEP_SUMMARY"
+              head -c 120000 build/fls_paralog_screen/$f >> "$GITHUB_STEP_SUMMARY"
+              echo >> "$GITHUB_STEP_SUMMARY"
+              echo '```' >> "$GITHUB_STEP_SUMMARY"
+            fi
+          done
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: sinensis-nitidissima-fls-paralog-screen
+          path: build/fls_paralog_screen
+          if-no-files-found: error
