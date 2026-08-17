@@ -1,0 +1,37 @@
+name: TPIA2 sequence crosswalk endpoint audit
+
+on:
+  pull_request:
+    paths:
+      - 'scripts/audit_tpia_query_endpoints.py'
+      - '.github/workflows/tpia-sequence-crosswalk-endpoint-audit.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install requests
+        run: python -m pip install --disable-pip-version-check requests
+      - name: Audit TPIA2 public query endpoints
+        run: python scripts/audit_tpia_query_endpoints.py --out-dir build/tpia_endpoint_audit
+      - name: Report compact endpoint audit
+        if: always()
+        run: |
+          if [ -f build/tpia_endpoint_audit/tpia_endpoint_audit.json ]; then
+            head -c 120000 build/tpia_endpoint_audit/tpia_endpoint_audit.json >> "$GITHUB_STEP_SUMMARY"
+          fi
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: tpia-sequence-crosswalk-endpoint-audit
+          path: build/tpia_endpoint_audit
+          if-no-files-found: error
