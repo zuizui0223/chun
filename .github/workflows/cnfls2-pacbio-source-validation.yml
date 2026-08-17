@@ -4,6 +4,8 @@ on:
   pull_request:
     paths:
       - 'data/cnfls2_gwh_candidate_GWHTFILD005297_1.fasta'
+      - 'data/cnfls2_pacbio_source_summary_v0_1.json'
+      - 'data/cnfls2_pacbio_consensus_v0_1.fasta'
       - 'scripts/summarize_cnfls2_pacbio_hits.py'
       - '.github/workflows/cnfls2-pacbio-source-validation.yml'
   workflow_dispatch:
@@ -17,14 +19,11 @@ jobs:
     timeout-minutes: 60
     steps:
       - uses: actions/checkout@v4
-
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
-
       - name: Validate summarizer
         run: python -m py_compile scripts/summarize_cnfls2_pacbio_hits.py
-
       - name: Install official NCBI BLAST plus with blastn_vdb
         run: |
           mkdir -p build/blast
@@ -38,9 +37,7 @@ jobs:
           md5sum -c ncbi-blast-2.17.0+-x64-linux.tar.gz.md5
           tar -xzf ncbi-blast-2.17.0+-x64-linux.tar.gz
           test -x ncbi-blast-2.17.0+/bin/blastn_vdb
-          ncbi-blast-2.17.0+/bin/blastn_vdb -version \
-            | tee blastn_vdb.version.txt
-
+          ncbi-blast-2.17.0+/bin/blastn_vdb -version | tee blastn_vdb.version.txt
       - name: Search the public F01 PacBio run without full FASTQ conversion
         env:
           VDB_CONFIG: /tmp
@@ -60,7 +57,6 @@ jobs:
               -out build/cnfls2_pacbio/blastn_vdb_hits.tsv \
               2> build/cnfls2_pacbio/blastn_vdb.stderr.log
           test -s build/cnfls2_pacbio/blastn_vdb_hits.tsv
-
       - name: Summarize source-read and consensus support
         run: |
           python scripts/summarize_cnfls2_pacbio_hits.py \
@@ -70,17 +66,19 @@ jobs:
             --out-dir build/cnfls2_pacbio/summary \
             --minimum-pident 80 \
             --minimum-qcov 70
-
+      - name: Verify frozen source-read result
+        run: |
+          diff --strip-trailing-cr -u \
+            data/cnfls2_pacbio_source_summary_v0_1.json \
+            build/cnfls2_pacbio/summary/summary.json
+          diff --strip-trailing-cr -u \
+            data/cnfls2_pacbio_consensus_v0_1.fasta \
+            build/cnfls2_pacbio/summary/pacbio_consensus.fasta
       - name: Report
         if: always()
         run: |
           echo '### CnFLS2 PacBio source validation' >> "$GITHUB_STEP_SUMMARY"
-          for f in \
-            ../blast/blastn_vdb.version.txt \
-            blastn_vdb.stderr.log \
-            summary/summary.json \
-            summary/best_read_hits.csv \
-            summary/pacbio_consensus.fasta; do
+          for f in ../blast/blastn_vdb.version.txt blastn_vdb.stderr.log summary/summary.json summary/best_read_hits.csv summary/pacbio_consensus.fasta; do
             if [ -f "build/cnfls2_pacbio/$f" ]; then
               echo "#### $f" >> "$GITHUB_STEP_SUMMARY"
               echo '```' >> "$GITHUB_STEP_SUMMARY"
@@ -89,7 +87,6 @@ jobs:
               echo '```' >> "$GITHUB_STEP_SUMMARY"
             fi
           done
-
       - uses: actions/upload-artifact@v4
         if: always()
         with:
