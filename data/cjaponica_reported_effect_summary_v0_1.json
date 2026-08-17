@@ -1,0 +1,17 @@
+{
+  "independence_cluster": "CJAPONICA",
+  "phenotype_order": "CK=white; T1=pink; T2=deep pink; T3=red; T4=crimson",
+  "n_metabolites": 187,
+  "anthocyanin_compounds": 25,
+  "flavonol_compounds": 43,
+  "PA_compounds": 16,
+  "anthocyanin_T4_CK_log2_total": 4.197664687561155,
+  "flavonol_T4_CK_log2_total": -0.8851105473239521,
+  "PA_T4_CK_log2_total": -0.25583685114544535,
+  "anthocyanin_colour_order_rho": 0.9819805060619657,
+  "flavonol_colour_order_rho": -0.7092081432669752,
+  "anthocyanin_T4_CK_hedges_g": 25.247398785505034,
+  "anthocyanin_minus_flavonol_T4_CK": 5.082775234885108,
+  "anthocyanin_minus_PA_T4_CK": 4.4535015387066,
+  "claim_ceiling": "one C. japonica cultivar-gradient system; quantitative metabolite corroboration, not cross-study pooled effect"
+}

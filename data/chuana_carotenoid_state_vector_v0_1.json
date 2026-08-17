@@ -1,0 +1,21 @@
+{
+  "independence_cluster": "CHUANA",
+  "source_doi": "10.1186/s12870-025-06549-z",
+  "source_pmcid": "PMC12125916",
+  "phenotypes": "GS1=golden bud; GS2=golden full bloom; RS1=red-outer-petal bud; RS2=red-outer-petal full bloom",
+  "replicates_per_group": 3,
+  "carotenoid_metabolites_screened": 40,
+  "bud_same_stage_comparison": "RS1_vs_GS1",
+  "bud_differential_carotenoids": 22,
+  "bud_red_higher": 21,
+  "bud_red_lower": 1,
+  "full_bloom_same_stage_comparison": "RS2_vs_GS2",
+  "full_bloom_differential_carotenoids": 18,
+  "full_bloom_red_higher": 18,
+  "full_bloom_red_lower": 0,
+  "development_golden": "GS2_vs_GS1: 27 differential; 6 up, 21 down",
+  "development_red": "RS2_vs_RS1: 35 differential; 6 up, 29 down",
+  "key_metabolite_pattern": "alpha-, gamma-, beta-carotene, phytoene/author-reported phytochrome and epsilon-carotene highest in RS1; lycopene higher in RS1/RS2 than GS1/GS2",
+  "state_vector_decision": "red outer-petal phenotype is accompanied by stronger carotenoid accumulation at matched developmental stages; do not equate visible red with an anthocyanin-only state",
+  "claim_ceiling": "one within-species colour-variant system; supports a carotenoid dimension of state aliasing, not a genus-wide red-carotenoid rule"
+}

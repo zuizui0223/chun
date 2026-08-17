@@ -1,0 +1,67 @@
+name: Camellia japonica reported effect pilot
+
+on:
+  pull_request:
+    paths:
+      - 'data/cjaponica_reported_effect_summary_v0_1.json'
+      - 'scripts/fetch_pmc_oa_supplement_manifest.py'
+      - 'scripts/inspect_tabular_supplements.py'
+      - 'scripts/extract_cjaponica_reported_metabolite_vector.py'
+      - '.github/workflows/camellia-japonica-reported-effect-pilot.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  audit-supplement:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install dependencies
+        run: python -m pip install --disable-pip-version-check requests openpyxl python-docx scipy
+      - name: Fetch PMC8226227 OA package
+        run: |
+          python scripts/fetch_pmc_oa_supplement_manifest.py \
+            --pmcid PMC8226227 \
+            --out-dir build/cjaponica_reported_effect
+      - name: Inspect tabular supplements
+        run: |
+          python scripts/inspect_tabular_supplements.py \
+            --root build/cjaponica_reported_effect \
+            --output build/cjaponica_reported_effect/table_inspection.csv
+      - name: Extract metabolite state-vector effects
+        run: |
+          python scripts/extract_cjaponica_reported_metabolite_vector.py \
+            --docx build/cjaponica_reported_effect/package/PMC8226227/Data_Sheet_1.docx \
+            --out-dir build/cjaponica_reported_effect/effects
+      - name: Verify frozen quantitative summary
+        run: diff -u data/cjaponica_reported_effect_summary_v0_1.json build/cjaponica_reported_effect/effects/summary.json
+      - name: Report
+        if: always()
+        run: |
+          echo '### C. japonica white-to-crimson quantitative supplement audit' >> "$GITHUB_STEP_SUMMARY"
+          for f in summary.json supplement_manifest.csv table_inspection.csv inspection_failures.json effects/summary.json effects/metabolite_class_effects.csv effects/state_vector_contrasts.csv; do
+            if [ -f "build/cjaponica_reported_effect/$f" ]; then
+              echo "#### $f" >> "$GITHUB_STEP_SUMMARY"
+              echo '```' >> "$GITHUB_STEP_SUMMARY"
+              head -c 60000 "build/cjaponica_reported_effect/$f" >> "$GITHUB_STEP_SUMMARY"
+              echo >> "$GITHUB_STEP_SUMMARY"
+              echo '```' >> "$GITHUB_STEP_SUMMARY"
+            fi
+          done
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: camellia-japonica-reported-effect-pilot
+          path: |
+            build/cjaponica_reported_effect/summary.json
+            build/cjaponica_reported_effect/supplement_manifest.csv
+            build/cjaponica_reported_effect/table_inspection.csv
+            build/cjaponica_reported_effect/inspection_failures.json
+            build/cjaponica_reported_effect/effects
+          if-no-files-found: error

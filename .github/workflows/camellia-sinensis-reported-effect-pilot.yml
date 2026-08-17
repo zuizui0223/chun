@@ -1,0 +1,69 @@
+name: Camellia sinensis reported effect pilot
+
+on:
+  pull_request:
+    paths:
+      - 'data/csinensis_reported_effect_summary_v0_1.json'
+      - 'scripts/fetch_pmc_oa_supplement_manifest.py'
+      - 'scripts/inspect_tabular_supplements.py'
+      - 'scripts/extract_csinensis_reported_pathway_effects_v2.py'
+      - '.github/workflows/camellia-sinensis-reported-effect-pilot.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  audit-supplement:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install dependencies
+        run: python -m pip install --disable-pip-version-check requests openpyxl
+      - name: Fetch PMC6983220 OA package and supplements
+        run: |
+          python scripts/fetch_pmc_oa_supplement_manifest.py \
+            --pmcid PMC6983220 \
+            --out-dir build/csinensis_reported_effect
+      - name: Inspect tabular supplements
+        run: |
+          python scripts/inspect_tabular_supplements.py \
+            --root build/csinensis_reported_effect \
+            --output build/csinensis_reported_effect/table_inspection.csv
+      - name: Extract stage-matched pathway effects with label provenance gate
+        run: |
+          python scripts/extract_csinensis_reported_pathway_effects_v2.py \
+            --s6 'build/csinensis_reported_effect/nested/molecules-25-00190-s001/Table S6.xlsx' \
+            --s8 'build/csinensis_reported_effect/nested/molecules-25-00190-s001/Table S8.xlsx' \
+            --s9 'build/csinensis_reported_effect/nested/molecules-25-00190-s001/Table S9.xlsx' \
+            --out-dir build/csinensis_reported_effect/effects
+      - name: Verify frozen quantitative summary
+        run: diff -u data/csinensis_reported_effect_summary_v0_1.json build/csinensis_reported_effect/effects/summary.json
+      - name: Report
+        if: always()
+        run: |
+          echo '### C. sinensis white/pink reported-effect supplement audit' >> "$GITHUB_STEP_SUMMARY"
+          for f in summary.json supplement_manifest.csv table_inspection.csv inspection_failures.json effects/summary.json effects/provenance_label_audit.json effects/s6_label_swap_examples.csv effects/s6_hub_gene_stage_effects.csv effects/s8_selected_deg_effects.csv effects/s9_module_gene_stage_effects.csv effects/module_stage_effects.csv effects/module_contrasts.csv; do
+            if [ -f "build/csinensis_reported_effect/$f" ]; then
+              echo "#### $f" >> "$GITHUB_STEP_SUMMARY"
+              echo '```' >> "$GITHUB_STEP_SUMMARY"
+              head -c 40000 "build/csinensis_reported_effect/$f" >> "$GITHUB_STEP_SUMMARY"
+              echo >> "$GITHUB_STEP_SUMMARY"
+              echo '```' >> "$GITHUB_STEP_SUMMARY"
+            fi
+          done
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: camellia-sinensis-reported-effect-pilot
+          path: |
+            build/csinensis_reported_effect/summary.json
+            build/csinensis_reported_effect/supplement_manifest.csv
+            build/csinensis_reported_effect/table_inspection.csv
+            build/csinensis_reported_effect/inspection_failures.json
+            build/csinensis_reported_effect/effects
+          if-no-files-found: error

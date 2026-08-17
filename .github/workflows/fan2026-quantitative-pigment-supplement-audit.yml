@@ -1,0 +1,83 @@
+name: Fan 2026 quantitative pigment supplement audit
+
+on:
+  pull_request:
+    paths:
+      - 'data/fan2026_anthocyanin_matrix_audit_v0_1.json'
+      - 'scripts/fetch_pmc_oa_supplement_manifest.py'
+      - 'scripts/inspect_tabular_supplements.py'
+      - 'scripts/audit_fan2026_anthocyanin_matrix.py'
+      - 'scripts/export_fan2026_table_s1_colour_registry.py'
+      - '.github/workflows/fan2026-quantitative-pigment-supplement-audit.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  audit-supplement:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install dependencies
+        run: python -m pip install --disable-pip-version-check requests openpyxl
+      - name: Fetch PMC12946509 OA package
+        run: |
+          python scripts/fetch_pmc_oa_supplement_manifest.py \
+            --pmcid PMC12946509 \
+            --out-dir build/fan2026_quant_pigment
+      - name: Inspect tabular supplements
+        run: |
+          python scripts/inspect_tabular_supplements.py \
+            --root build/fan2026_quant_pigment \
+            --output build/fan2026_quant_pigment/table_inspection.csv
+      - name: Export same-workbook Table S1 colour registry
+        run: |
+          python scripts/export_fan2026_table_s1_colour_registry.py \
+            --workbook build/fan2026_quant_pigment/package/PMC12946509/PBI-24-1725-s002.xlsx \
+            --output build/fan2026_quant_pigment/anthocyanin_audit/table_s1_colour_registry.csv
+      - name: Audit Table S2 matrix and article-to-supplement admission mismatch
+        run: |
+          python scripts/audit_fan2026_anthocyanin_matrix.py \
+            --workbook build/fan2026_quant_pigment/package/PMC12946509/PBI-24-1725-s002.xlsx \
+            --article-expected-red-like-species 29 \
+            --output-dir build/fan2026_quant_pigment/anthocyanin_audit
+      - name: Verify frozen audit semantically
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          frozen=json.loads(Path('data/fan2026_anthocyanin_matrix_audit_v0_1.json').read_text())
+          rebuilt=json.loads(Path('build/fan2026_quant_pigment/anthocyanin_audit/summary.json').read_text())
+          if frozen != rebuilt:
+              raise SystemExit('Frozen and rebuilt Fan anthocyanin audits differ semantically')
+          print('Frozen Fan anthocyanin audit matches rebuilt JSON semantically')
+          PY
+      - name: Report
+        if: always()
+        run: |
+          echo '### Fan 2026 quantitative pigment supplement audit' >> "$GITHUB_STEP_SUMMARY"
+          for f in summary.json supplement_manifest.csv table_inspection.csv inspection_failures.json anthocyanin_audit/summary.json anthocyanin_audit/species_row_summary.csv anthocyanin_audit/table_s1_colour_registry.csv; do
+            if [ -f "build/fan2026_quant_pigment/$f" ]; then
+              echo "#### $f" >> "$GITHUB_STEP_SUMMARY"
+              echo '```' >> "$GITHUB_STEP_SUMMARY"
+              head -c 100000 "build/fan2026_quant_pigment/$f" >> "$GITHUB_STEP_SUMMARY"
+              echo >> "$GITHUB_STEP_SUMMARY"
+              echo '```' >> "$GITHUB_STEP_SUMMARY"
+            fi
+          done
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: fan2026-quantitative-pigment-supplement-audit
+          path: |
+            build/fan2026_quant_pigment/summary.json
+            build/fan2026_quant_pigment/supplement_manifest.csv
+            build/fan2026_quant_pigment/table_inspection.csv
+            build/fan2026_quant_pigment/inspection_failures.json
+            build/fan2026_quant_pigment/anthocyanin_audit
+          if-no-files-found: error

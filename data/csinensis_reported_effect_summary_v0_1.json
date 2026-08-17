@@ -1,0 +1,24 @@
+{
+  "independence_cluster": "CSIN_WHITE_PINK",
+  "s6_label_gate": {
+    "table": "S6",
+    "overlap_tests": 16,
+    "direct_matches": 0,
+    "swapped_matches": 16,
+    "decision": "S6 headers are systematically reversed: printed BTP=biological ZJW/white; printed ZJW=biological BTP/pink"
+  },
+  "s9_label_gate": {
+    "table": "S9",
+    "overlap_tests": 2,
+    "direct_matches": 2,
+    "swapped_matches": 0,
+    "decision": "printed labels retained"
+  },
+  "S6_DFR_positive_gene_stage": "15/15",
+  "S6_FLS_positive_gene_stage": "5/10",
+  "S6_LAR_positive_gene_stage": "10/10",
+  "S6_ANR_positive_gene_stage": "0/0",
+  "S6_anthocyanin_minus_flavonol_positive_stages": "5/5",
+  "S6_anthocyanin_minus_PA_positive_stages": "3/5",
+  "claim_ceiling": "one C. sinensis system; quantitative within-study evidence, not cross-study pooled effect"
+}

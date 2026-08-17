@@ -1,0 +1,15 @@
+{
+  "independence_cluster": "CRETICULATA",
+  "phenotype_mapping": "HHYC=red; XJ=pink; TZM=white",
+  "key_ufgt_red_gt_white": "4/4",
+  "key_ufgt_red_gt_pink_gt_white": "3/4",
+  "key_ufgt_red_white_hedges_g": 2.2358634839917055,
+  "anthocyanin_compounds": 18,
+  "anthocyanin_red_white_log2_total": 3.9178522911940807,
+  "anthocyanin_pink_white_log2_total": 1.3223579421036107,
+  "flavonol_red_white_log2_total": -0.6675504460909752,
+  "PA_red_white_log2_total": -0.21527227348700642,
+  "anthocyanin_minus_flavonol_red_white": 4.585402737285056,
+  "anthocyanin_minus_PA_red_white": 4.133124564681087,
+  "claim_ceiling": "one independent C. reticulata system; quantitative corroboration of multidimensional pigment allocation, not cross-study pooled effect"
+}
