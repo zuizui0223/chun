@@ -5,6 +5,9 @@ on:
     paths:
       - 'data/cnfls2_gwh_candidate_GWHTFILD005297_1.fasta'
       - 'data/cnfls2_synteny_sources_v0_1.csv'
+      - 'data/cnfls2_synteny_download_manifest_v0_1.csv'
+      - 'data/cnfls2_synteny_gene_tree_summary_v0_1.json'
+      - 'data/cnfls2_local_rbh_anchors_v0_1.csv'
       - 'scripts/download_cnfls2_synteny_sources.py'
       - 'scripts/normalize_gwh_gff_accessions.py'
       - 'scripts/build_cnfls2_protein_query.py'
@@ -45,6 +48,12 @@ jobs:
             > build/cnfls2_synteny_tree/sources/tea_longjing43_crosswalk.gff.raw
           gzip -dc build/cnfls2_synteny_tree/sources/tea_longjing43_crosswalk.protein.faa.gz \
             > build/cnfls2_synteny_tree/sources/tea_longjing43_crosswalk.protein.faa
+
+      - name: Verify frozen source checksums
+        run: |
+          diff --strip-trailing-cr -u \
+            data/cnfls2_synteny_download_manifest_v0_1.csv \
+            build/cnfls2_synteny_tree/sources/download_manifest.csv
 
       - name: Normalize GWH local IDs to stable accessions
         run: |
@@ -124,6 +133,15 @@ jobs:
             --tea-to-cn build/cnfls2_synteny_tree/tea_to_cn.tsv \
             --tree build/cnfls2_synteny_tree/fls_family_tree.nwk \
             --out-dir build/cnfls2_synteny_tree/result
+
+      - name: Verify frozen biological result
+        run: |
+          diff --strip-trailing-cr -u \
+            data/cnfls2_synteny_gene_tree_summary_v0_1.json \
+            build/cnfls2_synteny_tree/result/summary.json
+          diff --strip-trailing-cr -u \
+            data/cnfls2_local_rbh_anchors_v0_1.csv \
+            build/cnfls2_synteny_tree/result/reciprocal_best_anchors.csv
 
       - name: Report
         if: always()
