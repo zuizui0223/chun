@@ -1,0 +1,100 @@
+name: CnFLS2 PacBio source validation
+
+on:
+  pull_request:
+    paths:
+      - 'data/cnfls2_gwh_candidate_GWHTFILD005297_1.fasta'
+      - 'scripts/summarize_cnfls2_pacbio_hits.py'
+      - '.github/workflows/cnfls2-pacbio-source-validation.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  validate-source:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Validate summarizer
+        run: python -m py_compile scripts/summarize_cnfls2_pacbio_hits.py
+
+      - name: Install official NCBI BLAST plus with blastn_vdb
+        run: |
+          mkdir -p build/blast
+          cd build/blast
+          curl -L --fail --retry 4 --retry-all-errors \
+            'https://ftp.ncbi.nlm.nih.gov/blast/executables/blast+/2.17.0/ncbi-blast-2.17.0+-x64-linux.tar.gz' \
+            -o ncbi-blast-2.17.0+-x64-linux.tar.gz
+          curl -L --fail --retry 4 --retry-all-errors \
+            'https://ftp.ncbi.nlm.nih.gov/blast/executables/blast+/2.17.0/ncbi-blast-2.17.0+-x64-linux.tar.gz.md5' \
+            -o ncbi-blast-2.17.0+-x64-linux.tar.gz.md5
+          md5sum -c ncbi-blast-2.17.0+-x64-linux.tar.gz.md5
+          tar -xzf ncbi-blast-2.17.0+-x64-linux.tar.gz
+          test -x ncbi-blast-2.17.0+/bin/blastn_vdb
+          ncbi-blast-2.17.0+/bin/blastn_vdb -version \
+            | tee blastn_vdb.version.txt
+
+      - name: Search the public F01 PacBio run without full FASTQ conversion
+        env:
+          VDB_CONFIG: /tmp
+        run: |
+          mkdir -p build/cnfls2_pacbio
+          timeout 50m \
+            build/blast/ncbi-blast-2.17.0+/bin/blastn_vdb \
+              -db SRR22729450 \
+              -query data/cnfls2_gwh_candidate_GWHTFILD005297_1.fasta \
+              -task dc-megablast \
+              -word_size 11 \
+              -dust no \
+              -evalue 1e-20 \
+              -max_target_seqs 1000 \
+              -num_threads 4 \
+              -outfmt '6 qseqid sseqid pident length mismatch gapopen qstart qend sstart send evalue bitscore qlen slen qcovs qseq sseq' \
+              -out build/cnfls2_pacbio/blastn_vdb_hits.tsv \
+              2> build/cnfls2_pacbio/blastn_vdb.stderr.log
+          test -s build/cnfls2_pacbio/blastn_vdb_hits.tsv
+
+      - name: Summarize source-read and consensus support
+        run: |
+          python scripts/summarize_cnfls2_pacbio_hits.py \
+            --query data/cnfls2_gwh_candidate_GWHTFILD005297_1.fasta \
+            --hits build/cnfls2_pacbio/blastn_vdb_hits.tsv \
+            --run SRR22729450 \
+            --out-dir build/cnfls2_pacbio/summary \
+            --minimum-pident 80 \
+            --minimum-qcov 70
+
+      - name: Report
+        if: always()
+        run: |
+          echo '### CnFLS2 PacBio source validation' >> "$GITHUB_STEP_SUMMARY"
+          for f in \
+            ../blast/blastn_vdb.version.txt \
+            blastn_vdb.stderr.log \
+            summary/summary.json \
+            summary/best_read_hits.csv \
+            summary/pacbio_consensus.fasta; do
+            if [ -f "build/cnfls2_pacbio/$f" ]; then
+              echo "#### $f" >> "$GITHUB_STEP_SUMMARY"
+              echo '```' >> "$GITHUB_STEP_SUMMARY"
+              head -c 120000 "build/cnfls2_pacbio/$f" >> "$GITHUB_STEP_SUMMARY"
+              echo >> "$GITHUB_STEP_SUMMARY"
+              echo '```' >> "$GITHUB_STEP_SUMMARY"
+            fi
+          done
+
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: cnfls2-pacbio-source-validation
+          path: |
+            build/blast/blastn_vdb.version.txt
+            build/cnfls2_pacbio
+          if-no-files-found: error
