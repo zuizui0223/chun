@@ -1,0 +1,56 @@
+{
+  "source_study_transcript": "F01.PB8395",
+  "source_class": "CnFLS2",
+  "source_longread_run": "SRR22729450",
+  "gwh_transcripts_scanned": 42697,
+  "primer_compatible_transcripts": 1,
+  "exact_primer_pair_transcripts": 1,
+  "candidate_transcript": "GWHTFILD005297.1",
+  "candidate_gene": "GWHGFILD004416.1",
+  "candidate_original_gene": "Cpet02g11620",
+  "candidate_bp": 1020,
+  "candidate_sequence_sha256": "7b5f8498cab54679d219c0decc567ad76bdcb15ce5968c13352ce46bb2328735",
+  "primer_forward_mismatches": 0,
+  "primer_reverse_mismatches": 0,
+  "primer_amplicon_bp": 246,
+  "closest_reference": "tea_CSA008358_CDS",
+  "closest_reference_identity_percent": 98.824,
+  "closest_reference_alignment_bp": 1020,
+  "closest_reference_mismatches": 12,
+  "closest_reference_gap_opens": 0,
+  "closest_reference_query_coverage_percent": 100,
+  "identity_margin_over_next_reference_percentage_points": 17.193,
+  "exploratory_tree_newick": "(tea_CSA008358_CDS:0.004747934,GWHTFILD005297.1:0.007331736,(tea_CSA006950_CDS:0.008455269,CnFLS1_JF343560.1:0.000552583)1.000:0.200869313);",
+  "cds_panel": {
+    "reference_layer": "coding_sequence",
+    "references": [
+      {
+        "name": "tea_CSA006950_CDS",
+        "bp": 1011,
+        "sha256": "86074782369f577f4a2c34f8ad06447337682ee61f423aa5359601c3fd2e72d0"
+      },
+      {
+        "name": "tea_CSA008358_CDS",
+        "bp": 1020,
+        "sha256": "da698283aaf8fe8fe67cd85b401c8079712e4235cda029bfb3ff9f0a3e370aa9"
+      },
+      {
+        "name": "CnFLS1_JF343560.1",
+        "bp": 1297,
+        "sha256": "dbe56ec0352c6b23169c115b6cad0cffd572039432f0a82d98f63fd03b30b9f7"
+      }
+    ],
+    "candidates": [
+      {
+        "name": "GWHTFILD005297.1",
+        "bp": 1020,
+        "sha256": "7b5f8498cab54679d219c0decc567ad76bdcb15ce5968c13352ce46bb2328735"
+      }
+    ],
+    "decision": "compare recovered GWH mRNA candidate against CDS/cDNA references; intron-bearing TPIA transcript exports are excluded",
+    "claim_ceiling": "coding-sequence similarity and exploratory gene placement; source-read recovery is still required for exact F01.PB8395 identity"
+  },
+  "decision": "The published F01.PB8395/CnFLS2 primer pair uniquely identifies GWHTFILD005297.1 among the public GWH transcript set. Its full coding sequence is nearly identical to tea CSA008358 and strongly separated from tea CSA006950 and published CnFLS1. This promotes CSA008358 and GWHTFILD005297.1 to a sequence-supported same-paralog/orthology hypothesis, while exact F01.PB8395 identity and formal orthology remain held out for PacBio source-read recovery and broader gene-tree/synteny tests.",
+  "chun_inference": "The early pink-directed tea locus CSA008358 and the C. nitidissima CnFLS2-class candidate GWHTFILD005297.1 are likely counterparts, whereas the later white-directed CSA006950 belongs to a different FLS paralog. The apparent developmental FLS sign switch is therefore consistent with paralog substitution rather than reversal of one locus.",
+  "claim_ceiling": "sequence-supported same-paralog/orthology hypothesis; do not call GWHTFILD005297.1 the exact F01.PB8395 source transcript until public PacBio reads/consensus recover it, and do not call formal orthology without broader FLS-family gene-tree and synteny evidence"
+}
