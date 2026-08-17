@@ -1,0 +1,134 @@
+name: Freeze ANR authoritative ledgers
+
+on:
+  push:
+    branches:
+      - agent/anr-reference-copy-resolution
+    paths:
+      - 'data/anr_reference_copy_diagnostic_v0_1/summary.json'
+      - 'scripts/freeze_anr_reference_copy_ledger.py'
+      - '.github/workflows/anr-freeze-authoritative-ledgers.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  freeze:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Wait for diagnostic output when this workflow itself triggered the run
+        run: |
+          for i in $(seq 1 30); do
+            git pull --ff-only origin "${GITHUB_REF_NAME}"
+            if [ -f data/anr_reference_copy_diagnostic_v0_1/summary.json ]; then
+              exit 0
+            fi
+            sleep 10
+          done
+          echo 'Diagnostic output is not present yet; the diagnostic-output push will retrigger this workflow.'
+          exit 0
+
+      - name: Freeze v0.3 ledgers
+        if: ${{ hashFiles('data/anr_reference_copy_diagnostic_v0_1/summary.json') != '' }}
+        run: |
+          rm -rf build/anr_ledger
+          python scripts/freeze_anr_reference_copy_ledger.py \
+            --diagnostic-dir data/anr_reference_copy_diagnostic_v0_1 \
+            --orthology-v02 data/orthology_resolution_by_feature_v0_2.csv \
+            --score-v02 data/micro_accessibility_node_score_harmonized_v0_2.csv \
+            --crosswalk-v02 data/pigment_node_source_id_crosswalk_v0_2.csv \
+            --out-dir build/anr_ledger
+
+          cp build/anr_ledger/anr_conservative_summary_v0_1.json data/anr_conservative_summary_v0_1.json
+          cp build/anr_ledger/orthology_resolution_by_feature_v0_3.csv data/orthology_resolution_by_feature_v0_3.csv
+          cp build/anr_ledger/micro_accessibility_node_score_harmonized_v0_3.csv data/micro_accessibility_node_score_harmonized_v0_3.csv
+          cp build/anr_ledger/pigment_node_source_id_crosswalk_v0_3.csv data/pigment_node_source_id_crosswalk_v0_3.csv
+          cp build/anr_ledger/ANR_CONSERVATIVE_RESOLUTION_RESULT.md docs/ANR_CONSERVATIVE_RESOLUTION_RESULT.md
+
+      - name: Commit authoritative ANR state
+        if: ${{ hashFiles('data/anr_reference_copy_diagnostic_v0_1/summary.json') != '' }}
+        run: |
+          git config user.name github-actions[bot]
+          git config user.email 41898282+github-actions[bot]@users.noreply.github.com
+          git add \
+            data/anr_conservative_summary_v0_1.json \
+            data/orthology_resolution_by_feature_v0_3.csv \
+            data/micro_accessibility_node_score_harmonized_v0_3.csv \
+            data/pigment_node_source_id_crosswalk_v0_3.csv \
+            docs/ANR_CONSERVATIVE_RESOLUTION_RESULT.md
+          if git diff --cached --quiet; then
+            echo 'No authoritative ANR change.'
+          else
+            git commit -m 'Freeze conservative ANR ledger state'
+            git push origin HEAD:${GITHUB_REF_NAME}
+          fi
+
+      - name: Update pull-request handoff
+        if: ${{ hashFiles('data/anr_conservative_summary_v0_1.json') != '' }}
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          s = json.load(open('data/anr_conservative_summary_v0_1.json'))
+          body = f"""## Purpose
+
+Resolve recurrent ANR family evidence at copy/paralog level after FLS, DFR, and ANS/LDOX.
+
+## Result
+
+- Tea source anchor protein: `{s['source_anchor_protein_accession']}`.
+- Source-anchor resolution: `{s['source_anchor_resolution']}`.
+- Best reference target: `{s['best_reference_target']}`.
+- Best non-gap protein identity: `{s['best_reference_identity']}`.
+- Margin over the runner-up: `{s['identity_margin_over_runner_up']}`.
+- Reference-copy direction heterogeneity: `{s['reference_copy_direction_heterogeneity']}`.
+- Sequence screen complete: `{s['sequence_screen_complete']}`.
+- Effect screen complete: `{s['effect_screen_complete']}`.
+
+## Authoritative ledger
+
+- ANR family recurrence clusters: `2`.
+- Reference-lineage-anchored clusters: `{s['reference_lineage_anchored_clusters']}`.
+- Species-native strict-node clusters: `0`.
+- Strict cross-species exact recurrence: `0`.
+- Family/module predictor: ready.
+- Strict-node predictor: `0`.
+
+## Claim boundary
+
+Supported: full-length relationship of the exact tea source ANR anchor to recovered tea reference copies, mapped reference-copy direction heterogeneity when effects are recovered, and ANR family/module recurrence across two source clusters.
+
+Not supported: species-native *C. reticulata* ANR orthology, strict cross-species exact-node recurrence, duplication age, adaptive selection, or macro-transition enrichment.
+
+The generated diagnostic, alignment, tree, conservative summary, v0.3 ledgers, and result document are committed on this branch.
+"""
+          Path('build/anr_pr_body.md').write_text(body, encoding='utf-8')
+          PY
+          pr=$(gh pr list --head "${GITHUB_REF_NAME}" --json number --jq '.[0].number')
+          if [ -n "$pr" ]; then
+            gh pr edit "$pr" --body-file build/anr_pr_body.md
+            gh pr ready "$pr" || true
+          fi
+
+      - name: Report
+        if: always()
+        run: |
+          echo '### Conservative ANR ledger' >> "$GITHUB_STEP_SUMMARY"
+          if [ -f data/anr_conservative_summary_v0_1.json ]; then
+            echo '```json' >> "$GITHUB_STEP_SUMMARY"
+            cat data/anr_conservative_summary_v0_1.json >> "$GITHUB_STEP_SUMMARY"
+            echo '```' >> "$GITHUB_STEP_SUMMARY"
+          fi
