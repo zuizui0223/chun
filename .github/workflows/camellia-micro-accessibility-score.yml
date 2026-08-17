@@ -1,0 +1,29 @@
+name: Camellia micro-accessibility score
+
+on:
+  pull_request:
+    paths:
+      - 'data/micro_accessibility_node_evidence_v0_1.csv'
+      - 'data/micro_accessibility_feature_summary_v0_1.csv'
+      - 'scripts/summarize_micro_accessibility_evidence.py'
+      - '.github/workflows/camellia-micro-accessibility-score.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  reproduce:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Recompute micro-accessibility evidence summary
+        run: |
+          python scripts/summarize_micro_accessibility_evidence.py \
+            data/micro_accessibility_node_evidence_v0_1.csv \
+            --output /tmp/micro_accessibility_feature_summary.csv
+      - name: Verify frozen result
+        run: diff --strip-trailing-cr -u data/micro_accessibility_feature_summary_v0_1.csv /tmp/micro_accessibility_feature_summary.csv
