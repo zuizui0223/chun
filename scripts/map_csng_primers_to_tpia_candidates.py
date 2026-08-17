@@ -1,14 +1,14 @@
 #!/usr/bin/env python3
-"""Map public CSNG qRT-PCR primer pairs to predeclared TPIA2 candidate CDSs.
+"""Map public CSNG qRT-PCR primers to predeclared TPIA2 candidate loci.
 
 Candidate panels are frozen independently of the mapping result. The script
-fetches candidate CDS sequences from the public TPIA2 Batch Retrieve endpoint,
-then scores the published forward primer and reverse-complement of the reverse
-primer against each CDS. Exact paired matches are preferred; if none exist,
-best <=2-mismatch windows are reported with amplicon-length deviation.
+queries CDS, transcript/genomic-transcript and exon exports. Exact or near
+paired amplicon matches are scored on CDS/exon sequence; transcript sequence is
+also searched for individual primer support because introns can inflate the
+apparent genomic product length.
 
-A primer match can crosswalk a de novo transcript to a candidate locus/family;
-it does not prove that all sequence outside the amplicon is identical.
+Primer compatibility can narrow a de novo transcript mapping. It is not
+full-length orthology evidence.
 """
 from __future__ import annotations
 import argparse,csv,hashlib,io,json,re,zipfile
@@ -18,13 +18,11 @@ from urllib.parse import urlencode
 import requests
 
 ENDPOINT='https://tpia.teaplants.cn/getGeneSeqByGeneNames'
+SEQ_PARAMS={'cds':{'cds':1,'trans':0,'exon':0},'transcript':{'cds':0,'trans':1,'exon':0},'exon':{'cds':0,'trans':0,'exon':1}}
 
 def rc(s:str)->str:
-    tab=str.maketrans('ACGTNacgtn','TGCANtgcan')
-    return s.translate(tab)[::-1]
-
+    return s.translate(str.maketrans('ACGTNacgtn','TGCANtgcan'))[::-1]
 def sha256(b:bytes)->str:return hashlib.sha256(b).hexdigest()
-
 def parse_fasta(text:str):
     out={};h=None;seq=[]
     for raw in text.splitlines():
@@ -37,38 +35,39 @@ def parse_fasta(text:str):
     if h is not None:out[h.split('\t')[0].split()[0]]=''.join(seq).upper()
     return out
 
-def fetch_cds(session,tea_type,ids):
-    params={'geneNames':','.join(ids),'cds':1,'trans':0,'exon':0,'down':0,'up':0,'teaType':tea_type}
+def fetch_sequences(session,tea_type,ids,seq_type):
+    flags=SEQ_PARAMS[seq_type];params={'geneNames':','.join(ids),**flags,'down':0,'up':0,'teaType':tea_type}
     r=session.get(ENDPOINT+'?'+urlencode(params),timeout=120);r.raise_for_status();raw=r.content
-    if not raw.startswith(b'PK\x03\x04'):raise RuntimeError(f'expected TPIA ZIP for {tea_type}, got {r.headers.get("content-type")}')
-    with zipfile.ZipFile(io.BytesIO(raw)) as zf:
-        texts=[]
-        for n in zf.namelist():
-            if n.lower().endswith('.txt'):texts.append(zf.read(n).decode('utf-8',errors='replace'))
+    if not raw.startswith(b'PK\x03\x04'):raise RuntimeError(f'expected TPIA ZIP for {tea_type}/{seq_type}')
     seq={}
-    for t in texts:seq.update(parse_fasta(t))
-    return seq,{'tea_type':tea_type,'requested_ids':ids,'response_bytes':len(raw),'response_sha256':sha256(raw),'n_sequences':len(seq),'content_disposition':r.headers.get('content-disposition','')}
+    with zipfile.ZipFile(io.BytesIO(raw)) as zf:
+        for n in zf.namelist():
+            if n.lower().endswith('.txt'):seq.update(parse_fasta(zf.read(n).decode('utf-8',errors='replace')))
+    return seq,{'tea_type':tea_type,'sequence_type':seq_type,'requested_ids':ids,'response_bytes':len(raw),'response_sha256':sha256(raw),'n_sequences':len(seq)}
 
-def windows(seq,primer,max_mis=2):
-    L=len(primer);hits=[]
-    for i in range(0,len(seq)-L+1):
+def best_window(seq,primer):
+    L=len(primer);best=None
+    for i in range(max(0,len(seq)-L+1)):
         w=seq[i:i+L];m=sum(a!=b for a,b in zip(w,primer))
-        if m<=max_mis:hits.append((m,i,w))
-    return sorted(hits)
+        cand=(m,i,w)
+        if best is None or cand<best:best=cand
+    return best
 
-def best_pair(seq,fwd,rev,expected):
-    revrc=rc(rev)
-    fh=windows(seq,fwd,2);rh=windows(seq,revrc,2);pairs=[]
+def paired(seq,fwd,rev,expected,max_mis=3,max_product=1000):
+    revrc=rc(rev);fh=[];rh=[]
+    for primer,target in [(fwd,fh),(revrc,rh)]:
+        L=len(primer)
+        for i in range(max(0,len(seq)-L+1)):
+            w=seq[i:i+L];m=sum(a!=b for a,b in zip(w,primer))
+            if m<=max_mis:target.append((m,i,w))
+    pairs=[]
     for fm,fp,fw in fh:
         for rm,rp,rw in rh:
-            if rp < fp:continue
-            product=(rp+len(revrc))-fp
-            if product<=0 or product>1000:continue
-            pairs.append((fm+rm,abs(product-expected),fm,rm,fp,rp,product,fw,rw))
-    if not pairs:
-        return {'paired_hit':False,'forward_best_mismatch':fh[0][0] if fh else '', 'reverse_best_mismatch':rh[0][0] if rh else ''}
-    p=min(pairs)
-    return {'paired_hit':True,'total_primer_mismatches':p[0],'product_length_deviation':p[1],'forward_mismatches':p[2],'reverse_mismatches':p[3],'forward_start_0based':p[4],'reverse_rc_start_0based':p[5],'predicted_product_bp':p[6],'forward_matched_window':p[7],'reverse_rc_matched_window':p[8]}
+            if rp<fp:continue
+            prod=rp+len(revrc)-fp
+            if 0<prod<=max_product:pairs.append((fm+rm,abs(prod-expected),fm,rm,fp,rp,prod,fw,rw))
+    if not pairs:return None
+    p=min(pairs);return {'total_mismatches':p[0],'product_deviation':p[1],'forward_mismatches':p[2],'reverse_mismatches':p[3],'forward_start':p[4],'reverse_start':p[5],'product_bp':p[6]}
 
 def main():
     ap=argparse.ArgumentParser();ap.add_argument('--primers',type=Path,required=True);ap.add_argument('--candidates',type=Path,required=True);ap.add_argument('--out-dir',type=Path,required=True);a=ap.parse_args();a.out_dir.mkdir(parents=True,exist_ok=True)
@@ -76,31 +75,48 @@ def main():
     with a.candidates.open(newline='',encoding='utf-8') as f:cands=list(csv.DictReader(f))
     bytype=defaultdict(list)
     for r in cands:bytype[r['tpia_type']].append(r['candidate_id'])
-    s=requests.Session();s.headers['User-Agent']='chun-camellia-orthology/0.1 (public primer-to-TPIA audit)'
+    s=requests.Session();s.headers['User-Agent']='chun-camellia-orthology/0.2 (public primer-to-TPIA audit)'
     seq={};fetch=[]
     for typ,ids in bytype.items():
-        q,meta=fetch_cds(s,typ,ids);fetch.append(meta)
-        for gid,ss in q.items():seq[(typ,gid)]=ss
+        for st in SEQ_PARAMS:
+            q,meta=fetch_sequences(s,typ,ids,st);fetch.append(meta)
+            for gid,ss in q.items():seq[(typ,st,gid)]=ss
     out=[]
     for c in cands:
-        p=prim[c['source_unigene']];gid=c['candidate_id'];ss=seq.get((c['tpia_type'],gid),'')
-        m=best_pair(ss,p['forward_primer'].upper(),p['reverse_primer'].upper(),int(p['reported_product_bp'])) if ss else {'paired_hit':False}
-        row={**c,'candidate_cds_bp':len(ss),'candidate_cds_sha256':sha256(ss.encode()) if ss else '',**m}
-        row['mapping_decision']='exact_or_near_paired_primer_match' if m.get('paired_hit') and m.get('total_primer_mismatches',99)<=2 and m.get('product_length_deviation',999)<=10 else ('paired_candidate_but_not_decisive' if m.get('paired_hit') else 'no_paired_match')
-        row['claim_boundary']='primer mapping identifies an amplicon-compatible candidate locus; full-length de novo transcript identity still requires transcript/assembly sequence'
+        p=prim[c['source_unigene']];gid=c['candidate_id'];fwd=p['forward_primer'].upper();rev=p['reverse_primer'].upper();expected=int(p['reported_product_bp'])
+        row={**c}
+        decisive=[]
+        for st in SEQ_PARAMS:
+            ss=seq.get((c['tpia_type'],st,gid),'');row[f'{st}_bp']=len(ss);row[f'{st}_sha256']=sha256(ss.encode()) if ss else ''
+            if not ss:
+                row[f'{st}_forward_best_mismatch']='';row[f'{st}_reverse_best_mismatch']='';row[f'{st}_paired']='';continue
+            fw=best_window(ss,fwd);rw=best_window(ss,rc(rev));row[f'{st}_forward_best_mismatch']=fw[0] if fw else '';row[f'{st}_reverse_best_mismatch']=rw[0] if rw else ''
+            pr=paired(ss,fwd,rev,expected,max_mis=3,max_product=5000)
+            if pr:
+                row[f'{st}_paired']=json.dumps(pr,sort_keys=True)
+                if pr['total_mismatches']<=2 and ((st in {'cds','exon'} and pr['product_deviation']<=10) or st=='transcript'):decisive.append((st,pr))
+            else:row[f'{st}_paired']=''
+        row['decisive_layers']=';'.join(st for st,_ in decisive)
+        row['mapping_decision']='amplicon_compatible_candidate' if decisive else 'no_decisive_match_across_cds_transcript_exon'
+        row['claim_boundary']='primer compatibility is locus support only; full-length de novo transcript sequence is required for strict ortholog assignment'
         out.append(row)
-    # rank within source unigene, preserving all candidates
+    # Rank by best combined individual-primer mismatch across all layers, then decisive status.
     for u in prim:
         rr=[r for r in out if r['source_unigene']==u]
-        rr.sort(key=lambda r:(0 if r.get('paired_hit') else 1,int(r.get('total_primer_mismatches') or 99),int(r.get('product_length_deviation') or 999),r['candidate_id']))
+        def key(r):
+            vals=[]
+            for st in SEQ_PARAMS:
+                try:vals.append(int(r[f'{st}_forward_best_mismatch'])+int(r[f'{st}_reverse_best_mismatch']))
+                except Exception:pass
+            return (0 if r['mapping_decision']=='amplicon_compatible_candidate' else 1,min(vals) if vals else 999,r['candidate_id'])
+        rr.sort(key=key)
         for rank,r in enumerate(rr,1):r['within_unigene_rank']=rank
     fields=list(out[0].keys())
     with (a.out_dir/'primer_candidate_mapping.csv').open('w',newline='',encoding='utf-8') as f:w=csv.DictWriter(f,fieldnames=fields);w.writeheader();w.writerows(out)
     summary={}
     for u in prim:
-        rr=sorted([r for r in out if r['source_unigene']==u],key=lambda r:r['within_unigene_rank']);best=rr[0]
-        decisive=[r for r in rr if r['mapping_decision']=='exact_or_near_paired_primer_match']
-        summary[u]={'candidate_count':len(rr),'decisive_candidate_count':len(decisive),'best_candidate':best['candidate_id'],'best_class':best['candidate_class'],'best_paired_hit':best.get('paired_hit'), 'best_total_primer_mismatches':best.get('total_primer_mismatches'),'best_predicted_product_bp':best.get('predicted_product_bp'),'reported_product_bp':int(prim[u]['reported_product_bp']),'decision':'unique_decisive_candidate' if len(decisive)==1 else ('multiple_amplicon_compatible_candidates' if len(decisive)>1 else 'no_decisive_candidate')}
-    meta={'endpoint':ENDPOINT,'fetches':fetch,'unigene_results':summary,'claim_ceiling':'qRT-PCR amplicon compatibility can narrow de novo unigene mapping but is not full-length orthology evidence'}
+        rr=sorted([r for r in out if r['source_unigene']==u],key=lambda r:r['within_unigene_rank']);dec=[r for r in rr if r['mapping_decision']=='amplicon_compatible_candidate'];best=rr[0]
+        summary[u]={'candidate_count':len(rr),'amplicon_compatible_candidates':[r['candidate_id'] for r in dec],'best_candidate_by_primer_distance':best['candidate_id'],'best_class':best['candidate_class'],'decision':'unique_amplicon_candidate' if len(dec)==1 else ('multiple_amplicon_candidates' if len(dec)>1 else 'no_decisive_candidate_across_three_sequence_layers')}
+    meta={'endpoint':ENDPOINT,'fetches':fetch,'unigene_results':summary,'claim_ceiling':'absence of primer compatibility across the predeclared CDS/transcript/exon panel rejects only a simple mapping to those candidates; it does not prove the de novo unigene is a novel gene'}
     (a.out_dir/'summary.json').write_text(json.dumps(meta,indent=2)+'\n',encoding='utf-8');print(json.dumps(meta,indent=2))
 if __name__=='__main__':main()
