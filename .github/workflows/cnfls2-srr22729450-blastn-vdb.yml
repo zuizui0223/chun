@@ -1,0 +1,104 @@
+name: CnFLS2 SRR22729450 targeted blastn_vdb
+
+on:
+  pull_request:
+    paths:
+      - 'scripts/build_cnfls2_sra_queries.py'
+      - 'scripts/summarize_cnfls2_blastn_vdb_hits.py'
+      - '.github/workflows/cnfls2-srr22729450-blastn-vdb.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  targeted-search:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install Python dependency
+        run: python -m pip install --disable-pip-version-check requests
+      - name: Install current official BLAST+ binary
+        run: |
+          python - <<'PY'
+          import re
+          from pathlib import Path
+          import requests
+          index = 'https://ftp.ncbi.nlm.nih.gov/blast/executables/blast+/LATEST/'
+          s = requests.Session(); s.headers['User-Agent'] = 'chun-cnfls2-blastn-vdb/0.1'
+          page = s.get(index, timeout=90); page.raise_for_status()
+          names = sorted(set(re.findall(r'href="([^"]*x64-linux\.tar\.gz)"', page.text)))
+          names = [name for name in names if not name.endswith('.md5')]
+          if not names: raise SystemExit('No BLAST+ x64-linux archive in official LATEST directory')
+          name = names[-1]
+          r = s.get(index + name, timeout=(30, 300)); r.raise_for_status()
+          Path('/tmp/ncbi-blast.tar.gz').write_bytes(r.content)
+          Path('/tmp/ncbi-blast-archive-name.txt').write_text(name + '\n')
+          print(name, len(r.content))
+          PY
+          tar -xzf /tmp/ncbi-blast.tar.gz -C /tmp
+          BLASTN_VDB=$(find /tmp -path '*/bin/blastn_vdb' -type f -print -quit)
+          test -n "$BLASTN_VDB"
+          echo "$(dirname "$BLASTN_VDB")" >> "$GITHUB_PATH"
+      - name: Verify blastn_vdb installation
+        run: |
+          blastn_vdb -version
+          cat /tmp/ncbi-blast-archive-name.txt
+      - name: Build provenance-frozen FLS queries
+        run: python scripts/build_cnfls2_sra_queries.py --output-dir build/cnfls2_sra_search/queries
+      - name: Search full FLS transcript references
+        run: |
+          mkdir -p build/cnfls2_sra_search/hits
+          blastn_vdb -db SRR22729450 -query build/cnfls2_sra_search/queries/full_queries.fasta \
+            -task blastn -word_size 11 -dust no -evalue 1e-12 -max_target_seqs 500 \
+            -max_hsps 1 -num_threads 4 \
+            -outfmt '6 qseqid sseqid pident length mismatch gapopen qstart qend sstart send evalue bitscore qlen slen sseq' \
+            -out build/cnfls2_sra_search/hits/full_hits.tsv
+      - name: Search exact 246-bp amplicon
+        run: |
+          blastn_vdb -db SRR22729450 -query build/cnfls2_sra_search/queries/amplicon_query.fasta \
+            -task blastn -word_size 7 -dust no -evalue 1e-5 -max_target_seqs 1000 \
+            -max_hsps 1 -num_threads 4 \
+            -outfmt '6 qseqid sseqid pident length mismatch gapopen qstart qend sstart send evalue bitscore qlen slen sseq' \
+            -out build/cnfls2_sra_search/hits/amplicon_hits.tsv
+      - name: Search source qRT-PCR primers
+        run: |
+          blastn_vdb -db SRR22729450 -query build/cnfls2_sra_search/queries/primer_queries.fasta \
+            -task blastn-short -word_size 7 -dust no -evalue 1000 -max_target_seqs 2000 \
+            -max_hsps 1 -num_threads 4 \
+            -outfmt '6 qseqid sseqid pident length mismatch gapopen qstart qend sstart send evalue bitscore qlen slen sseq' \
+            -out build/cnfls2_sra_search/hits/primer_hits.tsv
+      - name: Rank candidate SRA subjects and spots
+        run: |
+          python scripts/summarize_cnfls2_blastn_vdb_hits.py \
+            --full-hits build/cnfls2_sra_search/hits/full_hits.tsv \
+            --amplicon-hits build/cnfls2_sra_search/hits/amplicon_hits.tsv \
+            --primer-hits build/cnfls2_sra_search/hits/primer_hits.tsv \
+            --output-dir build/cnfls2_sra_search/candidates
+      - name: Report
+        if: always()
+        run: |
+          echo '### CnFLS2 targeted SRR22729450 search' >> "$GITHUB_STEP_SUMMARY"
+          find build/cnfls2_sra_search -maxdepth 2 -type f | sort >> "$GITHUB_STEP_SUMMARY" || true
+          for f in queries/summary.json queries/query_manifest.csv candidates/summary.json candidates/candidate_subjects.csv candidates/candidate_spot_ids.txt; do
+            if [ -f "build/cnfls2_sra_search/$f" ]; then
+              echo "#### $f" >> "$GITHUB_STEP_SUMMARY"; echo '```' >> "$GITHUB_STEP_SUMMARY"
+              head -c 100000 "build/cnfls2_sra_search/$f" >> "$GITHUB_STEP_SUMMARY"; echo >> "$GITHUB_STEP_SUMMARY"; echo '```' >> "$GITHUB_STEP_SUMMARY"
+            fi
+          done
+          for f in full_hits.tsv amplicon_hits.tsv primer_hits.tsv; do
+            if [ -f "build/cnfls2_sra_search/hits/$f" ]; then
+              echo "#### hits/$f" >> "$GITHUB_STEP_SUMMARY"; echo '```' >> "$GITHUB_STEP_SUMMARY"
+              head -n 30 "build/cnfls2_sra_search/hits/$f" >> "$GITHUB_STEP_SUMMARY"; echo '```' >> "$GITHUB_STEP_SUMMARY"
+            fi
+          done
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: cnfls2-srr22729450-targeted-search
+          path: build/cnfls2_sra_search
+          if-no-files-found: error
