@@ -7,6 +7,7 @@ on:
       - 'data/creticulata_reported_effect_summary_v0_1.json'
       - 'data/cjaponica_reported_effect_summary_v0_1.json'
       - 'data/oil_camellia_reported_effect_summary_v0_1.json'
+      - 'data/chuana_carotenoid_state_vector_v0_1.json'
       - 'data/quantitative_pigment_state_vector_systems_v0_1.csv'
       - 'data/quantitative_pigment_state_vector_summary_v0_1.csv'
       - 'scripts/summarize_quantitative_pigment_state_vector.py'
@@ -33,6 +34,7 @@ jobs:
             --cret data/creticulata_reported_effect_summary_v0_1.json \
             --cjap data/cjaponica_reported_effect_summary_v0_1.json \
             --oil data/oil_camellia_reported_effect_summary_v0_1.json \
+            --huana data/chuana_carotenoid_state_vector_v0_1.json \
             --systems-output /tmp/quant_systems.csv \
             --summary-output /tmp/quant_summary.csv
       - name: Verify frozen results
