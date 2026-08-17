@@ -1,0 +1,146 @@
+name: CnFLS2 exact-crosswalk synteny and gene tree
+
+on:
+  pull_request:
+    paths:
+      - 'data/cnfls2_gwh_candidate_GWHTFILD005297_1.fasta'
+      - 'data/cnfls2_synteny_sources_v0_1.csv'
+      - 'scripts/download_cnfls2_synteny_sources.py'
+      - 'scripts/build_cnfls2_protein_query.py'
+      - 'scripts/prepare_cnfls2_synteny_gene_tree.py'
+      - 'scripts/summarize_cnfls2_synteny_gene_tree.py'
+      - '.github/workflows/cnfls2-synteny-gene-tree.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  analyze:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install analysis dependencies
+        run: |
+          python -m pip install --disable-pip-version-check requests biopython
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq ncbi-blast+ mafft fasttree
+
+      - name: Download frozen GWH annotations
+        run: |
+          python scripts/download_cnfls2_synteny_sources.py \
+            --sources data/cnfls2_synteny_sources_v0_1.csv \
+            --out-dir build/cnfls2_synteny_tree/sources
+          gzip -dc build/cnfls2_synteny_tree/sources/cnitidissima_candidate.gff.gz \
+            > build/cnfls2_synteny_tree/sources/cnitidissima_candidate.gff
+          gzip -dc build/cnfls2_synteny_tree/sources/cnitidissima_candidate.protein.faa.gz \
+            > build/cnfls2_synteny_tree/sources/cnitidissima_candidate.protein.faa
+          gzip -dc build/cnfls2_synteny_tree/sources/tea_longjing43_crosswalk.gff.gz \
+            > build/cnfls2_synteny_tree/sources/tea_longjing43_crosswalk.gff
+          gzip -dc build/cnfls2_synteny_tree/sources/tea_longjing43_crosswalk.protein.faa.gz \
+            > build/cnfls2_synteny_tree/sources/tea_longjing43_crosswalk.protein.faa
+
+      - name: Translate admitted CnFLS2-like CDS
+        run: |
+          python scripts/build_cnfls2_protein_query.py \
+            --cds data/cnfls2_gwh_candidate_GWHTFILD005297_1.fasta \
+            --protein build/cnfls2_synteny_tree/candidate_protein.faa \
+            --summary build/cnfls2_synteny_tree/candidate_protein_summary.json
+
+      - name: Screen both proteomes for the FLS family
+        run: |
+          blastp \
+            -query build/cnfls2_synteny_tree/candidate_protein.faa \
+            -subject build/cnfls2_synteny_tree/sources/cnitidissima_candidate.protein.faa \
+            -evalue 1e-10 -max_target_seqs 200 -seg no \
+            -outfmt '6 qseqid sseqid pident length qlen slen qcovs evalue bitscore' \
+            -out build/cnfls2_synteny_tree/cn_family_hits.tsv
+          blastp \
+            -query build/cnfls2_synteny_tree/candidate_protein.faa \
+            -subject build/cnfls2_synteny_tree/sources/tea_longjing43_crosswalk.protein.faa \
+            -evalue 1e-10 -max_target_seqs 200 -seg no \
+            -outfmt '6 qseqid sseqid pident length qlen slen qcovs evalue bitscore' \
+            -out build/cnfls2_synteny_tree/tea_family_hits.tsv
+
+      - name: Resolve exact target genes and prepare neighborhoods
+        run: |
+          python scripts/prepare_cnfls2_synteny_gene_tree.py \
+            --cn-gff build/cnfls2_synteny_tree/sources/cnitidissima_candidate.gff \
+            --cn-proteins build/cnfls2_synteny_tree/sources/cnitidissima_candidate.protein.faa \
+            --tea-gff build/cnfls2_synteny_tree/sources/tea_longjing43_crosswalk.gff \
+            --tea-proteins build/cnfls2_synteny_tree/sources/tea_longjing43_crosswalk.protein.faa \
+            --cn-family-hits build/cnfls2_synteny_tree/cn_family_hits.tsv \
+            --tea-family-hits build/cnfls2_synteny_tree/tea_family_hits.tsv \
+            --out-dir build/cnfls2_synteny_tree/prepared \
+            --radius 10 \
+            --family-max-per-species 20
+
+      - name: Compute reciprocal local protein anchors
+        run: |
+          blastp \
+            -query build/cnfls2_synteny_tree/prepared/cn_neighborhood.faa \
+            -subject build/cnfls2_synteny_tree/prepared/tea_neighborhood.faa \
+            -evalue 1e-5 -max_target_seqs 50 -seg no \
+            -outfmt '6 qseqid sseqid pident length qlen slen qcovs evalue bitscore' \
+            -out build/cnfls2_synteny_tree/cn_to_tea.tsv
+          blastp \
+            -query build/cnfls2_synteny_tree/prepared/tea_neighborhood.faa \
+            -subject build/cnfls2_synteny_tree/prepared/cn_neighborhood.faa \
+            -evalue 1e-5 -max_target_seqs 50 -seg no \
+            -outfmt '6 qseqid sseqid pident length qlen slen qcovs evalue bitscore' \
+            -out build/cnfls2_synteny_tree/tea_to_cn.tsv
+
+      - name: Build exploratory FLS-family protein tree
+        run: |
+          mafft --auto --quiet \
+            build/cnfls2_synteny_tree/prepared/fls_family_candidates.faa \
+            > build/cnfls2_synteny_tree/fls_family_aligned.faa
+          FastTree -wag \
+            build/cnfls2_synteny_tree/fls_family_aligned.faa \
+            > build/cnfls2_synteny_tree/fls_family_tree.nwk
+
+      - name: Summarize sequence, tree and local-synteny evidence
+        run: |
+          python scripts/summarize_cnfls2_synteny_gene_tree.py \
+            --preparation-summary build/cnfls2_synteny_tree/prepared/preparation_summary.json \
+            --neighborhood-metadata build/cnfls2_synteny_tree/prepared/neighborhood_metadata.csv \
+            --family-metadata build/cnfls2_synteny_tree/prepared/family_candidate_metadata.csv \
+            --cn-to-tea build/cnfls2_synteny_tree/cn_to_tea.tsv \
+            --tea-to-cn build/cnfls2_synteny_tree/tea_to_cn.tsv \
+            --tree build/cnfls2_synteny_tree/fls_family_tree.nwk \
+            --out-dir build/cnfls2_synteny_tree/result
+
+      - name: Report
+        if: always()
+        run: |
+          echo '### CnFLS2 exact-crosswalk synteny and FLS-family tree' >> "$GITHUB_STEP_SUMMARY"
+          for f in \
+            sources/download_summary.json \
+            sources/download_manifest.csv \
+            candidate_protein_summary.json \
+            prepared/preparation_summary.json \
+            prepared/neighborhood_metadata.csv \
+            prepared/family_candidate_metadata.csv \
+            result/summary.json \
+            result/reciprocal_best_anchors.csv \
+            fls_family_tree.nwk; do
+            if [ -f "build/cnfls2_synteny_tree/$f" ]; then
+              echo "#### $f" >> "$GITHUB_STEP_SUMMARY"
+              echo '```' >> "$GITHUB_STEP_SUMMARY"
+              head -c 150000 "build/cnfls2_synteny_tree/$f" >> "$GITHUB_STEP_SUMMARY"
+              echo >> "$GITHUB_STEP_SUMMARY"
+              echo '```' >> "$GITHUB_STEP_SUMMARY"
+            fi
+          done
+
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: cnfls2-synteny-gene-tree
+          path: build/cnfls2_synteny_tree
+          if-no-files-found: error
