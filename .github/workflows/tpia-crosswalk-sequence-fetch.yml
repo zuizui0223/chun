@@ -4,7 +4,10 @@ on:
   pull_request:
     paths:
       - 'data/tpia_yunkang10_priority_crosswalk_v0_1.csv'
+      - 'data/tpia_crosswalk_sequence_identity_v0_1.csv'
+      - 'data/tpia_within_family_paralog_identity_v0_1.csv'
       - 'scripts/fetch_tpia_crosswalk_sequences.py'
+      - 'scripts/analyze_tpia_crosswalk_sequence_identity.py'
       - '.github/workflows/tpia-crosswalk-sequence-fetch.yml'
   workflow_dispatch:
 
@@ -20,17 +23,32 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
-      - name: Install requests
-        run: python -m pip install --disable-pip-version-check requests
+      - name: Install dependencies
+        run: python -m pip install --disable-pip-version-check requests biopython
       - name: Fetch YK10/SCZV1/SCZV2 CDS and transcript sequences
         run: |
           python scripts/fetch_tpia_crosswalk_sequences.py \
             --crosswalk data/tpia_yunkang10_priority_crosswalk_v0_1.csv \
             --out-dir build/tpia_crosswalk_sequences
+      - name: Quantify sequence coherence and within-family paralog separation
+        run: |
+          python scripts/analyze_tpia_crosswalk_sequence_identity.py \
+            --crosswalk data/tpia_yunkang10_priority_crosswalk_v0_1.csv \
+            --fasta-records build/tpia_crosswalk_sequences/fasta_records.csv \
+            --row-output build/tpia_crosswalk_sequences/crosswalk_sequence_identity.csv \
+            --paralog-output build/tpia_crosswalk_sequences/within_family_paralog_identity.csv
+      - name: Verify frozen sequence metrics when present
+        run: |
+          if [ -f data/tpia_crosswalk_sequence_identity_v0_1.csv ]; then
+            diff --strip-trailing-cr -u data/tpia_crosswalk_sequence_identity_v0_1.csv build/tpia_crosswalk_sequences/crosswalk_sequence_identity.csv
+          fi
+          if [ -f data/tpia_within_family_paralog_identity_v0_1.csv ]; then
+            diff --strip-trailing-cr -u data/tpia_within_family_paralog_identity_v0_1.csv build/tpia_crosswalk_sequences/within_family_paralog_identity.csv
+          fi
       - name: Report
         if: always()
         run: |
-          for f in summary.json request_audit.csv fasta_records.csv; do
+          for f in summary.json request_audit.csv crosswalk_sequence_identity.csv within_family_paralog_identity.csv fasta_records.csv; do
             if [ -f build/tpia_crosswalk_sequences/$f ]; then
               echo "### $f" >> "$GITHUB_STEP_SUMMARY"
               echo '```' >> "$GITHUB_STEP_SUMMARY"
