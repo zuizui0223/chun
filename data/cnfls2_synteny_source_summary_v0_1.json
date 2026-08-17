@@ -1,0 +1,24 @@
+{
+  "resolved_sources": 2,
+  "expected_sources": 2,
+  "roles": [
+    "cnitidissima_candidate",
+    "tea_longjing43_crosswalk"
+  ],
+  "assemblies": [
+    "GWHFILD00000000.1",
+    "GWHACFB00000000"
+  ],
+  "target_features": [
+    "GWHTFILD005297.1",
+    "GWHTACFB016172"
+  ],
+  "resolution_routes": [
+    "validated_static_GWH_release",
+    "official_GWH_Assembly_API"
+  ],
+  "failed_roles": [],
+  "all_annotation_routes_present": true,
+  "decision": "proceed to exact-crosswalk local neighborhoods and FLS-family gene tree",
+  "claim_ceiling": "source-route and crosswalk gate only; no synteny, orthology or functional equivalence inferred"
+}

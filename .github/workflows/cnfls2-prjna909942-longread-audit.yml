@@ -1,0 +1,43 @@
+name: CnFLS2 PRJNA909942 long-read audit
+
+on:
+  pull_request:
+    paths:
+      - 'scripts/audit_prjna909942_longread_runs.py'
+      - '.github/workflows/cnfls2-prjna909942-longread-audit.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install requests
+        run: python -m pip install --disable-pip-version-check requests
+      - name: Identify PRJNA909942 long-read run
+        run: python scripts/audit_prjna909942_longread_runs.py --out-dir build/cnfls2_longread_audit
+      - name: Report
+        if: always()
+        run: |
+          for f in summary.json longread_runs.csv; do
+            if [ -f build/cnfls2_longread_audit/$f ]; then
+              echo "### $f" >> "$GITHUB_STEP_SUMMARY"
+              echo '```' >> "$GITHUB_STEP_SUMMARY"
+              cat build/cnfls2_longread_audit/$f >> "$GITHUB_STEP_SUMMARY"
+              echo >> "$GITHUB_STEP_SUMMARY"
+              echo '```' >> "$GITHUB_STEP_SUMMARY"
+            fi
+          done
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: cnfls2-prjna909942-longread-audit
+          path: build/cnfls2_longread_audit
+          if-no-files-found: error

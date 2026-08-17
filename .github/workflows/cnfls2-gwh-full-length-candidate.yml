@@ -1,0 +1,150 @@
+name: CnFLS2 GWH full-length candidate
+
+on:
+  pull_request:
+    paths:
+      - 'data/tpia_yunkang10_priority_crosswalk_v0_1.csv'
+      - 'data/cnfls2_gwh_full_length_candidate_v0_1.json'
+      - 'data/cnfls2_gwh_reference_similarity_v0_1.csv'
+      - 'scripts/fetch_tpia_crosswalk_sequences.py'
+      - 'scripts/map_cnfls2_primer_to_gwh_transcripts.py'
+      - 'scripts/build_cnfls2_cds_reference_panel.py'
+      - 'scripts/summarize_cnfls2_gwh_recovery.py'
+      - '.github/workflows/cnfls2-gwh-full-length-candidate.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  recover:
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --disable-pip-version-check requests
+          sudo apt-get update -qq
+          sudo apt-get install -y --no-install-recommends ncbi-blast+ mafft fasttree
+
+      - name: Validate recovery scripts
+        run: |
+          python -m py_compile scripts/map_cnfls2_primer_to_gwh_transcripts.py
+          python -m py_compile scripts/build_cnfls2_cds_reference_panel.py
+          python -m py_compile scripts/summarize_cnfls2_gwh_recovery.py
+
+      - name: Download public C. nitidissima GWH RNA annotation
+        run: |
+          mkdir -p build/cnfls2_gwh
+          curl -L --fail --retry 4 --retry-all-errors \
+            'https://download.cncb.ac.cn/gwh/Plants/Camellia_nitidissima_Camellia_nitidissima_GWHFILD00000000.1/GWHFILD00000000.1.RNA.fasta.gz' \
+            -o build/cnfls2_gwh/GWHFILD00000000.1.RNA.fasta.gz
+          sha256sum build/cnfls2_gwh/GWHFILD00000000.1.RNA.fasta.gz \
+            > build/cnfls2_gwh/gwh_rna.sha256
+
+      - name: Recover tea FLS reference sequences from TPIA2
+        run: |
+          python scripts/fetch_tpia_crosswalk_sequences.py \
+            --crosswalk data/tpia_yunkang10_priority_crosswalk_v0_1.csv \
+            --out-dir build/cnfls2_gwh/tpia_sequences
+
+      - name: Map the source CnFLS2 primer pair to GWH transcripts
+        run: |
+          python scripts/map_cnfls2_primer_to_gwh_transcripts.py \
+            --gwh-rna build/cnfls2_gwh/GWHFILD00000000.1.RNA.fasta.gz \
+            --tpia-records build/cnfls2_gwh/tpia_sequences/fasta_records.csv \
+            --out-dir build/cnfls2_gwh/recovery \
+            --max-primer-mismatches 2 \
+            --max-product 1200
+
+      - name: Replace intron-bearing exports with CDS references
+        run: |
+          python scripts/build_cnfls2_cds_reference_panel.py \
+            --tpia-records build/cnfls2_gwh/tpia_sequences/fasta_records.csv \
+            --candidate-fasta build/cnfls2_gwh/recovery/candidate_sequences.fasta \
+            --out-dir build/cnfls2_gwh/recovery
+
+      - name: Quantify candidate-to-CDS sequence similarity
+        run: |
+          blastn \
+            -task dc-megablast \
+            -query build/cnfls2_gwh/recovery/candidate_sequences.fasta \
+            -subject build/cnfls2_gwh/recovery/reference_sequences.fasta \
+            -strand both \
+            -evalue 1e-20 \
+            -max_target_seqs 50 \
+            -outfmt '6 qseqid sseqid pident length mismatch gapopen qstart qend sstart send evalue bitscore qlen slen qcovs' \
+            -out build/cnfls2_gwh/recovery/candidate_reference_blast.tsv
+          test -s build/cnfls2_gwh/recovery/candidate_reference_blast.tsv
+
+      - name: Build an exploratory FLS coding-sequence tree
+        run: |
+          mafft --auto build/cnfls2_gwh/recovery/reference_and_candidates.fasta \
+            > build/cnfls2_gwh/recovery/reference_and_candidates.aligned.fasta
+          TREE_BIN="$(command -v FastTree || command -v fasttree)"
+          "$TREE_BIN" -nt -gtr \
+            build/cnfls2_gwh/recovery/reference_and_candidates.aligned.fasta \
+            > build/cnfls2_gwh/recovery/reference_and_candidates.fasttree.nwk \
+            2> build/cnfls2_gwh/recovery/fasttree.log
+          test -s build/cnfls2_gwh/recovery/reference_and_candidates.fasttree.nwk
+
+      - name: Freeze and verify the recovery result
+        run: |
+          python scripts/summarize_cnfls2_gwh_recovery.py \
+            --primer-summary build/cnfls2_gwh/recovery/summary.json \
+            --cds-panel-summary build/cnfls2_gwh/recovery/cds_reference_panel_summary.json \
+            --blast build/cnfls2_gwh/recovery/candidate_reference_blast.tsv \
+            --tree build/cnfls2_gwh/recovery/reference_and_candidates.fasttree.nwk \
+            --json-output /tmp/cnfls2_gwh_full_length_candidate.json \
+            --csv-output /tmp/cnfls2_gwh_reference_similarity.csv
+          diff --strip-trailing-cr -u \
+            data/cnfls2_gwh_full_length_candidate_v0_1.json \
+            /tmp/cnfls2_gwh_full_length_candidate.json
+          diff --strip-trailing-cr -u \
+            data/cnfls2_gwh_reference_similarity_v0_1.csv \
+            /tmp/cnfls2_gwh_reference_similarity.csv
+          cp /tmp/cnfls2_gwh_full_length_candidate.json \
+            build/cnfls2_gwh/recovery/frozen_result.json
+          cp /tmp/cnfls2_gwh_reference_similarity.csv \
+            build/cnfls2_gwh/recovery/frozen_reference_similarity.csv
+
+      - name: Report
+        if: always()
+        run: |
+          echo '### CnFLS2 GWH full-length candidate recovery' >> "$GITHUB_STEP_SUMMARY"
+          for f in \
+            gwh_rna.sha256 \
+            tpia_sequences/summary.json \
+            recovery/summary.json \
+            recovery/cds_reference_panel_summary.json \
+            recovery/frozen_result.json \
+            recovery/frozen_reference_similarity.csv \
+            recovery/gwh_primer_candidates.csv \
+            recovery/candidate_reference_blast.tsv \
+            recovery/reference_and_candidates.fasttree.nwk; do
+            if [ -f "build/cnfls2_gwh/$f" ]; then
+              echo "#### $f" >> "$GITHUB_STEP_SUMMARY"
+              echo '```' >> "$GITHUB_STEP_SUMMARY"
+              head -c 120000 "build/cnfls2_gwh/$f" >> "$GITHUB_STEP_SUMMARY"
+              echo >> "$GITHUB_STEP_SUMMARY"
+              echo '```' >> "$GITHUB_STEP_SUMMARY"
+            fi
+          done
+
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: cnfls2-gwh-full-length-candidate
+          path: |
+            build/cnfls2_gwh/gwh_rna.sha256
+            build/cnfls2_gwh/tpia_sequences/summary.json
+            build/cnfls2_gwh/tpia_sequences/request_audit.csv
+            build/cnfls2_gwh/tpia_sequences/fasta_records.csv
+            build/cnfls2_gwh/recovery
+          if-no-files-found: error

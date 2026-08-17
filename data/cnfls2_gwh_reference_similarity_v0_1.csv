@@ -1,0 +1,4 @@
+qseqid,sseqid,pident,length,mismatch,gapopen,qstart,qend,sstart,send,evalue,bitscore,qlen,slen,qcovs,claim_boundary
+GWHTFILD005297.1,tea_CSA008358_CDS,98.824,1020,12,0,1,1020,1,1020,0.0,1786,1020,1020,100,pairwise coding-sequence similarity; not by itself formal orthology
+GWHTFILD005297.1,CnFLS1_JF343560.1,81.631,1018,178,3,1,1018,71,1079,0.0,988,1020,1297,99,pairwise coding-sequence similarity; not by itself formal orthology
+GWHTFILD005297.1,tea_CSA006950_CDS,81.139,1018,183,3,1,1018,1,1009,0.0,966,1020,1011,99,pairwise coding-sequence similarity; not by itself formal orthology
