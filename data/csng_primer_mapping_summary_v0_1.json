@@ -1,0 +1,29 @@
+{
+  "source": "Zhou2019_pink_flower_de_novo_unigenes",
+  "source_doi": "10.3390/molecules24061064",
+  "sequence_layers_tested": ["cds", "transcript", "exon"],
+  "Csng45659": {
+    "reported_feature": "DFR",
+    "candidate_panel_size": 7,
+    "candidate_panel": ["TEA032730", "TEA023829", "TEA024758", "TEA024762", "TEA010588", "TEA022775", "TEA003656"],
+    "amplicon_compatible_candidates": [],
+    "best_candidate_by_primer_distance": "TEA032730",
+    "best_candidate_class": "CsDFRa",
+    "best_transcript_forward_mismatch": 0,
+    "best_transcript_reverse_mismatch": 7,
+    "decision": "no_decisive_candidate_across_cds_transcript_exon"
+  },
+  "Csng5035": {
+    "reported_feature": "LAR-like",
+    "candidate_panel_size": 4,
+    "candidate_panel": ["CSA014151", "CSA014943", "CSA019984", "CSA018523"],
+    "amplicon_compatible_candidates": [],
+    "best_candidate_by_primer_distance": "CSA014943",
+    "best_candidate_class": "LAR_source_candidate",
+    "best_transcript_forward_mismatch": 7,
+    "best_transcript_reverse_mismatch": 8,
+    "decision": "no_decisive_candidate_across_cds_transcript_exon"
+  },
+  "interpretation": "the public qRT-PCR primer pairs do not support a simple mapping of either de novo unigene to the predeclared known genome candidate panel; retain them as de novo family-level transcript evidence",
+  "claim_ceiling": "no-match rejects only the simple predeclared candidate mapping; it does not prove that either CSNG unigene is a novel gene or establish full-length orthology"
+}
