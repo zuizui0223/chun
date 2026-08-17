@@ -4,9 +4,12 @@ on:
   pull_request:
     paths:
       - 'data/tpia_yunkang10_priority_crosswalk_v0_1.csv'
+      - 'data/cnfls2_gwh_full_length_candidate_v0_1.json'
+      - 'data/cnfls2_gwh_reference_similarity_v0_1.csv'
       - 'scripts/fetch_tpia_crosswalk_sequences.py'
       - 'scripts/map_cnfls2_primer_to_gwh_transcripts.py'
       - 'scripts/build_cnfls2_cds_reference_panel.py'
+      - 'scripts/summarize_cnfls2_gwh_recovery.py'
       - '.github/workflows/cnfls2-gwh-full-length-candidate.yml'
   workflow_dispatch:
 
@@ -34,6 +37,7 @@ jobs:
         run: |
           python -m py_compile scripts/map_cnfls2_primer_to_gwh_transcripts.py
           python -m py_compile scripts/build_cnfls2_cds_reference_panel.py
+          python -m py_compile scripts/summarize_cnfls2_gwh_recovery.py
 
       - name: Download public C. nitidissima GWH RNA annotation
         run: |
@@ -90,6 +94,26 @@ jobs:
             2> build/cnfls2_gwh/recovery/fasttree.log
           test -s build/cnfls2_gwh/recovery/reference_and_candidates.fasttree.nwk
 
+      - name: Freeze and verify the recovery result
+        run: |
+          python scripts/summarize_cnfls2_gwh_recovery.py \
+            --primer-summary build/cnfls2_gwh/recovery/summary.json \
+            --cds-panel-summary build/cnfls2_gwh/recovery/cds_reference_panel_summary.json \
+            --blast build/cnfls2_gwh/recovery/candidate_reference_blast.tsv \
+            --tree build/cnfls2_gwh/recovery/reference_and_candidates.fasttree.nwk \
+            --json-output /tmp/cnfls2_gwh_full_length_candidate.json \
+            --csv-output /tmp/cnfls2_gwh_reference_similarity.csv
+          diff --strip-trailing-cr -u \
+            data/cnfls2_gwh_full_length_candidate_v0_1.json \
+            /tmp/cnfls2_gwh_full_length_candidate.json
+          diff --strip-trailing-cr -u \
+            data/cnfls2_gwh_reference_similarity_v0_1.csv \
+            /tmp/cnfls2_gwh_reference_similarity.csv
+          cp /tmp/cnfls2_gwh_full_length_candidate.json \
+            build/cnfls2_gwh/recovery/frozen_result.json
+          cp /tmp/cnfls2_gwh_reference_similarity.csv \
+            build/cnfls2_gwh/recovery/frozen_reference_similarity.csv
+
       - name: Report
         if: always()
         run: |
@@ -99,6 +123,8 @@ jobs:
             tpia_sequences/summary.json \
             recovery/summary.json \
             recovery/cds_reference_panel_summary.json \
+            recovery/frozen_result.json \
+            recovery/frozen_reference_similarity.csv \
             recovery/gwh_primer_candidates.csv \
             recovery/candidate_reference_blast.tsv \
             recovery/reference_and_candidates.fasttree.nwk; do
