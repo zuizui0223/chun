@@ -10,6 +10,10 @@ on:
       - '.github/workflows/cnfls2-pacbio-source-validation.yml'
   workflow_dispatch:
 
+concurrency:
+  group: cnfls2-pacbio-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
 permissions:
   contents: read
 
