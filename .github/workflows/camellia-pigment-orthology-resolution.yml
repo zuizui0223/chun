@@ -1,0 +1,34 @@
+name: Camellia pigment orthology resolution
+
+on:
+  pull_request:
+    paths:
+      - 'data/pigment_node_source_id_crosswalk_v0_1.csv'
+      - 'data/orthology_resolution_by_feature_v0_1.csv'
+      - 'data/micro_accessibility_node_score_harmonized_v0_1.csv'
+      - 'scripts/summarize_pigment_orthology_resolution.py'
+      - 'docs/ORTHOLOGY_RESOLUTION_PRE_MACRO_GATE.md'
+      - '.github/workflows/camellia-pigment-orthology-resolution.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  reproduce:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Recompute family versus strict-node resolution
+        run: |
+          python scripts/summarize_pigment_orthology_resolution.py \
+            data/pigment_node_source_id_crosswalk_v0_1.csv \
+            --resolution-output /tmp/orthology_resolution_by_feature.csv \
+            --score-output /tmp/micro_accessibility_node_score_harmonized.csv
+      - name: Verify frozen results
+        run: |
+          diff --strip-trailing-cr -u data/orthology_resolution_by_feature_v0_1.csv /tmp/orthology_resolution_by_feature.csv
+          diff --strip-trailing-cr -u data/micro_accessibility_node_score_harmonized_v0_1.csv /tmp/micro_accessibility_node_score_harmonized.csv
