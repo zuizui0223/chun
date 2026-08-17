@@ -1,0 +1,41 @@
+{
+  "cn_target_transcript": "GWHTFILD005297.1",
+  "cn_target_gene": "GWHGFILD004416.1",
+  "cn_target_protein": "GWHPFILD005297.1",
+  "tea_target_transcript": "GWHTACFB016172",
+  "tea_target_gene": "GWHGACFB016172",
+  "tea_target_protein": "GWHPACFB016172",
+  "target_pair_pident": 98.23,
+  "target_pair_qcov": 100.0,
+  "target_pair_alignment_aa": 339,
+  "target_pair_is_local_RBH": true,
+  "local_RBH_anchors_total": 9,
+  "local_RBH_anchors_non_target": 8,
+  "local_anchor_spearman_rho": 1.0,
+  "local_anchor_orientation": "same",
+  "local_anchor_LIS_same": 8,
+  "local_anchor_LIS_inverted": 1,
+  "local_anchor_longest_monotonic": 8,
+  "local_synteny_supported_under_declared_gate": true,
+  "family_tree_terminals": 40,
+  "target_pair_exclusive_sister": true,
+  "target_pair_mrca_descendants": [
+    "CN__GWHPFILD005297.1",
+    "TEA__GWHPACFB016172"
+  ],
+  "target_pair_tree_distance": 0.013553722,
+  "target_pair_mrca_support": 0.977,
+  "nearest_other_to_cn": {
+    "label": "CN__GWHPFILD024733.1",
+    "distance": 0.161748705
+  },
+  "nearest_other_to_tea": {
+    "label": "CN__GWHPFILD024733.1",
+    "distance": 0.157751775
+  },
+  "identity_gate_passed": true,
+  "tree_gate_passed": true,
+  "decision": "strong sequence-tree-local-synteny support for the CnFLS2-like same-paralog orthology hypothesis",
+  "new_chun_inference": "developmental FLS sign heterogeneity can reflect lineage-homologous CnFLS2-like versus distinct FLS-paralog deployment rather than reversal of one undifferentiated FLS node",
+  "claim_ceiling": "two-species local synteny plus an exploratory top-homolog protein tree; broader taxon sampling and PacBio source-read validation remain required before literal F01.PB8395 naming or macro strict-node reuse"
+}
