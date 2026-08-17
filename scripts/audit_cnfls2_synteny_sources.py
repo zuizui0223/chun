@@ -5,6 +5,8 @@ The C. nitidissima source uses the validated official static GWH release. The
 tea comparison uses the original Longjing43 assembly that is directly linked by
 TPIA2 to `CSA008358` through transcript `GWHTACFB016172`; this avoids replacing
 an exact crosswalk with a merely sequence-similar locus from another assembly.
+Transient API/download endpoint failures are retried and recorded rather than
+preventing the declared static fallback from being evaluated.
 """
 from __future__ import annotations
 
@@ -12,6 +14,7 @@ import argparse
 import csv
 import hashlib
 import json
+import time
 from pathlib import Path
 from typing import Any
 
@@ -61,27 +64,33 @@ def sha256(data: bytes) -> str:
     return hashlib.sha256(data).hexdigest()
 
 
-def validate_url(session: requests.Session, url: str) -> dict[str, Any]:
-    try:
-        response = session.get(
-            url,
-            headers={"Range": "bytes=0-0"},
-            stream=True,
-            timeout=(20, 90),
-        )
-        status = response.status_code
-        content_range = response.headers.get("Content-Range", "")
-        content_type = response.headers.get("Content-Type", "")
-        response.close()
-        return {
-            "url": url,
-            "status": status,
-            "content_range": content_range,
-            "content_type": content_type,
-            "available": status in {200, 206},
-        }
-    except requests.RequestException as exc:
-        return {"url": url, "available": False, "error": str(exc)}
+def validate_url(session: requests.Session, url: str, retries: int = 3) -> dict[str, Any]:
+    history: list[dict[str, Any]] = []
+    for attempt_no in range(1, retries + 1):
+        try:
+            response = session.get(
+                url,
+                headers={"Range": "bytes=0-0"},
+                stream=True,
+                timeout=(20, 120),
+            )
+            result = {
+                "attempt": attempt_no,
+                "url": url,
+                "status": response.status_code,
+                "content_range": response.headers.get("Content-Range", ""),
+                "content_type": response.headers.get("Content-Type", ""),
+                "available": response.status_code in {200, 206},
+            }
+            response.close()
+            history.append(result)
+            if result["available"]:
+                return {**result, "history": history}
+        except requests.RequestException as exc:
+            history.append({"attempt": attempt_no, "url": url, "available": False, "error": str(exc)})
+        if attempt_no < retries:
+            time.sleep(2 * attempt_no)
+    return {**history[-1], "history": history}
 
 
 def row_from_payload(target: dict[str, Any], accession: str, payload: dict[str, Any], digest: str) -> dict[str, Any] | None:
@@ -120,7 +129,19 @@ def row_from_payload(target: dict[str, Any], accession: str, payload: dict[str, 
 def resolve(session: requests.Session, target: dict[str, Any]) -> tuple[dict[str, Any], list[dict[str, Any]]]:
     attempts: list[dict[str, Any]] = []
     for accession in target["assembly_candidates"]:
-        response = session.get(f"{API}/{accession}", timeout=90)
+        url = f"{API}/{accession}"
+        try:
+            response = session.get(url, timeout=(20, 120))
+        except requests.RequestException as exc:
+            attempts.append(
+                {
+                    "route": "official_GWH_Assembly_API",
+                    "requested_accession": accession,
+                    "url": url,
+                    "transport_error": str(exc),
+                }
+            )
+            continue
         attempt: dict[str, Any] = {
             "route": "official_GWH_Assembly_API",
             "requested_accession": accession,
@@ -155,6 +176,7 @@ def resolve(session: requests.Session, target: dict[str, Any]) -> tuple[dict[str
         ]
         attempts.append({"route": "validated_static_GWH_release", "url_checks": url_checks})
         if all(check.get("available") for check in url_checks):
+            first_digest = next((attempt.get("sha256", "") for attempt in attempts if attempt.get("sha256")), "")
             return {
                 "role": target["role"],
                 "requested_accession": target["assembly_candidates"][0],
@@ -163,7 +185,7 @@ def resolve(session: requests.Session, target: dict[str, Any]) -> tuple[dict[str
                 "target_gene": target["target_gene"],
                 "query_anchor": target["query_anchor"],
                 "resolution_route": "validated_static_GWH_release",
-                "api_response_sha256": attempts[0].get("sha256", ""),
+                "api_response_sha256": first_digest,
                 "source_basis": target["source_basis"],
                 "claim_boundary": "official static release provenance only; local collinearity and gene-tree evidence not yet computed",
             }, attempts
@@ -177,7 +199,7 @@ def main() -> None:
     args.out_dir.mkdir(parents=True, exist_ok=True)
 
     session = requests.Session()
-    session.headers["User-Agent"] = "chun-cnfls2-synteny-source-audit/0.3"
+    session.headers["User-Agent"] = "chun-cnfls2-synteny-source-audit/0.4"
     rows: list[dict[str, Any]] = []
     all_attempts: dict[str, list[dict[str, Any]]] = {}
     failures: list[dict[str, str]] = []
