@@ -5,8 +5,10 @@ on:
     paths:
       - 'data/cnfls2_gwh_candidate_GWHTFILD005297_1.fasta'
       - 'data/cnfls2_pacbio_source_summary_v0_1.json'
+      - 'data/cnfls2_pacbio_source_provenance_v0_1.json'
       - 'data/cnfls2_pacbio_consensus_v0_1.fasta'
       - 'scripts/summarize_cnfls2_pacbio_hits.py'
+      - 'scripts/verify_cnfls2_frozen_source_result.py'
       - '.github/workflows/cnfls2-pacbio-source-validation.yml'
   workflow_dispatch:
 
@@ -18,7 +20,30 @@ permissions:
   contents: read
 
 jobs:
+  verify-frozen:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Verify frozen query, consensus, thresholds and successful-run provenance
+        run: |
+          python scripts/verify_cnfls2_frozen_source_result.py \
+            --query data/cnfls2_gwh_candidate_GWHTFILD005297_1.fasta \
+            --consensus data/cnfls2_pacbio_consensus_v0_1.fasta \
+            --summary data/cnfls2_pacbio_source_summary_v0_1.json \
+            --provenance data/cnfls2_pacbio_source_provenance_v0_1.json \
+            --output build/cnfls2_pacbio_frozen_integrity.json
+      - name: Report
+        run: |
+          echo '### Frozen CnFLS2 PacBio source-result integrity' >> "$GITHUB_STEP_SUMMARY"
+          echo '```' >> "$GITHUB_STEP_SUMMARY"
+          cat build/cnfls2_pacbio_frozen_integrity.json >> "$GITHUB_STEP_SUMMARY"
+          echo '```' >> "$GITHUB_STEP_SUMMARY"
+
   validate-source:
+    if: github.event_name == 'workflow_dispatch'
     runs-on: ubuntu-latest
     timeout-minutes: 60
     steps:
@@ -81,7 +106,7 @@ jobs:
       - name: Report
         if: always()
         run: |
-          echo '### CnFLS2 PacBio source validation' >> "$GITHUB_STEP_SUMMARY"
+          echo '### Full CnFLS2 PacBio source validation' >> "$GITHUB_STEP_SUMMARY"
           for f in ../blast/blastn_vdb.version.txt blastn_vdb.stderr.log summary/summary.json summary/best_read_hits.csv summary/pacbio_consensus.fasta; do
             if [ -f "build/cnfls2_pacbio/$f" ]; then
               echo "#### $f" >> "$GITHUB_STEP_SUMMARY"
