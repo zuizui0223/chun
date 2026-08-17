@@ -1,4 +1,4 @@
-# CnFLS2 full-length recovery result
+# CnFLS2 full-length recovery and same-paralog result
 
 ## Purpose
 
@@ -13,7 +13,7 @@ Feng et al. 2024 classify the PacBio transcript `F01.PB8395` in the `CnFLS2` gro
 - forward: `AGCAATCACCACCGTCAAAGG`;
 - reverse: `CTCTTAGACTCAGCATCCTTAGC`.
 
-The source paper and supplement do not expose the full `F01.PB8395` sequence. Therefore the literature alone does not identify its current genome locus or its strict cross-species ortholog.
+The source paper and supplement do not expose the full `F01.PB8395` sequence. Therefore the literature alone does not identify its current genome locus or strict cross-species counterpart.
 
 NCBI RunInfo independently connects the F01 PacBio transcriptome to the unique long-read run `SRR22729450` in BioProject `PRJNA909942`.
 
@@ -27,6 +27,7 @@ Exactly one transcript passed the declared gate, and it was an exact pair match:
 
 - transcript: `GWHTFILD005297.1`;
 - gene: `GWHGFILD004416.1` / original annotation `Cpet02g11620`;
+- protein: `GWHPFILD005297.1`;
 - coding length: **1,020 bp**;
 - forward-primer mismatches: **0**;
 - reverse-primer mismatches: **0**;
@@ -47,19 +48,60 @@ The candidate was compared against coding-sequence references rather than intron
 
 The identity margin between `CSA008358` and the next closest tested reference is **17.193 percentage points**.
 
-An exploratory coding-sequence tree also pairs `GWHTFILD005297.1` with `CSA008358`, while `CSA006950` groups with the published CnFLS1 reference in the four-sequence panel. This small tree is diagnostic only and is not treated as a formal family-wide gene tree.
+### 2.3 Exact Longjing43 crosswalk
+
+TPIA2 maps the tea source locus through the following exact chain:
+
+`CSA008358 / CSS0045924 -> GWHTACFB016172 -> GWHGACFB016172 / GWHPACFB016172`
+
+in the public Longjing43 assembly `GWHACFB00000000`.
+
+This avoids substituting a merely similar tea locus from a different assembly. The local-context analysis therefore compares the source-linked tea locus directly with `GWHTFILD005297.1`.
+
+### 2.4 Protein-family placement
+
+A 40-terminal exploratory protein tree was built from the top 20 candidate homologs in each of the two public proteomes.
+
+The target pair has:
+
+- protein identity: **98.23%**;
+- query coverage: **100%**;
+- aligned length: **339 aa**;
+- an exclusive sister relationship in the family tree;
+- target-pair MRCA support: **0.977**;
+- target-pair tree distance: **0.013553722**.
+
+The nearest non-target sequence to both targets is the admitted *C. nitidissima* CnFLS1 anchor `GWHPFILD024733.1`, at substantially greater tree distance (`0.16175` from the *C. nitidissima* target and `0.15775` from the tea target).
+
+### 2.5 Local synteny
+
+Stable GWH accessions were normalized before comparing a 21-gene window centred on each target.
+
+Results:
+
+- the target genes are reciprocal best local protein hits;
+- total local reciprocal-best anchors: **9**;
+- non-target anchors: **8**;
+- relative gene-order Spearman rho: **1.0**;
+- orientation: **same**;
+- longest same-orientation monotonic anchor chain: **8**;
+- declared local-synteny gate: **passed**.
+
+The target is therefore supported not only by sequence similarity but also by its position inside a strongly conserved local gene neighbourhood.
 
 ## 3. New chun inference
 
-The combined primer and full-length evidence supports the following inference:
+The combined primer, full-CDS, exact-crosswalk, protein-tree and local-synteny evidence supports:
 
-> The early pink-directed tea locus `CSA008358` and the *C. nitidissima* candidate `GWHTFILD005297.1` are likely counterparts in the CnFLS2-like paralog lineage, whereas the later white-directed tea locus `CSA006950` belongs to a distinct FLS paralog lineage.
+> `GWHTFILD005297.1 / GWHPFILD005297.1` and tea `CSA008358 / GWHPACFB016172` are strong same-paralog orthology counterparts in the CnFLS2-like lineage.
 
-This provides a concrete explanation for the stage-dependent FLS direction in the white/pink *C. sinensis* system:
+The later white-directed tea locus `CSA006950` is a separate FLS paralog.
 
-> part of the apparent FLS sign switch can arise from **paralog substitution through development**, rather than one FLS locus reversing its response.
+This produces a concrete explanation for the stage-dependent FLS direction in the white/pink *C. sinensis* system:
 
-This hypothesis was generated from the chun quantitative meta-analysis plus the public sequence crosswalk. It is not merely a remaining question copied from the source papers.
+> part of the apparent FLS sign switch can arise from **paralog substitution through development**, rather than one undifferentiated FLS locus reversing direction.
+
+This hypothesis was generated from the chun quantitative meta-analysis plus public sequence and genome-context reanalysis. It is not merely a remaining question copied from the source papers.
 
 ## 4. Connection to the existing meta-analysis
 
@@ -67,38 +109,34 @@ The earlier meta-analysis established that the flavonol/FLS module is repeatedly
 
 The present result resolves part of that heterogeneity:
 
-- `CSA008358`: early pink-directed and CnFLS2-like;
+- `CSA008358`: early pink-directed and strongly supported as the CnFLS2-like counterpart;
 - `CSA006950`: later white-directed and sequence-distinct;
-- therefore a symbol-level `FLS up/down` score compresses two different biological nodes.
+- symbol-level `FLS up/down` scores therefore compress different biological nodes.
 
 This strengthens the hierarchical state-vector model:
 
 `paralog identity -> module deployment -> pigment state vector -> visible/sensory phenotype`.
 
-It also refines `H_MICRO_MACRO_REUSE`:
+It also separates two macro hypotheses:
 
-1. module/state-vector reuse remains the valid first macro test;
-2. strict node reuse must be tested inside resolved paralog lineages;
+1. **module/state-vector reuse** remains the valid first held-out macro test;
+2. **strict-node reuse** must be tested within resolved paralog lineages;
 3. macro convergence may use the same module through either the same paralog or different paralogs.
 
-## 5. What is still not identified
+The current result resolves one cross-species same-paralog pair, but it does not yet show that this node was independently reused on multiple macro flower-colour branches.
 
-The current result does **not** yet prove all of the following:
+## 5. Remaining identification gate
 
-- that `GWHTFILD005297.1` is literally the source assembly record `F01.PB8395`;
-- formal CnFLS2–`CSA008358` orthology across a broadly sampled FLS family;
-- conserved synteny between the two loci;
-- repeated strict-node reuse on independent macro flower-colour branches.
+The current result still does not prove that the genome annotation record is literally the source PacBio record:
 
-The remaining public-data gates are:
+`F01.PB8395 = GWHTFILD005297.1`.
 
-1. recover source-read or consensus support from `SRR22729450`;
-2. add broader Camellia FLS-family sequences and infer a proper gene tree;
-3. compare locus neighbourhood/synteny where assemblies permit;
-4. only then use the resolved paralog class in the held-out macro enrichment test.
+A targeted `blastn_vdb` workflow is querying `SRR22729450` directly with the admitted candidate and will recover raw-read/consensus support without converting the full 4.5-GB archive.
+
+Broader taxon sampling can later strengthen the family tree, but the two-species sequence/tree/local-synteny result is already sufficient to replace a gene-symbol-only FLS comparison with a defended same-paralog hypothesis.
 
 ## Claim boundary
 
-**Supported now:** a unique exact GWH primer-compatible candidate and a strong sequence-supported same-paralog/orthology hypothesis linking `GWHTFILD005297.1` to tea `CSA008358`.
+**Supported now:** a unique exact primer-compatible full-length candidate; a source-linked tea crosswalk; and strong sequence, tree and local-synteny support for the `GWHTFILD005297.1 <-> CSA008358` CnFLS2-like same-paralog orthology hypothesis.
 
-**Not supported now:** exact source-transcript naming, formal orthology, macro reuse, or ecological selection pressure.
+**Not supported now:** literal source-record equality with `F01.PB8395`; repeated strict-node reuse on independent macro branches; macro transition counts; or ecological selection pressure.
