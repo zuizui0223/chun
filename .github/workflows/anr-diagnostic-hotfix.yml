@@ -1,0 +1,38 @@
+name: One-shot ANR workflow source-classification hotfix
+
+on:
+  push:
+    branches:
+      - agent/anr-reference-copy-resolution
+    paths:
+      - '.github/workflows/anr-diagnostic-hotfix.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  patch:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Patch URL-specific source classification and remove this one-shot workflow
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          path = Path('.github/workflows/anr-reference-copy-diagnostic.yml')
+          text = path.read_text(encoding='utf-8')
+          old = "context = (key + ' ' + value + ' ' + joined).lower()"
+          new = "context = (key + ' ' + value).lower()"
+          if old not in text:
+              raise SystemExit('expected source-classification line not found')
+          path.write_text(text.replace(old, new), encoding='utf-8')
+          Path('.github/workflows/anr-diagnostic-hotfix.yml').unlink()
+          PY
+          git config user.name github-actions[bot]
+          git config user.email 41898282+github-actions[bot]@users.noreply.github.com
+          git add .github/workflows/anr-reference-copy-diagnostic.yml .github/workflows/anr-diagnostic-hotfix.yml
+          git commit -m 'Fix ANR Longjing43 source classification'
+          git push origin HEAD:${GITHUB_REF_NAME}
