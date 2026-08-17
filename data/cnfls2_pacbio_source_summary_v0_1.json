@@ -35,5 +35,5 @@
   "primer_positions_covered": 43,
   "primer_consensus_mismatches": 0,
   "decision": "public PacBio source-read support recovered for the unique GWH CnFLS2-class candidate",
-  "claim_ceiling": "read-level support for presence of the candidate in the F01 PacBio run; exact F01.PB8395 naming additionally relies on the source primer/transcript-group provenance, and formal cross-species orthology is evaluated separately by the frozen protein-tree and local-synteny gate"
+  "claim_ceiling": "read-level support for presence of the candidate in the F01 PacBio run; exact F01.PB8395 naming additionally relies on the source primer/transcript-group provenance, and formal cross-species orthology still requires a broader gene tree and synteny"
 }
