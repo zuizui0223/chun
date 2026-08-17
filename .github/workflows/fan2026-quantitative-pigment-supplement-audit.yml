@@ -7,6 +7,7 @@ on:
       - 'scripts/fetch_pmc_oa_supplement_manifest.py'
       - 'scripts/inspect_tabular_supplements.py'
       - 'scripts/audit_fan2026_anthocyanin_matrix.py'
+      - 'scripts/export_fan2026_table_s1_colour_registry.py'
       - '.github/workflows/fan2026-quantitative-pigment-supplement-audit.yml'
   workflow_dispatch:
 
@@ -34,6 +35,11 @@ jobs:
           python scripts/inspect_tabular_supplements.py \
             --root build/fan2026_quant_pigment \
             --output build/fan2026_quant_pigment/table_inspection.csv
+      - name: Export same-workbook Table S1 colour registry
+        run: |
+          python scripts/export_fan2026_table_s1_colour_registry.py \
+            --workbook build/fan2026_quant_pigment/package/PMC12946509/PBI-24-1725-s002.xlsx \
+            --output build/fan2026_quant_pigment/anthocyanin_audit/table_s1_colour_registry.csv
       - name: Audit Table S2 matrix and article-to-supplement admission mismatch
         run: |
           python scripts/audit_fan2026_anthocyanin_matrix.py \
@@ -46,7 +52,7 @@ jobs:
         if: always()
         run: |
           echo '### Fan 2026 quantitative pigment supplement audit' >> "$GITHUB_STEP_SUMMARY"
-          for f in summary.json supplement_manifest.csv table_inspection.csv inspection_failures.json anthocyanin_audit/summary.json anthocyanin_audit/species_row_summary.csv; do
+          for f in summary.json supplement_manifest.csv table_inspection.csv inspection_failures.json anthocyanin_audit/summary.json anthocyanin_audit/species_row_summary.csv anthocyanin_audit/table_s1_colour_registry.csv; do
             if [ -f "build/fan2026_quant_pigment/$f" ]; then
               echo "#### $f" >> "$GITHUB_STEP_SUMMARY"
               echo '```' >> "$GITHUB_STEP_SUMMARY"
