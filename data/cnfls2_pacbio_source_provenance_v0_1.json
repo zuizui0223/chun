@@ -1,0 +1,16 @@
+{
+  "workflow_name": "CnFLS2 PacBio source validation",
+  "workflow_run_id": 32050007025,
+  "workflow_run_head_sha": "f49ef7c227d4fa4e26d55f5ae624f7f7e9a97201",
+  "workflow_conclusion": "success",
+  "artifact_id": 9294590784,
+  "artifact_name": "cnfls2-pacbio-source-validation",
+  "artifact_digest": "sha256:03a6770a2caae34a48fb0f8c26e0a06da793af9ee95021d55707f19f1de8b230",
+  "artifact_size_bytes": 362583,
+  "artifact_created_at": "2026-08-17T17:32:12Z",
+  "artifact_expires_at": "2026-11-15T17:22:08Z",
+  "source_run": "SRR22729450",
+  "query": "GWHTFILD005297.1",
+  "decision": "full remote blastn_vdb source validation completed successfully and its compact result files are frozen in the repository",
+  "claim_boundary": "provenance of the completed public-data computation; biological interpretation remains bounded by the frozen summary and consensus"
+}
