@@ -1,0 +1,5 @@
+# Source-model spellings reported across Fan 2023 and oil-Camellia studies
+Cao1_scaffold_14-gene-740.10
+maker-HiC_scaffold_14-snap-740.10
+HiC_scaffold_14-snap-740.10
+scaffold_14-snap-740.10
