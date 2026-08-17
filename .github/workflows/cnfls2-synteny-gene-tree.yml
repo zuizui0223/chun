@@ -6,6 +6,7 @@ on:
       - 'data/cnfls2_gwh_candidate_GWHTFILD005297_1.fasta'
       - 'data/cnfls2_synteny_sources_v0_1.csv'
       - 'scripts/download_cnfls2_synteny_sources.py'
+      - 'scripts/normalize_gwh_gff_accessions.py'
       - 'scripts/build_cnfls2_protein_query.py'
       - 'scripts/prepare_cnfls2_synteny_gene_tree.py'
       - 'scripts/summarize_cnfls2_synteny_gene_tree.py'
@@ -37,13 +38,22 @@ jobs:
             --sources data/cnfls2_synteny_sources_v0_1.csv \
             --out-dir build/cnfls2_synteny_tree/sources
           gzip -dc build/cnfls2_synteny_tree/sources/cnitidissima_candidate.gff.gz \
-            > build/cnfls2_synteny_tree/sources/cnitidissima_candidate.gff
+            > build/cnfls2_synteny_tree/sources/cnitidissima_candidate.gff.raw
           gzip -dc build/cnfls2_synteny_tree/sources/cnitidissima_candidate.protein.faa.gz \
             > build/cnfls2_synteny_tree/sources/cnitidissima_candidate.protein.faa
           gzip -dc build/cnfls2_synteny_tree/sources/tea_longjing43_crosswalk.gff.gz \
-            > build/cnfls2_synteny_tree/sources/tea_longjing43_crosswalk.gff
+            > build/cnfls2_synteny_tree/sources/tea_longjing43_crosswalk.gff.raw
           gzip -dc build/cnfls2_synteny_tree/sources/tea_longjing43_crosswalk.protein.faa.gz \
             > build/cnfls2_synteny_tree/sources/tea_longjing43_crosswalk.protein.faa
+
+      - name: Normalize GWH local IDs to stable accessions
+        run: |
+          python scripts/normalize_gwh_gff_accessions.py \
+            --input build/cnfls2_synteny_tree/sources/cnitidissima_candidate.gff.raw \
+            --output build/cnfls2_synteny_tree/sources/cnitidissima_candidate.gff
+          python scripts/normalize_gwh_gff_accessions.py \
+            --input build/cnfls2_synteny_tree/sources/tea_longjing43_crosswalk.gff.raw \
+            --output build/cnfls2_synteny_tree/sources/tea_longjing43_crosswalk.gff
 
       - name: Translate admitted CnFLS2-like CDS
         run: |
