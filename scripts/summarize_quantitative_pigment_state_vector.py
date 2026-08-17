@@ -3,9 +3,9 @@
 
 Expression and metabolite effect magnitudes are not pooled as commensurate.
 The comparable unit is the biological independence cluster and the direction of
-a pre-defined relative allocation contrast. Developmentally mixed systems are
-kept as `mixed`, not forced into a binary vote. OIL_CAMELLIA_MULTI contributes
-only author-defined colour-material contrast because source taxon names conflict.
+a pre-defined within-system allocation contrast. Developmentally mixed systems
+remain `mixed`. C. huana contributes an orthogonal carotenoid colour axis rather
+than being forced into an anthocyanin contrast.
 """
 from __future__ import annotations
 import argparse,csv,json,math
@@ -19,8 +19,8 @@ def exact_sign_p(y,n):
 def sign(x):return 'positive' if float(x)>0 else ('negative' if float(x)<0 else 'zero')
 
 def main():
-    p=argparse.ArgumentParser();p.add_argument('--csin',type=Path,required=True);p.add_argument('--cret',type=Path,required=True);p.add_argument('--cjap',type=Path,required=True);p.add_argument('--oil',type=Path,required=True);p.add_argument('--systems-output',type=Path,required=True);p.add_argument('--summary-output',type=Path,required=True);a=p.parse_args()
-    cs=json.loads(a.csin.read_text());cr=json.loads(a.cret.read_text());cj=json.loads(a.cjap.read_text());oil=json.loads(a.oil.read_text())
+    p=argparse.ArgumentParser();p.add_argument('--csin',type=Path,required=True);p.add_argument('--cret',type=Path,required=True);p.add_argument('--cjap',type=Path,required=True);p.add_argument('--oil',type=Path,required=True);p.add_argument('--huana',type=Path,required=True);p.add_argument('--systems-output',type=Path,required=True);p.add_argument('--summary-output',type=Path,required=True);a=p.parse_args()
+    cs=json.loads(a.csin.read_text());cr=json.loads(a.cret.read_text());cj=json.loads(a.cjap.read_text());oil=json.loads(a.oil.read_text());hu=json.loads(a.huana.read_text())
     systems=[
       {'independence_cluster':'CSIN_WHITE_PINK','quantitative_layer':'reported_expression','contrast':'anthocyanin_minus_flavonol','direction':'positive' if cs['S6_anthocyanin_minus_flavonol_positive_stages']=='5/5' else 'mixed','within_system_evidence':cs['S6_anthocyanin_minus_flavonol_positive_stages'],'effect_value':'','effect_unit':'stage-direction consistency','heterogeneity_note':'FLS changes sign through development while DFR remains pink-directed'},
       {'independence_cluster':'CRETICULATA','quantitative_layer':'reported_metabolites','contrast':'anthocyanin_minus_flavonol','direction':sign(cr['anthocyanin_minus_flavonol_red_white']),'within_system_evidence':'red vs white','effect_value':cr['anthocyanin_minus_flavonol_red_white'],'effect_unit':'difference of class log2 fold changes','heterogeneity_note':'broad enzyme homolog families have mixed paralog directions; highlighted UFGT set is cleaner'},
@@ -30,18 +30,22 @@ def main():
       {'independence_cluster':'CRETICULATA','quantitative_layer':'reported_metabolites','contrast':'anthocyanin_minus_proanthocyanidin','direction':sign(cr['anthocyanin_minus_PA_red_white']),'within_system_evidence':'red vs white','effect_value':cr['anthocyanin_minus_PA_red_white'],'effect_unit':'difference of class log2 fold changes','heterogeneity_note':'PA total slightly white-enriched while anthocyanin is strongly red-enriched'},
       {'independence_cluster':'CJAPONICA','quantitative_layer':'reported_metabolites','contrast':'anthocyanin_minus_proanthocyanidin','direction':sign(cj['anthocyanin_minus_PA_T4_CK']),'within_system_evidence':'crimson T4 vs white CK','effect_value':cj['anthocyanin_minus_PA_T4_CK'],'effect_unit':'difference of class log2 fold changes','heterogeneity_note':'PA total declines moderately across colour intensity while anthocyanin rises'},
       {'independence_cluster':'OIL_CAMELLIA_MULTI','quantitative_layer':'reported_metabolites_colour_material','contrast':'anthocyanin_minus_proanthocyanidin','direction':sign(oil['anthocyanin_minus_PA_R_W']),'within_system_evidence':'red material R vs white material W','effect_value':oil['anthocyanin_minus_PA_R_W'],'effect_unit':'difference of class log2 fold changes','heterogeneity_note':'PA itself rises from W to R; relative anthocyanin rise is larger; source taxon names not admitted'},
+      {'independence_cluster':'CHUANA','quantitative_layer':'reported_carotenoid_metabolites_colour_variant','contrast':'carotenoid_red_vs_golden_same_stage','direction':'positive' if hu['bud_red_higher']>hu['bud_red_lower'] and hu['full_bloom_red_higher']>hu['full_bloom_red_lower'] else 'mixed','within_system_evidence':f"bud {hu['bud_red_higher']}/{hu['bud_differential_carotenoids']} red-higher; full bloom {hu['full_bloom_red_higher']}/{hu['full_bloom_differential_carotenoids']} red-higher",'effect_value':'','effect_unit':'differential-metabolite direction consistency','heterogeneity_note':'developmental decline is strong in both phenotypes; matched-stage red outer-petal material is carotenoid-enriched, so visible red is not an anthocyanin-only state'},
     ]
-    for r in systems:r['claim_ceiling']='independence-cluster concordance only; expression and metabolite effect magnitudes are not pooled across assays'
+    for r in systems:r['claim_ceiling']='independence-cluster directional synthesis only; assay-specific effect magnitudes are not pooled across biochemical axes'
+    interpretations={
+      'anthocyanin_minus_flavonol':'four independent quantitative systems concordantly separate anthocyanin from flavonol, strengthening a multidimensional allocation model while remaining underpowered for a universal frequency claim',
+      'anthocyanin_minus_proanthocyanidin':'three interpretable systems are positive while C. sinensis is developmentally mixed; PA is a distinct dimension and can rise with anthocyanin rather than acting as a universal opposite branch',
+      'carotenoid_red_vs_golden_same_stage':'C. huana supplies an independent carotenoid colour axis: matched-stage red outer-petal material is carotenoid-enriched relative to golden material; one system establishes dimensional possibility, not recurrence frequency'
+    }
     summaries=[]
-    for contrast in ['anthocyanin_minus_flavonol','anthocyanin_minus_proanthocyanidin']:
-        rs=[r for r in systems if r['contrast']==contrast];interp=[r for r in rs if r['direction'] in {'positive','negative'}]
-        y=sum(r['direction']=='positive' for r in interp);n=sum(r['direction']=='negative' for r in interp);mixed=len(rs)-len(interp)
+    for contrast in ['anthocyanin_minus_flavonol','anthocyanin_minus_proanthocyanidin','carotenoid_red_vs_golden_same_stage']:
+        rs=[r for r in systems if r['contrast']==contrast];interp=[r for r in rs if r['direction'] in {'positive','negative'}];y=sum(r['direction']=='positive' for r in interp);n=sum(r['direction']=='negative' for r in interp);mixed=len(rs)-len(interp)
         lo,hi=beta.ppf([.025,.975],1+y,1+n) if interp else (float('nan'),float('nan'))
-        summaries.append({'contrast':contrast,'n_independence_clusters':len(rs),'n_interpretable_systems':len(interp),'n_positive_systems':y,'n_negative_systems':n,'n_mixed_systems':mixed,'exact_two_sided_sign_p':exact_sign_p(y,n),'beta11_posterior_mean_directional_concordance':(1+y)/(2+len(interp)) if interp else '', 'beta11_ci025':lo,'beta11_ci975':hi,'posterior_p_direction_gt_half':1-beta.cdf(.5,1+y,1+n) if interp else '','posterior_p_direction_gt_0_75':1-beta.cdf(.75,1+y,1+n) if interp else '','interpretation':('four independent quantitative systems concordantly separate anthocyanin from flavonol, strengthening the multidimensional state-vector model while remaining underpowered for a universal frequency claim' if contrast=='anthocyanin_minus_flavonol' else 'three interpretable systems are positive while C. sinensis is developmentally mixed; PA is a distinct dimension and can rise with anthocyanin rather than acting as a universal opposite branch'),'claim_ceiling':'selected quantitative systems; not a natural frequency estimate and not a pooled common effect size'})
+        summaries.append({'contrast':contrast,'n_independence_clusters':len(rs),'n_interpretable_systems':len(interp),'n_positive_systems':y,'n_negative_systems':n,'n_mixed_systems':mixed,'exact_two_sided_sign_p':exact_sign_p(y,n),'beta11_posterior_mean_directional_concordance':(1+y)/(2+len(interp)) if interp else '', 'beta11_ci025':lo,'beta11_ci975':hi,'posterior_p_direction_gt_half':1-beta.cdf(.5,1+y,1+n) if interp else '','posterior_p_direction_gt_0_75':1-beta.cdf(.75,1+y,1+n) if interp else '','interpretation':interpretations[contrast],'claim_ceiling':'selected quantitative systems; not a natural frequency estimate and not a pooled common effect size'})
     a.systems_output.parent.mkdir(parents=True,exist_ok=True)
     for path,data in [(a.systems_output,systems),(a.summary_output,summaries)]:
         with path.open('w',newline='',encoding='utf-8') as f:
             w=csv.DictWriter(f,fieldnames=list(data[0]));w.writeheader()
-            for r in data:
-                q={k:(f'{v:.8f}' if isinstance(v,float) and math.isfinite(v) else v) for k,v in r.items()};w.writerow(q)
+            for r in data:w.writerow({k:(f'{v:.8f}' if isinstance(v,float) and math.isfinite(v) else v) for k,v in r.items()})
 if __name__=='__main__':main()
