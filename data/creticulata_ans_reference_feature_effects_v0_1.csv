@@ -1,0 +1,5 @@
+gene_id,kegg_code,functional_class,red_minus_white_log2fpkm,red_gt_white,red_gt_pink_gt_white,source_dataset,evidence_scope,claim_boundary
+gene-LOC114274940,K05277,ANS_like,0.857081635638854,yes,yes,Ma2022 reported supplement reanalysis,tea-reference-mapped C. reticulata expression contrast,direction applies to the mapped tea reference feature and is not a recovered C. reticulata native-gene effect
+gene-LOC114288034,K05277,ANS_like,-3.1094019227191785,no,no,Ma2022 reported supplement reanalysis,tea-reference-mapped C. reticulata expression contrast,direction applies to the mapped tea reference feature and is not a recovered C. reticulata native-gene effect
+gene-LOC114295638,K05277,ANS_like,-1.1740092242895037,no,no,Ma2022 reported supplement reanalysis,tea-reference-mapped C. reticulata expression contrast,direction applies to the mapped tea reference feature and is not a recovered C. reticulata native-gene effect
+novel.12638,K05277,ANS_like,-2.703078828232295,no,no,Ma2022 reported supplement reanalysis,de novo transcript family annotation,direction is usable at ANS-family level only until the source transcript sequence is recovered
