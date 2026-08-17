@@ -1,12 +1,10 @@
 #!/usr/bin/env python3
 """Resolve public annotation routes for the CnFLS2 gene-tree/synteny test.
 
-TPIA crosswalk identifiers that look like GWH feature IDs are not assumed to
-encode a downloadable assembly. The C. nitidissima source uses the already
-validated official static GWH release route; the tea comparison uses an
-independently public Longjing43 GWH assembly resolved through the official
-Assembly API. The later analysis will locate the CSA008358-like locus by
-sequence rather than by an unverified cross-database feature-name inference.
+The C. nitidissima source uses the validated official static GWH release. The
+tea comparison uses the original Longjing43 assembly that is directly linked by
+TPIA2 to `CSA008358` through transcript `GWHTACFB016172`; this avoids replacing
+an exact crosswalk with a merely sequence-similar locus from another assembly.
 """
 from __future__ import annotations
 
@@ -49,12 +47,12 @@ TARGETS: list[dict[str, Any]] = [
         },
     },
     {
-        "role": "tea_longjing43_public",
-        "assembly_candidates": ["GWHBQCR00000000", "GWHBQCR00000000.1"],
-        "target_feature": "sequence_search_required",
+        "role": "tea_longjing43_crosswalk",
+        "assembly_candidates": ["GWHACFB00000000", "GWHACFB00000000.1"],
+        "target_feature": "GWHTACFB016172",
         "target_gene": "",
-        "query_anchor": "CSA008358/CSS0045924 full CDS/protein",
-        "source_basis": "official public Longjing43 GWH assembly; homologous locus will be found by sequence",
+        "query_anchor": "CSA008358/CSS0045924 -> GWHTACFB016172 TPIA2 exact crosswalk",
+        "source_basis": "TPIA2 exact CSA008358 Longjing43 crosswalk plus official GWHACFB assembly metadata",
     },
 ]
 
@@ -101,18 +99,18 @@ def row_from_payload(target: dict[str, Any], accession: str, payload: dict[str, 
         "bioproject": payload.get("bioprojectAccession", ""),
         "biosample": payload.get("biosampleAccession", ""),
         "assembly_level": payload.get("assemblyLevel", ""),
-        "target_feature": target["target_feature"],
-        "target_gene": target["target_gene"],
-        "query_anchor": target["query_anchor"],
         "ftp_gff": payload.get("ftpPathGff", ""),
         "ftp_rna": payload.get("ftpPathRna", ""),
         "ftp_cds": payload.get("ftpPathCds", ""),
         "ftp_protein": payload.get("ftpPathProtein", ""),
         "ftp_feature": payload.get("ftpPathFeature", ""),
+        "target_feature": target["target_feature"],
+        "target_gene": target["target_gene"],
+        "query_anchor": target["query_anchor"],
         "resolution_route": "official_GWH_Assembly_API",
         "api_response_sha256": digest,
         "source_basis": target["source_basis"],
-        "claim_boundary": "official assembly/download provenance only; local collinearity and gene-tree evidence not yet computed",
+        "claim_boundary": "official assembly/download and crosswalk provenance only; local collinearity and gene-tree evidence not yet computed",
     }
     if not row["ftp_gff"] or not row["ftp_protein"]:
         return None
@@ -179,7 +177,7 @@ def main() -> None:
     args.out_dir.mkdir(parents=True, exist_ok=True)
 
     session = requests.Session()
-    session.headers["User-Agent"] = "chun-cnfls2-synteny-source-audit/0.2"
+    session.headers["User-Agent"] = "chun-cnfls2-synteny-source-audit/0.3"
     rows: list[dict[str, Any]] = []
     all_attempts: dict[str, list[dict[str, Any]]] = {}
     failures: list[dict[str, str]] = []
@@ -211,11 +209,12 @@ def main() -> None:
         "expected_sources": len(TARGETS),
         "roles": [row["role"] for row in rows],
         "assemblies": [row["assembly_accession"] for row in rows],
+        "target_features": [row["target_feature"] for row in rows],
         "resolution_routes": [row["resolution_route"] for row in rows],
         "failed_roles": [failure["role"] for failure in failures],
         "all_annotation_routes_present": bool(rows) and all(row["ftp_gff"] and row["ftp_protein"] for row in rows),
-        "decision": "proceed to sequence-located neighborhoods and FLS-family gene tree" if len(rows) == len(TARGETS) else "source gate incomplete; do not start synteny analysis",
-        "claim_ceiling": "source-route gate only; no synteny, orthology or functional equivalence inferred",
+        "decision": "proceed to exact-crosswalk local neighborhoods and FLS-family gene tree" if len(rows) == len(TARGETS) else "source gate incomplete; do not start synteny analysis",
+        "claim_ceiling": "source-route and crosswalk gate only; no synteny, orthology or functional equivalence inferred",
     }
     (args.out_dir / "summary.json").write_text(json.dumps(summary, indent=2) + "\n", encoding="utf-8")
     print(json.dumps(summary, indent=2))
