@@ -1,0 +1,7 @@
+role,target_id,aliases,source_cluster,functional_class,source_direction,claim_boundary
+anchor,CSA011986,CSA011986.1;TEA022960.1;CSS0005927.1;GWHTACFB022597;GWHGACFB022597;GWHPACFB022597,CSIN_WHITE_PINK,ANR,pink_directed_stage2,exact TPIA2 crosswalk anchors the tea source locus; functional equivalence to every K08695 copy is not assumed
+reference_copy,gene-LOC114258680,LOC114258680,CRETICULATA,ANR,derive_from_frozen_reported_effect,tea-reference feature used by the C. reticulata mapping analysis; not a recovered species-native C. reticulata locus
+reference_copy,gene-LOC114259095,LOC114259095,CRETICULATA,ANR,derive_from_frozen_reported_effect,tea-reference feature used by the C. reticulata mapping analysis; not a recovered species-native C. reticulata locus
+reference_copy,gene-LOC114276938,LOC114276938,CRETICULATA,ANR,derive_from_frozen_reported_effect,tea-reference feature used by the C. reticulata mapping analysis; not a recovered species-native C. reticulata locus
+reference_copy,gene-LOC114287753,LOC114287753,CRETICULATA,ANR,derive_from_frozen_reported_effect,tea-reference feature used by the C. reticulata mapping analysis; not a recovered species-native C. reticulata locus
+reference_copy,gene-LOC114297899,LOC114297899,CRETICULATA,ANR,derive_from_frozen_reported_effect,tea-reference feature used by the C. reticulata mapping analysis; not a recovered species-native C. reticulata locus
