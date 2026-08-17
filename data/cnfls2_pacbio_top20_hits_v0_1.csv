@@ -1,0 +1,20 @@
+qseqid,sseqid,pident,length,mismatch,gapopen,qstart,qend,sstart,send,evalue,bitscore,qlen,slen,qcovs,admission_status,claim_boundary
+GWHTFILD005297.1,gnl|SRA|SRR22729450.1253473.1,92.493,1039,33,39,1,1020,1281,269,0.0,1388,1020,1386,100,admitted,raw-read alignment support; source transcript naming requires combined provenance
+GWHTFILD005297.1,gnl|SRA|SRR22729450.1253479.1,91.957,1032,36,42,1,1020,1269,273,0.0,1341,1020,1375,100,admitted,raw-read alignment support; source transcript naming requires combined provenance
+GWHTFILD005297.1,gnl|SRA|SRR22729450.9546655.1,91.876,1034,37,42,1,1020,1355,355,0.0,1340,1020,1458,100,admitted,raw-read alignment support; source transcript naming requires combined provenance
+GWHTFILD005297.1,gnl|SRA|SRR22729450.1253467.1,92.093,1037,29,47,1,1020,1263,263,0.0,1337,1020,1367,100,admitted,raw-read alignment support; source transcript naming requires combined provenance
+GWHTFILD005297.1,gnl|SRA|SRR22729450.8199609.1,91.739,1041,29,47,1,1020,1247,243,0.0,1330,1020,1334,100,admitted,raw-read alignment support; source transcript naming requires combined provenance
+GWHTFILD005297.1,gnl|SRA|SRR22729450.1253471.1,91.939,1042,24,51,1,1020,1273,270,0.0,1325,1020,1379,100,admitted,raw-read alignment support; source transcript naming requires combined provenance
+GWHTFILD005297.1,gnl|SRA|SRR22729450.1625106.1,91.321,1037,36,42,1,1020,1229,230,0.0,1324,1020,1343,100,admitted,raw-read alignment support; source transcript naming requires combined provenance
+GWHTFILD005297.1,gnl|SRA|SRR22729450.8131667.1,91.555,1042,27,48,1,1020,101,1103,0.0,1322,1020,1465,100,admitted,raw-read alignment support; source transcript naming requires combined provenance
+GWHTFILD005297.1,gnl|SRA|SRR22729450.4419873.1,91.498,1035,34,44,1,1020,1338,343,0.0,1321,1020,1444,100,admitted,raw-read alignment support; source transcript naming requires combined provenance
+GWHTFILD005297.1,gnl|SRA|SRR22729450.8131659.1,91.85,1043,29,52,1,1020,1348,339,0.0,1315,1020,1449,100,admitted,raw-read alignment support; source transcript naming requires combined provenance
+GWHTFILD005297.1,gnl|SRA|SRR22729450.9546663.1,91.506,1036,33,46,1,1020,1346,350,0.0,1315,1020,2008,100,admitted,raw-read alignment support; source transcript naming requires combined provenance
+GWHTFILD005297.1,gnl|SRA|SRR22729450.1253454.1,90.935,1048,40,44,1,1020,104,1124,0.0,1314,1020,1394,100,admitted,raw-read alignment support; source transcript naming requires combined provenance
+GWHTFILD005297.1,gnl|SRA|SRR22729450.8131655.1,91.205,1046,25,49,1,1020,1340,336,0.0,1312,1020,1444,100,admitted,raw-read alignment support; source transcript naming requires combined provenance
+GWHTFILD005297.1,gnl|SRA|SRR22729450.1028113.1,91.258,1041,36,47,1,1020,1245,239,0.0,1306,1020,1357,100,admitted,raw-read alignment support; source transcript naming requires combined provenance
+GWHTFILD005297.1,gnl|SRA|SRR22729450.10967077.1,90.267,1048,46,39,1,1020,1254,235,0.0,1306,1020,1363,100,admitted,raw-read alignment support; source transcript naming requires combined provenance
+GWHTFILD005297.1,gnl|SRA|SRR22729450.2267431.1,90.341,1056,44,43,1,1020,1261,228,0.0,1304,1020,1361,100,admitted,raw-read alignment support; source transcript naming requires combined provenance
+GWHTFILD005297.1,gnl|SRA|SRR22729450.10879885.1,91.16,1052,28,52,1,1020,1348,330,0.0,1303,1020,1460,100,admitted,raw-read alignment support; source transcript naming requires combined provenance
+GWHTFILD005297.1,gnl|SRA|SRR22729450.8199611.1,90.363,1048,43,41,1,1020,1257,240,0.0,1303,1020,1346,100,admitted,raw-read alignment support; source transcript naming requires combined provenance
+GWHTFILD005297.1,gnl|SRA|SRR22729450.8131661.1,89.823,1071,37,46,1,1020,1385,336,0.0,1298,1020,1498,100,admitted,raw-read alignment support; source transcript naming requires combined provenance
