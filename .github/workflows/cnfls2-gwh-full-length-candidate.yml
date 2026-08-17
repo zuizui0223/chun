@@ -6,6 +6,7 @@ on:
       - 'data/tpia_yunkang10_priority_crosswalk_v0_1.csv'
       - 'scripts/fetch_tpia_crosswalk_sequences.py'
       - 'scripts/map_cnfls2_primer_to_gwh_transcripts.py'
+      - 'scripts/build_cnfls2_cds_reference_panel.py'
       - '.github/workflows/cnfls2-gwh-full-length-candidate.yml'
   workflow_dispatch:
 
@@ -29,8 +30,10 @@ jobs:
           sudo apt-get update -qq
           sudo apt-get install -y --no-install-recommends ncbi-blast+ mafft fasttree
 
-      - name: Validate recovery script
-        run: python -m py_compile scripts/map_cnfls2_primer_to_gwh_transcripts.py
+      - name: Validate recovery scripts
+        run: |
+          python -m py_compile scripts/map_cnfls2_primer_to_gwh_transcripts.py
+          python -m py_compile scripts/build_cnfls2_cds_reference_panel.py
 
       - name: Download public C. nitidissima GWH RNA annotation
         run: |
@@ -41,7 +44,7 @@ jobs:
           sha256sum build/cnfls2_gwh/GWHFILD00000000.1.RNA.fasta.gz \
             > build/cnfls2_gwh/gwh_rna.sha256
 
-      - name: Recover tea FLS reference transcripts from TPIA2
+      - name: Recover tea FLS reference sequences from TPIA2
         run: |
           python scripts/fetch_tpia_crosswalk_sequences.py \
             --crosswalk data/tpia_yunkang10_priority_crosswalk_v0_1.csv \
@@ -56,7 +59,14 @@ jobs:
             --max-primer-mismatches 2 \
             --max-product 1200
 
-      - name: Quantify candidate-to-reference sequence similarity
+      - name: Replace intron-bearing exports with CDS references
+        run: |
+          python scripts/build_cnfls2_cds_reference_panel.py \
+            --tpia-records build/cnfls2_gwh/tpia_sequences/fasta_records.csv \
+            --candidate-fasta build/cnfls2_gwh/recovery/candidate_sequences.fasta \
+            --out-dir build/cnfls2_gwh/recovery
+
+      - name: Quantify candidate-to-CDS sequence similarity
         run: |
           blastn \
             -task dc-megablast \
@@ -69,7 +79,7 @@ jobs:
             -out build/cnfls2_gwh/recovery/candidate_reference_blast.tsv
           test -s build/cnfls2_gwh/recovery/candidate_reference_blast.tsv
 
-      - name: Build an exploratory FLS transcript tree
+      - name: Build an exploratory FLS coding-sequence tree
         run: |
           mafft --auto build/cnfls2_gwh/recovery/reference_and_candidates.fasta \
             > build/cnfls2_gwh/recovery/reference_and_candidates.aligned.fasta
@@ -88,6 +98,7 @@ jobs:
             gwh_rna.sha256 \
             tpia_sequences/summary.json \
             recovery/summary.json \
+            recovery/cds_reference_panel_summary.json \
             recovery/gwh_primer_candidates.csv \
             recovery/candidate_reference_blast.tsv \
             recovery/reference_and_candidates.fasttree.nwk; do
