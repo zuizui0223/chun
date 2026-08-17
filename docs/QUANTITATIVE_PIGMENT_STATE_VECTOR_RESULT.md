@@ -36,9 +36,17 @@ Importantly, the oil-Camellia colour-material system has both anthocyanin and PA
 - bud, `RS1 vs GS1`: 22 differential carotenoid metabolites, 21 higher and 1 lower in the red material;
 - full bloom, `RS2 vs GS2`: 18 differential carotenoid metabolites, all 18 higher in the red material.
 
-This system is kept separate from the anthocyanin contrasts. It demonstrates that a human-visible red phenotype can be produced within a carotenoid-dominated biochemical system and is therefore not synonymous with an anthocyanin-rich state.
+This system is kept separate from the anthocyanin contrasts. It demonstrates that a human-visible red phenotype can occur within a carotenoid-dominated biochemical system and is therefore not synonymous with an anthocyanin-rich state.
 
-### 2.4 C. sinensis shows why stage and paralog identity matter
+### 2.4 Visible A contains large anthocyanin heterogeneity under a strict source crosswalk
+
+Fan2026 Table S2 contains 33 quantitative anthocyanin rows whereas the article describes a 29-species red-like panel. The same-workbook Table S1-to-S2 gate currently admits 21 rows as visible A, one as W and leaves 11 unresolved. Fuzzy name matches are audit hints only and are not admitted as biological identities.
+
+Within the 21 source-safe A rows alone, total reported anthocyanin spans `24.1` to `596.17`, a **24.74-fold range**; the median is `222.27`. Therefore even the same coarse visible A category does not correspond to one anthocyanin-intensity state.
+
+Across all 33 S2 rows, normalized anthocyanin-composition Bray distance has median `0.748`, but the full 33-row set is not treated as the article's 29 red-like macro sample until row provenance is resolved.
+
+### 2.5 C. sinensis shows why stage and paralog identity matter
 
 Cross-table provenance checks on Zhou et al. reveal that Supplementary Table S6 systematically reverses BTP/ZJW labels relative to the mutually consistent S8/S9 tables. The S6 printed headers are therefore not admitted naively for genotype-effect estimation.
 
@@ -62,14 +70,14 @@ The first four dimensions are biochemical; UV/spectral and reward/phenology are 
 
 ### H_ACC — refined, not replaced
 
-`H_ACC` should now mean accessibility of **module-state changes**, not accessibility of one red/white switch. Regulatory/flux recurrence remains the strongest mechanism-meta result, while the quantitative studies show that the accessible directions are multidimensional and can be stage/paralog dependent.
+`H_ACC` should now mean accessibility of **node/paralog and module-state changes**, not accessibility of one red/white switch. Regulatory/flux recurrence remains the strongest mechanism-meta result, while the quantitative studies show that the accessible directions are multidimensional and can be stage/paralog dependent.
 
 ### H_STATE_ALIASING — strengthened
 
 Human-visible W/A/Y coding demonstrably compresses distinct biochemical states. Evidence now includes:
 
+- a 24.74-fold anthocyanin range within 21 source-safe visible-A Fan rows;
 - same visible red with different pollination/spectral function (`C. japonica` versus `C. rusticana`);
-- large quantitative differences among red-like anthocyanin systems in Fan et al. Table S2;
 - a red `C. huana` variant whose matched-stage carotenoid signal exceeds the golden phenotype;
 - PA and flavonol not behaving as one interchangeable `non-anthocyanin` axis.
 
@@ -102,6 +110,7 @@ Supported now:
 - quantitative concordance of anthocyanin relative to flavonol in four current independent systems;
 - PA as a separable dimension rather than a universal inverse of anthocyanin;
 - carotenoid as an independent visible-colour axis in `C. huana`;
+- substantial anthocyanin heterogeneity within source-safe visible A;
 - visible colour as a lossy compression of biochemical state.
 
 Not yet supported:
