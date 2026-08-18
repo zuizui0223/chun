@@ -1,3 +1,4 @@
+# Held-out macro entrypoint: resolve the public Wu 2022 nuclear-backbone assets before any colour-transition test.
 name: Wu 2022 TPIA backbone assets
 
 on:
@@ -54,22 +55,13 @@ jobs:
                   errors.append((u,r.status_code,r.headers.get('content-type'),len(r.content)))
               except Exception as e: errors.append((u,type(e).__name__,str(e)))
           else:
-              Path('build/wu2022_tpia/supplement_fetch_status.json').write_text(json.dumps({
-                  'status':'publisher_blocked_or_unavailable',
-                  'errors':errors,
-                  'decision':'continue with reproducible PRJNA665925 RunInfo species set; do not infer missing cultivated-tea duplicate tips'
-              },indent=2)+'\n')
+              Path('build/wu2022_tpia/supplement_fetch_status.json').write_text(json.dumps({'status':'publisher_blocked_or_unavailable','errors':errors,'decision':'continue with reproducible PRJNA665925 RunInfo species set; do not infer missing cultivated-tea duplicate tips'},indent=2)+'\n')
               print('publisher workbook unavailable; continuing with SRA taxon evidence')
           PY
       - name: Crosswalk public Wu taxa to TPIA catalogs
         run: |
-          args=(
-            --sra-runinfo build/wu2022_tpia/sra/CPHY001_PRJNA665925_runinfo.csv
-            --out-dir build/wu2022_tpia/audit
-          )
-          if [ -f build/wu2022_tpia/TableS1-S18.xlsx ]; then
-            args+=(--supp-xlsx build/wu2022_tpia/TableS1-S18.xlsx)
-          fi
+          args=(--sra-runinfo build/wu2022_tpia/sra/CPHY001_PRJNA665925_runinfo.csv --out-dir build/wu2022_tpia/audit)
+          if [ -f build/wu2022_tpia/TableS1-S18.xlsx ]; then args+=(--supp-xlsx build/wu2022_tpia/TableS1-S18.xlsx); fi
           python scripts/audit_wu2022_tpia_backbone_assets.py "${args[@]}"
       - name: Build provenance-safe preferred assembly manifest
         run: |
@@ -84,13 +76,7 @@ jobs:
         if: always()
         run: |
           echo '### Wu 2022 TPIA backbone asset gate' >> "$GITHUB_STEP_SUMMARY"
-          for f in \
-            build/wu2022_tpia/supplement_fetch_status.json \
-            build/wu2022_tpia/supplement_url.txt \
-            build/wu2022_tpia/sra/manifest_fetch_summary.csv \
-            build/wu2022_tpia/audit/summary.json \
-            build/wu2022_tpia/audit/preferred_manifest_v2_summary.json \
-            build/wu2022_tpia/audit/wu2022_preferred_assembly_manifest_v2.csv; do
+          for f in build/wu2022_tpia/supplement_fetch_status.json build/wu2022_tpia/supplement_url.txt build/wu2022_tpia/sra/manifest_fetch_summary.csv build/wu2022_tpia/audit/summary.json build/wu2022_tpia/audit/preferred_manifest_v2_summary.json build/wu2022_tpia/audit/wu2022_preferred_assembly_manifest_v2.csv; do
             if [ -f "$f" ]; then
               echo "#### $f" >> "$GITHUB_STEP_SUMMARY"
               echo '```' >> "$GITHUB_STEP_SUMMARY"
