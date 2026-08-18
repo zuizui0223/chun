@@ -40,108 +40,70 @@ jobs:
           python - <<'PY'
           import csv
           import re
-
           targets = list(csv.DictReader(open('data/anr_reference_copy_targets_v0_1.csv', encoding='utf-8-sig')))
           cross = list(csv.DictReader(open('data/tpia_yunkang10_priority_crosswalk_v0_1.csv', encoding='utf-8-sig')))
           matched = []
           for row in cross:
               values = [str(v or '').strip() for v in row.values()]
-              if any(v == 'CSA011986' or v == 'CSA011986.1' or 'CSA011986' in v for v in values):
-                  matched.append(row)
-          if len(matched) != 1:
-              raise RuntimeError(f'expected one CSA011986 crosswalk row, found {len(matched)}')
-          ids = []
+              if any(v == 'CSA011986' or v == 'CSA011986.1' or 'CSA011986' in v for v in values): matched.append(row)
+          if len(matched) != 1: raise RuntimeError(f'expected one CSA011986 crosswalk row, found {len(matched)}')
+          ids=[]
           for value in matched[0].values():
-              value = str(value or '').strip()
+              value=str(value or '').strip()
               for token in re.split(r'[;,|\s]+', value):
-                  token = token.strip()
-                  if not token or token.startswith(('http://', 'https://')):
-                      continue
-                  if len(token) <= 100 and re.fullmatch(r'[A-Za-z0-9_.:-]+', token):
-                      ids.append(token)
-          anchor = next(r for r in targets if r['role'] == 'anchor')
-          current = [x for x in anchor.get('aliases', '').split(';') if x]
-          anchor['aliases'] = ';'.join(dict.fromkeys(current + ids))
-          with open('build/anr/targets_resolved.csv', 'w', newline='', encoding='utf-8') as handle:
-              writer = csv.DictWriter(handle, fieldnames=list(targets[0]))
-              writer.writeheader()
-              writer.writerows(targets)
-          print('Resolved anchor aliases:', anchor['aliases'])
+                  token=token.strip()
+                  if token and not token.startswith(('http://','https://')) and len(token)<=100 and re.fullmatch(r'[A-Za-z0-9_.:-]+',token): ids.append(token)
+          anchor=next(r for r in targets if r['role']=='anchor')
+          current=[x for x in anchor.get('aliases','').split(';') if x]
+          anchor['aliases']=';'.join(dict.fromkeys(current+ids))
+          with open('build/anr/targets_resolved.csv','w',newline='',encoding='utf-8') as handle:
+              writer=csv.DictWriter(handle,fieldnames=list(targets[0])); writer.writeheader(); writer.writerows(targets)
+          print('Resolved anchor aliases:',anchor['aliases'])
           PY
 
       - name: Recover Longjing43 GFF and protein sources from the frozen registry
         run: |
           mkdir -p build/anr/sources/longjing43
           python - <<'PY'
-          import csv
-          import pathlib
-          import re
-          import time
-          import urllib.request
-
-          registry = pathlib.Path('data/cnfls2_synteny_sources_v0_1.csv')
-          rows = list(csv.DictReader(registry.open(encoding='utf-8-sig')))
-          selected = []
+          import csv,pathlib,re,time,urllib.request
+          registry=pathlib.Path('data/cnfls2_synteny_sources_v0_1.csv')
+          rows=list(csv.DictReader(registry.open(encoding='utf-8-sig'))); selected=[]
           for row in rows:
-              metadata = ' '.join(
-                  f'{key} {value}' for key, value in row.items()
-                  if value and not re.match(r'^https?://', str(value).strip())
-              ).lower()
-              if not any(x in metadata for x in ('longjing43', 'longjing 43', 'camellia sinensis', 'tea crosswalk', 'tea_longjing43')):
-                  continue
-              for key, value in row.items():
-                  value = str(value or '').strip()
-                  if not re.match(r'^https?://', value):
-                      continue
-                  context = f'{key} {value} {metadata}'.lower()
-                  if any(x in context for x in ('protein', 'proteome', '.faa', 'pep')):
-                      selected.append(('protein', value))
-                  elif any(x in context for x in ('gff', 'annotation')):
-                      selected.append(('gff', value))
-          selected = list(dict.fromkeys(selected))
-          print('Selected source URLs:', selected)
-          for kind in ('gff', 'protein'):
-              options = [url for k, url in selected if k == kind]
-              if not options:
-                  raise RuntimeError(f'no Longjing43 {kind} URL found in {registry}')
-              error = None
+              metadata=' '.join(f'{key} {value}' for key,value in row.items() if value and not re.match(r'^https?://',str(value).strip())).lower()
+              if not any(x in metadata for x in ('longjing43','longjing 43','camellia sinensis','tea crosswalk','tea_longjing43')): continue
+              for key,value in row.items():
+                  value=str(value or '').strip()
+                  if not re.match(r'^https?://',value): continue
+                  context=f'{key} {value}'.lower()
+                  if any(x in context for x in ('protein','proteome','.faa','pep')): selected.append(('protein',value))
+                  elif any(x in context for x in ('gff','annotation')): selected.append(('gff',value))
+          selected=list(dict.fromkeys(selected)); print('Selected source URLs:',selected)
+          for kind in ('gff','protein'):
+              options=[url for k,url in selected if k==kind]
+              if not options: raise RuntimeError(f'no Longjing43 {kind} URL found in {registry}')
+              error=None
               for url in options:
-                  target = pathlib.Path(
-                      f'build/anr/sources/longjing43/longjing43.{"gff" if kind == "gff" else "protein.faa"}'
-                      + ('.gz' if url.endswith('.gz') else '')
-                  )
+                  target=pathlib.Path(f'build/anr/sources/longjing43/longjing43.{"gff" if kind=="gff" else "protein.faa"}'+('.gz' if url.endswith('.gz') else ''))
                   for attempt in range(5):
                       try:
-                          req = urllib.request.Request(url, headers={'User-Agent': 'chun-anr-resolution/0.2'})
-                          with urllib.request.urlopen(req, timeout=180) as response:
-                              body = response.read()
-                          if len(body) < 1000:
-                              raise RuntimeError(f'source too small: {len(body)} bytes')
-                          target.write_bytes(body)
-                          print(kind, url, target, len(body))
-                          break
+                          req=urllib.request.Request(url,headers={'User-Agent':'chun-anr-resolution/0.2'})
+                          with urllib.request.urlopen(req,timeout=180) as response: body=response.read()
+                          if len(body)<1000: raise RuntimeError(f'source too small: {len(body)} bytes')
+                          target.write_bytes(body); print(kind,url,target,len(body)); break
                       except Exception as exc:
-                          error = exc
-                          time.sleep(2 ** attempt)
-                  if target.exists() and target.stat().st_size > 1000:
-                      break
-              else:
-                  raise RuntimeError(f'failed to download Longjing43 {kind}: {error}')
+                          error=exc; time.sleep(2**attempt)
+                  if target.exists() and target.stat().st_size>1000: break
+              else: raise RuntimeError(f'failed to download Longjing43 {kind}: {error}')
           PY
 
       - name: Download NCBI tea reference annotation
         run: |
           mkdir -p build/anr/sources/refseq
           base=https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/004/153/795/GCF_004153795.1_AHAU_CSS_1
-          curl --fail --location --retry 5 --retry-delay 3 \
-            "$base/GCF_004153795.1_AHAU_CSS_1_genomic.gff.gz" \
-            -o build/anr/sources/refseq/tea_refseq.gff.gz
-          curl --fail --location --retry 5 --retry-delay 3 \
-            "$base/GCF_004153795.1_AHAU_CSS_1_protein.faa.gz" \
-            -o build/anr/sources/refseq/tea_refseq.protein.faa.gz
+          curl --fail --location --retry 5 --retry-delay 3 "$base/GCF_004153795.1_AHAU_CSS_1_genomic.gff.gz" -o build/anr/sources/refseq/tea_refseq.gff.gz
+          curl --fail --location --retry 5 --retry-delay 3 "$base/GCF_004153795.1_AHAU_CSS_1_protein.faa.gz" -o build/anr/sources/refseq/tea_refseq.protein.faa.gz
 
       - name: Recover frozen C. reticulata effect artifact
-        id: effects
         continue-on-error: true
         env:
           GH_TOKEN: ${{ github.token }}
@@ -156,17 +118,8 @@ jobs:
           long_gff=$(find build/anr/sources/longjing43 -type f -name '*.gff*' | head -n 1)
           long_prot=$(find build/anr/sources/longjing43 -type f -name '*.faa*' | head -n 1)
           effect_arg=()
-          if [ -f build/anr/effect_artifact/effects/broad_homolog_audit.csv ]; then
-            effect_arg=(--effects build/anr/effect_artifact/effects/broad_homolog_audit.csv)
-          fi
-          python scripts/diagnose_anr_reference_copy_resolution.py \
-            --targets build/anr/targets_resolved.csv \
-            --longjing43-gff "$long_gff" \
-            --longjing43-proteins "$long_prot" \
-            --refseq-gff build/anr/sources/refseq/tea_refseq.gff.gz \
-            --refseq-proteins build/anr/sources/refseq/tea_refseq.protein.faa.gz \
-            "${effect_arg[@]}" \
-            --out-dir build/anr/result
+          if [ -f build/anr/effect_artifact/effects/broad_homolog_audit.csv ]; then effect_arg=(--effects build/anr/effect_artifact/effects/broad_homolog_audit.csv); fi
+          python scripts/diagnose_anr_reference_copy_resolution.py --targets build/anr/targets_resolved.csv --longjing43-gff "$long_gff" --longjing43-proteins "$long_prot" --refseq-gff build/anr/sources/refseq/tea_refseq.gff.gz --refseq-proteins build/anr/sources/refseq/tea_refseq.protein.faa.gz "${effect_arg[@]}" --out-dir build/anr/result
 
       - name: Build alignment and tree
         run: |
@@ -185,25 +138,7 @@ jobs:
           git config user.name github-actions[bot]
           git config user.email 41898282+github-actions[bot]@users.noreply.github.com
           git add data/anr_reference_copy_diagnostic_v0_1 docs/ANR_REFERENCE_COPY_DIAGNOSTIC.md
-          if git diff --cached --quiet; then
-            echo 'No generated diagnostic change.'
-          else
-            git commit -m 'Freeze ANR reference-copy diagnostic result'
-            git push origin HEAD:${GITHUB_REF_NAME}
-          fi
-
-      - name: Report
-        if: always()
-        run: |
-          echo '### ANR reference-copy diagnostic v2' >> "$GITHUB_STEP_SUMMARY"
-          for f in build/anr/targets_resolved.csv build/anr/result/summary.json build/anr/result/source_protein_mapping.csv build/anr/result/anchor_to_reference_identity.csv build/anr/result/reference_copy_effects.csv build/anr/result/anr_candidates.fasttree.nwk; do
-            if [ -f "$f" ]; then
-              echo "#### $f" >> "$GITHUB_STEP_SUMMARY"
-              echo '```' >> "$GITHUB_STEP_SUMMARY"
-              cat "$f" >> "$GITHUB_STEP_SUMMARY"
-              echo '```' >> "$GITHUB_STEP_SUMMARY"
-            fi
-          done
+          if git diff --cached --quiet; then echo 'No generated diagnostic change.'; else git commit -m 'Freeze ANR reference-copy diagnostic result'; git push origin HEAD:${GITHUB_REF_NAME}; fi
 
       - uses: actions/upload-artifact@v4
         if: always()
