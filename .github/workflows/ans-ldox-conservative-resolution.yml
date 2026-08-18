@@ -29,68 +29,51 @@ jobs:
       - name: Compile conservative summarizer
         run: python -m py_compile scripts/summarize_ans_ldox_conservative.py
 
-      - name: Verify conservative evidence contract
+      - name: Verify conservative biological result
         run: |
           python - <<'PY'
-          import csv
-          import json
-
-          decisions = {r['feature']: r for r in csv.DictReader(open('data/ans_ldox_source_feature_decisions_v0_1.csv'))}
-          effects = {r['gene_id']: r for r in csv.DictReader(open('data/creticulata_ans_reference_feature_effects_v0_1.csv'))}
-          summary = json.load(open('data/ans_ldox_conservative_summary_v0_1.json'))
-
-          canonical = decisions['gene-LOC114274940']
-          divergent = decisions['gene-LOC114288034']
-          weak = decisions['gene-LOC114295638']
-          novel = decisions['novel.12638']
-          crans = decisions['CrANS']
-
-          assert canonical['sequence_gate'] == 'canonical_ANS_LDOX_like'
-          assert float(canonical['protein_identity']) >= 0.95
-          assert float(canonical['protein_query_coverage']) >= 0.95
-          assert canonical['direction_red_minus_white'] == 'red_directed'
-          assert float(effects['gene-LOC114274940']['red_minus_white_log2fpkm']) > 0
-
-          assert divergent['sequence_gate'] == 'divergent_ANS_family_candidate'
-          assert float(divergent['protein_identity']) >= 0.70
-          assert float(divergent['protein_identity']) < 0.95
-          assert divergent['direction_red_minus_white'] == 'white_directed'
-          assert float(effects['gene-LOC114288034']['red_minus_white_log2fpkm']) < 0
-
-          assert weak['sequence_gate'] == 'fails_strict_ANS_sequence_gate'
-          assert weak['reference_lineage_anchor'] == 'no'
-          assert novel['sequence_gate'] == 'de_novo_ANS_annotation_sequence_unresolved'
-          assert crans['assay_link_status'] == 'one_unique_exact_reference_model_link'
-          assert crans['species_native_sequence_recovered'] == 'no'
-
-          counts = summary['evidence_counts']
-          assert counts['ANS_family_recurrence_clusters'] == 3
-          assert counts['reference_lineage_anchored_clusters'] == 2
-          assert counts['species_native_strict_node_clusters'] == 0
-          assert counts['strict_crossspecies_exact_recurrence_clusters'] == 0
-          assert summary['within_reticulata_reference_mapped_contrast']['copy_or_paralog_direction_heterogeneity_supported'] is True
+          import csv, json
+          effects={r['gene_id']:r for r in csv.DictReader(open('data/creticulata_ans_reference_feature_effects_v0_1.csv'))}
+          s=json.load(open('data/ans_ldox_conservative_summary_v0_1.json'))
+          c=s['reticulata_reference_feature_decisions']['gene-LOC114274940']
+          d=s['reticulata_reference_feature_decisions']['gene-LOC114288034']
+          w=s['reticulata_reference_feature_decisions']['gene-LOC114295638']
+          assert c['sequence_gate']=='canonical_ANS_LDOX_like' and c['protein_identity']>=0.95 and c['query_coverage']>=0.95
+          assert d['sequence_gate']=='divergent_ANS_family_candidate' and 0.70<=d['protein_identity']<0.95 and d['query_coverage']>=0.80
+          assert w['sequence_gate']=='fails_strict_ANS_sequence_gate'
+          assert c['direction']=='red_directed' and float(effects['gene-LOC114274940']['red_minus_white_log2fpkm'])>0
+          assert d['direction']=='white_directed' and float(effects['gene-LOC114288034']['red_minus_white_log2fpkm'])<0
+          assert s['within_reticulata_reference_mapped_contrast']['copy_or_paralog_direction_heterogeneity_supported'] is True
+          counts=s['evidence_counts']
+          assert counts['ANS_family_recurrence_clusters']==3
+          assert counts['reference_lineage_anchored_clusters']==2
+          assert counts['species_native_strict_node_clusters']==0
+          assert counts['strict_crossspecies_exact_recurrence_clusters']==0
+          assert s['crans_assay']['deduplicated_exact_reference_model_links']==1
+          assert s['crans_assay']['species_native_sequence_recovered'] is False
           PY
 
-      - name: Verify deduplicated CrANS assay link
+      - name: Verify conservative decision table agrees with summary
         run: |
           python - <<'PY'
           import csv
-          rows = [r for r in csv.DictReader(open('data/ans_ldox_primer_linkage_deduplicated_v0_1.csv')) if r['assay_feature'] == 'CrANS']
-          exact = [r for r in rows if r['deduplicated_link_status'] == 'one_unique_exact_reference_model_link']
-          assert len(exact) == 1
-          assert exact[0]['unique_exact_amplicons'] == '1'
-          assert exact[0]['species_native_sequence_recovered'] == 'no'
+          rows={r['feature']:r for r in csv.DictReader(open('data/ans_ldox_source_feature_decisions_v0_1.csv'))}
+          assert rows['gene-LOC114274940']['direction_red_minus_white']=='red_directed'
+          assert rows['gene-LOC114288034']['direction_red_minus_white']=='white_directed'
+          assert rows['gene-LOC114295638']['reference_lineage_anchor']=='no'
+          assert rows['CrANS']['species_native_sequence_recovered']=='no'
+          assert rows['CrANS']['strict_crossspecies_exact_node_ready']=='no'
           PY
 
       - name: Verify authoritative ledger state
         run: |
           python - <<'PY'
           import csv
-          orth = {r['feature']: r for r in csv.DictReader(open('data/orthology_resolution_by_feature_v0_2.csv'))}
-          score = {r['feature']: r for r in csv.DictReader(open('data/micro_accessibility_node_score_harmonized_v0_2.csv'))}
-          assert orth['ANS']['family_recurrence_clusters'] == '3'
-          assert orth['ANS']['named_or_sequence_anchored_clusters'] == '2'
-          assert orth['ANS']['strict_crossspecies_exact_recurrence_clusters'] == '0'
-          assert score['ANS']['anchored_clusters'] == '2'
-          assert score['ANS']['strict_node_predictor'] == '0'
+          orth={r['feature']:r for r in csv.DictReader(open('data/orthology_resolution_by_feature_v0_2.csv'))}
+          score={r['feature']:r for r in csv.DictReader(open('data/micro_accessibility_node_score_harmonized_v0_2.csv'))}
+          assert orth['ANS']['family_recurrence_clusters']=='3'
+          assert orth['ANS']['named_or_sequence_anchored_clusters']=='2'
+          assert orth['ANS']['strict_crossspecies_exact_recurrence_clusters']=='0'
+          assert score['ANS']['anchored_clusters']=='2'
+          assert score['ANS']['strict_node_predictor']=='0'
           PY
