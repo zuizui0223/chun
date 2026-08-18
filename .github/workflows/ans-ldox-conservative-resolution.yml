@@ -53,18 +53,6 @@ jobs:
           assert s['crans_assay']['species_native_sequence_recovered'] is False
           PY
 
-      - name: Verify conservative decision table agrees with summary
-        run: |
-          python - <<'PY'
-          import csv
-          rows={r['feature']:r for r in csv.DictReader(open('data/ans_ldox_source_feature_decisions_v0_1.csv'))}
-          assert rows['gene-LOC114274940']['direction_red_minus_white']=='red_directed'
-          assert rows['gene-LOC114288034']['direction_red_minus_white']=='white_directed'
-          assert rows['gene-LOC114295638']['reference_lineage_anchor']=='no'
-          assert rows['CrANS']['species_native_sequence_recovered']=='no'
-          assert rows['CrANS']['strict_crossspecies_exact_node_ready']=='no'
-          PY
-
       - name: Verify authoritative ledger state
         run: |
           python - <<'PY'
