@@ -94,7 +94,7 @@ jobs:
           assert s['source_species_level_taxa']==98, s
           assert s['manifest_rows']==98, s
           assert s['coverage_fraction']==1.0, s
-          assert s['id_bound_all_assemblies']==95, s
+          assert s['id_bound_allassemblies']==95, s
           assert s['bulk_fallback']==3, s
           assert sorted(s['bulk_fallback_taxa'])==sorted(['Camellia campanisepala','Camellia lipoensis','Camellia salicifolia']), s
           rows=list(csv.DictReader(open('build/wu2022_tpia/audit/wu2022_preferred_assembly_manifest_v2.csv')))
@@ -112,7 +112,7 @@ jobs:
           import json
           from pathlib import Path
           s=json.load(open('data/wu2022_public_backbone_asset_summary_v0_1.json'))
-          text=f'''# Wu 2022 public nuclear-backbone asset gate\n\n## Result\n\nThe fully public `PRJNA665925` route resolves **{s["manifest_rows"]}/{s["source_species_level_taxa"]} species-level Camellia taxa** to a preferred public assembly/transcriptome source.\n\n- ID-bound `All_assemblies` routes: **{s["id_bound_all_assemblies"]}** taxa.\n- Bulk fallback routes: **{s["bulk_fallback"]}** taxa.\n- Bulk fallback taxa: `Camellia campanisepala`, `Camellia lipoensis`, `Camellia salicifolia`.\n- Taxon-level source coverage: **100%**.\n\n## Decision\n\nThe macro-side bottleneck is no longer taxon-level source availability. The next gate is payload identity/checksum validation, especially for the three bulk-fallback taxa, followed by reconstruction of the Wu et al. low-copy nuclear backbone.\n\n## Claim boundary\n\nThis is a **resource/provenance gate only**. It does not reconstruct the 405-gene topology, estimate branch lengths, infer flower-colour ancestral states, count transitions, or test pigment-module enrichment. The Fan 2026 figure-only topology is not substituted for a machine-readable public tree.\n'''
+          text=f'''# Wu 2022 public nuclear-backbone asset gate\n\n## Result\n\nThe fully public `PRJNA665925` route resolves **{s["manifest_rows"]}/{s["source_species_level_taxa"]} species-level Camellia taxa** to a preferred public assembly/transcriptome source.\n\n- ID-bound `All_assemblies` routes: **{s["id_bound_allassemblies"]}** taxa.\n- Bulk fallback routes: **{s["bulk_fallback"]}** taxa.\n- Bulk fallback taxa: `Camellia campanisepala`, `Camellia lipoensis`, `Camellia salicifolia`.\n- Taxon-level source coverage: **100%**.\n\n## Decision\n\nThe macro-side bottleneck is no longer taxon-level source availability. The next gate is payload identity/checksum validation, especially for the three bulk-fallback taxa, followed by reconstruction of the Wu et al. low-copy nuclear backbone.\n\n## Claim boundary\n\nThis is a **resource/provenance gate only**. It does not reconstruct the 405-gene topology, estimate branch lengths, infer flower-colour ancestral states, count transitions, or test pigment-module enrichment. The Fan 2026 figure-only topology is not substituted for a machine-readable public tree.\n'''
           Path('docs/WU2022_PUBLIC_BACKBONE_ASSET_RESULT.md').write_text(text,encoding='utf-8')
           PY
 
