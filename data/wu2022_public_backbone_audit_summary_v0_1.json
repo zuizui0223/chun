@@ -1,0 +1,19 @@
+{
+  "source": "PRJNA665925_RunInfo",
+  "doi": "10.1111/tpj.15799",
+  "publisher_table_s1_recovered": false,
+  "table_s1_sheet": null,
+  "table_s1_rows": 0,
+  "sra_runinfo_rows": 109,
+  "sra_unique_camellia_species_level_taxa": 98,
+  "source_unique_camellia_species_level_taxa": 98,
+  "tpia_catalog_rows": 136,
+  "tpia_unique_camellia_species_level_taxa": 103,
+  "tpia_bulk_rows": 203,
+  "tpia_bulk_transcriptome_assemblies": 136,
+  "archive_tpia_explicit_crosswalk_rows": 8,
+  "source_taxa_with_downloadable_preferred_assembly": 98,
+  "unresolved_source_taxa": [],
+  "coverage_fraction": 1.0,
+  "claim_ceiling": "asset/crosswalk gate only; one assembly per PRJNA665925 species-level taxon; duplicated cultivated-tea paper tips omitted unless separately crosswalked; no topology or transition inference"
+}
