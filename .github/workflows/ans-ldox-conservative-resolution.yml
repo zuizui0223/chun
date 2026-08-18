@@ -1,0 +1,67 @@
+name: ANS-LDOX conservative sequence resolution
+
+on:
+  pull_request:
+    paths:
+      - 'data/creticulata_ans_reference_feature_effects_v0_1.csv'
+      - 'data/ans_ldox_source_feature_decisions_v0_1.csv'
+      - 'data/ans_ldox_primer_linkage_deduplicated_v0_1.csv'
+      - 'data/ans_ldox_conservative_summary_v0_1.json'
+      - 'data/pigment_node_source_id_crosswalk_v0_2.csv'
+      - 'data/orthology_resolution_by_feature_v0_2.csv'
+      - 'data/micro_accessibility_node_score_harmonized_v0_2.csv'
+      - 'scripts/summarize_ans_ldox_conservative.py'
+      - '.github/workflows/ans-ldox-conservative-resolution.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Compile conservative summarizer
+        run: python -m py_compile scripts/summarize_ans_ldox_conservative.py
+
+      - name: Verify conservative biological result
+        run: |
+          python - <<'PY'
+          import csv, json
+          effects={r['gene_id']:r for r in csv.DictReader(open('data/creticulata_ans_reference_feature_effects_v0_1.csv'))}
+          s=json.load(open('data/ans_ldox_conservative_summary_v0_1.json'))
+          c=s['reticulata_reference_feature_decisions']['gene-LOC114274940']
+          d=s['reticulata_reference_feature_decisions']['gene-LOC114288034']
+          w=s['reticulata_reference_feature_decisions']['gene-LOC114295638']
+          assert c['sequence_gate']=='canonical_ANS_LDOX_like' and c['protein_identity']>=0.95 and c['query_coverage']>=0.95
+          assert d['sequence_gate']=='divergent_ANS_family_candidate' and 0.70<=d['protein_identity']<0.95 and d['query_coverage']>=0.80
+          assert w['sequence_gate']=='fails_strict_ANS_sequence_gate'
+          assert c['direction']=='red_directed' and float(effects['gene-LOC114274940']['red_minus_white_log2fpkm'])>0
+          assert d['direction']=='white_directed' and float(effects['gene-LOC114288034']['red_minus_white_log2fpkm'])<0
+          assert s['within_reticulata_reference_mapped_contrast']['copy_or_paralog_direction_heterogeneity_supported'] is True
+          counts=s['evidence_counts']
+          assert counts['ANS_family_recurrence_clusters']==3
+          assert counts['reference_lineage_anchored_clusters']==2
+          assert counts['species_native_strict_node_clusters']==0
+          assert counts['strict_crossspecies_exact_recurrence_clusters']==0
+          assert s['crans_assay']['deduplicated_exact_reference_model_links']==1
+          assert s['crans_assay']['species_native_sequence_recovered'] is False
+          PY
+
+      - name: Verify authoritative ledger state
+        run: |
+          python - <<'PY'
+          import csv
+          orth={r['feature']:r for r in csv.DictReader(open('data/orthology_resolution_by_feature_v0_2.csv'))}
+          score={r['feature']:r for r in csv.DictReader(open('data/micro_accessibility_node_score_harmonized_v0_2.csv'))}
+          assert orth['ANS']['family_recurrence_clusters']=='3'
+          assert orth['ANS']['named_or_sequence_anchored_clusters']=='2'
+          assert orth['ANS']['strict_crossspecies_exact_recurrence_clusters']=='0'
+          assert score['ANS']['anchored_clusters']=='2'
+          assert score['ANS']['strict_node_predictor']=='0'
+          PY

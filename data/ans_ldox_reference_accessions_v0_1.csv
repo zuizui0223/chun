@@ -1,0 +1,4 @@
+role,accession,source_label,analysis_role,expected_taxon,source,claim_boundary
+CsANS_reference,QIM55351.1,CsANS,primary_reference,Camellia sinensis,Zhou et al. 2026 DOI 10.3389/fpls.2026.1831409 phylogeny and original accession record,"reference protein for the published tea ANS lineage; exact equivalence to every CsANS1/CsANSa database label is tested rather than assumed"
+CcANS_reference,AFC37246.1,CcANS,comparative_reference,,Zhou et al. 2026 DOI 10.3389/fpls.2026.1831409 phylogeny,"comparative Camellia ANS protein; organism and record metadata are accepted from the versioned GenBank record at analysis time"
+ClANS_reference,KAI7988436.1,ClANS,comparative_reference,,Zhou et al. 2026 DOI 10.3389/fpls.2026.1831409 phylogeny,"comparative Camellia ANS protein; organism and record metadata are accepted from the versioned GenBank record at analysis time"

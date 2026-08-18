@@ -1,0 +1,73 @@
+{
+  "analysis_version": "v0.1",
+  "claim_boundary": {
+    "not_supported": [
+      "recovery of a deposited C. reticulata CrANS nucleotide sequence",
+      "species-native C. reticulata orthology for the 2022 tea-reference targets",
+      "strict cross-species exact-node recurrence",
+      "duplication age, adaptive selection, or macro-transition enrichment"
+    ],
+    "supported": [
+      "canonical-like versus divergent ANS-family classification of admitted tea reference copies",
+      "red- versus white-directed deployment of those reference-mapped copies in the recovered 2022 contrast",
+      "one deduplicated exact CrANS primer-bounded link to a canonical-like tea reference model",
+      "two reference-lineage-anchored ANS independence clusters while strict recurrence remains zero"
+    ]
+  },
+  "crans_assay": {
+    "assay_link_status": "one_unique_exact_reference_model_link",
+    "deduplicated_exact_reference_model_links": 1,
+    "species_native_sequence_recovered": false
+  },
+  "decision": "ANS/LDOX family recurrence is strengthened at reference-lineage resolution, and the 2022 reference-mapped contrast supports copy/paralog-specific directional deployment. Strict species-native cross-species exact-node recurrence remains zero.",
+  "evidence_counts": {
+    "ANS_family_recurrence_clusters": 3,
+    "reference_lineage_anchored_clusters": 2,
+    "reticulata_de_novo_ANS_annotations_sequence_unresolved": 1,
+    "reticulata_features_excluded_from_strict_ANS_sequence_evidence": 1,
+    "reticulata_sequence_admitted_reference_copies": 2,
+    "species_native_strict_node_clusters": 0,
+    "strict_crossspecies_exact_recurrence_clusters": 0
+  },
+  "reticulata_reference_feature_decisions": {
+    "gene-LOC114274940": {
+      "direction": "red_directed",
+      "protein_identity": 0.997183,
+      "query_coverage": 1.0,
+      "sequence_gate": "canonical_ANS_LDOX_like"
+    },
+    "gene-LOC114288034": {
+      "direction": "white_directed",
+      "protein_identity": 0.842254,
+      "query_coverage": 0.965625,
+      "sequence_gate": "divergent_ANS_family_candidate"
+    },
+    "gene-LOC114295638": {
+      "direction": "white_directed",
+      "protein_identity": 0.341772,
+      "query_coverage": 0.729231,
+      "sequence_gate": "fails_strict_ANS_sequence_gate"
+    },
+    "novel.12638": {
+      "direction": "white_directed",
+      "sequence_gate": "de_novo_ANS_annotation_sequence_unresolved"
+    }
+  },
+  "thresholds": {
+    "canonical_ANS_LDOX_like": {
+      "minimum_protein_identity": 0.95,
+      "minimum_query_coverage": 0.95,
+      "minimum_subject_coverage": 0.9
+    },
+    "divergent_ANS_family_candidate": {
+      "minimum_protein_identity": 0.7,
+      "minimum_query_coverage": 0.8,
+      "minimum_subject_coverage": 0.8
+    }
+  },
+  "within_reticulata_reference_mapped_contrast": {
+    "canonical_like_copy_red_directed": true,
+    "copy_or_paralog_direction_heterogeneity_supported": true,
+    "divergent_ANS_family_copy_white_directed": true
+  }
+}
