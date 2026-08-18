@@ -1,0 +1,71 @@
+name: Wu 2022 bulk payload identity gate
+
+on:
+  pull_request:
+    paths:
+      - 'data/wu2022_public_backbone_manifest_v0_1.csv'
+      - 'scripts/audit_wu2022_bulk_payload_identity.py'
+      - '.github/workflows/wu2022-bulk-payload-identity.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.head_ref || github.ref_name }}
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Audit the three bulk fallback payloads
+        run: |
+          rm -rf build/wu2022_bulk_payload
+          python scripts/audit_wu2022_bulk_payload_identity.py \
+            --manifest data/wu2022_public_backbone_manifest_v0_1.csv \
+            --out-dir build/wu2022_bulk_payload
+      - name: Enforce non-collision gate
+        run: |
+          python - <<'PY'
+          import json
+          s=json.load(open('build/wu2022_bulk_payload/summary.json'))
+          assert s['bulk_fallback_taxa']==3
+          assert s['successful_zip_payloads']==3
+          assert s['payload_identity_gate_pass'] is True, s
+          assert s['unique_zip_payloads']==3, s
+          assert s['unique_sequence_sets']==3, s
+          PY
+      - name: Freeze payload audit
+        run: |
+          cp build/wu2022_bulk_payload/bulk_payload_audit.csv data/wu2022_bulk_payload_audit_v0_1.csv
+          cp build/wu2022_bulk_payload/bulk_payload_members.csv data/wu2022_bulk_payload_members_v0_1.csv
+          cp build/wu2022_bulk_payload/summary.json data/wu2022_bulk_payload_summary_v0_1.json
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          s=json.load(open('data/wu2022_bulk_payload_summary_v0_1.json'))
+          status='PASS' if s['payload_identity_gate_pass'] else 'FAIL'
+          Path('docs/WU2022_BULK_PAYLOAD_IDENTITY_RESULT.md').write_text(f'''# Wu 2022 bulk-fallback payload identity gate\n\n## Result\n\nPayload identity gate: **{status}**.\n\n- bulk fallback taxa audited: **{s["bulk_fallback_taxa"]}**\n- unique ZIP payloads: **{s["unique_zip_payloads"]}**\n- unique sequence sets: **{s["unique_sequence_sets"]}**\n- duplicate groups: **{len(s["duplicate_groups"])}**\n\nThe three bulk-fallback taxa are retained only if their downloaded archive bytes and extracted sequence sets are mutually distinct.\n\n## Claim boundary\n\nThis audit establishes payload-level provenance/non-collision only. It does not prove specimen identity, infer orthology, reconstruct the 405-gene topology, or test colour evolution.\n''',encoding='utf-8')
+          PY
+      - name: Commit frozen audit
+        run: |
+          git config user.name github-actions[bot]
+          git config user.email 41898282+github-actions[bot]@users.noreply.github.com
+          git add data/wu2022_bulk_payload_audit_v0_1.csv data/wu2022_bulk_payload_members_v0_1.csv data/wu2022_bulk_payload_summary_v0_1.json docs/WU2022_BULK_PAYLOAD_IDENTITY_RESULT.md
+          if git diff --cached --quiet; then
+            echo 'Frozen payload audit already matches.'
+          else
+            git commit -m 'Freeze Wu2022 bulk payload identity audit'
+            git push origin HEAD:${GITHUB_HEAD_REF:-${GITHUB_REF_NAME}}
+          fi
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: wu2022-bulk-payload-identity
+          path: build/wu2022_bulk_payload
+          if-no-files-found: error
