@@ -1,0 +1,6 @@
+target_id,source_feature,red_minus_white_log2fpkm,direction,red_gt_white,red_gt_pink_gt_white,evidence_scope,claim_boundary
+gene-LOC114258680,gene-LOC114258680,-1.2109706241596911,white_directed,False,False,tea-reference-mapped C. reticulata contrast,"direction applies to the mapped tea reference feature, not a recovered species-native C. reticulata locus"
+gene-LOC114259095,gene-LOC114259095,-1.3019080425778795,white_directed,False,False,tea-reference-mapped C. reticulata contrast,"direction applies to the mapped tea reference feature, not a recovered species-native C. reticulata locus"
+gene-LOC114276938,gene-LOC114276938,-0.05191754783351232,white_directed,False,False,tea-reference-mapped C. reticulata contrast,"direction applies to the mapped tea reference feature, not a recovered species-native C. reticulata locus"
+gene-LOC114287753,gene-LOC114287753,0.225961156552148,red_directed,True,True,tea-reference-mapped C. reticulata contrast,"direction applies to the mapped tea reference feature, not a recovered species-native C. reticulata locus"
+gene-LOC114297899,gene-LOC114297899,1.8314822555367023,red_directed,True,True,tea-reference-mapped C. reticulata contrast,"direction applies to the mapped tea reference feature, not a recovered species-native C. reticulata locus"
