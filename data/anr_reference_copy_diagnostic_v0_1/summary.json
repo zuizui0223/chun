@@ -1,0 +1,36 @@
+{
+  "analysis_version": "v0.1-diagnostic",
+  "anchor": {
+    "best_nongap_identity": 0.9955947136563876,
+    "best_reference_protein": "XP_028054899.1",
+    "best_reference_target": "gene-LOC114259095",
+    "identity_margin_over_runner_up": 0.1541850220264317,
+    "protein_accession": "GWHPACFB022597",
+    "protein_length_aa": 227,
+    "resolution": "one_reference_copy_is_ANR_source_lineage_like",
+    "source_id": "CSA011986"
+  },
+  "claim_boundary": {
+    "not_supported": [
+      "species-native C. reticulata ANR orthology",
+      "strict cross-species exact-node recurrence",
+      "duplication age, adaptation, or macroevolutionary enrichment"
+    ],
+    "supported": [
+      "sequence relationship between the exact tea ANR source anchor and tea reference copies",
+      "directional heterogeneity among reference-mapped copies when effect rows are recovered"
+    ]
+  },
+  "counts": {
+    "effect_rows_recovered": 5,
+    "recovered_reference_copies": 5,
+    "requested_reference_copies": 5,
+    "strict_crossspecies_exact_node_recurrence_clusters": 0
+  },
+  "decision": "Compare the exact tea ANR source lineage with all reference-mapped K08695 copies before treating ANR-family recurrence as exact-node recurrence.",
+  "observed_reference_copy_directions": [
+    "red_directed",
+    "white_directed"
+  ],
+  "reference_copy_direction_heterogeneity": true
+}

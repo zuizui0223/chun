@@ -1,0 +1,33 @@
+{
+  "analysis_version": "v0.1",
+  "best_reference_identity": 0.9955947136563876,
+  "best_reference_target": "gene-LOC114259095",
+  "claim_boundary": {
+    "not_supported": [
+      "species-native C. reticulata ANR orthology",
+      "strict cross-species exact-node recurrence",
+      "duplication age, adaptation, or macro-transition enrichment"
+    ],
+    "supported": [
+      "full-length relationship of the exact tea ANR source anchor to recovered tea reference copies",
+      "reference-copy direction heterogeneity when all frozen effects are recovered",
+      "family/module-level recurrence across two biological source clusters"
+    ]
+  },
+  "decision": "ANR family recurrence is sequence-resolved at the tea source and tea-reference-copy levels. The exact tea source lineage can be compared with all five mapped reference copies, but the C. reticulata cluster remains reference-lineage rather than species-native evidence.",
+  "effect_screen_complete": true,
+  "family": "ANR",
+  "family_recurrence_clusters": 2,
+  "identity_margin_over_runner_up": 0.1541850220264317,
+  "observed_reference_copy_directions": [
+    "red_directed",
+    "white_directed"
+  ],
+  "reference_copy_direction_heterogeneity": true,
+  "reference_lineage_anchored_clusters": 2,
+  "sequence_screen_complete": true,
+  "source_anchor_protein_accession": "GWHPACFB022597",
+  "source_anchor_resolution": "one_reference_copy_is_ANR_source_lineage_like",
+  "species_native_strict_node_clusters": 0,
+  "strict_crossspecies_exact_recurrence_clusters": 0
+}
