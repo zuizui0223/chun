@@ -1,0 +1,43 @@
+name: Wu 2022 public-backbone frozen checks
+
+on:
+  pull_request:
+    paths:
+      - 'data/wu2022_public_backbone_manifest_v0_1.csv'
+      - 'data/wu2022_public_backbone_asset_summary_v0_1.json'
+      - 'data/wu2022_public_backbone_audit_summary_v0_1.json'
+      - 'data/wu2022_prjna665925_run_taxa_v0_1.csv'
+      - 'docs/WU2022_PUBLIC_BACKBONE_ASSET_RESULT.md'
+      - '.github/workflows/wu2022-public-backbone-check.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Verify frozen asset gate
+        run: |
+          python - <<'PY'
+          import csv,json
+          manifest=list(csv.DictReader(open('data/wu2022_public_backbone_manifest_v0_1.csv')))
+          taxa=list(csv.DictReader(open('data/wu2022_prjna665925_run_taxa_v0_1.csv')))
+          s=json.load(open('data/wu2022_public_backbone_asset_summary_v0_1.json'))
+          a=json.load(open('data/wu2022_public_backbone_audit_summary_v0_1.json'))
+          assert len(manifest)==98
+          assert len({r['source_taxon'] for r in manifest})==98
+          assert s['source_species_level_taxa']==98
+          assert s['manifest_rows']==98
+          assert s['id_bound_allassemblies']==95
+          assert s['bulk_fallback']==3
+          assert s['coverage_fraction']==1.0
+          assert sorted(s['bulk_fallback_taxa'])==sorted(['Camellia campanisepala','Camellia lipoensis','Camellia salicifolia'])
+          assert a['sra_runinfo_rows']==109
+          assert a['source_unique_camellia_species_level_taxa']==98
+          assert a['source_taxa_with_downloadable_preferred_assembly']==98
+          assert a['coverage_fraction']==1.0
+          assert len(taxa)>=98
+          PY

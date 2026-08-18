@@ -1,0 +1,14 @@
+{
+  "source_species_level_taxa": 98,
+  "manifest_rows": 98,
+  "id_bound_allassemblies": 95,
+  "bulk_fallback": 3,
+  "coverage_fraction": 1.0,
+  "bulk_fallback_taxa": [
+    "Camellia campanisepala",
+    "Camellia lipoensis",
+    "Camellia salicifolia"
+  ],
+  "decision": "ID-bound All_assemblies is primary; bulk is fallback only after bulk endpoint payload collision was observed in diagnostic download",
+  "claim_ceiling": "resource-provenance manifest only; payload checksums/sequence identity still required before tree reconstruction"
+}
