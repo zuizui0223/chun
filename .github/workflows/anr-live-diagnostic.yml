@@ -1,0 +1,124 @@
+name: ANR live diagnostic
+
+on:
+  pull_request:
+    paths:
+      - 'data/anr_reference_copy_targets_v0_1.csv'
+      - 'scripts/diagnose_anr_reference_copy_resolution.py'
+      - '.github/workflows/anr-live-diagnostic.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  actions: read
+
+jobs:
+  diagnose:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install dependencies
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq mafft fasttree unzip
+          python -m pip install --disable-pip-version-check biopython requests
+
+      - name: Recover Longjing43 GFF and protein sources
+        run: |
+          mkdir -p build/anr/sources/longjing43
+          python - <<'PY'
+          import csv, pathlib, re, time, urllib.request
+          registry = pathlib.Path('data/cnfls2_synteny_sources_v0_1.csv')
+          rows = list(csv.DictReader(registry.open(encoding='utf-8-sig')))
+          selected=[]
+          for row in rows:
+              metadata=' '.join(f'{k} {v}' for k,v in row.items() if v and not re.match(r'^https?://',str(v).strip())).lower()
+              if not any(x in metadata for x in ('longjing43','longjing 43','camellia sinensis','tea crosswalk','tea_longjing43')):
+                  continue
+              for key,value in row.items():
+                  value=str(value or '').strip()
+                  if not re.match(r'^https?://',value): continue
+                  context=f'{key} {value}'.lower()
+                  if any(x in context for x in ('protein','proteome','.faa','pep')): selected.append(('protein',value))
+                  elif any(x in context for x in ('gff','annotation')): selected.append(('gff',value))
+          selected=list(dict.fromkeys(selected))
+          print('selected',selected)
+          for kind in ('gff','protein'):
+              options=[u for k,u in selected if k==kind]
+              if not options: raise RuntimeError(f'no Longjing43 {kind} source')
+              ok=False
+              for url in options:
+                  target=pathlib.Path(f'build/anr/sources/longjing43/longjing43.{"gff" if kind=="gff" else "protein.faa"}'+('.gz' if url.endswith('.gz') else ''))
+                  err=None
+                  for attempt in range(5):
+                      try:
+                          req=urllib.request.Request(url,headers={'User-Agent':'chun-anr-live/0.1'})
+                          with urllib.request.urlopen(req,timeout=180) as r: body=r.read()
+                          if len(body)<1000: raise RuntimeError(f'too small: {len(body)}')
+                          target.write_bytes(body); ok=True; print(kind,url,target,len(body)); break
+                      except Exception as exc:
+                          err=exc; time.sleep(2**attempt)
+                  if ok: break
+              if not ok: raise RuntimeError(f'failed Longjing43 {kind}: {err}')
+          PY
+
+      - name: Download NCBI tea reference
+        run: |
+          mkdir -p build/anr/sources/refseq
+          base=https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/004/153/795/GCF_004153795.1_AHAU_CSS_1
+          curl --fail --location --retry 5 "$base/GCF_004153795.1_AHAU_CSS_1_genomic.gff.gz" -o build/anr/sources/refseq/tea_refseq.gff.gz
+          curl --fail --location --retry 5 "$base/GCF_004153795.1_AHAU_CSS_1_protein.faa.gz" -o build/anr/sources/refseq/tea_refseq.protein.faa.gz
+
+      - name: Recover frozen reticulata effect artifact
+        continue-on-error: true
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          mkdir -p build/anr/effect_artifact
+          gh api repos/zuizui0223/chun/actions/artifacts/9287119758/zip > build/anr/effect_artifact.zip
+          unzip -q build/anr/effect_artifact.zip -d build/anr/effect_artifact
+          test -f build/anr/effect_artifact/effects/broad_homolog_audit.csv
+
+      - name: Run diagnostic
+        run: |
+          long_gff=$(find build/anr/sources/longjing43 -type f -name '*.gff*' | head -n 1)
+          long_prot=$(find build/anr/sources/longjing43 -type f -name '*.faa*' | head -n 1)
+          effect_arg=()
+          if [ -f build/anr/effect_artifact/effects/broad_homolog_audit.csv ]; then effect_arg=(--effects build/anr/effect_artifact/effects/broad_homolog_audit.csv); fi
+          python scripts/diagnose_anr_reference_copy_resolution.py \
+            --targets data/anr_reference_copy_targets_v0_1.csv \
+            --longjing43-gff "$long_gff" \
+            --longjing43-proteins "$long_prot" \
+            --refseq-gff build/anr/sources/refseq/tea_refseq.gff.gz \
+            --refseq-proteins build/anr/sources/refseq/tea_refseq.protein.faa.gz \
+            "${effect_arg[@]}" \
+            --out-dir build/anr/result
+
+      - name: Build alignment and tree
+        run: |
+          mafft --auto build/anr/result/anr_candidates.faa > build/anr/result/anr_candidates.aligned.faa
+          FastTree build/anr/result/anr_candidates.aligned.faa > build/anr/result/anr_candidates.fasttree.nwk
+
+      - name: Validate complete result
+        run: |
+          python - <<'PY'
+          import csv,json
+          s=json.load(open('build/anr/result/summary.json'))
+          assert s['counts']['requested_reference_copies']==5
+          assert s['counts']['recovered_reference_copies']==5
+          m=list(csv.DictReader(open('build/anr/result/source_protein_mapping.csv')))
+          assert len([r for r in m if r['role']=='reference_copy'])==5
+          assert len({r['protein_accession'] for r in m if r['role']=='reference_copy'})==5
+          PY
+
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: anr-live-diagnostic
+          path: build/anr
+          if-no-files-found: error
