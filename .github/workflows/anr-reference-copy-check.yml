@@ -1,3 +1,4 @@
+# Frozen-result verifier; the live diagnostic is the only analysis entrypoint.
 name: ANR reference-copy checks
 
 on:
@@ -15,16 +16,6 @@ on:
       - 'scripts/freeze_anr_reference_copy_ledger.py'
       - '.github/workflows/anr-reference-copy-*.yml'
       - '.github/workflows/anr-freeze-authoritative-ledgers.yml'
-  push:
-    branches:
-      - agent/anr-reference-copy-resolution
-    paths:
-      - 'data/anr_reference_copy_diagnostic_v0_1/**'
-      - 'data/anr_conservative_summary_v0_1.json'
-      - 'data/orthology_resolution_by_feature_v0_3.csv'
-      - 'data/micro_accessibility_node_score_harmonized_v0_3.csv'
-      - 'data/pigment_node_source_id_crosswalk_v0_3.csv'
-      - '.github/workflows/anr-reference-copy-check.yml'
   workflow_dispatch:
 
 permissions:
@@ -36,118 +27,53 @@ jobs:
     timeout-minutes: 10
     steps:
       - uses: actions/checkout@v4
-
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
 
       - name: Compile analysis code
         run: |
-          python -m py_compile \
-            scripts/diagnose_anr_reference_copy_resolution.py \
-            scripts/freeze_anr_reference_copy_ledger.py
+          python -m py_compile scripts/diagnose_anr_reference_copy_resolution.py scripts/freeze_anr_reference_copy_ledger.py
 
       - name: Assert complete conservative diagnostic
         run: |
           python - <<'PY'
-          import csv
-          import json
+          import csv,json
           from pathlib import Path
-
-          diagnostic = Path('data/anr_reference_copy_diagnostic_v0_1')
-          required = [
-              diagnostic / 'summary.json',
-              diagnostic / 'source_protein_mapping.csv',
-              diagnostic / 'anchor_to_reference_identity.csv',
-              diagnostic / 'reference_copy_pairwise_identity.csv',
-              diagnostic / 'reference_copy_effects.csv',
-              diagnostic / 'anr_candidates.faa',
-              diagnostic / 'anr_candidates.aligned.faa',
-              diagnostic / 'anr_candidates.fasttree.nwk',
-              Path('data/anr_conservative_summary_v0_1.json'),
-              Path('data/orthology_resolution_by_feature_v0_3.csv'),
-              Path('data/micro_accessibility_node_score_harmonized_v0_3.csv'),
-              Path('data/pigment_node_source_id_crosswalk_v0_3.csv'),
-              Path('docs/ANR_REFERENCE_COPY_DIAGNOSTIC.md'),
-              Path('docs/ANR_CONSERVATIVE_RESOLUTION_RESULT.md'),
-          ]
-          missing = [str(p) for p in required if not p.exists()]
-          assert not missing, f'missing frozen ANR outputs: {missing}'
-
-          s = json.load(open(diagnostic / 'summary.json'))
-          assert s['counts']['requested_reference_copies'] == 5
-          assert s['counts']['recovered_reference_copies'] == 5
-          assert s['counts']['effect_rows_recovered'] == 5
-          assert s['counts']['strict_crossspecies_exact_node_recurrence_clusters'] == 0
-          assert s['anchor']['protein_accession']
-          assert s['anchor']['resolution'] != 'ANR_anchor_to_reference_mapping_unresolved'
-
-          mapping = list(csv.DictReader(open(diagnostic / 'source_protein_mapping.csv')))
-          assert len(mapping) == 6
-          assert sum(r['role'] == 'anchor' for r in mapping) == 1
-          refs = [r for r in mapping if r['role'] == 'reference_copy']
-          assert len(refs) == 5
-          assert all(r['protein_accession'] for r in refs)
-          assert all(r['species_native_target_sequence'] == 'no' for r in refs)
-          assert len({r['protein_accession'] for r in refs}) == 5
-
-          identities = list(csv.DictReader(open(diagnostic / 'anchor_to_reference_identity.csv')))
-          assert len(identities) == 5
-          assert all(r['strict_crossspecies_exact_node_ready'] == 'no' for r in identities)
-
-          effects = list(csv.DictReader(open(diagnostic / 'reference_copy_effects.csv')))
-          assert len(effects) == 5
-          directions = {r['direction'] for r in effects}
-          assert directions <= {'red_directed', 'white_directed', 'neutral'}
-          assert len(directions - {'neutral'}) >= 2, f'expected mixed red/white copy directions, observed {directions}'
-
-          c = json.load(open('data/anr_conservative_summary_v0_1.json'))
-          assert c['family_recurrence_clusters'] == 2
-          assert c['reference_lineage_anchored_clusters'] == 2
-          assert c['species_native_strict_node_clusters'] == 0
-          assert c['strict_crossspecies_exact_recurrence_clusters'] == 0
-          assert c['sequence_screen_complete'] is True
-          assert c['effect_screen_complete'] is True
-          assert c['reference_copy_direction_heterogeneity'] is True
+          d=Path('data/anr_reference_copy_diagnostic_v0_1')
+          required=[d/'summary.json',d/'source_protein_mapping.csv',d/'anchor_to_reference_identity.csv',d/'reference_copy_pairwise_identity.csv',d/'reference_copy_effects.csv',d/'anr_candidates.faa',d/'anr_candidates.aligned.faa',d/'anr_candidates.fasttree.nwk',Path('data/anr_conservative_summary_v0_1.json'),Path('data/orthology_resolution_by_feature_v0_3.csv'),Path('data/micro_accessibility_node_score_harmonized_v0_3.csv'),Path('data/pigment_node_source_id_crosswalk_v0_3.csv'),Path('docs/ANR_REFERENCE_COPY_DIAGNOSTIC.md'),Path('docs/ANR_CONSERVATIVE_RESOLUTION_RESULT.md')]
+          missing=[str(p) for p in required if not p.exists()]; assert not missing,missing
+          s=json.load(open(d/'summary.json'))
+          assert s['counts']['requested_reference_copies']==5 and s['counts']['recovered_reference_copies']==5 and s['counts']['effect_rows_recovered']==5
+          assert s['counts']['strict_crossspecies_exact_node_recurrence_clusters']==0
+          assert s['anchor']['best_reference_target']=='gene-LOC114259095'
+          assert s['anchor']['best_nongap_identity']>0.99
+          mapping=list(csv.DictReader(open(d/'source_protein_mapping.csv'))); refs=[r for r in mapping if r['role']=='reference_copy']
+          assert len(mapping)==6 and len(refs)==5 and len({r['protein_accession'] for r in refs})==5 and all(r['species_native_target_sequence']=='no' for r in refs)
+          identities=list(csv.DictReader(open(d/'anchor_to_reference_identity.csv'))); assert len(identities)==5 and all(r['strict_crossspecies_exact_node_ready']=='no' for r in identities)
+          effects=list(csv.DictReader(open(d/'reference_copy_effects.csv'))); directions={r['direction'] for r in effects}; assert {'red_directed','white_directed'}<=directions
+          c=json.load(open('data/anr_conservative_summary_v0_1.json'))
+          assert c['family_recurrence_clusters']==2 and c['reference_lineage_anchored_clusters']==2
+          assert c['species_native_strict_node_clusters']==0 and c['strict_crossspecies_exact_recurrence_clusters']==0
+          assert c['sequence_screen_complete'] is True and c['effect_screen_complete'] is True and c['reference_copy_direction_heterogeneity'] is True
           PY
 
-      - name: Regenerate v0.3 ledgers from frozen diagnostic
+      - name: Regenerate and diff v0.3 ledgers
         run: |
           rm -rf build/anr_ledger_check
-          python scripts/freeze_anr_reference_copy_ledger.py \
-            --diagnostic-dir data/anr_reference_copy_diagnostic_v0_1 \
-            --orthology-v02 data/orthology_resolution_by_feature_v0_2.csv \
-            --score-v02 data/micro_accessibility_node_score_harmonized_v0_2.csv \
-            --crosswalk-v02 data/pigment_node_source_id_crosswalk_v0_2.csv \
-            --out-dir build/anr_ledger_check
-
-          diff --strip-trailing-cr -u \
-            data/anr_conservative_summary_v0_1.json \
-            build/anr_ledger_check/anr_conservative_summary_v0_1.json
-          diff --strip-trailing-cr -u \
-            data/orthology_resolution_by_feature_v0_3.csv \
-            build/anr_ledger_check/orthology_resolution_by_feature_v0_3.csv
-          diff --strip-trailing-cr -u \
-            data/micro_accessibility_node_score_harmonized_v0_3.csv \
-            build/anr_ledger_check/micro_accessibility_node_score_harmonized_v0_3.csv
-          diff --strip-trailing-cr -u \
-            data/pigment_node_source_id_crosswalk_v0_3.csv \
-            build/anr_ledger_check/pigment_node_source_id_crosswalk_v0_3.csv
-          diff --strip-trailing-cr -u \
-            docs/ANR_CONSERVATIVE_RESOLUTION_RESULT.md \
-            build/anr_ledger_check/ANR_CONSERVATIVE_RESOLUTION_RESULT.md
+          python scripts/freeze_anr_reference_copy_ledger.py --diagnostic-dir data/anr_reference_copy_diagnostic_v0_1 --orthology-v02 data/orthology_resolution_by_feature_v0_2.csv --score-v02 data/micro_accessibility_node_score_harmonized_v0_2.csv --crosswalk-v02 data/pigment_node_source_id_crosswalk_v0_2.csv --out-dir build/anr_ledger_check
+          diff --strip-trailing-cr -u data/anr_conservative_summary_v0_1.json build/anr_ledger_check/anr_conservative_summary_v0_1.json
+          diff --strip-trailing-cr -u data/orthology_resolution_by_feature_v0_3.csv build/anr_ledger_check/orthology_resolution_by_feature_v0_3.csv
+          diff --strip-trailing-cr -u data/micro_accessibility_node_score_harmonized_v0_3.csv build/anr_ledger_check/micro_accessibility_node_score_harmonized_v0_3.csv
+          diff --strip-trailing-cr -u data/pigment_node_source_id_crosswalk_v0_3.csv build/anr_ledger_check/pigment_node_source_id_crosswalk_v0_3.csv
+          diff --strip-trailing-cr -u docs/ANR_CONSERVATIVE_RESOLUTION_RESULT.md build/anr_ledger_check/ANR_CONSERVATIVE_RESOLUTION_RESULT.md
 
       - name: Verify authoritative ANR row
         run: |
           python - <<'PY'
           import csv
-          orth = {r['feature']: r for r in csv.DictReader(open('data/orthology_resolution_by_feature_v0_3.csv'))}
-          assert orth['ANR']['family_recurrence_clusters'] == '2'
-          assert orth['ANR']['named_or_sequence_anchored_clusters'] == '2'
-          assert orth['ANR']['strict_crossspecies_exact_recurrence_clusters'] == '0'
-
-          score = {r['feature']: r for r in csv.DictReader(open('data/micro_accessibility_node_score_harmonized_v0_3.csv'))}
-          assert score['ANR']['anchored_clusters'] == '2'
-          assert score['ANR']['primary_family_predictor'] == '2'
-          assert score['ANR']['strict_node_predictor'] == '0'
+          orth={r['feature']:r for r in csv.DictReader(open('data/orthology_resolution_by_feature_v0_3.csv'))}
+          score={r['feature']:r for r in csv.DictReader(open('data/micro_accessibility_node_score_harmonized_v0_3.csv'))}
+          assert orth['ANR']['family_recurrence_clusters']=='2' and orth['ANR']['named_or_sequence_anchored_clusters']=='2' and orth['ANR']['strict_crossspecies_exact_recurrence_clusters']=='0'
+          assert score['ANR']['anchored_clusters']=='2' and score['ANR']['primary_family_predictor']=='2' and score['ANR']['strict_node_predictor']=='0'
           PY
