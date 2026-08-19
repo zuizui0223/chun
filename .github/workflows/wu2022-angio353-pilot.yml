@@ -15,26 +15,53 @@ on:
 permissions:
   contents: read
 
+concurrency:
+  group: wu2022-angio353-pilot-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   pilot:
     runs-on: ubuntu-latest
-    timeout-minutes: 45
+    timeout-minutes: 30
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
 
-      - name: Verify pilot against authoritative v0.2 resource manifest
+      - name: Build compact wiring subpanel
+        run: |
+          mkdir -p build/wu_angio353
+          python - <<'PY'
+          import csv
+          keep={
+              'Camellia azalea',
+              'Camellia reticulata',
+              'Camellia rubituberculata',
+              'Camellia impressinervis',
+              'Camellia pingguoensis',
+              'Camellia luteoflora',
+              'Camellia oleifera',
+              'Camellia sinensis',
+              'Camellia yunnanensis',
+          }
+          src=list(csv.DictReader(open('data/wu2022_angio353_pilot_panel_v0_1.csv',encoding='utf-8-sig')))
+          rows=[r for r in src if r['taxon'] in keep and r.get('admission_status','admit').lower()=='admit']
+          assert {r['taxon'] for r in rows}==keep, sorted(keep-{r['taxon'] for r in rows})
+          with open('build/wu_angio353/pilot_panel.csv','w',newline='',encoding='utf-8') as f:
+              w=csv.DictWriter(f,fieldnames=src[0].keys()); w.writeheader(); w.writerows(rows)
+          print('wiring_subpanel_taxa',len(rows))
+          for r in rows: print(r['taxon'],r['colour_state'],r['assembly_url'],sep='\t')
+          PY
+
+      - name: Verify wiring subpanel against authoritative v0.2 resource manifest
         run: |
           python - <<'PY'
           import csv
-          panel=list(csv.DictReader(open('data/wu2022_angio353_pilot_panel_v0_1.csv',encoding='utf-8-sig')))
+          panel=list(csv.DictReader(open('build/wu_angio353/pilot_panel.csv',encoding='utf-8-sig')))
           manifest=list(csv.DictReader(open('data/wu2022_public_backbone_manifest_v0_2.csv',encoding='utf-8-sig')))
           missing=[]; wrong=[]; resolved=[]
           for r in panel:
-              if r.get('admission_status','admit').lower()!='admit':
-                  continue
               tax=r['taxon']
               candidates=[m for m in manifest if tax in {m['source_taxon'],m['resource_taxon']}]
               if not candidates:
@@ -48,6 +75,7 @@ jobs:
               resolved.append((tax,m['source_taxon'],m['resource_taxon']))
           assert not missing, missing
           assert not wrong, wrong
+          assert len(resolved)==9, resolved
           print('authoritative_manifest_gate_pass',len(resolved))
           for x in resolved: print('RESOLVED',*x,sep='\t')
           PY
@@ -69,12 +97,12 @@ jobs:
           grep -c '^>' build/wu_angio353/targets/Angiosperms353.FAA
           diamond makedb --in build/wu_angio353/targets/Angiosperms353.FAA --db build/wu_angio353/targets/Angiosperms353
 
-      - name: Download and provenance-audit admitted ID-bound TPIA assemblies
+      - name: Download and provenance-audit compact ID-bound TPIA subpanel
         run: |
           python scripts/download_tpia_panel_assemblies.py \
-            --panel data/wu2022_angio353_pilot_panel_v0_1.csv \
+            --panel build/wu_angio353/pilot_panel.csv \
             --out-dir build/wu_angio353/assemblies \
-            --workers 8
+            --workers 6 --read-timeout 45 --retries 1
 
       - name: Recover Angiosperms353 translated marker HSPs
         run: |
@@ -91,7 +119,7 @@ jobs:
       - name: Admit high-occupancy markers
         run: |
           python scripts/extract_angio353_pilot_hits.py \
-            --panel data/wu2022_angio353_pilot_panel_v0_1.csv \
+            --panel build/wu_angio353/pilot_panel.csv \
             --hits-dir build/wu_angio353/hits \
             --out-dir build/wu_angio353/markers \
             --min-subject-coverage 0.45 --min-aa 80 --min-occupancy 0.80
@@ -106,7 +134,7 @@ jobs:
       - name: Concatenate trimmed AA markers
         run: |
           python scripts/concat_angio353_pilot_alignments.py \
-            --panel data/wu2022_angio353_pilot_panel_v0_1.csv \
+            --panel build/wu_angio353/pilot_panel.csv \
             --align-dir build/wu_angio353/align \
             --output build/wu_angio353/concat.faa \
             --partition build/wu_angio353/partitions.txt \
@@ -118,21 +146,21 @@ jobs:
           mkdir -p build/wu_angio353/tree
           FT=$(command -v FastTree || command -v fasttree)
           "$FT" -lg build/wu_angio353/concat.faa > build/wu_angio353/tree/pilot_tree.nwk 2> build/wu_angio353/tree/fasttree.log
-          printf 'FastTree-LG pilot; final backbone requires IQ-TREE/coalescent gate\n' > build/wu_angio353/tree/engine.txt
+          printf 'FastTree-LG wiring pilot only; final backbone requires IQ-TREE/gene-tree or coalescent gate\n' > build/wu_angio353/tree/engine.txt
 
-      - name: Test minimum A and Y state changes
+      - name: Test minimum A and Y state changes descriptively
         run: |
           python scripts/analyze_pilot_tree_fitch.py \
             --tree build/wu_angio353/tree/pilot_tree.nwk \
-            --panel data/wu2022_angio353_pilot_panel_v0_1.csv \
+            --panel build/wu_angio353/pilot_panel.csv \
             --output build/wu_angio353/fitch_min_changes.csv \
             --pairs-output build/wu_angio353/nearest_nonstate_pairs.csv
 
       - name: Report
         if: always()
         run: |
-          echo '### Wu/TPIA Angiosperms353 held-out pilot' >> "$GITHUB_STEP_SUMMARY"
-          for f in build/wu_angio353/assemblies/download_summary.json build/wu_angio353/assemblies/quarantined_taxa.csv build/wu_angio353/markers/summary.json build/wu_angio353/concat_summary.json build/wu_angio353/tree/engine.txt build/wu_angio353/tree/pilot_tree.nwk build/wu_angio353/fitch_min_changes.csv build/wu_angio353/nearest_nonstate_pairs.csv; do
+          echo '### Wu/TPIA Angiosperms353 compact wiring pilot' >> "$GITHUB_STEP_SUMMARY"
+          for f in build/wu_angio353/pilot_panel.csv build/wu_angio353/assemblies/download_summary.json build/wu_angio353/markers/summary.json build/wu_angio353/concat_summary.json build/wu_angio353/tree/engine.txt build/wu_angio353/tree/pilot_tree.nwk build/wu_angio353/fitch_min_changes.csv build/wu_angio353/nearest_nonstate_pairs.csv; do
             if [ -f "$f" ]; then echo "#### $f" >> "$GITHUB_STEP_SUMMARY"; echo '```' >> "$GITHUB_STEP_SUMMARY"; head -c 30000 "$f" >> "$GITHUB_STEP_SUMMARY"; echo >> "$GITHUB_STEP_SUMMARY"; echo '```' >> "$GITHUB_STEP_SUMMARY"; fi
           done
 
@@ -140,9 +168,9 @@ jobs:
         if: always()
         run: |
           mkdir -p build/wu_angio353/result_artifact
+          cp -f build/wu_angio353/pilot_panel.csv build/wu_angio353/result_artifact/ 2>/dev/null || true
           cp -f build/wu_angio353/assemblies/archive_provenance.csv build/wu_angio353/result_artifact/ 2>/dev/null || true
           cp -f build/wu_angio353/assemblies/download_summary.json build/wu_angio353/result_artifact/ 2>/dev/null || true
-          cp -f build/wu_angio353/assemblies/quarantined_taxa.csv build/wu_angio353/result_artifact/ 2>/dev/null || true
           cp -f build/wu_angio353/markers/best_hits.csv build/wu_angio353/result_artifact/ 2>/dev/null || true
           cp -f build/wu_angio353/markers/locus_occupancy.csv build/wu_angio353/result_artifact/ 2>/dev/null || true
           cp -f build/wu_angio353/markers/summary.json build/wu_angio353/result_artifact/ 2>/dev/null || true
