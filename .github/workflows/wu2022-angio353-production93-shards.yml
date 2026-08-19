@@ -9,6 +9,7 @@ on:
       - 'scripts/slice_wu2022_angio353_panel.py'
       - 'scripts/download_tpia_panel_assemblies.py'
       - 'scripts/extract_angio353_pilot_hits.py'
+      - 'scripts/aggregate_wu_angio353_best_hits.py'
       - '.github/workflows/wu2022-angio353-production93-shards.yml'
   workflow_dispatch:
 
@@ -18,6 +19,9 @@ concurrency:
 
 permissions:
   contents: read
+
+env:
+  RUNTIME_TAXA: '91'
 
 jobs:
   recover:
@@ -40,10 +44,10 @@ jobs:
             --runtime-exclusions data/wu2022_tpia_runtime_exclusions_v0_1.csv \
             --output build/full_panel.csv --summary build/full_panel_summary.json \
             --expected-total 98 --expected-frozen-assembled 93 --expected-frozen-raw 5 \
-            --expected-runtime-assembled 91
+            --expected-runtime-assembled "$RUNTIME_TAXA"
           python scripts/slice_wu2022_angio353_panel.py \
             --panel build/full_panel.csv --output build/shard_panel.csv \
-            --expected-total 91 --shard ${{ matrix.shard }} --n-shards 6
+            --expected-total "$RUNTIME_TAXA" --shard ${{ matrix.shard }} --n-shards 6
       - name: Install marker-recovery tools
         run: |
           sudo apt-get install -y -qq diamond-aligner
@@ -94,4 +98,49 @@ jobs:
         with:
           name: wu-angio353-runtime-shard-${{ matrix.shard }}
           path: build/result
+          if-no-files-found: error
+
+  aggregate:
+    needs: recover
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Rebuild authoritative runtime panel
+        run: |
+          python scripts/build_wu2022_angio353_backbone_panel.py \
+            --manifest data/wu2022_public_backbone_manifest_v0_3.csv \
+            --runtime-exclusions data/wu2022_tpia_runtime_exclusions_v0_1.csv \
+            --output build/full_panel.csv --summary build/full_panel_summary.json \
+            --expected-total 98 --expected-frozen-assembled 93 --expected-frozen-raw 5 \
+            --expected-runtime-assembled "$RUNTIME_TAXA"
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: wu-angio353-runtime-shard-*
+          path: build/shards
+      - name: Aggregate global marker occupancy
+        run: |
+          test $(find build/shards -name best_hits.csv | wc -l) -eq 6
+          python scripts/aggregate_wu_angio353_best_hits.py \
+            --panel build/full_panel.csv \
+            --best-hit-glob 'build/shards/**/best_hits.csv' \
+            --output-dir build/global_occupancy \
+            --expected-taxa "$RUNTIME_TAXA" --min-occupancy 0.80
+          python - <<'PY'
+          import json
+          s=json.load(open('build/global_occupancy/summary.json'))
+          assert s['n_panel_taxa']==91
+          assert s['n_input_files']==6
+          assert s['candidate_loci']>=300
+          assert s['admitted_loci']>=250
+          print(json.dumps(s,indent=2))
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: wu-angio353-runtime91-global-occupancy
+          path: |
+            build/full_panel_summary.json
+            build/global_occupancy/
           if-no-files-found: error
