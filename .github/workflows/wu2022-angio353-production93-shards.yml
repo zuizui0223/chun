@@ -1,9 +1,10 @@
-name: Wu 2022 Angiosperms353 production93 shard recovery
+name: Wu 2022 Angiosperms353 runtime-assembled shard recovery
 
 on:
   pull_request:
     paths:
       - 'data/wu2022_public_backbone_manifest_v0_3.csv'
+      - 'data/wu2022_tpia_runtime_exclusions_v0_1.csv'
       - 'scripts/build_wu2022_angio353_backbone_panel.py'
       - 'scripts/slice_wu2022_angio353_panel.py'
       - 'scripts/download_tpia_panel_assemblies.py'
@@ -12,7 +13,7 @@ on:
   workflow_dispatch:
 
 concurrency:
-  group: wu-angio353-production93-${{ github.ref }}
+  group: wu-angio353-runtime-${{ github.ref }}
   cancel-in-progress: true
 
 permissions:
@@ -22,25 +23,27 @@ jobs:
   recover:
     strategy:
       fail-fast: false
-      max-parallel: 3
+      max-parallel: 1
       matrix:
         shard: [0, 1, 2, 3, 4, 5]
     runs-on: ubuntu-latest
-    timeout-minutes: 100
+    timeout-minutes: 300
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
-      - name: Build authoritative 93-taxon panel and shard
+      - name: Build runtime-admitted nuclear panel and shard
         run: |
           python scripts/build_wu2022_angio353_backbone_panel.py \
             --manifest data/wu2022_public_backbone_manifest_v0_3.csv \
+            --runtime-exclusions data/wu2022_tpia_runtime_exclusions_v0_1.csv \
             --output build/full_panel.csv --summary build/full_panel_summary.json \
-            --expected-total 98 --expected-assembled 93 --expected-raw 5
+            --expected-total 98 --expected-frozen-assembled 93 --expected-frozen-raw 5 \
+            --expected-runtime-assembled 91
           python scripts/slice_wu2022_angio353_panel.py \
             --panel build/full_panel.csv --output build/shard_panel.csv \
-            --shard ${{ matrix.shard }} --n-shards 6
+            --expected-total 91 --shard ${{ matrix.shard }} --n-shards 6
       - name: Install marker-recovery tools
         run: |
           sudo apt-get install -y -qq diamond-aligner
@@ -53,23 +56,23 @@ jobs:
             -o build/targets/Angiosperms353.FAA
           test $(grep -c '^>' build/targets/Angiosperms353.FAA) -gt 4000
           diamond makedb --in build/targets/Angiosperms353.FAA --db build/targets/Angiosperms353
-      - name: Download and provenance-audit shard transcriptomes
+      - name: Download and provenance-audit shard transcriptomes serially
         run: |
           python scripts/download_tpia_panel_assemblies.py \
             --panel build/shard_panel.csv --out-dir build/assemblies \
-            --workers 3 --read-timeout 60 --wall-timeout 720 --retries 2
+            --workers 1 --read-timeout 90 --wall-timeout 1800 --retries 1
       - name: Recover translated Angiosperms353 hits
         run: |
           mkdir -p build/hits
           find build/assemblies/fastas -name '*.fna' -print0 | \
-            xargs -0 -n1 -P3 bash -c '
+            xargs -0 -n1 -P2 bash -c '
               fa="$0"; base=$(basename "$fa" .fna)
               diamond blastx --db build/targets/Angiosperms353 \
                 --query "$fa" --out "build/hits/${base}.tsv" \
                 --outfmt 6 qseqid sseqid pident length qlen slen evalue bitscore qstart qend sstart send qseq_translated \
                 --evalue 1e-5 --max-target-seqs 5 --max-hsps 1 --mid-sensitive --threads 2
             '
-      - name: Freeze all qualifying best hits for later 93-taxon occupancy
+      - name: Freeze all qualifying best hits for later full-panel occupancy
         run: |
           python scripts/extract_angio353_pilot_hits.py \
             --panel build/shard_panel.csv --hits-dir build/hits --out-dir build/markers \
@@ -79,6 +82,7 @@ jobs:
         if: always()
         run: |
           mkdir -p build/result
+          cp -f build/full_panel_summary.json build/result/ 2>/dev/null || true
           cp -f build/shard_panel.csv build/result/
           cp -f build/assemblies/archive_provenance.csv build/result/ 2>/dev/null || true
           cp -f build/assemblies/download_summary.json build/result/ 2>/dev/null || true
@@ -88,6 +92,6 @@ jobs:
       - uses: actions/upload-artifact@v4
         if: always()
         with:
-          name: wu-angio353-production93-shard-${{ matrix.shard }}
+          name: wu-angio353-runtime-shard-${{ matrix.shard }}
           path: build/result
           if-no-files-found: error
