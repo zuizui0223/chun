@@ -1,0 +1,36 @@
+{
+  "analysis_version": "v0.3",
+  "manifest_rows": 98,
+  "resource_counts": {
+    "ncbi_sra_raw_fallback": 5,
+    "tpia_id_bound_allassemblies": 93
+  },
+  "known_collision_promotions": [
+    {
+      "source_taxon": "Camellia euphlebia",
+      "run": "SRR19266673",
+      "biosample": "SAMN28458161",
+      "old_resource": {
+        "assembly_source": "tpia_id_bound_allassemblies",
+        "assembly_file": "239_Camellia euphlebia.zip",
+        "assembly_url": "https://tpia.teaplants.cn/web/All_assemblies/Fasta/239_Camellia%20euphlebia.zip"
+      }
+    },
+    {
+      "source_taxon": "Camellia pilosperma",
+      "run": "SRR19266674",
+      "biosample": "SAMN28458160",
+      "old_resource": {
+        "assembly_source": "tpia_id_bound_allassemblies",
+        "assembly_file": "182_Camellia pilosperma.zip",
+        "assembly_url": "https://tpia.teaplants.cn/web/All_assemblies/Fasta/182_Camellia%20pilosperma.zip"
+      }
+    }
+  ],
+  "expected_authoritative_state": {
+    "tpia_id_bound_allassemblies": 93,
+    "ncbi_sra_raw_fallback": 5
+  },
+  "decision": "known exact TPIA checksum-collision taxa are excluded from assembled-resource admission and reverted to frozen PRJNA665925 raw RNA-seq runs",
+  "claim_ceiling": "resource provenance only; five raw-read taxa require transcript/locus recovery before nuclear topology reconstruction"
+}

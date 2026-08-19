@@ -1,0 +1,86 @@
+name: Wu 2022 known payload-collision fallback
+
+on:
+  pull_request:
+    paths:
+      - 'data/wu2022_public_backbone_manifest_v0_2.csv'
+      - 'data/wu2022_prjna665925_run_taxa_v0_1.csv'
+      - 'scripts/promote_wu2022_collision_sra_fallbacks.py'
+      - '.github/workflows/wu2022-known-collision-fallback.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  correct:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.head_ref || github.ref_name }}
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Build v0.3 authoritative resource manifest
+        run: |
+          mkdir -p build/wu2022_v03
+          python scripts/promote_wu2022_collision_sra_fallbacks.py \
+            --manifest-v02 data/wu2022_public_backbone_manifest_v0_2.csv \
+            --run-taxa data/wu2022_prjna665925_run_taxa_v0_1.csv \
+            --output build/wu2022_v03/wu2022_public_backbone_manifest_v0_3.csv \
+            --summary build/wu2022_v03/wu2022_public_backbone_resource_summary_v0_3.json
+      - name: Freeze v0.3 resource gate
+        run: |
+          cp build/wu2022_v03/wu2022_public_backbone_manifest_v0_3.csv data/wu2022_public_backbone_manifest_v0_3.csv
+          cp build/wu2022_v03/wu2022_public_backbone_resource_summary_v0_3.json data/wu2022_public_backbone_resource_summary_v0_3.json
+          cat > docs/WU2022_KNOWN_COLLISION_FALLBACK_V0_3.md <<'EOF'
+          # Wu 2022 known checksum-collision correction
+
+          ## Decision
+
+          The authoritative public-backbone resource state is **93 ID-bound TPIA transcriptome assemblies + 5 frozen PRJNA665925 raw RNA-seq fallbacks**.
+
+          In addition to the three stale bulk-route fallbacks already moved to SRA, two nominally ID-bound TPIA archives are excluded because an earlier live audit found their outer ZIP SHA256 checksums to be exactly identical despite different taxon metadata and different NCBI runs:
+
+          - `Camellia euphlebia` -> `SRR19266673`
+          - `Camellia pilosperma` -> `SRR19266674`
+
+          The other raw fallbacks remain `C. lipoensis` (`SRR19266662`), `C. campanisepala` (`SRR19266763`) and `C. salicifolia` (`SRR19266758`).
+
+          ## Claim boundary
+
+          This is a provenance correction, not a phylogenetic result. The five SRA fallbacks require transcriptome/locus recovery before admission to a nuclear topology. No colour-transition or pigment-module inference is changed.
+          EOF
+      - name: Verify v0.3 state
+        run: |
+          python - <<'PY'
+          import csv,json
+          rows=list(csv.DictReader(open('data/wu2022_public_backbone_manifest_v0_3.csv')))
+          s=json.load(open('data/wu2022_public_backbone_resource_summary_v0_3.json'))
+          assert len(rows)==98
+          assert sum(r['assembly_source']=='tpia_id_bound_allassemblies' for r in rows)==93
+          assert sum(r['assembly_source']=='ncbi_sra_raw_fallback' for r in rows)==5
+          expected={'Camellia euphlebia':'SRR19266673','Camellia pilosperma':'SRR19266674'}
+          assert {r['source_taxon']:r['assembly_file'] for r in rows if r['source_taxon'] in expected}==expected
+          assert s['expected_authoritative_state']=={'tpia_id_bound_allassemblies':93,'ncbi_sra_raw_fallback':5}
+          PY
+      - name: Commit frozen v0.3 state
+        run: |
+          git config user.name github-actions[bot]
+          git config user.email 41898282+github-actions[bot]@users.noreply.github.com
+          git add data/wu2022_public_backbone_manifest_v0_3.csv data/wu2022_public_backbone_resource_summary_v0_3.json docs/WU2022_KNOWN_COLLISION_FALLBACK_V0_3.md
+          if git diff --cached --quiet; then
+            echo 'v0.3 already matches.'
+          else
+            git commit -m 'Freeze Wu2022 known-collision resource correction v0.3'
+            git push origin HEAD:${GITHUB_HEAD_REF:-${GITHUB_REF_NAME}}
+          fi
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: wu2022-known-collision-v03
+          path: build/wu2022_v03
+          if-no-files-found: error
