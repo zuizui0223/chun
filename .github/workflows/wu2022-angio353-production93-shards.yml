@@ -64,7 +64,8 @@ jobs:
         run: |
           python scripts/download_tpia_panel_assemblies.py \
             --panel build/shard_panel.csv --out-dir build/assemblies \
-            --workers 1 --read-timeout 90 --wall-timeout 1800 --retries 1
+            --workers 1 --read-timeout 90 --wall-timeout 1800 --retries 1 \
+            --allow-partial
       - name: Recover translated Angiosperms353 hits
         run: |
           mkdir -p build/hits
@@ -80,7 +81,8 @@ jobs:
         run: |
           python scripts/extract_angio353_pilot_hits.py \
             --panel build/shard_panel.csv --hits-dir build/hits --out-dir build/markers \
-            --min-subject-coverage 0.45 --min-aa 80 --min-occupancy 0.0
+            --min-subject-coverage 0.45 --min-aa 80 --min-occupancy 0.0 \
+            --allow-missing-taxa
           test -s build/markers/best_hits.csv
       - name: Stage compact shard result
         if: always()
