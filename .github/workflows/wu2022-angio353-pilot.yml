@@ -52,15 +52,14 @@ jobs:
           for x in resolved: print('RESOLVED',*x,sep='\t')
           PY
 
-      - name: Install phylogenomics tools
+      - name: Install minimal pilot phylogenomics tools
         run: |
           sudo apt-get update -qq
-          sudo apt-get install -y diamond-aligner mafft fasttree
-          if apt-cache show iqtree >/dev/null 2>&1; then sudo apt-get install -y iqtree; fi
+          sudo apt-get install -y -qq diamond-aligner mafft fasttree
           python -m pip install --disable-pip-version-check requests biopython
           diamond version
           mafft --version 2>&1 | head -n 1 || true
-          command -v iqtree2 || command -v iqtree || command -v FastTree || command -v fasttree
+          command -v FastTree || command -v fasttree
 
       - name: Fetch public Angiosperms353 protein targets
         run: |
@@ -115,19 +114,12 @@ jobs:
             --summary build/wu_angio353/concat_summary.json \
             --min-nongap 0.60
 
-      - name: Infer unrooted ML pilot tree
+      - name: Infer unrooted FastTree-LG pilot tree
         run: |
           mkdir -p build/wu_angio353/tree
-          if command -v iqtree2 >/dev/null 2>&1; then IQ=$(command -v iqtree2); elif command -v iqtree >/dev/null 2>&1; then IQ=$(command -v iqtree); else IQ=''; fi
-          if [ -n "$IQ" ]; then
-            "$IQ" -s build/wu_angio353/concat.faa -st AA -m LG+G4 -B 1000 -nt AUTO --prefix build/wu_angio353/tree/pilot
-            cp build/wu_angio353/tree/pilot.treefile build/wu_angio353/tree/pilot_tree.nwk
-            printf 'IQ-TREE\n' > build/wu_angio353/tree/engine.txt
-          else
-            FT=$(command -v FastTree || command -v fasttree)
-            "$FT" -lg build/wu_angio353/concat.faa > build/wu_angio353/tree/pilot_tree.nwk 2> build/wu_angio353/tree/fasttree.log
-            printf 'FastTree-LG fallback\n' > build/wu_angio353/tree/engine.txt
-          fi
+          FT=$(command -v FastTree || command -v fasttree)
+          "$FT" -lg build/wu_angio353/concat.faa > build/wu_angio353/tree/pilot_tree.nwk 2> build/wu_angio353/tree/fasttree.log
+          printf 'FastTree-LG pilot; final backbone requires IQ-TREE/coalescent gate\n' > build/wu_angio353/tree/engine.txt
 
       - name: Test minimum A and Y state changes
         run: |
@@ -159,7 +151,7 @@ jobs:
           cp -f build/wu_angio353/partitions.txt build/wu_angio353/result_artifact/ 2>/dev/null || true
           cp -f build/wu_angio353/tree/pilot_tree.nwk build/wu_angio353/result_artifact/ 2>/dev/null || true
           cp -f build/wu_angio353/tree/engine.txt build/wu_angio353/result_artifact/ 2>/dev/null || true
-          cp -f build/wu_angio353/tree/pilot.iqtree build/wu_angio353/result_artifact/ 2>/dev/null || true
+          cp -f build/wu_angio353/tree/fasttree.log build/wu_angio353/result_artifact/ 2>/dev/null || true
           cp -f build/wu_angio353/fitch_min_changes.csv build/wu_angio353/result_artifact/ 2>/dev/null || true
           cp -f build/wu_angio353/nearest_nonstate_pairs.csv build/wu_angio353/result_artifact/ 2>/dev/null || true
           printf 'artifact staged\n' > build/wu_angio353/result_artifact/status.txt
