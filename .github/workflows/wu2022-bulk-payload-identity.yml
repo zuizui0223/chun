@@ -1,0 +1,97 @@
+name: Wu 2022 raw-fallback provenance gate
+
+on:
+  pull_request:
+    paths:
+      - 'data/wu2022_public_backbone_manifest_v0_1.csv'
+      - 'data/wu2022_prjna665925_run_taxa_v0_1.csv'
+      - 'scripts/promote_wu2022_sra_fallback_manifest.py'
+      - '.github/workflows/wu2022-bulk-payload-identity.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.head_ref || github.ref_name }}
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Promote unavailable bulk routes to frozen SRA fallbacks
+        run: |
+          rm -rf build/wu2022_sra_fallback
+          mkdir -p build/wu2022_sra_fallback
+          python scripts/promote_wu2022_sra_fallback_manifest.py \
+            --manifest-v01 data/wu2022_public_backbone_manifest_v0_1.csv \
+            --run-taxa data/wu2022_prjna665925_run_taxa_v0_1.csv \
+            --output build/wu2022_sra_fallback/wu2022_public_backbone_manifest_v0_2.csv \
+            --summary build/wu2022_sra_fallback/summary.json
+
+      - name: Validate corrected 98-taxon resource gate
+        run: |
+          python - <<'PY'
+          import csv,json
+          s=json.load(open('build/wu2022_sra_fallback/summary.json'))
+          assert s['manifest_rows']==98, s
+          assert s['tpia_id_bound_assemblies']==95, s
+          assert s['ncbi_sra_raw_fallbacks']==3, s
+          assert s['tpia_bulk_fallbacks_remaining']==0, s
+          observed={r['source_taxon']:r['run'] for r in s['raw_fallbacks']}
+          assert observed=={
+            'Camellia lipoensis':'SRR19266662',
+            'Camellia campanisepala':'SRR19266763',
+            'Camellia salicifolia':'SRR19266758',
+          }, observed
+          rows=list(csv.DictReader(open('build/wu2022_sra_fallback/wu2022_public_backbone_manifest_v0_2.csv')))
+          assert len(rows)==98
+          assert not [r for r in rows if r['assembly_source']=='tpia_bulk_fallback']
+          PY
+
+      - name: Freeze corrected manifest and handoff
+        run: |
+          cp build/wu2022_sra_fallback/wu2022_public_backbone_manifest_v0_2.csv data/wu2022_public_backbone_manifest_v0_2.csv
+          cp build/wu2022_sra_fallback/summary.json data/wu2022_public_backbone_fallback_summary_v0_2.json
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          s=json.load(open('data/wu2022_public_backbone_fallback_summary_v0_2.json'))
+          lines=['# Wu 2022 public-backbone fallback correction','',
+                 '## Result','',
+                 'The three TPIA bulk-download fallbacks were retired after the frozen URL for `Camellia campanisepala` returned HTTP 404 during the live payload audit. The authoritative v0.2 resource manifest therefore uses **95 ID-bound TPIA assemblies + 3 frozen NCBI SRA raw-read fallbacks**.','',
+                 '- `Camellia lipoensis` -> `SRR19266662`',
+                 '- `Camellia campanisepala` -> `SRR19266763`',
+                 '- `Camellia salicifolia` -> `SRR19266758`','',
+                 'No TPIA bulk fallback remains in v0.2.','',
+                 '## Next gate','',
+                 'Assemble or otherwise recover transcript sequences for the three raw-read fallbacks, then pass all 98 taxa through the same low-copy nuclear-locus recovery pipeline.','',
+                 '## Claim boundary','',
+                 'This fixes resource provenance only. The three raw SRA runs are not yet equivalent to assembled transcriptomes and are not admitted to topology reconstruction until transcript/locus recovery succeeds.','']
+          Path('docs/WU2022_SRA_FALLBACK_CORRECTION.md').write_text('\n'.join(lines),encoding='utf-8')
+          PY
+
+      - name: Commit corrected resource gate
+        run: |
+          git config user.name github-actions[bot]
+          git config user.email 41898282+github-actions[bot]@users.noreply.github.com
+          git add data/wu2022_public_backbone_manifest_v0_2.csv data/wu2022_public_backbone_fallback_summary_v0_2.json docs/WU2022_SRA_FALLBACK_CORRECTION.md
+          if git diff --cached --quiet; then
+            echo 'Corrected Wu2022 resource gate already matches.'
+          else
+            git commit -m 'Freeze Wu2022 SRA fallback correction'
+            git push origin HEAD:${GITHUB_HEAD_REF:-${GITHUB_REF_NAME}}
+          fi
+
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: wu2022-sra-fallback-provenance
+          path: build/wu2022_sra_fallback
+          if-no-files-found: error

@@ -1,0 +1,32 @@
+{
+  "analysis_version": "v0.2",
+  "manifest_rows": 98,
+  "tpia_id_bound_assemblies": 95,
+  "ncbi_sra_raw_fallbacks": 3,
+  "tpia_bulk_fallbacks_remaining": 0,
+  "raw_fallbacks": [
+    {
+      "source_taxon": "Camellia campanisepala",
+      "run": "SRR19266763",
+      "biosample": "SAMN28458199",
+      "bioproject": "PRJNA665925",
+      "library_strategy": "RNA-Seq"
+    },
+    {
+      "source_taxon": "Camellia lipoensis",
+      "run": "SRR19266662",
+      "biosample": "SAMN28458194",
+      "bioproject": "PRJNA665925",
+      "library_strategy": "RNA-Seq"
+    },
+    {
+      "source_taxon": "Camellia salicifolia",
+      "run": "SRR19266758",
+      "biosample": "SAMN28458204",
+      "bioproject": "PRJNA665925",
+      "library_strategy": "RNA-Seq"
+    }
+  ],
+  "decision": "retire unavailable TPIA bulk fallback URLs and use the frozen PRJNA665925 SRA runs for the three affected taxa",
+  "claim_ceiling": "resource provenance only; the three raw-read fallbacks must be assembled and passed through the same locus-recovery pipeline before inclusion in the nuclear topology"
+}
