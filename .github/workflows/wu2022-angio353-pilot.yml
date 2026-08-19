@@ -1,9 +1,10 @@
-name: Wu 2022 Angiosperms353 nuclear pilot
+name: Wu 2022 Angiosperms353 held-out nuclear pilot
 
 on:
   pull_request:
     paths:
       - 'data/wu2022_angio353_pilot_panel_v0_1.csv'
+      - 'data/wu2022_public_backbone_manifest_v0_2.csv'
       - 'scripts/download_tpia_panel_assemblies.py'
       - 'scripts/extract_angio353_pilot_hits.py'
       - 'scripts/concat_angio353_pilot_alignments.py'
@@ -23,6 +24,31 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
+
+      - name: Verify pilot against authoritative v0.2 resource manifest
+        run: |
+          python - <<'PY'
+          import csv
+          panel=list(csv.DictReader(open('data/wu2022_angio353_pilot_panel_v0_1.csv',encoding='utf-8-sig')))
+          manifest=list(csv.DictReader(open('data/wu2022_public_backbone_manifest_v0_2.csv',encoding='utf-8-sig')))
+          bytax={r['source_taxon']:r for r in manifest}
+          missing=[]; wrong=[]
+          for r in panel:
+              if r.get('admission_status','admit').lower()!='admit':
+                  continue
+              tax=r['taxon']
+              if tax not in bytax:
+                  missing.append(tax); continue
+              m=bytax[tax]
+              if m['assembly_source']!='tpia_id_bound_allassemblies':
+                  wrong.append((tax,m['assembly_source']))
+              if r['assembly_url'] != m['assembly_url']:
+                  wrong.append((tax,'pilot_url_differs_from_v0.2_manifest'))
+          assert not missing, missing
+          assert not wrong, wrong
+          print('authoritative_manifest_gate_pass',sum(r.get('admission_status','admit').lower()=='admit' for r in panel))
+          PY
+
       - name: Install phylogenomics tools
         run: |
           sudo apt-get update -qq
@@ -32,6 +58,7 @@ jobs:
           diamond version
           mafft --version 2>&1 | head -n 1 || true
           command -v iqtree2 || command -v iqtree || command -v FastTree || command -v fasttree
+
       - name: Fetch public Angiosperms353 protein targets
         run: |
           mkdir -p build/wu_angio353/targets
@@ -39,31 +66,27 @@ jobs:
             'https://raw.githubusercontent.com/mossmatters/Angiosperms353/master/Angiosperms353.FAA' \
             -o build/wu_angio353/targets/Angiosperms353.FAA
           grep -c '^>' build/wu_angio353/targets/Angiosperms353.FAA
-          diamond makedb \
-            --in build/wu_angio353/targets/Angiosperms353.FAA \
-            --db build/wu_angio353/targets/Angiosperms353
+          diamond makedb --in build/wu_angio353/targets/Angiosperms353.FAA --db build/wu_angio353/targets/Angiosperms353
+
       - name: Download and provenance-audit admitted ID-bound TPIA assemblies
         run: |
           python scripts/download_tpia_panel_assemblies.py \
             --panel data/wu2022_angio353_pilot_panel_v0_1.csv \
             --out-dir build/wu_angio353/assemblies \
             --workers 8
+
       - name: Recover Angiosperms353 translated marker HSPs
         run: |
           mkdir -p build/wu_angio353/hits
           find build/wu_angio353/assemblies/fastas -name '*.fna' -print0 | \
             xargs -0 -n1 -P4 bash -c '
-              fa="$0"
-              base=$(basename "$fa" .fna)
-              echo "blastx $base"
-              diamond blastx \
-                --db build/wu_angio353/targets/Angiosperms353 \
-                --query "$fa" \
-                --out "build/wu_angio353/hits/${base}.tsv" \
+              fa="$0"; base=$(basename "$fa" .fna); echo "blastx $base"
+              diamond blastx --db build/wu_angio353/targets/Angiosperms353 \
+                --query "$fa" --out "build/wu_angio353/hits/${base}.tsv" \
                 --outfmt 6 qseqid sseqid pident length qlen slen evalue bitscore qstart qend sstart send qseq_translated \
-                --evalue 1e-5 --max-target-seqs 5 --max-hsps 1 \
-                --mid-sensitive --threads 2
+                --evalue 1e-5 --max-target-seqs 5 --max-hsps 1 --mid-sensitive --threads 2
             '
+
       - name: Admit high-occupancy markers
         run: |
           python scripts/extract_angio353_pilot_hits.py \
@@ -72,14 +95,13 @@ jobs:
             --out-dir build/wu_angio353/markers \
             --min-subject-coverage 0.45 --min-aa 80 --min-occupancy 0.80
           test $(find build/wu_angio353/markers -name 'locus_*.faa' | wc -l) -ge 20
+
       - name: Align admitted markers
         run: |
           mkdir -p build/wu_angio353/align
           find build/wu_angio353/markers -name 'locus_*.faa' -print0 | \
-            xargs -0 -n1 -P4 bash -c '
-              f="$0"; b=$(basename "$f" .faa)
-              mafft --auto --quiet "$f" > "build/wu_angio353/align/${b}.aln.faa"
-            '
+            xargs -0 -n1 -P4 bash -c 'f="$0"; b=$(basename "$f" .faa); mafft --auto --quiet "$f" > "build/wu_angio353/align/${b}.aln.faa"'
+
       - name: Concatenate trimmed AA markers
         run: |
           python scripts/concat_angio353_pilot_alignments.py \
@@ -89,19 +111,13 @@ jobs:
             --partition build/wu_angio353/partitions.txt \
             --summary build/wu_angio353/concat_summary.json \
             --min-nongap 0.60
+
       - name: Infer unrooted ML pilot tree
         run: |
           mkdir -p build/wu_angio353/tree
-          if command -v iqtree2 >/dev/null 2>&1; then
-            IQ=$(command -v iqtree2)
-          elif command -v iqtree >/dev/null 2>&1; then
-            IQ=$(command -v iqtree)
-          else
-            IQ=''
-          fi
+          if command -v iqtree2 >/dev/null 2>&1; then IQ=$(command -v iqtree2); elif command -v iqtree >/dev/null 2>&1; then IQ=$(command -v iqtree); else IQ=''; fi
           if [ -n "$IQ" ]; then
-            "$IQ" -s build/wu_angio353/concat.faa -st AA -m LG+G4 -B 1000 -nt AUTO \
-              --prefix build/wu_angio353/tree/pilot
+            "$IQ" -s build/wu_angio353/concat.faa -st AA -m LG+G4 -B 1000 -nt AUTO --prefix build/wu_angio353/tree/pilot
             cp build/wu_angio353/tree/pilot.treefile build/wu_angio353/tree/pilot_tree.nwk
             printf 'IQ-TREE\n' > build/wu_angio353/tree/engine.txt
           else
@@ -109,7 +125,7 @@ jobs:
             "$FT" -lg build/wu_angio353/concat.faa > build/wu_angio353/tree/pilot_tree.nwk 2> build/wu_angio353/tree/fasttree.log
             printf 'FastTree-LG fallback\n' > build/wu_angio353/tree/engine.txt
           fi
-          cat build/wu_angio353/tree/pilot_tree.nwk
+
       - name: Test minimum A and Y state changes
         run: |
           python scripts/analyze_pilot_tree_fitch.py \
@@ -117,27 +133,15 @@ jobs:
             --panel data/wu2022_angio353_pilot_panel_v0_1.csv \
             --output build/wu_angio353/fitch_min_changes.csv \
             --pairs-output build/wu_angio353/nearest_nonstate_pairs.csv
+
       - name: Report
         if: always()
         run: |
-          echo '### Wu/TPIA Angiosperms353 pilot' >> "$GITHUB_STEP_SUMMARY"
-          for f in \
-            build/wu_angio353/assemblies/download_summary.json \
-            build/wu_angio353/assemblies/quarantined_taxa.csv \
-            build/wu_angio353/markers/summary.json \
-            build/wu_angio353/concat_summary.json \
-            build/wu_angio353/tree/engine.txt \
-            build/wu_angio353/tree/pilot_tree.nwk \
-            build/wu_angio353/fitch_min_changes.csv \
-            build/wu_angio353/nearest_nonstate_pairs.csv; do
-            if [ -f "$f" ]; then
-              echo "#### $f" >> "$GITHUB_STEP_SUMMARY"
-              echo '```' >> "$GITHUB_STEP_SUMMARY"
-              head -c 30000 "$f" >> "$GITHUB_STEP_SUMMARY"
-              echo >> "$GITHUB_STEP_SUMMARY"
-              echo '```' >> "$GITHUB_STEP_SUMMARY"
-            fi
+          echo '### Wu/TPIA Angiosperms353 held-out pilot' >> "$GITHUB_STEP_SUMMARY"
+          for f in build/wu_angio353/assemblies/download_summary.json build/wu_angio353/assemblies/quarantined_taxa.csv build/wu_angio353/markers/summary.json build/wu_angio353/concat_summary.json build/wu_angio353/tree/engine.txt build/wu_angio353/tree/pilot_tree.nwk build/wu_angio353/fitch_min_changes.csv build/wu_angio353/nearest_nonstate_pairs.csv; do
+            if [ -f "$f" ]; then echo "#### $f" >> "$GITHUB_STEP_SUMMARY"; echo '```' >> "$GITHUB_STEP_SUMMARY"; head -c 30000 "$f" >> "$GITHUB_STEP_SUMMARY"; echo >> "$GITHUB_STEP_SUMMARY"; echo '```' >> "$GITHUB_STEP_SUMMARY"; fi
           done
+
       - name: Stage compact result artifact
         if: always()
         run: |
