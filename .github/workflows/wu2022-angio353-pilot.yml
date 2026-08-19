@@ -54,7 +54,6 @@ jobs:
 
       - name: Install minimal pilot phylogenomics tools
         run: |
-          sudo apt-get update -qq
           sudo apt-get install -y -qq diamond-aligner mafft fasttree
           python -m pip install --disable-pip-version-check requests biopython
           diamond version
