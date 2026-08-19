@@ -59,7 +59,7 @@ def main():
                 rec={'taxon':tax,'tip':slug(tax),'colour_state':state[tax],'section':section[tax],
                      'locus':loc,'qseqid':h['qseqid'],'sseqid':h['sseqid'],'pident':float(h['pident']),
                      'aligned_aa':length,'subject_coverage':scov,'evalue':float(h['evalue']),
-                     'bitscore':float(h['bitscore']),'translated_hsp_aa':len(seq)}
+                     'bitscore':float(h['bitscore']),'translated_hsp_aa':len(seq),'translated_hsp_seq':seq}
                 if length < a.min_aa or scov < a.min_subject_coverage or len(seq)<a.min_aa: continue
                 key=(tax,loc)
                 if key not in best or rec['bitscore']>best[key][0]['bitscore']:
@@ -83,7 +83,7 @@ def main():
         w=csv.DictWriter(f,fieldnames=list(locus_summary[0]) if locus_summary else ['locus']);w.writeheader();w.writerows(locus_summary)
     summary={'n_panel_taxa':len(taxa),'n_recovered_taxa':len(taxa)-len(missing),'n_missing_taxa':len(missing),'missing_taxa':sorted(missing),'candidate_loci':len(loci),'admitted_loci':len(admitted),
              'min_occupancy':a.min_occupancy,'min_subject_coverage':a.min_subject_coverage,'min_aa':a.min_aa,
-             'admitted_loci_ids':admitted,
+             'admitted_loci_ids':admitted,'best_hit_sequences_retained':True,
              'claim_ceiling':'best translated HSP per Angiosperms353 locus/admitted species; missing payloads retained as explicit missing data; marker recovery only, not orthology proof'}
     (a.out_dir/'summary.json').write_text(json.dumps(summary,indent=2)+'\n')
     print(json.dumps(summary,indent=2))
