@@ -4,6 +4,7 @@ on:
   pull_request:
     paths:
       - 'data/wu2022_public_backbone_manifest_v0_3.csv'
+      - 'data/wu2022_tpia_runtime_exclusions_v0_1.csv'
       - 'scripts/build_wu2022_angio353_backbone_panel.py'
       - '.github/workflows/wu2022-angio353-backbone-panel.yml'
   workflow_dispatch:
@@ -19,29 +20,34 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
-      - name: Build assembled-only backbone panel
+      - name: Build runtime-admitted backbone panel
         run: |
           python scripts/build_wu2022_angio353_backbone_panel.py \
             --manifest data/wu2022_public_backbone_manifest_v0_3.csv \
-            --output build/wu_backbone93/panel.csv \
-            --summary build/wu_backbone93/panel_summary.json \
-            --expected-total 98 --expected-assembled 93 --expected-raw 5
+            --runtime-exclusions data/wu2022_tpia_runtime_exclusions_v0_1.csv \
+            --output build/wu_backbone/panel.csv \
+            --summary build/wu_backbone/panel_summary.json \
+            --expected-total 98 --expected-frozen-assembled 93 --expected-frozen-raw 5 \
+            --expected-runtime-assembled 91
       - name: Verify hard provenance boundary
         run: |
           python - <<'PY'
-          import csv, json
-          p=list(csv.DictReader(open('build/wu_backbone93/panel.csv',encoding='utf-8')))
-          s=json.load(open('build/wu_backbone93/panel_summary.json'))
-          assert len(p)==93
-          assert len({r['taxon'] for r in p})==93
-          assert len({r['assembly_url'] for r in p})==93
+          import csv,json
+          p=list(csv.DictReader(open('build/wu_backbone/panel.csv',encoding='utf-8')))
+          s=json.load(open('build/wu_backbone/panel_summary.json'))
+          assert len(p)==91
+          assert len({r['taxon'] for r in p})==91
+          assert len({r['assembly_url'] for r in p})==91
           assert all(r['admission_status']=='admit' for r in p)
           assert all(r['colour_state']=='U' for r in p)
-          assert s['n_raw_held_out']==5
+          assert s['n_frozen_raw']==5
+          assert s['n_runtime_tpia_excluded']==2
+          assert s['n_total_held_out']==7
+          assert set(s['runtime_exclusions'])=={'Camellia granthamiana','Camellia tenii'}
           print(json.dumps(s,indent=2))
           PY
       - uses: actions/upload-artifact@v4
         with:
-          name: wu2022-angio353-backbone93-panel
-          path: build/wu_backbone93/
+          name: wu2022-angio353-runtime91-panel
+          path: build/wu_backbone/
           if-no-files-found: error
