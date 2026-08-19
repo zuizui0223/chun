@@ -31,22 +31,25 @@ jobs:
           import csv
           panel=list(csv.DictReader(open('data/wu2022_angio353_pilot_panel_v0_1.csv',encoding='utf-8-sig')))
           manifest=list(csv.DictReader(open('data/wu2022_public_backbone_manifest_v0_2.csv',encoding='utf-8-sig')))
-          bytax={r['source_taxon']:r for r in manifest}
-          missing=[]; wrong=[]
+          missing=[]; wrong=[]; resolved=[]
           for r in panel:
               if r.get('admission_status','admit').lower()!='admit':
                   continue
               tax=r['taxon']
-              if tax not in bytax:
+              candidates=[m for m in manifest if tax in {m['source_taxon'],m['resource_taxon']}]
+              if not candidates:
                   missing.append(tax); continue
-              m=bytax[tax]
+              exact_url=[m for m in candidates if m['assembly_url']==r['assembly_url']]
+              if len(exact_url)!=1:
+                  wrong.append((tax,'authoritative_resource_crosswalk_or_url_not_unique',[(m['source_taxon'],m['resource_taxon'],m['assembly_url']) for m in candidates])); continue
+              m=exact_url[0]
               if m['assembly_source']!='tpia_id_bound_allassemblies':
                   wrong.append((tax,m['assembly_source']))
-              if r['assembly_url'] != m['assembly_url']:
-                  wrong.append((tax,'pilot_url_differs_from_v0.2_manifest'))
+              resolved.append((tax,m['source_taxon'],m['resource_taxon']))
           assert not missing, missing
           assert not wrong, wrong
-          print('authoritative_manifest_gate_pass',sum(r.get('admission_status','admit').lower()=='admit' for r in panel))
+          print('authoritative_manifest_gate_pass',len(resolved))
+          for x in resolved: print('RESOLVED',*x,sep='\t')
           PY
 
       - name: Install phylogenomics tools
@@ -159,7 +162,7 @@ jobs:
           cp -f build/wu_angio353/tree/pilot.iqtree build/wu_angio353/result_artifact/ 2>/dev/null || true
           cp -f build/wu_angio353/fitch_min_changes.csv build/wu_angio353/result_artifact/ 2>/dev/null || true
           cp -f build/wu_angio353/nearest_nonstate_pairs.csv build/wu_angio353/result_artifact/ 2>/dev/null || true
-          touch build/wu_angio353/result_artifact/.artifact_created
+          printf 'artifact staged\n' > build/wu_angio353/result_artifact/status.txt
       - uses: actions/upload-artifact@v4
         if: always()
         with:
