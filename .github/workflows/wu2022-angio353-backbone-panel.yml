@@ -1,0 +1,47 @@
+name: Wu 2022 Angiosperms353 backbone panel gate
+
+on:
+  pull_request:
+    paths:
+      - 'data/wu2022_public_backbone_manifest_v0_3.csv'
+      - 'scripts/build_wu2022_angio353_backbone_panel.py'
+      - '.github/workflows/wu2022-angio353-backbone-panel.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  panel:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Build assembled-only backbone panel
+        run: |
+          python scripts/build_wu2022_angio353_backbone_panel.py \
+            --manifest data/wu2022_public_backbone_manifest_v0_3.csv \
+            --output build/wu_backbone93/panel.csv \
+            --summary build/wu_backbone93/panel_summary.json \
+            --expected-total 98 --expected-assembled 93 --expected-raw 5
+      - name: Verify hard provenance boundary
+        run: |
+          python - <<'PY'
+          import csv, json
+          p=list(csv.DictReader(open('build/wu_backbone93/panel.csv',encoding='utf-8')))
+          s=json.load(open('build/wu_backbone93/panel_summary.json'))
+          assert len(p)==93
+          assert len({r['taxon'] for r in p})==93
+          assert len({r['assembly_url'] for r in p})==93
+          assert all(r['admission_status']=='admit' for r in p)
+          assert all(r['colour_state']=='U' for r in p)
+          assert s['n_raw_held_out']==5
+          print(json.dumps(s,indent=2))
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: wu2022-angio353-backbone93-panel
+          path: build/wu_backbone93/
+          if-no-files-found: error
