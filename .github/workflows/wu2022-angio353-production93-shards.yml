@@ -1,0 +1,93 @@
+name: Wu 2022 Angiosperms353 production93 shard recovery
+
+on:
+  pull_request:
+    paths:
+      - 'data/wu2022_public_backbone_manifest_v0_3.csv'
+      - 'scripts/build_wu2022_angio353_backbone_panel.py'
+      - 'scripts/slice_wu2022_angio353_panel.py'
+      - 'scripts/download_tpia_panel_assemblies.py'
+      - 'scripts/extract_angio353_pilot_hits.py'
+      - '.github/workflows/wu2022-angio353-production93-shards.yml'
+  workflow_dispatch:
+
+concurrency:
+  group: wu-angio353-production93-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  recover:
+    strategy:
+      fail-fast: false
+      max-parallel: 3
+      matrix:
+        shard: [0, 1, 2, 3, 4, 5]
+    runs-on: ubuntu-latest
+    timeout-minutes: 100
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Build authoritative 93-taxon panel and shard
+        run: |
+          python scripts/build_wu2022_angio353_backbone_panel.py \
+            --manifest data/wu2022_public_backbone_manifest_v0_3.csv \
+            --output build/full_panel.csv --summary build/full_panel_summary.json \
+            --expected-total 98 --expected-assembled 93 --expected-raw 5
+          python scripts/slice_wu2022_angio353_panel.py \
+            --panel build/full_panel.csv --output build/shard_panel.csv \
+            --shard ${{ matrix.shard }} --n-shards 6
+      - name: Install marker-recovery tools
+        run: |
+          sudo apt-get install -y -qq diamond-aligner
+          python -m pip install --disable-pip-version-check requests
+      - name: Fetch Angiosperms353 targets
+        run: |
+          mkdir -p build/targets
+          curl --fail --location --retry 3 \
+            https://raw.githubusercontent.com/mossmatters/Angiosperms353/master/Angiosperms353.FAA \
+            -o build/targets/Angiosperms353.FAA
+          test $(grep -c '^>' build/targets/Angiosperms353.FAA) -gt 4000
+          diamond makedb --in build/targets/Angiosperms353.FAA --db build/targets/Angiosperms353
+      - name: Download and provenance-audit shard transcriptomes
+        run: |
+          python scripts/download_tpia_panel_assemblies.py \
+            --panel build/shard_panel.csv --out-dir build/assemblies \
+            --workers 3 --read-timeout 60 --wall-timeout 720 --retries 2
+      - name: Recover translated Angiosperms353 hits
+        run: |
+          mkdir -p build/hits
+          find build/assemblies/fastas -name '*.fna' -print0 | \
+            xargs -0 -n1 -P3 bash -c '
+              fa="$0"; base=$(basename "$fa" .fna)
+              diamond blastx --db build/targets/Angiosperms353 \
+                --query "$fa" --out "build/hits/${base}.tsv" \
+                --outfmt 6 qseqid sseqid pident length qlen slen evalue bitscore qstart qend sstart send qseq_translated \
+                --evalue 1e-5 --max-target-seqs 5 --max-hsps 1 --mid-sensitive --threads 2
+            '
+      - name: Freeze all qualifying best hits for later 93-taxon occupancy
+        run: |
+          python scripts/extract_angio353_pilot_hits.py \
+            --panel build/shard_panel.csv --hits-dir build/hits --out-dir build/markers \
+            --min-subject-coverage 0.45 --min-aa 80 --min-occupancy 0.0
+          test -s build/markers/best_hits.csv
+      - name: Stage compact shard result
+        if: always()
+        run: |
+          mkdir -p build/result
+          cp -f build/shard_panel.csv build/result/
+          cp -f build/assemblies/archive_provenance.csv build/result/ 2>/dev/null || true
+          cp -f build/assemblies/download_summary.json build/result/ 2>/dev/null || true
+          cp -f build/assemblies/download_failures.json build/result/ 2>/dev/null || true
+          cp -f build/markers/best_hits.csv build/result/ 2>/dev/null || true
+          cp -f build/markers/summary.json build/result/ 2>/dev/null || true
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: wu-angio353-production93-shard-${{ matrix.shard }}
+          path: build/result
+          if-no-files-found: error
