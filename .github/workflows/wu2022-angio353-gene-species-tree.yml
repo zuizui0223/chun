@@ -18,17 +18,17 @@ permissions:
 env:
   FROZEN_ALIGNMENT_RUN_ID: '32324054012'
   N_LOCI: '339'
-  N_SHARDS: '6'
+  N_SHARDS: '12'
 
 jobs:
   gene_trees:
     strategy:
       fail-fast: false
-      max-parallel: 3
+      max-parallel: 6
       matrix:
-        shard: [0, 1, 2, 3, 4, 5]
+        shard: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11]
     runs-on: ubuntu-latest
-    timeout-minutes: 240
+    timeout-minutes: 180
     steps:
       - uses: actions/checkout@v4
       - name: Install IQ-TREE
@@ -59,25 +59,31 @@ jobs:
           keep=[p for i,p in enumerate(files) if i % n == shard]
           Path('build/shard.list').write_text('\n'.join(keep)+'\n')
           print({'shard':shard,'n_loci':len(keep),'first':keep[0],'last':keep[-1]})
-          assert 50 <= len(keep) <= 60
+          assert 27 <= len(keep) <= 29
           PY
       - name: Infer locus gene trees with LG+G4 and UFBoot
         run: |
           mkdir -p build/gene_trees
-          while IFS= read -r aln; do
+          export IQTREE
+          cat build/shard.list | xargs -P 2 -I{} bash -c '
+            set -euo pipefail
+            aln="$1"
             base=$(basename "$aln" .aln.faa)
             "$IQTREE" -s "$aln" -st AA -m LG+G4 -B 1000 -nt 1 \
               -pre "build/gene_trees/$base" -quiet
             test -s "build/gene_trees/$base.treefile"
-          done < build/shard.list
-          test $(find build/gene_trees -name '*.treefile' | wc -l) -ge 50
+          ' _ {}
+          expected=$(wc -l < build/shard.list)
+          observed=$(find build/gene_trees -name '*.treefile' | wc -l)
+          test "$observed" -eq "$expected"
       - name: Freeze shard tree list
         run: |
           cat $(find build/gene_trees -name '*.treefile' | sort) > build/gene_trees_shard.nwk
           python - <<'PY'
-          import glob,json,os
+          import glob,json
           trees=sorted(glob.glob('build/gene_trees/*.treefile'))
-          out={'shard':int('${{ matrix.shard }}'),'n_gene_trees':len(trees),'model':'LG+G4','ufboot':1000,'claim_ceiling':'independent protein-locus gene trees only; no colour information used'}
+          out={'shard':int('${{ matrix.shard }}'),'n_gene_trees':len(trees),'n_shards':12,'locus_parallelism_per_runner':2,'model':'LG+G4','ufboot':1000,'claim_ceiling':'independent protein-locus gene trees only; no colour information used'}
+          assert 27 <= len(trees) <= 29, out
           open('build/gene_tree_summary.json','w').write(json.dumps(out,indent=2)+'\n')
           print(json.dumps(out,indent=2))
           PY
@@ -102,6 +108,7 @@ jobs:
           path: build/shards
       - name: Assemble complete gene-tree set
         run: |
+          test $(find build/shards -name '*.treefile' | wc -l) -eq "$N_LOCI"
           cat $(find build/shards -name '*.treefile' | sort) > build/gene_trees_339.nwk
           test $(grep -c ';' build/gene_trees_339.nwk) -eq "$N_LOCI"
       - name: Build current ASTER wASTRAL
