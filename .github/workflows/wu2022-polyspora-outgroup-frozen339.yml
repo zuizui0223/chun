@@ -1,0 +1,99 @@
+name: Wu 2022 Polyspora frozen339 outgroup recovery
+
+on:
+  pull_request:
+    paths:
+      - 'data/wu2022_polyspora_outgroup_v0_1.csv'
+      - 'scripts/freeze_hybpiper_frozen339.py'
+      - '.github/workflows/wu2022-polyspora-outgroup-frozen339.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  actions: read
+
+env:
+  FROZEN_RECOVERY_RUN_ID: '32256913348'
+  RUN: 'SRR19266757'
+
+jobs:
+  recover:
+    runs-on: ubuntu-latest
+    timeout-minutes: 180
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install HybPiper dependencies
+        run: |
+          sudo apt-get install -y -qq spades exonerate parallel ncbi-blast+ diamond-aligner mafft samtools bwa bbmap
+          python -m pip install --disable-pip-version-check 'hybpiper==2.3.4'
+          hybpiper check_dependencies
+      - name: Freeze the existing 339-locus definition and targets
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          mkdir -p build/frozen build/targets
+          gh run download "$FROZEN_RECOVERY_RUN_ID" --repo "$GITHUB_REPOSITORY" \
+            --name wu-angio353-runtime91-global-occupancy --dir build/frozen
+          test -s build/frozen/global_occupancy/locus_occupancy.csv
+          curl --fail --location --retry 3 \
+            https://raw.githubusercontent.com/mossmatters/Angiosperms353/master/Angiosperms353.FAA \
+            -o build/targets/Angiosperms353.FAA
+          test $(grep -c '^>' build/targets/Angiosperms353.FAA) -gt 4000
+      - name: Resolve and download exact ENA FASTQ payloads
+        run: |
+          mkdir -p build/reads
+          curl --fail --location --retry 3 \
+            "https://www.ebi.ac.uk/ena/portal/api/filereport?accession=$RUN&result=read_run&fields=fastq_ftp,fastq_md5,fastq_bytes&format=tsv" \
+            -o build/ena.tsv
+          python - <<'PY'
+          import csv,hashlib,os,subprocess
+          from pathlib import Path
+          rows=list(csv.DictReader(open('build/ena.tsv'),delimiter='\t'))
+          if len(rows)!=1: raise SystemExit(f'unexpected ENA rows: {len(rows)}')
+          urls=(rows[0].get('fastq_ftp') or '').split(';')
+          md5s=(rows[0].get('fastq_md5') or '').split(';')
+          if len(urls)!=2: raise SystemExit(f'expected paired FASTQ, got {urls}')
+          for i,(u,m) in enumerate(zip(urls,md5s),1):
+              url='https://'+u if u.startswith('ftp.') else u.replace('ftp://','https://')
+              p=Path(f'build/reads/R{i}.fastq.gz')
+              subprocess.run(['curl','--fail','--location','--retry','3','--retry-all-errors',url,'-o',str(p)],check=True)
+              h=hashlib.md5(p.read_bytes()).hexdigest()
+              if m and h!=m: raise SystemExit(f'md5 mismatch R{i}: {h} != {m}')
+              print({'read':i,'bytes':p.stat().st_size,'md5':h})
+          PY
+          test -s build/reads/R1.fastq.gz
+          test -s build/reads/R2.fastq.gz
+      - name: Targeted Angiosperms353 assembly with HybPiper
+        run: |
+          mkdir -p build/hybpiper
+          cd build/hybpiper
+          hybpiper assemble \
+            -r ../reads/R1.fastq.gz ../reads/R2.fastq.gz \
+            -t_aa ../targets/Angiosperms353.FAA \
+            --prefix Polyspora_speciosa --diamond --diamond_sensitivity mid-sensitive \
+            --cpu 4 --no_intronerate --skip_targetfile_checks
+          test -d Polyspora_speciosa
+      - name: Freeze only the pre-admitted 339 loci
+        run: |
+          python scripts/freeze_hybpiper_frozen339.py \
+            --taxon 'Polyspora speciosa' \
+            --sample-dir build/hybpiper/Polyspora_speciosa \
+            --occupancy build/frozen/global_occupancy/locus_occupancy.csv \
+            --out-dir build/result
+          python - <<'PY'
+          import json
+          s=json.load(open('build/result/summary.json'))
+          assert s['frozen_loci']==339, s
+          assert s['recovered_loci']>=250, s
+          print(json.dumps(s,indent=2))
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: wu2022-polyspora-speciosa-frozen339
+          path: |
+            build/ena.tsv
+            build/result/
+          if-no-files-found: error
