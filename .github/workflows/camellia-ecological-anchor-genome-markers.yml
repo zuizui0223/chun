@@ -1,0 +1,102 @@
+name: Camellia ecological-anchor frozen marker recovery
+
+on:
+  pull_request:
+    paths:
+      - 'data/ultimate_ecology_genome_extension_v0_1.csv'
+      - 'scripts/recover_frozen_angio353_from_proteome.py'
+      - '.github/workflows/camellia-ecological-anchor-genome-markers.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  actions: read
+
+env:
+  FROZEN_RECOVERY_RUN_ID: '32256913348'
+
+jobs:
+  recover:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - taxon: Camellia japonica
+            slug: Camellia_japonica
+            resource_kind: zip
+            proteome_url: 'https://zenodo.org/records/7340615/files/cjaND_pep.zip?download=1'
+          - taxon: Camellia nitidissima
+            slug: Camellia_nitidissima
+            resource_kind: gz
+            proteome_url: 'https://download.cncb.ac.cn/gwh/Plants/Camellia_nitidissima_Camellia_nitidissima_GWHFILD00000000.1/GWHFILD00000000.1.Protein.faa.gz'
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install DIAMOND
+        run: sudo apt-get install -y -qq diamond-aligner unzip
+      - name: Freeze the existing 339-locus definition
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          mkdir -p build/frozen build/targets
+          gh run download "$FROZEN_RECOVERY_RUN_ID" --repo "$GITHUB_REPOSITORY" \
+            --name wu-angio353-runtime91-global-occupancy --dir build/frozen
+          test -s build/frozen/global_occupancy/locus_occupancy.csv
+          curl --fail --location --retry 3 \
+            https://raw.githubusercontent.com/mossmatters/Angiosperms353/master/Angiosperms353.FAA \
+            -o build/targets/Angiosperms353.FAA
+          diamond makedb --in build/targets/Angiosperms353.FAA --db build/targets/Angiosperms353
+      - name: Download exact source-published annotated proteome
+        env:
+          PROTEOME_URL: ${{ matrix.proteome_url }}
+          RESOURCE_KIND: ${{ matrix.resource_kind }}
+        run: |
+          mkdir -p build/source
+          curl --fail --location --retry 3 --retry-all-errors "$PROTEOME_URL" -o build/source/payload
+          if [ "$RESOURCE_KIND" = gz ]; then
+            gzip -dc build/source/payload > build/proteome.faa
+          elif [ "$RESOURCE_KIND" = zip ]; then
+            unzip -q build/source/payload -d build/source/unpacked
+            found=''
+            while IFS= read -r f; do
+              n=$(grep -c '^>' "$f" 2>/dev/null || true)
+              if [ "$n" -gt 10000 ]; then found="$f"; break; fi
+            done < <(find build/source/unpacked -type f | sort)
+            test -n "$found"
+            cp "$found" build/proteome.faa
+          else
+            echo "unsupported resource kind: $RESOURCE_KIND" >&2; exit 2
+          fi
+          test -s build/proteome.faa
+          test $(grep -c '^>' build/proteome.faa) -gt 10000
+      - name: Screen annotated proteins against Angiosperms353
+        run: |
+          diamond blastp --db build/targets/Angiosperms353 \
+            --query build/proteome.faa --out build/hits.tsv \
+            --outfmt 6 qseqid sseqid pident length qlen slen evalue bitscore qstart qend sstart send qseq \
+            --evalue 1e-8 --max-target-seqs 5 --max-hsps 1 --mid-sensitive --threads 4
+          test -s build/hits.tsv
+      - name: Recover only the frozen 339 marker definitions
+        env:
+          TAXON: ${{ matrix.taxon }}
+        run: |
+          python scripts/recover_frozen_angio353_from_proteome.py \
+            --taxon "$TAXON" --hits build/hits.tsv \
+            --occupancy build/frozen/global_occupancy/locus_occupancy.csv \
+            --out-dir build/result
+          python - <<'PY'
+          import json
+          s=json.load(open('build/result/summary.json'))
+          assert s['frozen_loci']==339, s
+          assert s['recovered_loci']>=250, s
+          print(json.dumps(s,indent=2))
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: ecological-anchor-${{ matrix.slug }}-frozen339
+          path: build/result/
+          if-no-files-found: error
