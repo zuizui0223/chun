@@ -1,0 +1,207 @@
+name: Wu Angiosperms353 fast ASTRAL-IV topology
+
+on:
+  pull_request:
+    paths:
+      - 'scripts/test_nuclear_topology_colour_clustering.py'
+      - '.github/workflows/wu2022-angio353-fast-astral4-topology.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  actions: read
+
+env:
+  FROZEN_ALIGNMENT_RUN_ID: '32324054012'
+  N_LOCI: '339'
+  N_SHARDS: '12'
+
+jobs:
+  gene_trees:
+    strategy:
+      fail-fast: false
+      max-parallel: 6
+      matrix:
+        shard: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11]
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install IQ-TREE
+        run: |
+          sudo apt-get install -y -qq iqtree
+          IQTREE=$(command -v iqtree3 || command -v iqtree2 || command -v iqtree)
+          test -n "$IQTREE"
+          "$IQTREE" -version || "$IQTREE" --version || true
+          echo "IQTREE=$IQTREE" >> "$GITHUB_ENV"
+      - name: Download frozen 339-locus alignment artifact
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          mkdir -p build/source
+          gh run download "$FROZEN_ALIGNMENT_RUN_ID" --repo "$GITHUB_REPOSITORY" \
+            --name wu-angio353-runtime91-frozen-alignments --dir build/source
+          test $(find build/source -name '*.aln.faa' | wc -l) -eq "$N_LOCI"
+      - name: Select deterministic locus shard
+        env:
+          SHARD: ${{ matrix.shard }}
+        run: |
+          python - <<'PY'
+          import glob,os
+          from pathlib import Path
+          files=sorted(glob.glob('build/source/**/*.aln.faa',recursive=True))
+          shard=int(os.environ['SHARD']); n=int(os.environ['N_SHARDS'])
+          keep=[p for i,p in enumerate(files) if i % n == shard]
+          Path('build/shard.list').write_text('\n'.join(keep)+'\n')
+          print({'shard':shard,'n_loci':len(keep),'first':keep[0],'last':keep[-1]})
+          assert 27 <= len(keep) <= 29
+          PY
+      - name: Infer fixed-model ML gene-tree topologies
+        run: |
+          mkdir -p build/gene_trees
+          while IFS= read -r aln; do
+            base=$(basename "$aln" .aln.faa)
+            "$IQTREE" -s "$aln" -st AA -m LG+G4 -nt 1 \
+              -pre "build/gene_trees/$base" -quiet
+            test -s "build/gene_trees/$base.treefile"
+          done < build/shard.list
+          test $(find build/gene_trees -name '*.treefile' | wc -l) -ge 27
+      - name: Freeze shard tree list
+        run: |
+          cat $(find build/gene_trees -name '*.treefile' | sort) > build/gene_trees_shard.nwk
+          python - <<'PY'
+          import glob,json
+          trees=sorted(glob.glob('build/gene_trees/*.treefile'))
+          out={'shard':int('${{ matrix.shard }}'),'n_gene_trees':len(trees),'model':'LG+G4','bootstrap':0,
+               'claim_ceiling':'fixed-model ML protein gene-tree topology only; no flower-colour data used'}
+          open('build/gene_tree_summary.json','w').write(json.dumps(out,indent=2)+'\n')
+          print(json.dumps(out,indent=2))
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: wu-fast-gene-trees-shard-${{ matrix.shard }}
+          path: |
+            build/gene_trees/*.treefile
+            build/gene_trees_shard.nwk
+            build/gene_tree_summary.json
+          if-no-files-found: error
+
+  species_topology:
+    needs: gene_trees
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: wu-fast-gene-trees-shard-*
+          path: build/shards
+      - name: Assemble exact 339-gene topology set
+        run: |
+          cat $(find build/shards -name '*.treefile' | sort) > build/gene_trees_339.nwk
+          test $(grep -c ';' build/gene_trees_339.nwk) -eq "$N_LOCI"
+      - name: Build ASTRAL-IV
+        run: |
+          sudo apt-get install -y -qq g++ make git
+          git clone --depth 1 https://github.com/chaoszhang/ASTER.git build/ASTER
+          make -C build/ASTER astral4
+          test -x build/ASTER/bin/astral4
+      - name: Infer unrooted nuclear species topology
+        run: |
+          build/ASTER/bin/astral4 -u 0 -t 4 \
+            -o build/species_topology_astral4.nwk build/gene_trees_339.nwk \
+            2> build/astral4.log
+          test -s build/species_topology_astral4.nwk
+          python - <<'PY'
+          import json,re
+          tree=open('build/species_topology_astral4.nwk').read().strip()
+          tips=re.findall(r'(?<=[(,])([^():,;]+)',tree)
+          out={'n_gene_trees':339,'species_tree_tips_detected':len(set(tips)),
+               'gene_tree_model':'LG+G4','gene_tree_bootstrap':0,'species_tree_method':'ASTRAL-IV topology-only (-u 0)',
+               'claim_ceiling':'unrooted independent nuclear topology only; flower-colour state has not yet been joined'}
+          assert out['species_tree_tips_detected'] >= 80, out
+          open('build/species_topology_summary.json','w').write(json.dumps(out,indent=2)+'\n')
+          print(json.dumps(out,indent=2))
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: wu-angio353-runtime91-fast-astral4-topology
+          path: |
+            build/gene_trees_339.nwk
+            build/species_topology_astral4.nwk
+            build/species_topology_summary.json
+            build/astral4.log
+          if-no-files-found: error
+
+  colour_cluster:
+    needs: species_topology
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install clustering dependencies
+        run: python -m pip install --disable-pip-version-check numpy biopython openpyxl
+      - uses: actions/download-artifact@v4
+        with:
+          name: wu-angio353-runtime91-fast-astral4-topology
+          path: build/topology
+      - name: Rebuild deterministic Fan 2026 visible-colour seed after topology freeze
+        run: |
+          mkdir -p build/fan/package build/result
+          curl --fail --location --retry 3 'https://www.ncbi.nlm.nih.gov/pmc/utils/oa/oa.fcgi?id=PMC12946509' -o build/fan/oa.xml
+          python - <<'PY'
+          import xml.etree.ElementTree as ET
+          from pathlib import Path
+          root=ET.fromstring(Path('build/fan/oa.xml').read_bytes())
+          links=[x.attrib.get('href','') for x in root.findall('.//link') if x.attrib.get('format')=='tgz']
+          if len(links)!=1: raise SystemExit(f'unexpected OA links {links}')
+          u=links[0]
+          if u.startswith('ftp://ftp.ncbi.nlm.nih.gov/'):
+              u='https://ftp.ncbi.nlm.nih.gov/'+u.split('ftp://ftp.ncbi.nlm.nih.gov/',1)[1]
+          Path('build/fan/url').write_text(u+'\n')
+          PY
+          u=$(cat build/fan/url)
+          if ! curl --fail --location --retry 3 --retry-all-errors "$u" -o build/fan/a.tgz; then
+            u2=$(python - <<'PY'
+          from pathlib import Path
+          u=Path('build/fan/url').read_text().strip(); m='https://ftp.ncbi.nlm.nih.gov/pub/pmc/'
+          print(u.replace(m,m+'deprecated/',1) if u.startswith(m) and '/deprecated/' not in u else u)
+          PY
+          )
+            curl --fail --location --retry 3 --retry-all-errors "$u2" -o build/fan/a.tgz
+          fi
+          tar -xzf build/fan/a.tgz -C build/fan/package
+          xlsx=$(find build/fan/package -type f -iname '*s002*.xlsx' | head -n 1)
+          test -n "$xlsx"
+          python scripts/build_fan2026_species_colour_seed.py "$xlsx" \
+            --output build/fan/fan_species_colour_seed.csv --audit build/fan/seed_audit.json
+      - name: Test A-state clustering on independent nuclear topology
+        run: |
+          python scripts/test_nuclear_topology_colour_clustering.py \
+            --tree build/topology/species_topology_astral4.nwk \
+            --fan-colour build/fan/fan_species_colour_seed.csv \
+            --out-dir build/result --permutations 100000 --seed 20260820
+          python - <<'PY'
+          import json
+          s=json.load(open('build/result/summary.json'))
+          assert s['tree_tips'] >= 80, s
+          assert s['visible_colour_overlap'] >= 40, s
+          assert s['state_counts']['A'] >= 7, s
+          print(json.dumps(s,indent=2))
+          PY
+      - name: Report independent nuclear clustering result
+        run: |
+          echo '### Independent nuclear-topology colour clustering' >> "$GITHUB_STEP_SUMMARY"
+          cat build/result/summary.json >> "$GITHUB_STEP_SUMMARY"
+          echo '### State-level tests' >> "$GITHUB_STEP_SUMMARY"
+          cat build/result/nuclear_colour_clustering.csv >> "$GITHUB_STEP_SUMMARY"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: wu-angio353-nuclear-colour-clustering
+          path: |
+            build/result/
+            build/fan/seed_audit.json
+          if-no-files-found: error
