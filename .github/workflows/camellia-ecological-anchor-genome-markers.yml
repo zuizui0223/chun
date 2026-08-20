@@ -22,11 +22,13 @@ jobs:
       matrix:
         include:
           - taxon: Camellia japonica
-            accession: GCA_030407325.1
             slug: Camellia_japonica
+            resource_kind: zip
+            proteome_url: 'https://zenodo.org/records/7340615/files/cjaND_pep.zip?download=1'
           - taxon: Camellia nitidissima
-            accession: GCA_049201075.1
             slug: Camellia_nitidissima
+            resource_kind: gz
+            proteome_url: 'https://download.cncb.ac.cn/gwh/Plants/Camellia_nitidissima_Camellia_nitidissima_GWHFILD00000000.1/GWHFILD00000000.1.Protein.faa.gz'
     runs-on: ubuntu-latest
     timeout-minutes: 90
     steps:
@@ -34,14 +36,8 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
-      - name: Install DIAMOND and NCBI Datasets CLI
-        run: |
-          sudo apt-get install -y -qq diamond-aligner unzip
-          curl --fail --location --retry 3 \
-            https://ftp.ncbi.nlm.nih.gov/pub/datasets/command-line/v2/linux-amd64/datasets \
-            -o /tmp/datasets
-          chmod +x /tmp/datasets
-          /tmp/datasets version
+      - name: Install DIAMOND
+        run: sudo apt-get install -y -qq diamond-aligner unzip
       - name: Freeze the existing 339-locus definition
         env:
           GH_TOKEN: ${{ github.token }}
@@ -54,18 +50,28 @@ jobs:
             https://raw.githubusercontent.com/mossmatters/Angiosperms353/master/Angiosperms353.FAA \
             -o build/targets/Angiosperms353.FAA
           diamond makedb --in build/targets/Angiosperms353.FAA --db build/targets/Angiosperms353
-      - name: Download exact public annotated proteome
+      - name: Download exact source-published annotated proteome
         env:
-          ACCESSION: ${{ matrix.accession }}
+          PROTEOME_URL: ${{ matrix.proteome_url }}
+          RESOURCE_KIND: ${{ matrix.resource_kind }}
         run: |
-          mkdir -p build/ncbi
-          /tmp/datasets download genome accession "$ACCESSION" --include protein \
-            --filename build/ncbi/package.zip --no-progressbar
-          unzip -q build/ncbi/package.zip -d build/ncbi/package
-          proteome=$(find build/ncbi/package -type f -name 'protein.faa' -o -name '*protein.faa' | head -n 1)
-          test -n "$proteome"
-          test -s "$proteome"
-          cp "$proteome" build/proteome.faa
+          mkdir -p build/source
+          curl --fail --location --retry 3 --retry-all-errors "$PROTEOME_URL" -o build/source/payload
+          if [ "$RESOURCE_KIND" = gz ]; then
+            gzip -dc build/source/payload > build/proteome.faa
+          elif [ "$RESOURCE_KIND" = zip ]; then
+            unzip -q build/source/payload -d build/source/unpacked
+            found=''
+            while IFS= read -r f; do
+              n=$(grep -c '^>' "$f" 2>/dev/null || true)
+              if [ "$n" -gt 10000 ]; then found="$f"; break; fi
+            done < <(find build/source/unpacked -type f | sort)
+            test -n "$found"
+            cp "$found" build/proteome.faa
+          else
+            echo "unsupported resource kind: $RESOURCE_KIND" >&2; exit 2
+          fi
+          test -s build/proteome.faa
           test $(grep -c '^>' build/proteome.faa) -gt 10000
       - name: Screen annotated proteins against Angiosperms353
         run: |
