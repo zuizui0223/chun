@@ -1,0 +1,120 @@
+name: Wu rooted94 fast nuclear topology
+
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/wu2022-rooted94-fast-astral.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  actions: read
+
+env:
+  ROOTED_ALIGNMENT_RUN: '32353920371'
+  N_LOCI: '339'
+  N_SHARDS: '12'
+
+jobs:
+  gene_trees:
+    strategy:
+      fail-fast: false
+      max-parallel: 12
+      matrix:
+        shard: [0,1,2,3,4,5,6,7,8,9,10,11]
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install FastTree
+        run: sudo apt-get install -y -qq fasttree
+      - name: Download frozen rooted94 alignments
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          mkdir -p build/source
+          gh run download "$ROOTED_ALIGNMENT_RUN" --repo "$GITHUB_REPOSITORY" \
+            --name wu-angio353-rooted94-frozen-alignments --dir build/source
+          test $(find build/source -name '*.aln.faa' | wc -l) -eq "$N_LOCI"
+      - name: Infer approximate LG gene trees
+        env:
+          SHARD: ${{ matrix.shard }}
+        run: |
+          mkdir -p build/trees
+          python - <<'PY'
+          import glob,os
+          from pathlib import Path
+          fs=sorted(glob.glob('build/source/**/*.aln.faa',recursive=True))
+          s=int(os.environ['SHARD']);n=int(os.environ['N_SHARDS'])
+          keep=[x for i,x in enumerate(fs) if i%n==s]
+          Path('build/list').write_text('\n'.join(keep)+'\n')
+          print({'shard':s,'n_loci':len(keep)})
+          assert 27<=len(keep)<=29
+          PY
+          while IFS= read -r aln; do
+            b=$(basename "$aln" .aln.faa)
+            FastTree -quiet -lg -gamma "$aln" > "build/trees/$b.treefile"
+            test -s "build/trees/$b.treefile"
+          done < build/list
+      - uses: actions/upload-artifact@v4
+        with:
+          name: rooted94-ft-gene-trees-${{ matrix.shard }}
+          path: build/trees/*.treefile
+          if-no-files-found: error
+
+  rooted_species_tree:
+    needs: gene_trees
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: rooted94-ft-gene-trees-*
+          path: build/shards
+      - name: Assemble and audit 339 gene trees
+        run: |
+          cat $(find build/shards -name '*.treefile' | sort) > build/gene_trees_339.nwk
+          test $(grep -c ';' build/gene_trees_339.nwk) -eq "$N_LOCI"
+      - name: Build current ASTER and infer Polyspora-rooted ASTRAL-IV tree
+        run: |
+          sudo apt-get install -y -qq g++ make git
+          git clone --depth 1 https://github.com/chaoszhang/ASTER.git build/ASTER
+          make -C build/ASTER
+          test -x build/ASTER/bin/astral4
+          build/ASTER/bin/astral4 --root Polyspora_speciosa -u 2 -t 4 \
+            -o build/rooted94_astral4.nwk build/gene_trees_339.nwk 2>build/astral4.log
+          test -s build/rooted94_astral4.nwk
+      - name: Freeze topology-only audit
+        run: |
+          python - <<'PY'
+          import json,re
+          from pathlib import Path
+          tree=Path('build/rooted94_astral4.nwk').read_text().strip()
+          tips=re.findall(r'(?<=[(,])([^():,;]+)',tree)
+          tips={re.sub(r"\[[^\]]*\]",'',x).strip() for x in tips}
+          required={'Polyspora_speciosa','Camellia_japonica','Camellia_nitidissima'}
+          out={
+            'n_gene_trees':339,
+            'species_tree_tips_detected':len(tips),
+            'required_extra_tips_present':sorted(required & tips),
+            'outgroup':'Polyspora_speciosa',
+            'gene_tree_method':'FastTree LG+gamma approximate sensitivity',
+            'species_tree_method':'ASTRAL-IV rooted with Polyspora speciosa; -u 2',
+            'colour_joined':False,
+            'claim_ceiling':'independent rooted nuclear sensitivity backbone only; no ancestral flower-colour or ecological causal interpretation yet'
+          }
+          assert len(tips)==94,out
+          assert required<=tips,out
+          Path('build/rooted94_summary.json').write_text(json.dumps(out,indent=2)+'\n')
+          print(json.dumps(out,indent=2))
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: wu-angio353-rooted94-fast-astral4
+          path: |
+            build/gene_trees_339.nwk
+            build/rooted94_astral4.nwk
+            build/rooted94_summary.json
+            build/astral4.log
+          if-no-files-found: error
