@@ -1,0 +1,134 @@
+name: Wu Angiosperms353 gene trees and species tree
+
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/wu2022-angio353-gene-species-tree.yml'
+  workflow_dispatch:
+    inputs:
+      alignment_run_id:
+        description: 'Successful alignment run containing wu-angio353-runtime91-frozen-alignments'
+        required: false
+        type: string
+
+permissions:
+  contents: read
+  actions: read
+
+env:
+  FROZEN_ALIGNMENT_RUN_ID: '32324054012'
+  N_LOCI: '339'
+  N_SHARDS: '6'
+
+jobs:
+  gene_trees:
+    strategy:
+      fail-fast: false
+      max-parallel: 3
+      matrix:
+        shard: [0, 1, 2, 3, 4, 5]
+    runs-on: ubuntu-latest
+    timeout-minutes: 240
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install IQ-TREE
+        run: |
+          sudo apt-get install -y -qq iqtree
+          IQTREE=$(command -v iqtree3 || command -v iqtree2 || command -v iqtree)
+          "$IQTREE" -version || "$IQTREE" --version || true
+          echo "IQTREE=$IQTREE" >> "$GITHUB_ENV"
+      - name: Download frozen 339-locus alignment artifact
+        env:
+          GH_TOKEN: ${{ github.token }}
+          DISPATCH_RUN_ID: ${{ inputs.alignment_run_id }}
+        run: |
+          SOURCE_RUN_ID="${DISPATCH_RUN_ID:-$FROZEN_ALIGNMENT_RUN_ID}"
+          mkdir -p build/source
+          gh run download "$SOURCE_RUN_ID" --repo "$GITHUB_REPOSITORY" \
+            --name wu-angio353-runtime91-frozen-alignments --dir build/source
+          test $(find build/source -name '*.aln.faa' | wc -l) -eq "$N_LOCI"
+      - name: Select deterministic locus shard
+        env:
+          SHARD: ${{ matrix.shard }}
+        run: |
+          python - <<'PY'
+          import glob,os
+          from pathlib import Path
+          files=sorted(glob.glob('build/source/**/*.aln.faa',recursive=True))
+          shard=int(os.environ['SHARD']); n=int(os.environ['N_SHARDS'])
+          keep=[p for i,p in enumerate(files) if i % n == shard]
+          Path('build/shard.list').write_text('\n'.join(keep)+'\n')
+          print({'shard':shard,'n_loci':len(keep),'first':keep[0],'last':keep[-1]})
+          assert 50 <= len(keep) <= 60
+          PY
+      - name: Infer locus gene trees with LG+G4 and UFBoot
+        run: |
+          mkdir -p build/gene_trees
+          while IFS= read -r aln; do
+            base=$(basename "$aln" .aln.faa)
+            "$IQTREE" -s "$aln" -st AA -m LG+G4 -B 1000 -nt 1 \
+              -pre "build/gene_trees/$base" -quiet
+            test -s "build/gene_trees/$base.treefile"
+          done < build/shard.list
+          test $(find build/gene_trees -name '*.treefile' | wc -l) -ge 50
+      - name: Freeze shard tree list
+        run: |
+          cat $(find build/gene_trees -name '*.treefile' | sort) > build/gene_trees_shard.nwk
+          python - <<'PY'
+          import glob,json,os
+          trees=sorted(glob.glob('build/gene_trees/*.treefile'))
+          out={'shard':int('${{ matrix.shard }}'),'n_gene_trees':len(trees),'model':'LG+G4','ufboot':1000,'claim_ceiling':'independent protein-locus gene trees only; no colour information used'}
+          open('build/gene_tree_summary.json','w').write(json.dumps(out,indent=2)+'\n')
+          print(json.dumps(out,indent=2))
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: wu-angio353-gene-trees-shard-${{ matrix.shard }}
+          path: |
+            build/gene_trees/*.treefile
+            build/gene_trees_shard.nwk
+            build/gene_tree_summary.json
+          if-no-files-found: error
+
+  species_tree:
+    needs: gene_trees
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: wu-angio353-gene-trees-shard-*
+          path: build/shards
+      - name: Assemble complete gene-tree set
+        run: |
+          cat $(find build/shards -name '*.treefile' | sort) > build/gene_trees_339.nwk
+          test $(grep -c ';' build/gene_trees_339.nwk) -eq "$N_LOCI"
+      - name: Build current ASTER wASTRAL
+        run: |
+          sudo apt-get install -y -qq g++ make git
+          git clone --depth 1 https://github.com/chaoszhang/ASTER.git build/ASTER
+          make -C build/ASTER wastral
+          test -x build/ASTER/bin/wastral
+          build/ASTER/bin/wastral 2>&1 | head -20 || true
+      - name: Infer support-weighted coalescent species tree
+        run: |
+          build/ASTER/bin/wastral -S -o build/species_tree_wastral.nwk build/gene_trees_339.nwk
+          test -s build/species_tree_wastral.nwk
+          python - <<'PY'
+          import json,re
+          tree=open('build/species_tree_wastral.nwk').read().strip()
+          tips=re.findall(r'(?<=[(,])([^():,;]+)',tree)
+          out={'n_gene_trees':339,'species_tree_tips_detected':len(set(tips)),'gene_tree_model':'LG+G4','gene_tree_ufboot':1000,'species_tree_method':'wASTRAL support weighting (-S)','claim_ceiling':'independent nuclear coalescent backbone only; no flower-colour state joined or interpreted'}
+          assert out['species_tree_tips_detected'] >= 80, out
+          open('build/species_tree_summary.json','w').write(json.dumps(out,indent=2)+'\n')
+          print(json.dumps(out,indent=2))
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: wu-angio353-runtime91-wastral-species-tree
+          path: |
+            build/gene_trees_339.nwk
+            build/species_tree_wastral.nwk
+            build/species_tree_summary.json
+          if-no-files-found: error
