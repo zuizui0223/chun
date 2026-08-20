@@ -1,0 +1,84 @@
+name: Camellia ultimate-cause pre-branch tests
+
+on:
+  pull_request:
+    paths:
+      - 'scripts/test_ultimate_cause_prebranch.py'
+      - '.github/workflows/camellia-ultimate-cause-prebranch-tests.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install dependencies
+        run: python -m pip install --disable-pip-version-check numpy openpyxl
+      - name: Rebuild frozen runtime91 panel
+        run: |
+          mkdir -p build/ultimate_pre/fan_package
+          python scripts/build_wu2022_angio353_backbone_panel.py \
+            --manifest data/wu2022_public_backbone_manifest_v0_3.csv \
+            --runtime-exclusions data/wu2022_tpia_runtime_exclusions_v0_1.csv \
+            --output build/ultimate_pre/runtime91.csv \
+            --summary build/ultimate_pre/runtime91_summary.json \
+            --expected-total 98 --expected-frozen-assembled 93 --expected-frozen-raw 5 \
+            --expected-runtime-assembled 91
+      - name: Rebuild deterministic Fan 2026 colour seed
+        run: |
+          curl --fail --location --retry 3 'https://www.ncbi.nlm.nih.gov/pmc/utils/oa/oa.fcgi?id=PMC12946509' -o build/ultimate_pre/oa.xml
+          python - <<'PY'
+          import xml.etree.ElementTree as ET
+          from pathlib import Path
+          root=ET.fromstring(Path('build/ultimate_pre/oa.xml').read_bytes())
+          links=[x.attrib.get('href','') for x in root.findall('.//link') if x.attrib.get('format')=='tgz']
+          if len(links)!=1: raise SystemExit(f'unexpected OA links {links}')
+          u=links[0]
+          if u.startswith('ftp://ftp.ncbi.nlm.nih.gov/'):
+              u='https://ftp.ncbi.nlm.nih.gov/'+u.split('ftp://ftp.ncbi.nlm.nih.gov/',1)[1]
+          Path('build/ultimate_pre/fan_url').write_text(u+'\n')
+          PY
+          u=$(cat build/ultimate_pre/fan_url)
+          if ! curl --fail --location --retry 3 --retry-all-errors "$u" -o build/ultimate_pre/fan.tgz; then
+            u2=$(python - <<'PY'
+          from pathlib import Path
+          u=Path('build/ultimate_pre/fan_url').read_text().strip(); m='https://ftp.ncbi.nlm.nih.gov/pub/pmc/'
+          print(u.replace(m,m+'deprecated/',1) if u.startswith(m) and '/deprecated/' not in u else u)
+          PY
+          )
+            curl --fail --location --retry 3 --retry-all-errors "$u2" -o build/ultimate_pre/fan.tgz
+          fi
+          tar -xzf build/ultimate_pre/fan.tgz -C build/ultimate_pre/fan_package
+          xlsx=$(find build/ultimate_pre/fan_package -type f -iname '*s002*.xlsx' | head -n 1)
+          test -n "$xlsx"
+          python scripts/build_fan2026_species_colour_seed.py "$xlsx" \
+            --output build/ultimate_pre/fan_species_colour_seed.csv \
+            --audit build/ultimate_pre/fan_seed_audit.json
+      - name: Test frozen hypotheses without inspecting topology
+        run: |
+          python scripts/test_ultimate_cause_prebranch.py \
+            --panel build/ultimate_pre/runtime91.csv \
+            --fan-colour build/ultimate_pre/fan_species_colour_seed.csv \
+            --climate data/fan2026_chelsa_species_compact_v0_1.csv \
+            --mechanism data/camellia_flower_color_mechanism_meta_v0_3.csv \
+            --out-dir build/ultimate_pre/result \
+            --permutations 100000 --seed 20260820
+      - name: Report
+        run: |
+          echo '### Ultimate-cause pre-branch tests' >> "$GITHUB_STEP_SUMMARY"
+          cat build/ultimate_pre/result/summary.json >> "$GITHUB_STEP_SUMMARY"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: camellia-ultimate-cause-prebranch-tests
+          path: |
+            build/ultimate_pre/runtime91_summary.json
+            build/ultimate_pre/fan_seed_audit.json
+            build/ultimate_pre/result/
+          if-no-files-found: error
