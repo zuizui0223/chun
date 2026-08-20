@@ -1,0 +1,3 @@
+source_taxon,reason,raw_run,decision
+Camellia granthamiana,tpia_id_bound_url_http_404,SRR19266768,exclude_from_assembled_runtime_and_hold_for_raw_recovery
+Camellia tenii,tpia_id_bound_url_http_404,SRR19266717,exclude_from_assembled_runtime_and_hold_for_raw_recovery

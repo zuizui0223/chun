@@ -36,14 +36,18 @@ def main():
     ap.add_argument('--min-subject-coverage',type=float,default=0.45)
     ap.add_argument('--min-aa',type=int,default=80)
     ap.add_argument('--min-occupancy',type=float,default=0.80)
+    ap.add_argument('--allow-missing-taxa',action='store_true')
     a=ap.parse_args(); a.out_dir.mkdir(parents=True,exist_ok=True)
     panel=read_panel(a.panel); taxa=[r['taxon'] for r in panel]
     if not taxa: raise SystemExit('no admitted taxa in panel')
     state={r['taxon']:r['colour_state'] for r in panel}; section={r['taxon']:r['section'] for r in panel}
-    best={}
+    best={}; missing=[]
     for r in panel:
         tax=r['taxon']; p=a.hits_dir/(slug(tax)+'.tsv')
-        if not p.exists(): raise SystemExit(f'missing DIAMOND output {p}')
+        if not p.exists():
+            if a.allow_missing_taxa:
+                missing.append(tax); continue
+            raise SystemExit(f'missing DIAMOND output {p}')
         with p.open(encoding='utf-8') as f:
             for line in f:
                 if not line.strip(): continue
@@ -55,7 +59,7 @@ def main():
                 rec={'taxon':tax,'tip':slug(tax),'colour_state':state[tax],'section':section[tax],
                      'locus':loc,'qseqid':h['qseqid'],'sseqid':h['sseqid'],'pident':float(h['pident']),
                      'aligned_aa':length,'subject_coverage':scov,'evalue':float(h['evalue']),
-                     'bitscore':float(h['bitscore']),'translated_hsp_aa':len(seq)}
+                     'bitscore':float(h['bitscore']),'translated_hsp_aa':len(seq),'translated_hsp_seq':seq}
                 if length < a.min_aa or scov < a.min_subject_coverage or len(seq)<a.min_aa: continue
                 key=(tax,loc)
                 if key not in best or rec['bitscore']>best[key][0]['bitscore']:
@@ -77,10 +81,10 @@ def main():
         w=csv.DictWriter(f,fieldnames=list(best_rows[0]) if best_rows else ['taxon']);w.writeheader();w.writerows(best_rows)
     with (a.out_dir/'locus_occupancy.csv').open('w',newline='',encoding='utf-8') as f:
         w=csv.DictWriter(f,fieldnames=list(locus_summary[0]) if locus_summary else ['locus']);w.writeheader();w.writerows(locus_summary)
-    summary={'n_panel_taxa':len(taxa),'candidate_loci':len(loci),'admitted_loci':len(admitted),
+    summary={'n_panel_taxa':len(taxa),'n_recovered_taxa':len(taxa)-len(missing),'n_missing_taxa':len(missing),'missing_taxa':sorted(missing),'candidate_loci':len(loci),'admitted_loci':len(admitted),
              'min_occupancy':a.min_occupancy,'min_subject_coverage':a.min_subject_coverage,'min_aa':a.min_aa,
-             'admitted_loci_ids':admitted,
-             'claim_ceiling':'best translated HSP per Angiosperms353 locus/admitted species; quarantined payloads excluded; pilot marker recovery, not orthology proof'}
+             'admitted_loci_ids':admitted,'best_hit_sequences_retained':True,
+             'claim_ceiling':'best translated HSP per Angiosperms353 locus/admitted species; missing payloads retained as explicit missing data; marker recovery only, not orthology proof'}
     (a.out_dir/'summary.json').write_text(json.dumps(summary,indent=2)+'\n')
     print(json.dumps(summary,indent=2))
 if __name__=='__main__':main()
