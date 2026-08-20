@@ -1,0 +1,99 @@
+name: Camellia ultimate-cause trait coverage gate
+
+on:
+  pull_request:
+    paths:
+      - 'scripts/audit_wu91_ultimate_trait_overlap.py'
+      - '.github/workflows/camellia-ultimate-trait-coverage.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  coverage:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install Fan seed dependency
+        run: python -m pip install --disable-pip-version-check openpyxl
+      - name: Rebuild frozen runtime91 panel
+        run: |
+          mkdir -p build/ultimate
+          python scripts/build_wu2022_angio353_backbone_panel.py \
+            --manifest data/wu2022_public_backbone_manifest_v0_3.csv \
+            --runtime-exclusions data/wu2022_tpia_runtime_exclusions_v0_1.csv \
+            --output build/ultimate/runtime91.csv \
+            --summary build/ultimate/runtime91_summary.json \
+            --expected-total 98 --expected-frozen-assembled 93 --expected-frozen-raw 5 \
+            --expected-runtime-assembled 91
+      - name: Rebuild deterministic Fan 2026 visible-colour seed
+        run: |
+          mkdir -p build/ultimate/fan_package
+          curl --fail --location --retry 3 'https://www.ncbi.nlm.nih.gov/pmc/utils/oa/oa.fcgi?id=PMC12946509' -o build/ultimate/oa.xml
+          python - <<'PY'
+          import xml.etree.ElementTree as ET
+          from pathlib import Path
+          root=ET.fromstring(Path('build/ultimate/oa.xml').read_bytes())
+          links=[x.attrib.get('href','') for x in root.findall('.//link') if x.attrib.get('format')=='tgz']
+          if len(links)!=1: raise SystemExit(f'unexpected OA links {links}')
+          u=links[0]
+          if u.startswith('ftp://ftp.ncbi.nlm.nih.gov/'):
+              u='https://ftp.ncbi.nlm.nih.gov/'+u.split('ftp://ftp.ncbi.nlm.nih.gov/',1)[1]
+          Path('build/ultimate/fan_url').write_text(u+'\n')
+          PY
+          u=$(cat build/ultimate/fan_url)
+          if ! curl --fail --location --retry 3 --retry-all-errors "$u" -o build/ultimate/fan.tgz; then
+            u2=$(python - <<'PY'
+          from pathlib import Path
+          u=Path('build/ultimate/fan_url').read_text().strip(); m='https://ftp.ncbi.nlm.nih.gov/pub/pmc/'
+          print(u.replace(m,m+'deprecated/',1) if u.startswith(m) and '/deprecated/' not in u else u)
+          PY
+          )
+            curl --fail --location --retry 3 --retry-all-errors "$u2" -o build/ultimate/fan.tgz
+          fi
+          tar -xzf build/ultimate/fan.tgz -C build/ultimate/fan_package
+          xlsx=$(find build/ultimate/fan_package -type f -iname '*s002*.xlsx' | head -n 1)
+          test -n "$xlsx"
+          python scripts/build_fan2026_species_colour_seed.py "$xlsx" \
+            --output build/ultimate/fan_species_colour_seed.csv \
+            --audit build/ultimate/fan_seed_audit.json
+      - name: Audit ecological trait coverage on runtime91
+        run: |
+          python scripts/audit_wu91_ultimate_trait_overlap.py \
+            --panel build/ultimate/runtime91.csv \
+            --fan-colour build/ultimate/fan_species_colour_seed.csv \
+            --climate data/fan2026_chelsa_species_compact_v0_1.csv \
+            --pollinator data/camellia_pollination_function_meta_v0_2.csv \
+            --latent data/camellia_latent_state_seed_v0_1.csv \
+            --macro-priority data/camellia_macro_niche_taxa_v0_1.csv \
+            --out-dir build/ultimate/result
+          python - <<'PY'
+          import json
+          s=json.load(open('build/ultimate/result/summary.json'))
+          assert s['n_tree_taxa']==91, s
+          assert s['n_climate_overlap']==27, s
+          assert s['n_pollinator_overlap']==2, s
+          assert s['n_latent_state_overlap']==2, s
+          assert s['n_macro_niche_priority_overlap']==0, s
+          assert s['n_visible_colour_overlap'] >= 40, s
+          print(json.dumps(s,indent=2))
+          PY
+      - name: Report coverage decision
+        run: |
+          echo '### Ultimate-cause trait coverage' >> "$GITHUB_STEP_SUMMARY"
+          cat build/ultimate/result/summary.json >> "$GITHUB_STEP_SUMMARY"
+          echo '### Priority taxa missing from runtime91' >> "$GITHUB_STEP_SUMMARY"
+          cat build/ultimate/result/priority_tree_extension.csv >> "$GITHUB_STEP_SUMMARY"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: camellia-ultimate-trait-coverage
+          path: |
+            build/ultimate/runtime91_summary.json
+            build/ultimate/fan_seed_audit.json
+            build/ultimate/result/
+          if-no-files-found: error
