@@ -8,7 +8,8 @@ This gate deliberately compares:
 - Fitch parsimony root-state set;
 - continuous-time 3-state Mk ER, SYM and ARD models;
 - ASTRAL substitution-per-site branch lengths versus unit edge lengths;
-- equal versus model-stationary root priors.
+- equal versus model-stationary root priors;
+- AICc model-averaged root posterior within each treatment.
 
 It does not treat ASTRAL branch lengths as divergence time and does not test
 climate/pollinator causation.
@@ -142,14 +143,12 @@ def pruning_vector(clade, Q: np.ndarray, mode: str, colour: dict[str, str]):
             v[SINDEX[s]] = 1.0
             return v, 0.0
         return np.ones(3, dtype=float), 0.0
-
     v = np.ones(3, dtype=float)
     log_scale = 0.0
     for ch in clade.clades:
         cv, cs = pruning_vector(ch, Q, mode, colour)
         P = expm(Q * edge_length(ch, mode))
-        contrib = P @ cv
-        v *= contrib
+        v *= P @ cv
         log_scale += cs
     scale = float(v.sum())
     if not np.isfinite(scale) or scale <= 0:
@@ -180,16 +179,9 @@ def fit_model(clade, model: str, mode: str, prior_mode: str, colour, nobs: int):
     med = float(np.median(branch_lengths)) if branch_lengths else 1.0
     base_rate = max(1e-3, min(1e3, 0.5 / med))
     base = math.log(base_rate)
-    starts = [
-        np.full(k, base),
-        np.full(k, base + math.log(0.2)),
-        np.full(k, base + math.log(5.0)),
-    ]
+    starts = [np.full(k, base), np.full(k, base + math.log(0.2)), np.full(k, base + math.log(5.0))]
     if k > 1:
-        starts += [
-            np.linspace(base - 0.7, base + 0.7, k),
-            np.linspace(base + 0.7, base - 0.7, k),
-        ]
+        starts += [np.linspace(base - 0.7, base + 0.7, k), np.linspace(base + 0.7, base - 0.7, k)]
 
     def objective(x):
         ll, _, _ = likelihood_and_root(clade, model, x, mode, prior_mode, colour)
@@ -211,20 +203,13 @@ def fit_model(clade, model: str, mode: str, prior_mode: str, colour, nobs: int):
         "ARD": ["A_to_W", "A_to_Y", "W_to_A", "W_to_Y", "Y_to_A", "Y_to_W"],
     }[model]
     return {
-        "branch_mode": mode,
-        "root_prior": prior_mode,
-        "model": model,
-        "k": k,
-        "logLik": float(ll),
-        "AIC": float(aic),
-        "AICc": float(aicc),
-        "optimizer_success": bool(best.success),
-        "optimizer_message": str(best.message),
+        "branch_mode": mode, "root_prior": prior_mode, "model": model, "k": k,
+        "logLik": float(ll), "AIC": float(aic), "AICc": float(aicc),
+        "optimizer_success": bool(best.success), "optimizer_message": str(best.message),
         "rates": {n: float(v) for n, v in zip(names, rates)},
         "prior": {s: float(prior[i]) for i, s in enumerate(STATES)},
         "root_posterior": {s: float(root[i]) for i, s in enumerate(STATES)},
-        "root_top_state": STATES[int(np.argmax(root))],
-        "root_top_probability": float(np.max(root)),
+        "root_top_state": STATES[int(np.argmax(root))], "root_top_probability": float(np.max(root)),
     }
 
 
@@ -234,8 +219,7 @@ def main():
     ap.add_argument("--colour", type=Path, required=True)
     ap.add_argument("--out-dir", type=Path, required=True)
     ap.add_argument("--outgroup", default="Polyspora speciosa")
-    a = ap.parse_args()
-    a.out_dir.mkdir(parents=True, exist_ok=True)
+    a = ap.parse_args(); a.out_dir.mkdir(parents=True, exist_ok=True)
 
     tree = Phylo.read(str(a.tree), "newick")
     crown = extract_camellia_crown(tree, a.outgroup)
@@ -244,77 +228,76 @@ def main():
     mapped = [(t.name, colour.get(norm_name(t.name))) for t in tips]
     observed = [(x, s) for x, s in mapped if s]
     counts = {s: sum(1 for _, x in observed if x == s) for s in STATES}
-    if len(tips) != 93:
-        raise SystemExit(f"expected 93 Camellia tips, got {len(tips)}")
-    if len(observed) < 40 or min(counts.values()) < 2:
-        raise SystemExit(f"insufficient colour overlap: n={len(observed)}, counts={counts}")
+    if len(tips) != 93: raise SystemExit(f"expected 93 Camellia tips, got {len(tips)}")
+    if len(observed) < 40 or min(counts.values()) < 2: raise SystemExit(f"insufficient colour overlap: n={len(observed)}, counts={counts}")
 
     fset, fchanges = fitch(crown, colour)
-    fits = []
-    for mode in ("astral", "unit"):
-        for prior in ("equal", "stationary"):
-            for model in ("ER", "SYM", "ARD"):
-                fits.append(fit_model(crown, model, mode, prior, colour, len(observed)))
+    fits = [fit_model(crown, model, mode, prior, colour, len(observed))
+            for mode in ("astral", "unit") for prior in ("equal", "stationary") for model in ("ER", "SYM", "ARD")]
 
-    # rank only within the same branch-length/prior treatment
+    treatment_summaries = {}
     for mode in ("astral", "unit"):
         for prior in ("equal", "stationary"):
             grp = [x for x in fits if x["branch_mode"] == mode and x["root_prior"] == prior]
-            best = min(x["AICc"] for x in grp)
+            best_aicc = min(x["AICc"] for x in grp)
+            raw = []
             for x in grp:
-                x["delta_AICc_within_treatment"] = float(x["AICc"] - best)
+                x["delta_AICc_within_treatment"] = float(x["AICc"] - best_aicc)
+                raw.append(math.exp(-0.5 * x["delta_AICc_within_treatment"]))
+            denom = sum(raw)
+            for x, r in zip(grp, raw): x["akaike_weight_within_treatment"] = float(r / denom)
+            avg = {s: sum(x["akaike_weight_within_treatment"] * x["root_posterior"][s] for x in grp) for s in STATES}
+            total = sum(avg.values()); avg = {s: float(v / total) for s, v in avg.items()}
+            best = min(grp, key=lambda x: x["AICc"])
+            treatment_summaries[f"{mode}__{prior}"] = {
+                "best_model": best["model"],
+                "best_AICc": best["AICc"],
+                "best_model_root_posterior": best["root_posterior"],
+                "model_averaged_root_posterior": avg,
+                "model_averaged_top_state": max(avg, key=avg.get),
+                "model_averaged_top_probability": max(avg.values()),
+                "model_weights": {x["model"]: x["akaike_weight_within_treatment"] for x in grp},
+            }
 
-    fields = [
-        "branch_mode", "root_prior", "model", "k", "logLik", "AIC", "AICc",
-        "delta_AICc_within_treatment", "root_top_state", "root_top_probability",
-        "optimizer_success", "optimizer_message", "rates", "prior", "root_posterior",
-    ]
+    fields = ["branch_mode","root_prior","model","k","logLik","AIC","AICc","delta_AICc_within_treatment",
+              "akaike_weight_within_treatment","root_top_state","root_top_probability","optimizer_success","optimizer_message",
+              "rates","prior","root_posterior"]
     with (a.out_dir / "mk_model_fits.csv").open("w", newline="", encoding="utf-8") as f:
-        w = csv.DictWriter(f, fieldnames=fields)
-        w.writeheader()
+        w = csv.DictWriter(f, fieldnames=fields); w.writeheader()
         for x in fits:
             y = dict(x)
-            for k in ("rates", "prior", "root_posterior"):
-                y[k] = json.dumps(y[k], sort_keys=True)
+            for k in ("rates", "prior", "root_posterior"): y[k] = json.dumps(y[k], sort_keys=True)
             w.writerow(y)
 
     with (a.out_dir / "tip_colour_join.csv").open("w", newline="", encoding="utf-8") as f:
-        w = csv.DictWriter(f, fieldnames=["taxon", "colour_state"])
-        w.writeheader()
-        for taxon, state in sorted(mapped):
-            w.writerow({"taxon": taxon, "colour_state": state or ""})
+        w = csv.DictWriter(f, fieldnames=["taxon", "colour_state"]); w.writeheader()
+        for taxon, state in sorted(mapped): w.writerow({"taxon": taxon, "colour_state": state or ""})
 
-    best_rows = {}
-    for mode in ("astral", "unit"):
-        for prior in ("equal", "stationary"):
-            grp = [x for x in fits if x["branch_mode"] == mode and x["root_prior"] == prior]
-            b = min(grp, key=lambda x: x["AICc"])
-            best_rows[f"{mode}__{prior}"] = {
-                "model": b["model"],
-                "AICc": b["AICc"],
-                "root_posterior": b["root_posterior"],
-                "root_top_state": b["root_top_state"],
-                "root_top_probability": b["root_top_probability"],
-            }
-    top_states = [x["root_top_state"] for x in best_rows.values()]
-    top_probs = [x["root_top_probability"] for x in best_rows.values()]
+    avg_states = [x["model_averaged_top_state"] for x in treatment_summaries.values()]
+    avg_probs = [x["model_averaged_top_probability"] for x in treatment_summaries.values()]
+    min_avg = float(min(avg_probs))
+    if len(set(avg_states)) != 1:
+        status = "model_or_branch_treatment_sensitive"
+    elif min_avg >= 0.9:
+        status = "strongly_robust"
+    elif min_avg >= 0.7:
+        status = "moderately_robust"
+    else:
+        status = "same_top_state_but_model_uncertain"
+
     summary = {
-        "n_camellia_tree_tips": len(tips),
-        "n_colour_observed": len(observed),
-        "state_counts": counts,
+        "n_camellia_tree_tips": len(tips), "n_colour_observed": len(observed), "state_counts": counts,
         "n_unobserved_tips": len(tips) - len(observed),
-        "fitch_root_state_set": sorted(fset),
-        "fitch_minimum_changes": int(fchanges),
-        "best_model_by_treatment": best_rows,
-        "best_treatment_root_top_states": top_states,
-        "root_top_state_agreement": len(set(top_states)) == 1,
-        "minimum_top_state_probability": float(min(top_probs)),
+        "fitch_root_state_set": sorted(fset), "fitch_minimum_changes": int(fchanges),
+        "treatments": treatment_summaries,
+        "model_averaged_top_states": avg_states,
+        "model_averaged_root_state_agreement": len(set(avg_states)) == 1,
+        "minimum_model_averaged_top_probability": min_avg,
+        "root_state_robustness_status": status,
         "branch_length_warning": "ASTRAL branch lengths are substitution-per-site estimates, not divergence times; unit-edge fits are a topology-only sensitivity.",
         "claim_ceiling": "rooted visible-colour history sensitivity only; no ecological causation, no time-calibrated transition rate, and no micro-mechanistic branch assignment yet",
     }
     (a.out_dir / "summary.json").write_text(json.dumps(summary, indent=2) + "\n", encoding="utf-8")
     print(json.dumps(summary, indent=2))
 
-
-if __name__ == "__main__":
-    main()
+if __name__ == "__main__": main()
