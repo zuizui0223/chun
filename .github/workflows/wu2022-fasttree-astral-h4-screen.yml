@@ -1,0 +1,113 @@
+name: Wu FastTree ASTRAL H4 screen
+
+on:
+  pull_request:
+    paths:
+      - 'scripts/test_nuclear_topology_colour_clustering.py'
+      - '.github/workflows/wu2022-fasttree-astral-h4-screen.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  actions: read
+
+concurrency:
+  group: wu-fasttree-astral-h4-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+env:
+  N_LOCI: '339'
+  FROZEN_FASTTREE_RUN: '32349439280'
+
+jobs:
+  topology:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - name: Reuse completed 339 FastTree gene trees
+        uses: actions/download-artifact@v4
+        with:
+          pattern: ft-gene-trees-*
+          path: build/shards
+          run-id: ${{ env.FROZEN_FASTTREE_RUN }}
+          github-token: ${{ github.token }}
+      - name: Assemble and audit frozen gene-tree set
+        run: |
+          test $(find build/shards -name '*.treefile' | wc -l) -eq "$N_LOCI"
+          cat $(find build/shards -name '*.treefile' | sort) > build/gene_trees.nwk
+          test $(grep -c ';' build/gene_trees.nwk) -eq "$N_LOCI"
+          python - <<'PY'
+          import glob,re
+          fs=glob.glob('build/shards/**/*.treefile',recursive=True)
+          loci=[]
+          for p in fs:
+              m=re.search(r'locus_(\d+)\.treefile$',p)
+              assert m,p
+              loci.append(m.group(1))
+          assert len(fs)==339 and len(set(loci))==339,(len(fs),len(set(loci)))
+          print({'gene_trees':len(fs),'unique_loci':len(set(loci))})
+          PY
+      - name: Build and run current ASTRAL-IV
+        run: |
+          sudo apt-get install -y -qq g++ make git
+          git clone --depth 1 https://github.com/chaoszhang/ASTER.git build/ASTER
+          make -C build/ASTER
+          test -x build/ASTER/bin/astral4
+          build/ASTER/bin/astral4 -u 0 -t 4 -o build/species_topology.nwk build/gene_trees.nwk 2>build/astral.log
+          test -s build/species_topology.nwk
+      - uses: actions/upload-artifact@v4
+        with:
+          name: ft-astral-topology
+          path: |
+            build/species_topology.nwk
+            build/gene_trees.nwk
+            build/astral.log
+          if-no-files-found: error
+
+  cluster:
+    needs: topology
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: python -m pip install --disable-pip-version-check numpy biopython openpyxl
+      - uses: actions/download-artifact@v4
+        with:
+          name: ft-astral-topology
+          path: build/topology
+      - name: Rebuild Fan colour seed after topology freeze
+        run: |
+          mkdir -p build/fan/package build/result
+          curl --fail --location --retry 3 'https://www.ncbi.nlm.nih.gov/pmc/utils/oa/oa.fcgi?id=PMC12946509' -o build/fan/oa.xml
+          python - <<'PY'
+          import xml.etree.ElementTree as ET
+          from pathlib import Path
+          r=ET.fromstring(Path('build/fan/oa.xml').read_bytes());ls=[x.attrib.get('href','') for x in r.findall('.//link') if x.attrib.get('format')=='tgz'];assert len(ls)==1,ls;u=ls[0]
+          if u.startswith('ftp://ftp.ncbi.nlm.nih.gov/'):u='https://ftp.ncbi.nlm.nih.gov/'+u.split('ftp://ftp.ncbi.nlm.nih.gov/',1)[1]
+          Path('build/fan/url').write_text(u+'\n')
+          PY
+          u=$(cat build/fan/url)
+          if ! curl --fail --location --retry 3 --retry-all-errors "$u" -o build/fan/a.tgz; then
+            u2=$(python - <<'PY'
+          from pathlib import Path
+          u=Path('build/fan/url').read_text().strip();m='https://ftp.ncbi.nlm.nih.gov/pub/pmc/';print(u.replace(m,m+'deprecated/',1) if u.startswith(m) and '/deprecated/' not in u else u)
+          PY
+          )
+            curl --fail --location --retry 3 --retry-all-errors "$u2" -o build/fan/a.tgz
+          fi
+          tar -xzf build/fan/a.tgz -C build/fan/package
+          x=$(find build/fan/package -type f -iname '*s002*.xlsx' | head -n 1); test -n "$x"
+          python scripts/build_fan2026_species_colour_seed.py "$x" --output build/fan/colour.csv --audit build/fan/audit.json
+      - name: Run 100k topology clustering permutations
+        run: |
+          python scripts/test_nuclear_topology_colour_clustering.py --tree build/topology/species_topology.nwk --fan-colour build/fan/colour.csv --out-dir build/result --permutations 100000 --seed 20260820
+          cat build/result/summary.json
+      - uses: actions/upload-artifact@v4
+        with:
+          name: ft-astral-h4-clustering
+          path: build/result/
+          if-no-files-found: error
