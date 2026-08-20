@@ -31,6 +31,17 @@ jobs:
             --summary build/ultimate_pre/runtime91_summary.json \
             --expected-total 98 --expected-frozen-assembled 93 --expected-frozen-raw 5 \
             --expected-runtime-assembled 91
+          python - <<'PY'
+          import csv
+          p='build/ultimate_pre/runtime91.csv'
+          rows=list(csv.DictReader(open(p,newline='',encoding='utf-8-sig')))
+          fields=list(rows[0])
+          if 'source_taxon' not in fields:
+              fields.append('source_taxon')
+              for r in rows: r['source_taxon']=r.get('taxon','')
+              with open(p,'w',newline='',encoding='utf-8') as f:
+                  w=csv.DictWriter(f,fieldnames=fields); w.writeheader(); w.writerows(rows)
+          PY
       - name: Rebuild deterministic Fan 2026 colour seed
         run: |
           curl --fail --location --retry 3 'https://www.ncbi.nlm.nih.gov/pmc/utils/oa/oa.fcgi?id=PMC12946509' -o build/ultimate_pre/oa.xml
