@@ -76,7 +76,8 @@ jobs:
         run: |
           sudo apt-get install -y -qq g++ make git
           git clone --depth 1 https://github.com/chaoszhang/ASTER.git build/ASTER
-          make -C build/ASTER astral4
+          make -C build/ASTER
+          test -x build/ASTER/bin/astral4
           build/ASTER/bin/astral4 -u 0 -t 4 -o build/species_topology.nwk build/gene_trees.nwk 2>build/astral.log
           test -s build/species_topology.nwk
       - uses: actions/upload-artifact@v4
