@@ -11,68 +11,44 @@ permissions:
   contents: read
   actions: read
 
+concurrency:
+  group: wu-fasttree-astral-h4-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
 env:
-  ALIGNMENT_RUN: '32324054012'
   N_LOCI: '339'
-  N_SHARDS: '12'
+  FROZEN_FASTTREE_RUN: '32349439280'
 
 jobs:
-  gene_trees:
-    strategy:
-      fail-fast: false
-      max-parallel: 12
-      matrix:
-        shard: [0,1,2,3,4,5,6,7,8,9,10,11]
-    runs-on: ubuntu-latest
-    timeout-minutes: 30
-    steps:
-      - uses: actions/checkout@v4
-      - name: Install FastTree
-        run: sudo apt-get install -y -qq fasttree
-      - name: Download frozen alignments
-        env:
-          GH_TOKEN: ${{ github.token }}
-        run: |
-          mkdir -p build/source
-          gh run download "$ALIGNMENT_RUN" --repo "$GITHUB_REPOSITORY" --name wu-angio353-runtime91-frozen-alignments --dir build/source
-          test $(find build/source -name '*.aln.faa' | wc -l) -eq "$N_LOCI"
-      - name: Infer approximate LG gene trees
-        env:
-          SHARD: ${{ matrix.shard }}
-        run: |
-          mkdir -p build/trees
-          python - <<'PY'
-          import glob,os
-          from pathlib import Path
-          fs=sorted(glob.glob('build/source/**/*.aln.faa',recursive=True));s=int(os.environ['SHARD']);n=int(os.environ['N_SHARDS']);keep=[x for i,x in enumerate(fs) if i%n==s]
-          Path('build/list').write_text('\n'.join(keep)+'\n');print({'shard':s,'n':len(keep)});assert 27<=len(keep)<=29
-          PY
-          while IFS= read -r aln; do
-            b=$(basename "$aln" .aln.faa)
-            FastTree -quiet -lg -gamma "$aln" > "build/trees/$b.treefile"
-            test -s "build/trees/$b.treefile"
-          done < build/list
-      - uses: actions/upload-artifact@v4
-        with:
-          name: ft-gene-trees-${{ matrix.shard }}
-          path: build/trees/*.treefile
-          if-no-files-found: error
-
   topology:
-    needs: gene_trees
     runs-on: ubuntu-latest
     timeout-minutes: 20
     steps:
       - uses: actions/checkout@v4
-      - uses: actions/download-artifact@v4
+      - name: Reuse completed 339 FastTree gene trees
+        uses: actions/download-artifact@v4
         with:
           pattern: ft-gene-trees-*
           path: build/shards
-      - name: Assemble gene trees
+          run-id: ${{ env.FROZEN_FASTTREE_RUN }}
+          github-token: ${{ github.token }}
+      - name: Assemble and audit frozen gene-tree set
         run: |
+          test $(find build/shards -name '*.treefile' | wc -l) -eq "$N_LOCI"
           cat $(find build/shards -name '*.treefile' | sort) > build/gene_trees.nwk
           test $(grep -c ';' build/gene_trees.nwk) -eq "$N_LOCI"
-      - name: Build and run ASTRAL-IV
+          python - <<'PY'
+          import glob,re
+          fs=glob.glob('build/shards/**/*.treefile',recursive=True)
+          loci=[]
+          for p in fs:
+              m=re.search(r'locus_(\d+)\.treefile$',p)
+              assert m,p
+              loci.append(m.group(1))
+          assert len(fs)==339 and len(set(loci))==339,(len(fs),len(set(loci)))
+          print({'gene_trees':len(fs),'unique_loci':len(set(loci))})
+          PY
+      - name: Build and run current ASTRAL-IV
         run: |
           sudo apt-get install -y -qq g++ make git
           git clone --depth 1 https://github.com/chaoszhang/ASTER.git build/ASTER
