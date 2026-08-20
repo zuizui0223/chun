@@ -1,0 +1,93 @@
+name: Wu 2022 Angiosperms353 frozen-marker alignments
+
+on:
+  pull_request:
+    paths:
+      - 'scripts/materialize_wu_angio353_marker_fastas.py'
+      - '.github/workflows/wu2022-angio353-marker-alignments.yml'
+  workflow_dispatch:
+    inputs:
+      source_run_id:
+        description: 'Successful runtime recovery run containing wu-angio353-runtime91-global-occupancy'
+        required: false
+        type: string
+
+permissions:
+  contents: read
+  actions: read
+
+env:
+  FROZEN_SOURCE_RUN_ID: '32256913348'
+
+jobs:
+  align:
+    runs-on: ubuntu-latest
+    timeout-minutes: 180
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install MAFFT
+        run: sudo apt-get install -y -qq mafft
+      - name: Download frozen global occupancy artifact
+        env:
+          GH_TOKEN: ${{ github.token }}
+          DISPATCH_SOURCE_RUN_ID: ${{ inputs.source_run_id }}
+        run: |
+          SOURCE_RUN_ID="${DISPATCH_SOURCE_RUN_ID:-$FROZEN_SOURCE_RUN_ID}"
+          echo "SOURCE_RUN_ID=$SOURCE_RUN_ID"
+          mkdir -p build/source
+          gh run download "$SOURCE_RUN_ID" \
+            --repo "$GITHUB_REPOSITORY" \
+            --name wu-angio353-runtime91-global-occupancy \
+            --dir build/source
+          test -s build/source/global_occupancy/best_hits_merged.csv
+          test -s build/source/global_occupancy/locus_occupancy.csv
+          test -s build/source/global_occupancy/summary.json
+      - name: Materialize only frozen >=80% markers
+        run: |
+          python scripts/materialize_wu_angio353_marker_fastas.py \
+            --best-hits build/source/global_occupancy/best_hits_merged.csv \
+            --occupancy build/source/global_occupancy/locus_occupancy.csv \
+            --out-dir build/markers --min-occupancy 0.80
+          python - <<'PY'
+          import json
+          s=json.load(open('build/markers/materialization_summary.json'))
+          assert s['admitted_loci'] == 339, s
+          assert s['materialized_loci'] == 339, s
+          print(json.dumps(s,indent=2))
+          PY
+      - name: Align admitted protein markers
+        run: |
+          mkdir -p build/alignments
+          find build/markers -name 'locus_*.faa' -print0 | \
+            xargs -0 -n1 -P2 bash -c '
+              fa="$0"; base=$(basename "$fa" .faa)
+              mafft --auto --thread 1 "$fa" > "build/alignments/${base}.aln.faa" 2> "build/alignments/${base}.mafft.log"
+            '
+          test $(find build/alignments -name '*.aln.faa' | wc -l) -eq 339
+      - name: Audit aligned locus/taxon counts
+        run: |
+          python - <<'PY'
+          import glob,json
+          from pathlib import Path
+          loci=[]
+          for p in glob.glob('build/alignments/*.aln.faa'):
+              n=sum(1 for line in open(p) if line.startswith('>'))
+              loci.append({'locus':Path(p).name.split('.')[0].replace('locus_',''),'n_taxa':n})
+          assert len(loci)==339, len(loci)
+          assert min(x['n_taxa'] for x in loci)>=73, min(x['n_taxa'] for x in loci)
+          out={'source_run_id':32256913348,'aligned_loci':len(loci),'min_taxa_per_alignment':min(x['n_taxa'] for x in loci),'max_taxa_per_alignment':max(x['n_taxa'] for x in loci),'claim_ceiling':'frozen >=80% Angiosperms353 protein-marker alignments only; no topology or colour inference'}
+          Path('build/alignment_summary.json').write_text(json.dumps(out,indent=2)+'\n')
+          print(json.dumps(out,indent=2))
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: wu-angio353-runtime91-frozen-alignments
+          path: |
+            build/source/global_occupancy/summary.json
+            build/markers/materialization_summary.json
+            build/alignments/*.aln.faa
+            build/alignment_summary.json
+          if-no-files-found: error
