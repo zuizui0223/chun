@@ -1,0 +1,54 @@
+name: Camellia new ecological persistence hypotheses
+
+on:
+  pull_request:
+    paths:
+      - 'scripts/screen_new_ecological_persistence_hypotheses.py'
+      - 'docs/NEW_ECOLOGICAL_PERSISTENCE_HYPOTHESES.md'
+      - '.github/workflows/camellia-new-ecological-persistence-hypotheses.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  screen:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Screen newly generated hypotheses
+        run: |
+          mkdir -p build/new_ecology
+          python scripts/screen_new_ecological_persistence_hypotheses.py \
+            --pollination data/camellia_pollination_function_meta_v0_2.csv \
+            --mechanism data/camellia_flower_color_mechanism_meta_v0_3.csv \
+            --prebranch data/ultimate_cause_prebranch_hypothesis_results_v0_1.csv \
+            --out-dir build/new_ecology \
+            --permutations 100000 --seed 20260820
+      - name: Validate claim boundary
+        run: |
+          python - <<'PY'
+          import json,csv
+          s=json.load(open('build/new_ecology/summary.json'))
+          rows=list(csv.DictReader(open('build/new_ecology/hypothesis_registry.csv')))
+          assert len(rows)==5, rows
+          assert s['n_pollination_taxa']==7, s
+          assert s['structural_loss_required_clusters']==0, s
+          assert s['n_multi_taxon_states']>=2, s
+          print(json.dumps(s,indent=2))
+          PY
+      - name: Report
+        run: |
+          echo '### Newly generated ecological hypotheses' >> "$GITHUB_STEP_SUMMARY"
+          cat build/new_ecology/summary.json >> "$GITHUB_STEP_SUMMARY"
+          echo '### Registry' >> "$GITHUB_STEP_SUMMARY"
+          cat build/new_ecology/hypothesis_registry.csv >> "$GITHUB_STEP_SUMMARY"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: camellia-new-ecological-persistence-hypotheses
+          path: build/new_ecology/
+          if-no-files-found: error
