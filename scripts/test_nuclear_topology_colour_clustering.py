@@ -1,8 +1,11 @@
 #!/usr/bin/env python3
 """Join visible colour only after an independent nuclear topology is frozen.
 
-Tests whether A/W/Y tips are more clustered than count-preserving random sets on
-an unrooted topology using edge-count MPD and MNTD.
+Tests two distinct, root-independent questions on unrooted topology edge counts:
+1. whether each A/W/Y state is more clustered than a count-preserving random set;
+2. whether visible colour states as a whole are phylogenetically conserved, i.e.
+   same-state pairs / nearest same-state neighbours are closer than under a
+   count-preserving permutation of all observed labels.
 """
 from __future__ import annotations
 import argparse,csv,json,re
@@ -41,7 +44,40 @@ def test(state,idx,D,nperm,rng):
     om,ont=metrics(D[np.ix_(idx,idx)]); nm=np.empty(nperm); nn=np.empty(nperm);N=len(D)
     for z in range(nperm):
         x=rng.choice(N,n,replace=False);nm[z],nn[z]=metrics(D[np.ix_(x,x)])
-    return {'state':state,'n_state':n,'observed_mpd_edges':om,'expected_mpd_edges':float(nm.mean()),'mpd_cluster_p':float((np.sum(nm<=om)+1)/(nperm+1)),'observed_mntd_edges':ont,'expected_mntd_edges':float(nn.mean()),'mntd_cluster_p':float((np.sum(nn<=ont)+1)/(nperm+1))}
+    sm=float(nm.std(ddof=1)); sn=float(nn.std(ddof=1))
+    return {
+        'state':state,'n_state':n,
+        'observed_mpd_edges':om,'expected_mpd_edges':float(nm.mean()),'null_sd_mpd_edges':sm,
+        'mpd_z':float((om-nm.mean())/sm) if sm else None,
+        'mpd_cluster_p':float((np.sum(nm<=om)+1)/(nperm+1)),
+        'observed_mntd_edges':ont,'expected_mntd_edges':float(nn.mean()),'null_sd_mntd_edges':sn,
+        'mntd_z':float((ont-nn.mean())/sn) if sn else None,
+        'mntd_cluster_p':float((np.sum(nn<=ont)+1)/(nperm+1)),
+    }
+def global_metrics(labels,D):
+    labels=np.asarray(labels,dtype=object); n=len(labels)
+    iu=np.triu_indices(n,1); same=labels[iu[0]]==labels[iu[1]]
+    same_mpd=float(np.mean(D[iu][same]))
+    X=D.astype(float).copy();np.fill_diagonal(X,np.inf)
+    near=[]
+    for i,s in enumerate(labels):
+        mask=labels==s;mask[i]=False
+        near.append(float(np.min(X[i,mask])))
+    return same_mpd,float(np.mean(near))
+def global_test(labels,D,nperm,rng):
+    om,ont=global_metrics(labels,D);nm=np.empty(nperm);nn=np.empty(nperm)
+    labels=np.asarray(labels,dtype=object)
+    for z in range(nperm):
+        p=rng.permutation(labels);nm[z],nn[z]=global_metrics(p,D)
+    sm=float(nm.std(ddof=1));sn=float(nn.std(ddof=1))
+    return {
+        'observed_same_state_mpd_edges':om,'expected_same_state_mpd_edges':float(nm.mean()),
+        'null_sd_same_state_mpd_edges':sm,'same_state_mpd_z':float((om-nm.mean())/sm) if sm else None,
+        'same_state_mpd_cluster_p':float((np.sum(nm<=om)+1)/(nperm+1)),
+        'observed_nearest_same_state_edges':ont,'expected_nearest_same_state_edges':float(nn.mean()),
+        'null_sd_nearest_same_state_edges':sn,'nearest_same_state_z':float((ont-nn.mean())/sn) if sn else None,
+        'nearest_same_state_cluster_p':float((np.sum(nn<=ont)+1)/(nperm+1)),
+    }
 def main():
     ap=argparse.ArgumentParser();ap.add_argument('--tree',type=Path,required=True);ap.add_argument('--fan-colour',type=Path,required=True);ap.add_argument('--out-dir',type=Path,required=True);ap.add_argument('--permutations',type=int,default=100000);ap.add_argument('--seed',type=int,default=20260820);a=ap.parse_args();a.out_dir.mkdir(parents=True,exist_ok=True)
     names,D=matrix(a.tree); col={}
@@ -51,6 +87,15 @@ def main():
     ti=[i for i,n in enumerate(names) if n in col]; st=[col[names[i]] for i in ti]; PD=D[np.ix_(ti,ti)];rng=np.random.default_rng(a.seed)
     out=[test(s,[i for i,x in enumerate(st) if x==s],PD,a.permutations,rng) for s in ['A','W','Y']]
     with (a.out_dir/'nuclear_colour_clustering.csv').open('w',newline='',encoding='utf-8') as f:w=csv.DictWriter(f,fieldnames=list(out[0]));w.writeheader();w.writerows(out)
-    A=out[0]; summary={'tree_tips':len(names),'visible_colour_overlap':len(st),'state_counts':{s:st.count(s) for s in ['A','W','Y']},'distance_metric':'unrooted topology edge count','permutations':a.permutations,'A_result':A,'A_lineage_clustering_status':'supported' if A.get('mpd_cluster_p',1)<.05 and A.get('mntd_cluster_p',1)<.05 else 'partial_or_not_supported','claim_ceiling':'approximate-gene-tree, root-independent topology screen only; no ancestral-state or causal claim'}
+    global_result=global_test(st,PD,a.permutations,rng)
+    A=out[0]
+    summary={
+        'tree_tips':len(names),'visible_colour_overlap':len(st),'state_counts':{s:st.count(s) for s in ['A','W','Y']},
+        'distance_metric':'unrooted topology edge count','permutations':a.permutations,
+        'A_result':A,'global_colour_conservatism':global_result,
+        'A_lineage_clustering_status':'supported' if A.get('mpd_cluster_p',1)<.05 and A.get('mntd_cluster_p',1)<.05 else ('local_only' if A.get('mntd_cluster_p',1)<.05 else 'not_supported'),
+        'global_colour_conservatism_status':'supported' if global_result['same_state_mpd_cluster_p']<.05 and global_result['nearest_same_state_cluster_p']<.05 else 'partial_or_not_supported',
+        'claim_ceiling':'approximate-gene-tree, root-independent topology screen only; distinguishes A-specific clustering from general visible-colour phylogenetic conservatism; no ancestral-state or causal claim'
+    }
     (a.out_dir/'summary.json').write_text(json.dumps(summary,indent=2)+'\n');print(json.dumps(summary,indent=2))
 if __name__=='__main__':main()
