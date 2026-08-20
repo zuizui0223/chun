@@ -1,0 +1,2 @@
+taxon,source_project,run,role,marker_definition,admission_status,provenance_note
+Polyspora speciosa,PRJNA665925,SRR19266757,nuclear_outgroup,frozen_runtime91_339,admit_for_targeted_recovery,"same Wu 2022 RNA-seq project used for Camellia backbone; outgroup only; no flower-colour/ecology information enters marker recovery"

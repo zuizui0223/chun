@@ -1,0 +1,153 @@
+name: Wu 2022 Polyspora frozen339 outgroup recovery
+
+on:
+  pull_request:
+    paths:
+      - 'data/wu2022_polyspora_outgroup_v0_1.csv'
+      - 'scripts/recover_frozen_angio353_from_blastx.py'
+      - '.github/workflows/wu2022-polyspora-outgroup-frozen339.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  actions: read
+
+env:
+  FROZEN_RECOVERY_RUN_ID: '32256913348'
+  RUN: 'SRR19266757'
+
+jobs:
+  recover:
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install targeted transcriptome recovery tools
+        run: sudo apt-get install -y -qq spades diamond-aligner
+      - name: Freeze the existing 339-locus definition and targets
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          mkdir -p build/frozen build/targets
+          gh run download "$FROZEN_RECOVERY_RUN_ID" --repo "$GITHUB_REPOSITORY" \
+            --name wu-angio353-runtime91-global-occupancy --dir build/frozen
+          test -s build/frozen/global_occupancy/locus_occupancy.csv
+          curl --fail --location --retry 3 \
+            https://raw.githubusercontent.com/mossmatters/Angiosperms353/master/Angiosperms353.FAA \
+            -o build/targets/Angiosperms353.FAA
+          python - <<'PY'
+          import csv,re
+          from pathlib import Path
+          occ=list(csv.DictReader(open('build/frozen/global_occupancy/locus_occupancy.csv',encoding='utf-8-sig')))
+          frozen={r['locus'] for r in occ if str(r.get('admitted','')).lower() in {'true','1','yes'} and float(r['occupancy'])>=0.80}
+          assert len(frozen)==339,len(frozen)
+          out=open('build/targets/frozen339_targets.faa','w')
+          name=None; seq=[]; kept=0
+          def emit(n,s):
+              global kept
+              if not n:return
+              token=n.split()[0]; loc=token.split('-')[-1]
+              if loc in frozen:
+                  out.write('>'+n+'\n'+''.join(s)+'\n');kept+=1
+          for line in open('build/targets/Angiosperms353.FAA'):
+              line=line.rstrip('\n')
+              if line.startswith('>'):
+                  emit(name,seq);name=line[1:];seq=[]
+              else: seq.append(line.strip())
+          emit(name,seq);out.close()
+          assert kept>3000,kept
+          print({'frozen_loci':len(frozen),'target_sequences_retained':kept})
+          PY
+          diamond makedb --in build/targets/frozen339_targets.faa --db build/targets/frozen339
+      - name: Resolve and download exact ENA FASTQ payloads
+        run: |
+          mkdir -p build/reads
+          curl --fail --location --retry 3 \
+            "https://www.ebi.ac.uk/ena/portal/api/filereport?accession=$RUN&result=read_run&fields=fastq_ftp,fastq_md5,fastq_bytes&format=tsv" \
+            -o build/ena.tsv
+          python - <<'PY'
+          import csv,hashlib,subprocess
+          from pathlib import Path
+          rows=list(csv.DictReader(open('build/ena.tsv'),delimiter='\t'))
+          if len(rows)!=1: raise SystemExit(f'unexpected ENA rows: {len(rows)}')
+          urls=(rows[0].get('fastq_ftp') or '').split(';'); md5s=(rows[0].get('fastq_md5') or '').split(';')
+          if len(urls)!=2: raise SystemExit(f'expected paired FASTQ, got {urls}')
+          for i,(u,m) in enumerate(zip(urls,md5s),1):
+              url='https://'+u if u.startswith('ftp.') else u.replace('ftp://','https://')
+              p=Path(f'build/reads/R{i}.fastq.gz')
+              subprocess.run(['curl','--fail','--location','--retry','3','--retry-all-errors',url,'-o',str(p)],check=True)
+              h=hashlib.md5(p.read_bytes()).hexdigest()
+              if m and h!=m: raise SystemExit(f'md5 mismatch R{i}: {h} != {m}')
+              print({'read':i,'bytes':p.stat().st_size,'md5':h})
+          PY
+      - name: Prefilter paired reads against the frozen339 target universe
+        run: |
+          mkdir -p build/prefilter
+          diamond blastx --db build/targets/frozen339 --query build/reads/R1.fastq.gz \
+            --out build/prefilter/R1_hits.tsv --outfmt 6 qseqid sseqid bitscore \
+            --evalue 1e-5 --max-target-seqs 1 --max-hsps 1 --fast --threads 4
+          diamond blastx --db build/targets/frozen339 --query build/reads/R2.fastq.gz \
+            --out build/prefilter/R2_hits.tsv --outfmt 6 qseqid sseqid bitscore \
+            --evalue 1e-5 --max-target-seqs 1 --max-hsps 1 --fast --threads 4
+          python - <<'PY'
+          import gzip,json,re
+          from pathlib import Path
+          ids=set()
+          def base(x):
+              x=x.split()[0]
+              return re.sub(r'([/_][12])$','',x)
+          for p in ['build/prefilter/R1_hits.tsv','build/prefilter/R2_hits.tsv']:
+              for line in open(p):
+                  if line.strip(): ids.add(base(line.split('\t',1)[0]))
+          if len(ids)<1000: raise SystemExit(f'too few target-like read pairs: {len(ids)}')
+          inp=[gzip.open('build/reads/R1.fastq.gz','rt'),gzip.open('build/reads/R2.fastq.gz','rt')]
+          out=[gzip.open('build/prefilter/R1.fq.gz','wt'),gzip.open('build/prefilter/R2.fq.gz','wt')]
+          total=selected=0
+          while True:
+              a=[inp[0].readline() for _ in range(4)]; b=[inp[1].readline() for _ in range(4)]
+              if not a[0] and not b[0]: break
+              if not a[0] or not b[0]: raise SystemExit('paired FASTQ length mismatch')
+              total+=1
+              if base(a[0][1:].strip()) in ids or base(b[0][1:].strip()) in ids:
+                  out[0].writelines(a);out[1].writelines(b);selected+=1
+          for x in inp+out:x.close()
+          s={'target_hit_pair_ids':len(ids),'total_pairs':total,'selected_pairs':selected,'selected_fraction':selected/total}
+          Path('build/prefilter/summary.json').write_text(json.dumps(s,indent=2)+'\n');print(json.dumps(s,indent=2))
+          if selected<1000: raise SystemExit(f'too few selected pairs: {selected}')
+          PY
+      - name: Assemble only target-enriched read pairs with rnaSPAdes
+        run: |
+          rnaspades.py -1 build/prefilter/R1.fq.gz -2 build/prefilter/R2.fq.gz \
+            -o build/rnaspades -t 4 -m 14
+          test -s build/rnaspades/transcripts.fasta
+      - name: Screen target-enriched transcripts against frozen339
+        run: |
+          diamond blastx --db build/targets/frozen339 \
+            --query build/rnaspades/transcripts.fasta --out build/hits.tsv \
+            --outfmt 6 qseqid sseqid pident length qlen slen evalue bitscore qstart qend sstart send qseq_translated \
+            --evalue 1e-8 --max-target-seqs 5 --max-hsps 1 --mid-sensitive --threads 4
+          test -s build/hits.tsv
+      - name: Freeze only the pre-admitted 339 loci
+        run: |
+          python scripts/recover_frozen_angio353_from_blastx.py \
+            --taxon 'Polyspora speciosa' --hits build/hits.tsv \
+            --occupancy build/frozen/global_occupancy/locus_occupancy.csv \
+            --out-dir build/result
+          python - <<'PY'
+          import json
+          s=json.load(open('build/result/summary.json'))
+          assert s['frozen_loci']==339, s
+          assert s['recovered_loci']>=250, s
+          print(json.dumps(s,indent=2))
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: wu2022-polyspora-speciosa-frozen339-targeted
+          path: |
+            build/ena.tsv
+            build/prefilter/summary.json
+            build/result/
+          if-no-files-found: error
