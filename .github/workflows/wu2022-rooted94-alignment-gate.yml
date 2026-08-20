@@ -1,0 +1,80 @@
+name: Wu rooted94 frozen alignment gate
+
+on:
+  pull_request:
+    paths:
+      - 'scripts/expand_frozen_angio353_alignments.py'
+      - '.github/workflows/wu2022-rooted94-alignment-gate.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  actions: read
+
+env:
+  BASE_ALIGNMENT_RUN_ID: '32324054012'
+  ECO_ANCHOR_RUN_ID: '32337471645'
+  OUTGROUP_RUN_ID: '32349736439'
+
+jobs:
+  expand:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install MAFFT
+        run: sudo apt-get install -y -qq mafft
+      - name: Download frozen runtime91 alignments and extra marker artifacts
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          mkdir -p build/base build/japonica build/nitidissima build/polyspora
+          gh run download "$BASE_ALIGNMENT_RUN_ID" --repo "$GITHUB_REPOSITORY" \
+            --name wu-angio353-runtime91-frozen-alignments --dir build/base
+          gh run download "$ECO_ANCHOR_RUN_ID" --repo "$GITHUB_REPOSITORY" \
+            --name ecological-anchor-Camellia_japonica-frozen339 --dir build/japonica
+          gh run download "$ECO_ANCHOR_RUN_ID" --repo "$GITHUB_REPOSITORY" \
+            --name ecological-anchor-Camellia_nitidissima-frozen339 --dir build/nitidissima
+          gh run download "$OUTGROUP_RUN_ID" --repo "$GITHUB_REPOSITORY" \
+            --name wu2022-polyspora-speciosa-frozen339-targeted --dir build/polyspora
+          test $(find build/base -name '*.aln.faa' | wc -l) -eq 339
+          test -s "$(find build/japonica -name frozen_markers.faa | head -1)"
+          test -s "$(find build/nitidissima -name frozen_markers.faa | head -1)"
+          test -s "$(find build/polyspora -name frozen_markers.faa | head -1)"
+      - name: Expand immutable runtime91 alignments
+        run: |
+          JAPONICA=$(find build/japonica -name frozen_markers.faa | head -1)
+          NITIDISSIMA=$(find build/nitidissima -name frozen_markers.faa | head -1)
+          POLYSPORA=$(find build/polyspora -name frozen_markers.faa | head -1)
+          python scripts/expand_frozen_angio353_alignments.py \
+            --base-alignments build/base \
+            --extra-markers "$JAPONICA" \
+            --extra-markers "$NITIDISSIMA" \
+            --extra-markers "$POLYSPORA" \
+            --out-dir build/rooted94/alignments \
+            --summary build/rooted94/summary.json \
+            --manifest build/rooted94/locus_manifest.csv \
+            --expected-loci 339
+          test $(find build/rooted94/alignments -name '*.aln.faa' | wc -l) -eq 339
+      - name: Verify frozen expansion boundary
+        run: |
+          python - <<'PY'
+          import json
+          s=json.load(open('build/rooted94/summary.json'))
+          assert s['expanded_alignments']==339, s
+          assert s['maximum_tip_set']==94, s
+          assert s['added_loci_by_taxon']['Camellia_japonica']==332, s
+          assert s['added_loci_by_taxon']['Camellia_nitidissima']==338, s
+          assert s['added_loci_by_taxon']['Polyspora_speciosa']==338, s
+          assert s['missing_loci_by_taxon']['Polyspora_speciosa']==['5921'], s
+          print(json.dumps(s,indent=2))
+          PY
+      - name: Report
+        run: |
+          echo '### Rooted94 alignment expansion' >> "$GITHUB_STEP_SUMMARY"
+          cat build/rooted94/summary.json >> "$GITHUB_STEP_SUMMARY"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: wu-angio353-rooted94-frozen-alignments
+          path: build/rooted94/
+          if-no-files-found: error
