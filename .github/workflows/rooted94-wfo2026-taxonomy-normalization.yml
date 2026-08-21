@@ -13,18 +13,20 @@ permissions:
 
 env:
   ROOTED94_TREE_RUN: '32375742772'
+  WFO_DWCA_URL: 'https://zenodo.org/records/20782718/files/_DwC_backbone_R.zip?download=1'
+  WFO_DWCA_MD5: '0e4486945cd9f7af548ca87eb9a870ed'
 
 jobs:
   normalize:
     runs-on: ubuntu-latest
-    timeout-minutes: 20
+    timeout-minutes: 30
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
       - name: Install dependencies
-        run: python -m pip install --disable-pip-version-check requests biopython
+        run: python -m pip install --disable-pip-version-check biopython
       - name: Download frozen rooted94 topology
         env:
           GH_TOKEN: ${{ github.token }}
@@ -35,24 +37,31 @@ jobs:
           tree=$(find build/source -name 'rooted94_astral4.nwk' | head -n 1)
           test -n "$tree"; test -s "$tree"
           cp "$tree" build/rooted94_astral4.nwk
+      - name: Download immutable WFO Plant List 2026-06 Darwin Core snapshot
+        run: |
+          curl --fail --location --retry 3 --retry-all-errors "$WFO_DWCA_URL" -o build/wfo2026_06_dwca.zip
+          echo "$WFO_DWCA_MD5  build/wfo2026_06_dwca.zip" | md5sum -c -
       - name: Normalize every rooted tip to WFO Plant List 2026-06
         run: |
           mkdir -p build/result
           python scripts/normalize_rooted94_wfo2026_taxonomy.py \
             --tree build/rooted94_astral4.nwk \
+            --dwca build/wfo2026_06_dwca.zip \
             --out-dir build/result
       - name: Audit and report
         run: |
           python - <<'PY'
-          import csv,json
+          import json
           s=json.load(open('build/result/summary.json'))
           assert s['backbone']=='WFO Plant List 2026-06',s
           assert s['release_doi']=='10.5281/zenodo.20782718',s
+          assert s['dwca_md5']=='0e4486945cd9f7af548ca87eb9a870ed',s
           assert s['n_tree_tips']==94,s
           assert s['n_camellia_legacy_tips']==93,s
+          assert s['n_polyspora_legacy_tips']==1,s
           assert s['n_unresolved_or_ambiguous']==0,s
-          m=list(csv.reader(open('build/result/astral_species_mapping.tsv'),delimiter=' '))
-          assert len(m)==94,len(m)
+          lines=[x for x in open('build/result/astral_species_mapping.tsv') if x.strip()]
+          assert len(lines)==94,len(lines)
           print(json.dumps(s,indent=2))
           PY
           echo '### Rooted94 WFO 2026-06 taxonomy normalization' >> "$GITHUB_STEP_SUMMARY"
