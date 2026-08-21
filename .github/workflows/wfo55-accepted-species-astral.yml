@@ -1,0 +1,126 @@
+name: WFO55 accepted-species rooted nuclear tree
+
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/wfo55-accepted-species-astral.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  actions: read
+
+env:
+  ROOTED94_GENE_TREE_RUN: '32375742772'
+  WFO_MAPPING_RUN: '32439843289'
+  N_GENE_TREES: '339'
+  N_LEGACY_TIPS: '94'
+  N_ACCEPTED_GROUPS: '56'
+
+jobs:
+  accepted_species_tree:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - name: Download frozen rooted94 gene trees and WFO mapping
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          mkdir -p build/tree build/taxonomy
+          gh run download "$ROOTED94_GENE_TREE_RUN" --repo "$GITHUB_REPOSITORY" \
+            --name wu-angio353-rooted94-fast-astral4 --dir build/tree
+          gh run download "$WFO_MAPPING_RUN" --repo "$GITHUB_REPOSITORY" \
+            --name rooted94-wfo2026-06-taxonomy-normalization --dir build/taxonomy
+          genes=$(find build/tree -name 'gene_trees_339.nwk' | head -n 1)
+          mapping=$(find build/taxonomy -name 'astral_species_mapping.tsv' | head -n 1)
+          registry=$(find build/taxonomy -name 'wfo2026_06_taxonomy_registry.csv' | head -n 1)
+          test -n "$genes"; test -s "$genes"
+          test -n "$mapping"; test -s "$mapping"
+          test -n "$registry"; test -s "$registry"
+          cp "$genes" build/gene_trees_339.nwk
+          cp "$mapping" build/astral_species_mapping.tsv
+          cp "$registry" build/wfo2026_06_taxonomy_registry.csv
+      - name: Audit frozen inputs
+        run: |
+          python - <<'PY'
+          import csv,json
+          genes=sum(1 for line in open('build/gene_trees_339.nwk') if line.strip().endswith(';'))
+          mapping=[]
+          for line in open('build/astral_species_mapping.tsv'):
+              if line.strip():
+                  a,b=line.split()
+                  mapping.append((a,b))
+          rows=list(csv.DictReader(open('build/wfo2026_06_taxonomy_registry.csv',encoding='utf-8-sig')))
+          out={
+            'n_gene_trees':genes,
+            'n_mapping_rows':len(mapping),
+            'n_unique_legacy_tips':len({a for a,b in mapping}),
+            'n_unique_accepted_species_groups':len({b for a,b in mapping}),
+            'n_registry_rows':len(rows),
+            'polyspora_mapping':[x for x in mapping if x[0]=='Polyspora_speciosa']
+          }
+          print(json.dumps(out,indent=2))
+          assert genes==339,out
+          assert len(mapping)==94 and len({a for a,b in mapping})==94,out
+          assert len({b for a,b in mapping})==56,out
+          assert len(rows)==94,out
+          assert out['polyspora_mapping']==[('Polyspora_speciosa','Polyspora_speciosa')],out
+          open('build/input_audit.json','w').write(json.dumps(out,indent=2)+'\n')
+          PY
+      - name: Build current ASTER
+        run: |
+          sudo apt-get install -y -qq g++ make git
+          git clone --depth 1 https://github.com/chaoszhang/ASTER.git build/ASTER
+          make -C build/ASTER
+          test -x build/ASTER/bin/astral4
+      - name: Infer WFO-normalized multi-individual species tree
+        run: |
+          build/ASTER/bin/astral4 \
+            -a build/astral_species_mapping.tsv \
+            --root Polyspora_speciosa \
+            -u 2 -t 4 \
+            -o build/wfo55_rooted_astral4.nwk \
+            build/gene_trees_339.nwk 2>build/astral4.log
+          test -s build/wfo55_rooted_astral4.nwk
+      - name: Freeze accepted-species tree audit
+        run: |
+          python - <<'PY'
+          import json,re
+          from pathlib import Path
+          tree=Path('build/wfo55_rooted_astral4.nwk').read_text().strip()
+          tips=re.findall(r'(?<=[(,])([^():,;]+)',tree)
+          tips={re.sub(r'\[[^\]]*\]','',x).strip() for x in tips}
+          out={
+            'n_gene_trees':339,
+            'n_species_tree_tips':len(tips),
+            'n_camellia_accepted_species_tips':sum(x.startswith('Camellia_') for x in tips),
+            'outgroup':'Polyspora_speciosa',
+            'outgroup_present':'Polyspora_speciosa' in tips,
+            'mapping_backbone':'WFO Plant List 2026-06',
+            'taxonomy_mapping_run':32439843289,
+            'gene_tree_source_run':32375742772,
+            'gene_tree_method':'FastTree LG+gamma approximate rooted94 sensitivity',
+            'species_tree_method':'ASTRAL-IV with -a multi-individual accepted-species mapping; Polyspora root; -u 2',
+            'colour_joined':False,
+            'claim_ceiling':'WFO-normalized accepted-species nuclear sensitivity tree only; no flower-colour or ecological interpretation'
+          }
+          print(json.dumps(out,indent=2))
+          assert len(tips)==56,out
+          assert out['n_camellia_accepted_species_tips']==55,out
+          assert out['outgroup_present'],out
+          Path('build/species_tree_summary.json').write_text(json.dumps(out,indent=2)+'\n')
+          PY
+          echo '### WFO55 accepted-species rooted nuclear tree' >> "$GITHUB_STEP_SUMMARY"
+          cat build/species_tree_summary.json >> "$GITHUB_STEP_SUMMARY"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: wfo55-accepted-species-rooted-astral4
+          path: |
+            build/wfo55_rooted_astral4.nwk
+            build/species_tree_summary.json
+            build/input_audit.json
+            build/astral_species_mapping.tsv
+            build/wfo2026_06_taxonomy_registry.csv
+            build/astral4.log
+          if-no-files-found: error
