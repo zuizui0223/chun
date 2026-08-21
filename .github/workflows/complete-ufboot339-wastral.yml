@@ -1,0 +1,171 @@
+name: Complete UFBoot339 and current ASTER species trees
+
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/complete-ufboot339-wastral.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  actions: read
+
+env:
+  ALIGNMENT_RUN: '32324054012'
+  PARTIAL_UFBOOT_RUN: '32353571995'
+  N_LOCI: '339'
+  ORIGINAL_N_SHARDS: '12'
+  MISSING_SHARD: '8'
+  RECOVERY_PARTS: '4'
+
+jobs:
+  recover_missing_shard8:
+    strategy:
+      fail-fast: false
+      max-parallel: 4
+      matrix:
+        part: [0,1,2,3]
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install IQ-TREE
+        run: |
+          sudo apt-get install -y -qq iqtree
+          IQTREE=$(command -v iqtree3 || command -v iqtree2 || command -v iqtree)
+          "$IQTREE" -version || "$IQTREE" --version || true
+          echo "IQTREE=$IQTREE" >> "$GITHUB_ENV"
+      - name: Download frozen 339 alignments
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          mkdir -p build/source
+          gh run download "$ALIGNMENT_RUN" --repo "$GITHUB_REPOSITORY" \
+            --name wu-angio353-runtime91-frozen-alignments --dir build/source
+          test $(find build/source -name '*.aln.faa' | wc -l) -eq "$N_LOCI"
+      - name: Select one quarter of original shard 8
+        env:
+          PART: ${{ matrix.part }}
+        run: |
+          python - <<'PY'
+          import glob,os
+          from pathlib import Path
+          fs=sorted(glob.glob('build/source/**/*.aln.faa',recursive=True))
+          shard=int(os.environ['MISSING_SHARD']); nsh=int(os.environ['ORIGINAL_N_SHARDS'])
+          original=[p for i,p in enumerate(fs) if i % nsh == shard]
+          part=int(os.environ['PART']); nparts=int(os.environ['RECOVERY_PARTS'])
+          keep=[p for j,p in enumerate(original) if j % nparts == part]
+          Path('build/list').write_text('\n'.join(keep)+'\n')
+          print({'original_shard':shard,'original_n':len(original),'part':part,'n_loci':len(keep),'files':[Path(x).name for x in keep]})
+          assert 27 <= len(original) <= 29
+          assert 6 <= len(keep) <= 8
+          PY
+      - name: Infer only missing LG+G4 UFBoot gene trees
+        run: |
+          mkdir -p build/trees
+          while IFS= read -r aln; do
+            base=$(basename "$aln" .aln.faa)
+            "$IQTREE" -s "$aln" -st AA -m LG+G4 -B 1000 -nt 1 \
+              -pre "build/trees/$base" -quiet
+            test -s "build/trees/$base.treefile"
+          done < build/list
+          expected=$(wc -l < build/list)
+          observed=$(find build/trees -name '*.treefile' | wc -l)
+          test "$observed" -eq "$expected"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: recovered-ufboot-shard8-part-${{ matrix.part }}
+          path: build/trees/*.treefile
+          if-no-files-found: error
+
+  species_trees:
+    needs: recover_missing_shard8
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - name: Download eleven successful original UFBoot shard artifacts
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          mkdir -p build/original
+          gh run download "$PARTIAL_UFBOOT_RUN" --repo "$GITHUB_REPOSITORY" \
+            --pattern 'wu-angio353-gene-trees-shard-*' --dir build/original
+          test $(find build/original -name '*.treefile' | wc -l) -gt 300
+          # Shard 8 must still be absent here; if the old run finished later,
+          # deliberately ignore that artifact to keep this completion auditable.
+          rm -rf build/original/wu-angio353-gene-trees-shard-8 || true
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: recovered-ufboot-shard8-part-*
+          path: build/recovered
+      - name: Assemble and audit exactly 339 unique gene trees
+        run: |
+          mkdir -p build/all
+          find build/original build/recovered -name '*.treefile' -exec cp {} build/all/ \;
+          python - <<'PY'
+          import glob,json
+          from pathlib import Path
+          fs=sorted(glob.glob('build/all/*.treefile'))
+          names=[Path(x).name for x in fs]
+          out={'n_treefiles':len(fs),'n_unique_filenames':len(set(names)),'first':names[:5],'last':names[-5:]}
+          print(json.dumps(out,indent=2))
+          assert len(fs)==339,out
+          assert len(set(names))==339,out
+          with open('build/gene_trees_339.nwk','w') as o:
+              for p in fs:
+                  text=Path(p).read_text().strip()
+                  assert text.endswith(';'),p
+                  o.write(text+'\n')
+          assert sum(1 for _ in open('build/gene_trees_339.nwk'))==339
+          Path('build/gene_tree_assembly_summary.json').write_text(json.dumps(out,indent=2)+'\n')
+          PY
+      - name: Build current ASTER
+        run: |
+          sudo apt-get install -y -qq g++ make git
+          git clone --depth 1 https://github.com/chaoszhang/ASTER.git build/ASTER
+          make -C build/ASTER
+          test -x build/ASTER/bin/wastral
+          test -x build/ASTER/bin/astral4
+      - name: Infer support-weighted and topology-only species trees
+        run: |
+          build/ASTER/bin/wastral -S -o build/runtime91_wastral.nwk build/gene_trees_339.nwk 2>build/wastral.log
+          build/ASTER/bin/astral4 -u 2 -t 4 -o build/runtime91_astral4.nwk build/gene_trees_339.nwk 2>build/astral4.log
+          test -s build/runtime91_wastral.nwk
+          test -s build/runtime91_astral4.nwk
+          python - <<'PY'
+          import json,re
+          from pathlib import Path
+          def tips(p):
+              s=Path(p).read_text().strip()
+              xs=re.findall(r'(?<=[(,])([^():,;]+)',s)
+              return {re.sub(r'\[[^\]]*\]','',x).strip() for x in xs}
+          w=tips('build/runtime91_wastral.nwk'); a=tips('build/runtime91_astral4.nwk')
+          out={
+            'n_gene_trees':339,
+            'gene_tree_model':'LG+G4',
+            'gene_tree_ufboot':1000,
+            'wastral_tips':len(w),
+            'astral4_tips':len(a),
+            'same_tip_set':w==a,
+            'species_tree_primary_sensitivity':'wASTRAL support weighting (-S)',
+            'species_tree_topology_comparator':'ASTRAL-IV -u 2',
+            'colour_joined':False,
+            'claim_ceiling':'runtime91 nuclear species-tree sensitivity only; no taxonomic collapsing, flower-colour, or ecological interpretation'
+          }
+          assert len(w)==91 and len(a)==91 and w==a,out
+          Path('build/species_tree_summary.json').write_text(json.dumps(out,indent=2)+'\n')
+          print(json.dumps(out,indent=2))
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: runtime91-ufboot339-current-aster-species-trees
+          path: |
+            build/gene_trees_339.nwk
+            build/gene_tree_assembly_summary.json
+            build/runtime91_wastral.nwk
+            build/runtime91_astral4.nwk
+            build/species_tree_summary.json
+            build/wastral.log
+            build/astral4.log
+          if-no-files-found: error
