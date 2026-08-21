@@ -3,7 +3,12 @@
 
 The pinned Zenodo R-backbone snapshot contains one ~953 MB classification.csv.
 We stream it and retain only Theaceae records, then resolve exact legacy
-binomials via acceptedNameUsageID and parentNameUsageID to species rank.
+*species-binomial* inputs using species-rank WFO name records only. Accepted
+usage links and parent links are then followed to the accepted species group.
+
+Restricting lookup to species-rank records is essential: a species binomial such
+as Camellia japonica must not be made artificially ambiguous by also indexing
+all varieties/subspecies that share its genus + specific epithet.
 """
 from __future__ import annotations
 import argparse,csv,hashlib,io,json,re,zipfile
@@ -53,8 +58,11 @@ def load_theaceae(path):
                 "family","genus","specificEpithet","acceptedNameUsageID","parentNameUsageID"
             )}
             records[tid]=rec
-            b=binomial(rec)
-            if b:index[b].append(tid)
+            # Inputs are species-level binomials. Index only WFO species-rank
+            # name records so infraspecific records cannot create false ambiguity.
+            if rec["taxonRank"].casefold()=="species":
+                b=binomial(rec)
+                if b:index[b].append(tid)
     return records,index,md5,core,delim,scanned
 
 def accepted(rec,records):
@@ -91,7 +99,7 @@ def resolve(name,records,index):
         same.sort(key=lambda x:(0 if x[1]["taxonID"]==x[2]["taxonID"] else 1,x[1]["taxonID"]))
         chosen=same[0]
     return {
-        "legacy_name":name,"match_status":status,"n_exact_records":len(index.get(name,[])),
+        "legacy_name":name,"match_status":status,"n_exact_species_rank_records":len(index.get(name,[])),
         "n_resolved_records":len(candidates),"accepted_species_candidates":";".join(groups),
         "matched_taxon_id":chosen[1]["taxonID"] if chosen else "",
         "matched_scientific_name":chosen[1]["scientificName"] if chosen else "",
@@ -112,7 +120,7 @@ def main():
     records,index,md5,core,delim,scanned=load_theaceae(a.snapshot)
     rows=[]
     for tip,name in zip(tips,names):
-        r=resolve(name,records,index);r.update({"tree_tip":tip,"backbone":f"WFO Plant List {RELEASE}","release_doi":DOI});rows.append(r);print(name,r["match_status"],"=>",r["accepted_species"])
+        r=resolve(name,records,index);r.update({"tree_tip":tip,"backbone":f"WFO Plant List {RELEASE}","release_doi":DOI});rows.append(r);print(name,r["match_status"],r["accepted_species_candidates"],"=>",r["accepted_species"])
     unresolved=[r for r in rows if r["match_status"]!="resolved"]
     cam=[r for r in rows if r["legacy_name"].startswith("Camellia ")]; poly=[r for r in rows if r["legacy_name"]=="Polyspora speciosa"]
     groups=defaultdict(list)
@@ -128,6 +136,7 @@ def main():
     summary={
         "backbone":f"WFO Plant List {RELEASE}","release_doi":DOI,"snapshot_md5":md5,"snapshot_core":core,"snapshot_delimiter":"TAB" if delim=="\t" else "COMMA","n_snapshot_rows_scanned":scanned,"n_theaceae_records":len(records),
         "n_tree_tips":len(rows),"n_camellia_legacy_tips":len(cam),"n_polyspora_legacy_tips":len(poly),"n_unresolved_or_ambiguous":len(unresolved),"unresolved_or_ambiguous":[r["legacy_name"] for r in unresolved],
+        "unresolved_details":[{k:r[k] for k in ("legacy_name","match_status","accepted_species_candidates","n_exact_species_rank_records")} for r in unresolved],
         "n_accepted_species_groups_all":len(groups),"n_accepted_camellia_species_groups":len({r["accepted_species"] for r in cam if r["accepted_species"]}),"n_duplicate_accepted_species_groups":len(dup),"duplicate_groups":dup,
         "claim_ceiling":"versioned taxonomy mapping only; no species-tree remapping, trait transfer, or evolutionary claim"
     }
