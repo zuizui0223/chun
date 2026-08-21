@@ -1,0 +1,70 @@
+name: Robust W-to-A trait and taxonomy sensitivity
+
+on:
+  pull_request:
+    paths:
+      - 'data/robust_w_to_a_trait_audit_v0_1.csv'
+      - 'data/b011_species_level_taxonomy_audit_v0_1.csv'
+      - 'scripts/test_robust_transition_trait_taxonomy_sensitivity.py'
+      - '.github/workflows/robust-transition-trait-taxonomy-audit.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  actions: read
+
+env:
+  COLOUR_HISTORY_RUN: '32437060740'
+
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install dependencies
+        run: python -m pip install --disable-pip-version-check numpy scipy biopython
+      - name: Download frozen rooted tree and baseline Fan colour seed
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          mkdir -p build/source
+          gh run download "$COLOUR_HISTORY_RUN" --repo "$GITHUB_REPOSITORY" \
+            --name rooted94-camellia-colour-history-sensitivity --dir build/source
+          tree=$(find build/source -name 'rooted94_astral4.nwk' | head -n 1)
+          colour=$(find build/source -name 'species_colour.csv' | head -n 1)
+          test -n "$tree"; test -s "$tree"
+          test -n "$colour"; test -s "$colour"
+          cp "$tree" build/rooted94_astral4.nwk
+          cp "$colour" build/species_colour.csv
+      - name: Refit trait-quality sensitivity and retest robust branches
+        run: |
+          mkdir -p build/result
+          python scripts/test_robust_transition_trait_taxonomy_sensitivity.py \
+            --tree build/rooted94_astral4.nwk \
+            --colour build/species_colour.csv \
+            --trait-audit data/robust_w_to_a_trait_audit_v0_1.csv \
+            --b011-taxonomy data/b011_species_level_taxonomy_audit_v0_1.csv \
+            --out-dir build/result
+      - name: Audit and report
+        run: |
+          python - <<'PY'
+          import json
+          s=json.load(open('build/result/summary.json'))
+          assert s['baseline_reproduced'] is True,s
+          t=s['b011_taxonomy_audit']
+          assert t['legacy_tip_count']==24,t
+          assert t['accepted_species_group_count']==8,t
+          assert set(s['baseline_target_branches'])=={'B011','B073','B083'},s
+          print(json.dumps(s,indent=2))
+          PY
+          echo '### Robust W-to-A trait/taxonomy sensitivity' >> "$GITHUB_STEP_SUMMARY"
+          cat build/result/summary.json >> "$GITHUB_STEP_SUMMARY"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: robust-w-to-a-trait-taxonomy-sensitivity
+          path: build/result/
+          if-no-files-found: error
