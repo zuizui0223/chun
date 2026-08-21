@@ -3,12 +3,15 @@
 
 The pinned Zenodo R-backbone snapshot contains one ~953 MB classification.csv.
 We stream it and retain only Theaceae records, then resolve exact legacy
-*species-binomial* inputs using species-rank WFO name records only. Accepted
-usage links and parent links are then followed to the accepted species group.
+*species-binomial* inputs using species-rank WFO name records only.
 
-Restricting lookup to species-rank records is essential: a species binomial such
-as Camellia japonica must not be made artificially ambiguous by also indexing
-all varieties/subspecies that share its genus + specific epithet.
+Resolution rules are deliberately narrow:
+1. exact species-rank WFO name records that all lead to one accepted species;
+2. if a binomial is a nomenclatural homonym, prefer the unique *currently
+   accepted record with the same binomial* over synonym homonyms;
+3. only for legacy names absent from the WFO species-rank snapshot, allow a
+   small curated override registry with an external authority. Every override
+   target must itself be verified as a current accepted WFO species.
 """
 from __future__ import annotations
 import argparse,csv,hashlib,io,json,re,zipfile
@@ -58,8 +61,6 @@ def load_theaceae(path):
                 "family","genus","specificEpithet","acceptedNameUsageID","parentNameUsageID"
             )}
             records[tid]=rec
-            # Inputs are species-level binomials. Index only WFO species-rank
-            # name records so infraspecific records cannot create false ambiguity.
             if rec["taxonRank"].casefold()=="species":
                 b=binomial(rec)
                 if b:index[b].append(tid)
@@ -82,25 +83,30 @@ def species_parent(rec,records):
         cur=records.get(pid) if pid else None
     return None
 
-def resolve(name,records,index):
-    candidates=[]
+def candidate_tuples(name,records,index):
+    out=[]
     for tid in index.get(name,[]):
         src=records[tid]; acc=accepted(src,records)
         if not acc:continue
         spp=species_parent(acc,records)
         if not spp:continue
         s=binomial(spp)
-        if s:candidates.append((s,src,acc,spp))
+        if s:out.append((s,src,acc,spp))
+    return out
+
+def current_accepted_record_for_species(name,records,index):
+    candidates=candidate_tuples(name,records,index)
+    xs=[x for x in candidates if x[0]==name and x[1]["taxonID"]==x[2]["taxonID"] and "accepted" in x[1]["taxonomicStatus"].casefold()]
+    if len(xs)!=1:
+        return None
+    return xs[0]
+
+def row_from_chosen(name,status,method,candidates,chosen,override=None):
     groups=sorted({x[0] for x in candidates})
-    status="resolved" if len(groups)==1 else ("unresolved" if not groups else "ambiguous")
-    chosen=None
-    if status=="resolved":
-        same=[x for x in candidates if x[0]==groups[0]]
-        same.sort(key=lambda x:(0 if x[1]["taxonID"]==x[2]["taxonID"] else 1,x[1]["taxonID"]))
-        chosen=same[0]
     return {
-        "legacy_name":name,"match_status":status,"n_exact_species_rank_records":len(index.get(name,[])),
-        "n_resolved_records":len(candidates),"accepted_species_candidates":";".join(groups),
+        "legacy_name":name,"match_status":status,"resolution_method":method,
+        "n_exact_species_rank_records":len(candidates),"n_resolved_records":len(candidates),
+        "accepted_species_candidates":";".join(groups),
         "matched_taxon_id":chosen[1]["taxonID"] if chosen else "",
         "matched_scientific_name":chosen[1]["scientificName"] if chosen else "",
         "matched_taxonomic_status":chosen[1]["taxonomicStatus"] if chosen else "",
@@ -110,17 +116,70 @@ def resolve(name,records,index):
         "accepted_species_taxon_id":chosen[3]["taxonID"] if chosen else "",
         "accepted_species":chosen[0] if chosen else "",
         "input_record_is_accepted_usage":bool(chosen and chosen[1]["taxonID"]==chosen[2]["taxonID"]),
+        "override_reason":(override or {}).get("override_reason",""),
+        "override_source_authority":(override or {}).get("source_authority",""),
+        "override_source_url":(override or {}).get("source_url",""),
+        "override_evidence_note":(override or {}).get("evidence_note",""),
     }
 
+def resolve(name,records,index):
+    candidates=candidate_tuples(name,records,index)
+    groups=sorted({x[0] for x in candidates})
+    if len(groups)==1:
+        same=[x for x in candidates if x[0]==groups[0]]
+        same.sort(key=lambda x:(0 if x[1]["taxonID"]==x[2]["taxonID"] else 1,x[1]["taxonID"]))
+        return row_from_chosen(name,"resolved","exact_species_rank",candidates,same[0])
+    if len(groups)>1:
+        # Example: Camellia sasanqua Thunb. is accepted, while the later
+        # homonym C. sasanqua Blanco is a synonym of C. oleifera. A legacy
+        # binomial with no author is deterministically mapped to the unique
+        # current accepted same-binomial record, and this decision is explicit.
+        preferred=[x for x in candidates if x[0]==name and x[1]["taxonID"]==x[2]["taxonID"] and "accepted" in x[1]["taxonomicStatus"].casefold()]
+        if len(preferred)==1:
+            return row_from_chosen(name,"resolved","unique_current_accepted_same_binomial_homonym",candidates,preferred[0])
+        return row_from_chosen(name,"ambiguous","unresolved_ambiguous_exact_species_rank",candidates,None)
+    return row_from_chosen(name,"unresolved","no_exact_species_rank_record",candidates,None)
+
+def read_overrides(path):
+    out={}
+    with path.open(newline="",encoding="utf-8-sig") as f:
+        for r in csv.DictReader(f):
+            name=clean(r.get("legacy_name")); target=clean(r.get("accepted_species"))
+            if not name or not target:raise SystemExit(f"bad override row: {r}")
+            if name in out:raise SystemExit(f"duplicate override: {name}")
+            out[name]={k:clean(v) for k,v in r.items()}
+    return out
+
+def apply_override(row,override,records,index):
+    if row["match_status"]=="resolved":
+        raise SystemExit(f"override supplied for already resolved name {row['legacy_name']}")
+    target=override["accepted_species"]
+    chosen=current_accepted_record_for_species(target,records,index)
+    if chosen is None:
+        raise SystemExit(f"override target is not a unique current accepted WFO species: {target}")
+    # Preserve automatic candidates in audit while making the external override explicit.
+    candidates=candidate_tuples(row["legacy_name"],records,index)
+    x=row_from_chosen(row["legacy_name"],"resolved","curated_external_legacy_override",candidates,chosen,override)
+    x["accepted_species_candidates"]=(row.get("accepted_species_candidates") or "")
+    x["n_exact_species_rank_records"]=row["n_exact_species_rank_records"]
+    x["n_resolved_records"]=row["n_resolved_records"]
+    return x
+
 def main():
-    ap=argparse.ArgumentParser();ap.add_argument("--tree",type=Path,required=True);ap.add_argument("--snapshot",type=Path,required=True);ap.add_argument("--out-dir",type=Path,required=True);a=ap.parse_args();a.out_dir.mkdir(parents=True,exist_ok=True)
+    ap=argparse.ArgumentParser();ap.add_argument("--tree",type=Path,required=True);ap.add_argument("--snapshot",type=Path,required=True);ap.add_argument("--overrides",type=Path,required=True);ap.add_argument("--out-dir",type=Path,required=True);a=ap.parse_args();a.out_dir.mkdir(parents=True,exist_ok=True)
     tree=Phylo.read(str(a.tree),"newick"); tips=sorted(t.name for t in tree.get_terminals() if t.name)
     if len(tips)!=94:raise SystemExit(f"expected 94 tips, got {len(tips)}")
     names=[tip_name(x) for x in tips]
     records,index,md5,core,delim,scanned=load_theaceae(a.snapshot)
-    rows=[]
+    overrides=read_overrides(a.overrides)
+    rows=[]; used_overrides=set()
     for tip,name in zip(tips,names):
-        r=resolve(name,records,index);r.update({"tree_tip":tip,"backbone":f"WFO Plant List {RELEASE}","release_doi":DOI});rows.append(r);print(name,r["match_status"],r["accepted_species_candidates"],"=>",r["accepted_species"])
+        r=resolve(name,records,index)
+        if r["match_status"]!="resolved" and name in overrides:
+            r=apply_override(r,overrides[name],records,index);used_overrides.add(name)
+        r.update({"tree_tip":tip,"backbone":f"WFO Plant List {RELEASE}","release_doi":DOI});rows.append(r);print(name,r["match_status"],r["resolution_method"],"=>",r["accepted_species"])
+    unused=set(overrides)-used_overrides
+    if unused:raise SystemExit(f"curated overrides were not needed/used: {sorted(unused)}")
     unresolved=[r for r in rows if r["match_status"]!="resolved"]
     cam=[r for r in rows if r["legacy_name"].startswith("Camellia ")]; poly=[r for r in rows if r["legacy_name"]=="Polyspora speciosa"]
     groups=defaultdict(list)
@@ -133,12 +192,14 @@ def main():
             if r["accepted_species"]:f.write(f"{r['tree_tip']} {r['accepted_species'].replace(' ','_')}\n")
     drows=[{"accepted_species":k,"n_legacy_tips":len(v),"legacy_tips":";".join(v)} for k,v in sorted(dup.items())]
     with (a.out_dir/"duplicate_accepted_species_groups.csv").open("w",newline="",encoding="utf-8") as f:w=csv.DictWriter(f,fieldnames=["accepted_species","n_legacy_tips","legacy_tips"]);w.writeheader();w.writerows(drows)
+    methods=defaultdict(int)
+    for r in rows:methods[r["resolution_method"]]+=1
     summary={
         "backbone":f"WFO Plant List {RELEASE}","release_doi":DOI,"snapshot_md5":md5,"snapshot_core":core,"snapshot_delimiter":"TAB" if delim=="\t" else "COMMA","n_snapshot_rows_scanned":scanned,"n_theaceae_records":len(records),
         "n_tree_tips":len(rows),"n_camellia_legacy_tips":len(cam),"n_polyspora_legacy_tips":len(poly),"n_unresolved_or_ambiguous":len(unresolved),"unresolved_or_ambiguous":[r["legacy_name"] for r in unresolved],
-        "unresolved_details":[{k:r[k] for k in ("legacy_name","match_status","accepted_species_candidates","n_exact_species_rank_records")} for r in unresolved],
+        "resolution_method_counts":dict(sorted(methods.items())),"curated_override_names":sorted(used_overrides),
         "n_accepted_species_groups_all":len(groups),"n_accepted_camellia_species_groups":len({r["accepted_species"] for r in cam if r["accepted_species"]}),"n_duplicate_accepted_species_groups":len(dup),"duplicate_groups":dup,
-        "claim_ceiling":"versioned taxonomy mapping only; no species-tree remapping, trait transfer, or evolutionary claim"
+        "claim_ceiling":"versioned taxonomy mapping with explicit curated legacy overrides only; no species-tree remapping, trait transfer, or evolutionary claim"
     }
     (a.out_dir/"summary.json").write_text(json.dumps(summary,indent=2)+"\n",encoding="utf-8");print(json.dumps(summary,indent=2))
     if len(cam)!=93 or len(poly)!=1:raise SystemExit("unexpected genus composition")
