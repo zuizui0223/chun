@@ -1,0 +1,10 @@
+taxon,fan_state,wild_colour_status,strict_state,dominant_state,accepted_species,taxonomy_action,source_authority,source_url,evidence_note
+Camellia azalea,A,stable_A,A,A,Camellia azalea,retain,Flora of China,https://www.efloras.org/florataxon.aspx?flora_id=2&taxon_id=242309885,"petals roseate"
+Camellia brevistyla,A,polymorphic_AW,,,Camellia brevistyla,retain,Flora of China,https://www.efloras.org/florataxon.aspx?flora_id=2&taxon_id=242309895,"petals white or pink"
+Camellia japonica,A,polymorphic_AW,,,Camellia japonica,retain,Flora of China,https://www.efloras.org/florataxon.aspx?flora_id=3&taxon_id=200014034,"petals rose or white"
+Camellia reticulata,A,dominant_A_rare_W,,A,Camellia reticulata,retain,Flora of China,https://www.efloras.org/florataxon.aspx?flora_id=2&taxon_id=242310199,"petals rose to pink, rarely almost white"
+Camellia saluenensis,A,polymorphic_AW,,,Camellia saluenensis,retain,Flora of China,https://www.efloras.org/florataxon.aspx?flora_id=2&taxon_id=242310213,"petals rose, pink, or white"
+Camellia subintegra,A,dominant_A_rare_W,,A,Camellia subintegra,retain,Flora of China,https://www.iplant.cn/foc/pdf/Camellia.pdf,"petals roseate or rarely white"
+Camellia pentapetala,A,taxonomic_duplicate,,,Camellia reticulata,drop_duplicate_colour,POWO/WCVP,https://powo.science.kew.org/taxon/urn:lsid:ipni.org:names:828540-1,"accepted as synonym of C. reticulata; C. reticulata is separately present and colour-observed"
+Camellia villosa,A,stable_A,A,A,Camellia polyodonta,retain_alias_single_observation,POWO/WCVP + International Camellia Register,https://powo.science.kew.org/taxon/urn:lsid:ipni.org:names:77228671-1,"C. villosa is a synonym of C. polyodonta; historical species description reports red flowers; no separate colour-observed C. polyodonta tip in rooted94"
+Camellia yunnanensis,W,stable_W,W,W,Camellia yunnanensis,retain,International Camellia Register / Flora of China,https://camellia.iflora.cn/Species/Detail?latin=Camellia+yunnanensis,"petals white"
