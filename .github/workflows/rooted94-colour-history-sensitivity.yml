@@ -1,0 +1,103 @@
+name: Rooted94 Camellia visible-colour history sensitivity
+
+on:
+  pull_request:
+    paths:
+      - 'scripts/analyze_rooted_camellia_colour_history.py'
+      - '.github/workflows/rooted94-colour-history-sensitivity.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  actions: read
+
+env:
+  ROOTED_TREE_RUN: '32375742772'
+
+jobs:
+  colour_history:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install dependencies
+        run: python -m pip install --disable-pip-version-check numpy scipy biopython openpyxl
+      - name: Download independently frozen rooted94 tree
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          mkdir -p build/tree
+          gh run download "$ROOTED_TREE_RUN" --repo "$GITHUB_REPOSITORY" \
+            --name wu-angio353-rooted94-fast-astral4 --dir build/tree
+          tree=$(find build/tree -name 'rooted94_astral4.nwk' | head -n 1)
+          test -n "$tree"
+          test -s "$tree"
+          cp "$tree" build/rooted94_astral4.nwk
+      - name: Rebuild deterministic Fan 2026 species colour seed after topology freeze
+        run: |
+          mkdir -p build/fan/package
+          curl --fail --location --retry 3 \
+            'https://www.ncbi.nlm.nih.gov/pmc/utils/oa/oa.fcgi?id=PMC12946509' \
+            -o build/fan/oa.xml
+          python - <<'PY'
+          import xml.etree.ElementTree as ET
+          from pathlib import Path
+          root=ET.fromstring(Path('build/fan/oa.xml').read_bytes())
+          links=[x.attrib.get('href','') for x in root.findall('.//link') if x.attrib.get('format')=='tgz']
+          if len(links)!=1: raise SystemExit(f'unexpected OA links: {links}')
+          u=links[0]
+          if u.startswith('ftp://ftp.ncbi.nlm.nih.gov/'):
+              u='https://ftp.ncbi.nlm.nih.gov/'+u.split('ftp://ftp.ncbi.nlm.nih.gov/',1)[1]
+          Path('build/fan/url').write_text(u+'\n')
+          PY
+          u=$(cat build/fan/url)
+          if ! curl --fail --location --retry 3 --retry-all-errors "$u" -o build/fan/a.tgz; then
+            u2=$(python - <<'PY'
+          from pathlib import Path
+          u=Path('build/fan/url').read_text().strip();m='https://ftp.ncbi.nlm.nih.gov/pub/pmc/'
+          print(u.replace(m,m+'deprecated/',1) if u.startswith(m) and '/deprecated/' not in u else u)
+          PY
+          )
+            curl --fail --location --retry 3 --retry-all-errors "$u2" -o build/fan/a.tgz
+          fi
+          tar -xzf build/fan/a.tgz -C build/fan/package
+          xlsx=$(find build/fan/package -type f -iname '*s002*.xlsx' | head -n 1)
+          test -n "$xlsx"
+          python scripts/build_fan2026_species_colour_seed.py "$xlsx" \
+            --output build/fan/species_colour.csv \
+            --audit build/fan/seed_audit.json
+      - name: Fit rooted colour-history sensitivity models
+        run: |
+          mkdir -p build/result
+          python scripts/analyze_rooted_camellia_colour_history.py \
+            --tree build/rooted94_astral4.nwk \
+            --colour build/fan/species_colour.csv \
+            --out-dir build/result \
+            --outgroup 'Polyspora speciosa'
+      - name: Audit and report
+        run: |
+          python - <<'PY'
+          import json
+          s=json.load(open('build/result/summary.json'))
+          assert s['n_camellia_tree_tips']==93,s
+          assert s['n_colour_observed']>=40,s
+          assert sum(s['state_counts'].values())==s['n_colour_observed'],s
+          assert len(s['treatments'])==4,s
+          assert s['model_averaged_root_state_agreement'] is True,s
+          assert set(s['model_averaged_top_states'])=={'W'},s
+          print(json.dumps(s,indent=2))
+          PY
+          echo '### Rooted Camellia colour-history sensitivity' >> "$GITHUB_STEP_SUMMARY"
+          cat build/result/summary.json >> "$GITHUB_STEP_SUMMARY"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: rooted94-camellia-colour-history-sensitivity
+          path: |
+            build/result/
+            build/fan/seed_audit.json
+            build/fan/species_colour.csv
+            build/rooted94_astral4.nwk
+          if-no-files-found: error
