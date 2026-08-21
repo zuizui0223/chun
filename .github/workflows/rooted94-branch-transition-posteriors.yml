@@ -1,0 +1,70 @@
+name: Rooted94 Camellia branch colour-transition posteriors
+
+on:
+  pull_request:
+    paths:
+      - 'scripts/analyze_rooted_camellia_branch_transitions.py'
+      - '.github/workflows/rooted94-branch-transition-posteriors.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  actions: read
+
+env:
+  COLOUR_HISTORY_RUN: '32437060740'
+
+jobs:
+  transitions:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install dependencies
+        run: python -m pip install --disable-pip-version-check numpy scipy biopython
+      - name: Download frozen rooted colour-history artifact
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          mkdir -p build/source
+          gh run download "$COLOUR_HISTORY_RUN" --repo "$GITHUB_REPOSITORY" \
+            --name rooted94-camellia-colour-history-sensitivity --dir build/source
+          tree=$(find build/source -name 'rooted94_astral4.nwk' | head -n 1)
+          colour=$(find build/source -name 'species_colour.csv' | head -n 1)
+          fits=$(find build/source -name 'mk_model_fits.csv' | head -n 1)
+          test -n "$tree"; test -s "$tree"
+          test -n "$colour"; test -s "$colour"
+          test -n "$fits"; test -s "$fits"
+          cp "$tree" build/rooted94_astral4.nwk
+          cp "$colour" build/species_colour.csv
+          cp "$fits" build/mk_model_fits.csv
+      - name: Compute model-averaged branch endpoint-state posteriors
+        run: |
+          mkdir -p build/result
+          python scripts/analyze_rooted_camellia_branch_transitions.py \
+            --tree build/rooted94_astral4.nwk \
+            --colour build/species_colour.csv \
+            --fits build/mk_model_fits.csv \
+            --out-dir build/result \
+            --outgroup 'Polyspora speciosa'
+      - name: Audit and report
+        run: |
+          python - <<'PY'
+          import json
+          s=json.load(open('build/result/summary.json'))
+          assert s['n_camellia_tips']==93,s
+          assert s['n_colour_observed']==45,s
+          assert s['n_treatments']==4,s
+          assert 100 <= s['n_branches'] <= 200,s
+          print(json.dumps(s,indent=2))
+          PY
+          echo '### Rooted Camellia branch colour-transition posteriors' >> "$GITHUB_STEP_SUMMARY"
+          cat build/result/summary.json >> "$GITHUB_STEP_SUMMARY"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: rooted94-camellia-branch-transition-posteriors
+          path: build/result/
+          if-no-files-found: error
