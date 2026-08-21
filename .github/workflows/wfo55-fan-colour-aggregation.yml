@@ -1,0 +1,62 @@
+name: WFO55 Fan colour aggregation gate
+
+on:
+  pull_request:
+    paths:
+      - 'scripts/aggregate_fan_colour_to_wfo_species.py'
+      - '.github/workflows/wfo55-fan-colour-aggregation.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  actions: read
+
+env:
+  TAXONOMY_RUN: '32439843289'
+  COLOUR_HISTORY_RUN: '32437060740'
+
+jobs:
+  aggregate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - name: Download frozen WFO taxonomy and held-out Fan colour seed
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          mkdir -p build/taxonomy build/colour
+          gh run download "$TAXONOMY_RUN" --repo "$GITHUB_REPOSITORY" \
+            --name rooted94-wfo2026-06-taxonomy-normalization --dir build/taxonomy
+          gh run download "$COLOUR_HISTORY_RUN" --repo "$GITHUB_REPOSITORY" \
+            --name rooted94-camellia-colour-history-sensitivity --dir build/colour
+          taxonomy=$(find build/taxonomy -name 'wfo2026_06_taxonomy_registry.csv' | head -n 1)
+          colour=$(find build/colour -name 'species_colour.csv' | head -n 1)
+          test -n "$taxonomy"; test -s "$taxonomy"
+          test -n "$colour"; test -s "$colour"
+          cp "$taxonomy" build/taxonomy.csv
+          cp "$colour" build/species_colour.csv
+      - name: Aggregate historical labels only after WFO species collapse
+        run: |
+          mkdir -p build/result
+          python scripts/aggregate_fan_colour_to_wfo_species.py \
+            --taxonomy build/taxonomy.csv \
+            --colour build/species_colour.csv \
+            --out-dir build/result
+      - name: Audit and report
+        run: |
+          python - <<'PY'
+          import json
+          s=json.load(open('build/result/summary.json'))
+          assert s['taxonomy_backbone']=='WFO Plant List 2026-06',s
+          assert s['n_accepted_camellia_species']==55,s
+          assert s['n_hard_single_state_after_taxonomy']<=s['n_with_any_fan_colour'],s
+          print(json.dumps(s,indent=2))
+          PY
+          echo '### WFO55 Fan colour aggregation gate' >> "$GITHUB_STEP_SUMMARY"
+          cat build/result/summary.json >> "$GITHUB_STEP_SUMMARY"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: wfo55-fan-colour-aggregation
+          path: build/result/
+          if-no-files-found: error
