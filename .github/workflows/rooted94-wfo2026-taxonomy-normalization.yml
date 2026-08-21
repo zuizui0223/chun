@@ -41,6 +41,7 @@ jobs:
         run: |
           curl --fail --location --retry 3 --retry-all-errors "$WFO_DWCA_URL" -o build/wfo2026_06_dwca.zip
           echo "$WFO_DWCA_MD5  build/wfo2026_06_dwca.zip" | md5sum -c -
+          unzip -l build/wfo2026_06_dwca.zip | head -80 || true
       - name: Normalize every rooted tip to WFO Plant List 2026-06
         run: |
           mkdir -p build/result
