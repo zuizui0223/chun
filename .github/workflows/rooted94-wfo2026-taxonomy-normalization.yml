@@ -1,0 +1,64 @@
+name: Rooted94 WFO 2026-06 taxonomy normalization
+
+on:
+  pull_request:
+    paths:
+      - 'scripts/normalize_rooted94_wfo2026_taxonomy.py'
+      - '.github/workflows/rooted94-wfo2026-taxonomy-normalization.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  actions: read
+
+env:
+  ROOTED94_TREE_RUN: '32375742772'
+
+jobs:
+  normalize:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install dependencies
+        run: python -m pip install --disable-pip-version-check requests biopython
+      - name: Download frozen rooted94 topology
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          mkdir -p build/source
+          gh run download "$ROOTED94_TREE_RUN" --repo "$GITHUB_REPOSITORY" \
+            --name wu-angio353-rooted94-fast-astral4 --dir build/source
+          tree=$(find build/source -name 'rooted94_astral4.nwk' | head -n 1)
+          test -n "$tree"; test -s "$tree"
+          cp "$tree" build/rooted94_astral4.nwk
+      - name: Normalize every rooted tip to WFO Plant List 2026-06
+        run: |
+          mkdir -p build/result
+          python scripts/normalize_rooted94_wfo2026_taxonomy.py \
+            --tree build/rooted94_astral4.nwk \
+            --out-dir build/result
+      - name: Audit and report
+        run: |
+          python - <<'PY'
+          import csv,json
+          s=json.load(open('build/result/summary.json'))
+          assert s['backbone']=='WFO Plant List 2026-06',s
+          assert s['release_doi']=='10.5281/zenodo.20782718',s
+          assert s['n_tree_tips']==94,s
+          assert s['n_camellia_legacy_tips']==93,s
+          assert s['n_unresolved_or_ambiguous']==0,s
+          m=list(csv.reader(open('build/result/astral_species_mapping.tsv'),delimiter=' '))
+          assert len(m)==94,len(m)
+          print(json.dumps(s,indent=2))
+          PY
+          echo '### Rooted94 WFO 2026-06 taxonomy normalization' >> "$GITHUB_STEP_SUMMARY"
+          cat build/result/summary.json >> "$GITHUB_STEP_SUMMARY"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: rooted94-wfo2026-06-taxonomy-normalization
+          path: build/result/
+          if-no-files-found: error
