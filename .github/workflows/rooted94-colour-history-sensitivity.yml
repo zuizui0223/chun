@@ -85,7 +85,9 @@ jobs:
           assert s['n_camellia_tree_tips']==93,s
           assert s['n_colour_observed']>=40,s
           assert sum(s['state_counts'].values())==s['n_colour_observed'],s
-          assert len(s['best_model_by_treatment'])==4,s
+          assert len(s['treatments'])==4,s
+          assert s['model_averaged_root_state_agreement'] is True,s
+          assert set(s['model_averaged_top_states'])=={'W'},s
           print(json.dumps(s,indent=2))
           PY
           echo '### Rooted Camellia colour-history sensitivity' >> "$GITHUB_STEP_SUMMARY"
