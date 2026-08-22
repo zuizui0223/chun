@@ -1,0 +1,143 @@
+name: WFO53 UFBoot accepted-species topology sensitivity
+
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/wfo53-ufboot-topology-sensitivity.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  actions: read
+
+env:
+  UFBOOT_RUN: '32439653098'
+  WFO_MAPPING_RUN: '32439843289'
+  FAST_WFO_TREE_RUN: '32440138207'
+
+jobs:
+  compare:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install comparison dependency
+        run: python -m pip install --disable-pip-version-check biopython
+      - name: Download frozen UFBoot gene trees, WFO mapping, and FastTree WFO tree
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          mkdir -p build/ufboot build/taxonomy build/fast
+          gh run download "$UFBOOT_RUN" --repo "$GITHUB_REPOSITORY" \
+            --name runtime91-ufboot339-current-aster-species-trees --dir build/ufboot
+          gh run download "$WFO_MAPPING_RUN" --repo "$GITHUB_REPOSITORY" \
+            --name rooted94-wfo2026-06-taxonomy-normalization --dir build/taxonomy
+          gh run download "$FAST_WFO_TREE_RUN" --repo "$GITHUB_REPOSITORY" \
+            --name wfo55-accepted-species-rooted-astral4 --dir build/fast
+          genes=$(find build/ufboot -name 'gene_trees_339.nwk' | head -n 1)
+          mapping=$(find build/taxonomy -name 'astral_species_mapping.tsv' | head -n 1)
+          fast=$(find build/fast -name 'wfo55_rooted_astral4.nwk' | head -n 1)
+          test -n "$genes"; test -s "$genes"
+          test -n "$mapping"; test -s "$mapping"
+          test -n "$fast"; test -s "$fast"
+          cp "$genes" build/gene_trees_339.nwk
+          cp "$mapping" build/astral_species_mapping.tsv
+          cp "$fast" build/fast_wfo55.nwk
+      - name: Filter WFO mapping to the 91 UFBoot gene-tree individuals
+        run: |
+          python - <<'PY'
+          import json,re
+          text=open('build/gene_trees_339.nwk').read()
+          tips=set(re.findall(r'(?:Camellia|Polyspora)_[A-Za-z0-9_]+',text))
+          rows=[tuple(line.split()) for line in open('build/astral_species_mapping.tsv') if line.strip()]
+          kept=[r for r in rows if r[0] in tips]
+          groups=sorted({b for a,b in kept})
+          missing=sorted({b for a,b in rows}-{b for a,b in kept})
+          out={'n_gene_tree_individuals':len(tips),'n_mapping_rows_kept':len(kept),'n_accepted_groups':len(groups),'accepted_groups_missing_from_runtime91':missing,'polyspora_present':'Polyspora_speciosa' in tips}
+          assert len(tips)==91,out
+          assert len(kept)==91,out
+          assert len(groups)==53,out
+          assert missing==['Camellia_japonica','Camellia_petelotii','Polyspora_speciosa'],out
+          assert out['polyspora_present'] is False,out
+          with open('build/filtered_mapping.tsv','w') as f:
+              for a,b in kept:f.write(f'{a} {b}\n')
+          open('build/input_summary.json','w').write(json.dumps(out,indent=2)+'\n')
+          print(json.dumps(out,indent=2))
+          PY
+      - name: Build current ASTER
+        run: |
+          sudo apt-get install -y -qq g++ make git
+          git clone --depth 1 https://github.com/chaoszhang/ASTER.git build/ASTER
+          make -C build/ASTER
+          test -x build/ASTER/bin/astral4
+      - name: Infer WFO53 UFBoot ASTRAL-IV topology
+        run: |
+          build/ASTER/bin/astral4 \
+            -a build/filtered_mapping.tsv \
+            -u 2 -t 4 \
+            -o build/wfo53_ufboot_astral4.nwk \
+            build/gene_trees_339.nwk 2>build/astral4.log
+          test -s build/wfo53_ufboot_astral4.nwk
+      - name: Compare accepted-species splits to FastTree sensitivity tree
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          from Bio import Phylo
+
+          u=Phylo.read('build/wfo53_ufboot_astral4.nwk','newick')
+          f=Phylo.read('build/fast_wfo55.nwk','newick')
+          u_tips={x.name for x in u.get_terminals() if x.name}
+          assert len(u_tips)==53,u_tips
+          for tip in list(f.get_terminals()):
+              if tip.name not in u_tips:
+                  f.prune(tip)
+          f_tips={x.name for x in f.get_terminals() if x.name}
+          assert f_tips==u_tips,(len(f_tips),len(u_tips),sorted(f_tips^u_tips))
+
+          def splits(tree):
+              all_tips={x.name for x in tree.get_terminals() if x.name};n=len(all_tips);out=set()
+              for clade in tree.find_clades(order='preorder'):
+                  if clade is tree.root or clade.is_terminal():continue
+                  side={x.name for x in clade.get_terminals() if x.name}
+                  if len(side)<2 or len(side)>n-2:continue
+                  comp=all_tips-side
+                  chosen=side if (len(side),tuple(sorted(side))) <= (len(comp),tuple(sorted(comp))) else comp
+                  out.add(frozenset(chosen))
+              return out
+          us=splits(u);fs=splits(f);shared=us&fs
+          rf=len(us-shared)+len(fs-shared)
+          out={
+            'n_common_accepted_species':len(u_tips),
+            'ufboot_astral_nontrivial_splits':len(us),
+            'fasttree_astral_nontrivial_splits':len(fs),
+            'shared_nontrivial_splits':len(shared),
+            'ufboot_split_recall_of_fasttree':len(shared)/len(fs) if fs else None,
+            'fasttree_split_recall_of_ufboot':len(shared)/len(us) if us else None,
+            'split_jaccard':len(shared)/len(us|fs) if us|fs else None,
+            'robinson_foulds_symmetric_difference':rf,
+            'normalized_rf_over_total_splits':rf/(len(us)+len(fs)) if (us or fs) else None,
+            'colour_joined':False,
+            'claim_ceiling':'53-species overlapping-topology sensitivity only; C. japonica, C. petelotii and Polyspora are absent from runtime91 UFBoot gene trees'
+          }
+          print(json.dumps(out,indent=2))
+          Path('build/topology_comparison_summary.json').write_text(json.dumps(out,indent=2)+'\n')
+          Phylo.write(f,'build/fasttree_wfo53_pruned.nwk','newick')
+          PY
+          echo '### WFO53 UFBoot accepted-species topology sensitivity' >> "$GITHUB_STEP_SUMMARY"
+          cat build/input_summary.json >> "$GITHUB_STEP_SUMMARY"
+          cat build/topology_comparison_summary.json >> "$GITHUB_STEP_SUMMARY"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: wfo53-ufboot-topology-sensitivity
+          path: |
+            build/wfo53_ufboot_astral4.nwk
+            build/fasttree_wfo53_pruned.nwk
+            build/input_summary.json
+            build/topology_comparison_summary.json
+            build/filtered_mapping.tsv
+            build/astral4.log
+          if-no-files-found: error
