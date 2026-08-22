@@ -1,0 +1,99 @@
+name: Macro-paper topology robustness gate
+
+on:
+  pull_request:
+    paths:
+      - 'scripts/compare_rooted94_wastral_runtime91_topologies.py'
+      - '.github/workflows/macro-paper-topology-robustness.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  actions: read
+
+env:
+  WASTRAL_RUN: '32353571995'
+  ROOTED94_RUN: '32375742772'
+  COLOUR_RUN: '32437060740'
+  TRANSITION_RUN: '32437407222'
+
+jobs:
+  robustness:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install dependencies
+        run: python -m pip install --disable-pip-version-check numpy biopython
+      - name: Download frozen topology, colour, and branch artifacts
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          mkdir -p build/wastral build/rooted build/colour build/transitions
+          gh run download "$WASTRAL_RUN" --repo "$GITHUB_REPOSITORY" \
+            --name wu-angio353-runtime91-wastral-species-tree --dir build/wastral
+          gh run download "$ROOTED94_RUN" --repo "$GITHUB_REPOSITORY" \
+            --name wu-angio353-rooted94-fast-astral4 --dir build/rooted
+          gh run download "$COLOUR_RUN" --repo "$GITHUB_REPOSITORY" \
+            --name rooted94-camellia-colour-history-sensitivity --dir build/colour
+          gh run download "$TRANSITION_RUN" --repo "$GITHUB_REPOSITORY" \
+            --name rooted94-camellia-branch-transition-posteriors --dir build/transitions
+          w=$(find build/wastral -name 'species_tree_wastral.nwk' | head -n 1)
+          r=$(find build/rooted -name 'rooted94_astral4.nwk' | head -n 1)
+          c=$(find build/colour -name 'species_colour.csv' | head -n 1)
+          t=$(find build/transitions -name 'branch_transition_robustness.csv' | head -n 1)
+          test -s "$w"; test -s "$r"; test -s "$c"; test -s "$t"
+          cp "$w" build/wastral91.nwk
+          cp "$r" build/rooted94.nwk
+          cp "$c" build/species_colour.csv
+          cp "$t" build/branch_transition_robustness.csv
+      - name: Compare shared-tip topologies and robust branch relationships
+        run: |
+          mkdir -p build/result
+          python scripts/compare_rooted94_wastral_runtime91_topologies.py \
+            --rooted94 build/rooted94.nwk \
+            --wastral91 build/wastral91.nwk \
+            --transitions build/branch_transition_robustness.csv \
+            --out build/result/topology_comparison.json
+      - name: Re-test colour conservatism on strong wASTRAL topology
+        run: |
+          python scripts/test_nuclear_topology_colour_clustering.py \
+            --tree build/wastral91.nwk \
+            --fan-colour build/species_colour.csv \
+            --out-dir build/result/wastral_colour \
+            --permutations 100000 \
+            --seed 20260822
+      - name: Freeze paper-readiness topology verdict
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          t=json.load(open('build/result/topology_comparison.json'))
+          c=json.load(open('build/result/wastral_colour/summary.json'))
+          if t['n_shared_tips']!=91: raise SystemExit(t)
+          if c['tree_tips']!=91: raise SystemExit(c)
+          if c['global_colour_conservatism_status']!='supported':
+              status='core_claim_topology_sensitive'
+          elif t['B011_24tip_split_present_wastral91'] is False or t['B073_local_pair_retained'] is False:
+              status='robust_branch_relationship_topology_sensitive'
+          else:
+              status='core_macro_claims_robust_on_wastral91'
+          out={
+            'status':status,
+            'topology_comparison':t,
+            'wastral_colour_conservatism':c,
+            'paper_interpretation':'global colour conservatism is the primary cross-topology claim; B011/B073 local branch stability is checked where runtime91 coverage permits; B083 remains rooted94-only because C. japonica is absent from runtime91',
+            'claim_ceiling':'does not validate the B083 branch on wASTRAL91 and does not convert topology sensitivity into ecological causation'
+          }
+          Path('build/result/final_summary.json').write_text(json.dumps(out,indent=2)+'\n')
+          print(json.dumps(out,indent=2))
+          PY
+          cat build/result/final_summary.json >> "$GITHUB_STEP_SUMMARY"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: macro-paper-topology-robustness
+          path: build/result/
+          if-no-files-found: error
