@@ -1,0 +1,92 @@
+name: Paper 1 AJB submission bundle
+
+on:
+  pull_request:
+    paths:
+      - 'data/paper1_release_artifact_manifest_v0_2.csv'
+      - 'docs/PAPER1_SUBMISSION_BUNDLE_README.md'
+      - 'scripts/audit_paper1_submission_bundle.py'
+      - '.github/workflows/paper1-submission-bundle.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  build_bundle:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install plotting dependency
+        run: python -m pip install --disable-pip-version-check matplotlib
+      - name: Prepare directories
+        run: |
+          mkdir -p build/paper1_bundle/{manuscript,main_figures,supplementary_tables,supplementary_figures,provenance}
+          mkdir -p build/paper1_bundle_work
+      - name: Build AJB manuscript v0.2 then submission-clean v0.3
+        run: |
+          python scripts/build_paper1_manuscript_v0_2.py \
+            --v01 manuscript/PAPER1_AJB_MANUSCRIPT_V0_1.md \
+            --abstract-source docs/PAPER1_TITLE_ABSTRACT_AJB.md \
+            --corrections data/paper1_manuscript_v0_2_corrections.csv \
+            --out build/paper1_bundle_work/PAPER1_AJB_MANUSCRIPT_V0_2.md \
+            --summary build/paper1_bundle_work/v0_2_build_summary.json
+          python scripts/build_paper1_submission_v0_3.py \
+            --v02 build/paper1_bundle_work/PAPER1_AJB_MANUSCRIPT_V0_2.md \
+            --cleanup data/paper1_submission_cleanup_v0_3.json \
+            --out build/paper1_bundle/manuscript/PAPER1_AJB_SUBMISSION_V0_3.md \
+            --summary build/paper1_bundle/provenance/v0_3_build_summary.json
+          python scripts/validate_paper1_submission_v0_3.py \
+            --manuscript build/paper1_bundle/manuscript/PAPER1_AJB_SUBMISSION_V0_3.md \
+            --out build/paper1_bundle/provenance/v0_3_validation_summary.json
+      - name: Build Main Fig 1–6
+        run: |
+          python scripts/build_paper1_main_figures.py \
+            --registry data/paper1_authoritative_results_v0_1.csv \
+            --inputs data/paper1_figure_numeric_inputs_v0_1.csv \
+            --out-dir build/paper1_bundle/main_figures
+      - name: Build Supplementary Tables S1–S6
+        run: |
+          python scripts/audit_paper1_source_provenance.py \
+            --registry data/paper1_authoritative_results_v0_1.csv \
+            --wild-colour data/wfo55_accepted_species_wild_colour_registry_v0_1.csv \
+            --micro-sources data/paper1_micro_source_provenance_v0_1.csv \
+            --out-dir build/paper1_bundle_work/source_audit
+          python scripts/build_paper1_supp_tables.py \
+            --disposition data/paper1_analysis_disposition_v0_1.csv \
+            --micro data/paper1_micro_source_provenance_v0_1.csv \
+            --wild-audit build/paper1_bundle_work/source_audit/wild_colour_source_audit.csv \
+            --ecology data/paper1_ecological_primary_references_v0_1.csv \
+            --figure-inputs data/paper1_figure_numeric_inputs_v0_1.csv \
+            --results data/paper1_authoritative_results_v0_1.csv \
+            --out-dir build/paper1_bundle/supplementary_tables
+      - name: Build Supplementary Fig S1–S3
+        run: |
+          python scripts/build_paper1_supp_figures.py \
+            --inputs data/paper1_supp_figure_numeric_inputs_v0_1.csv \
+            --registry data/paper1_authoritative_results_v0_1.csv \
+            --out-dir build/paper1_bundle/supplementary_figures
+      - name: Copy frozen provenance and bundle contract
+        run: |
+          cp data/paper1_authoritative_results_v0_1.csv build/paper1_bundle/provenance/
+          cp data/paper1_analysis_disposition_v0_1.csv build/paper1_bundle/provenance/
+          cp data/paper1_micro_source_provenance_v0_1.csv build/paper1_bundle/provenance/
+          cp data/paper1_ecological_primary_references_v0_1.csv build/paper1_bundle/provenance/
+          cp data/wfo55_accepted_species_wild_colour_registry_v0_1.csv build/paper1_bundle/provenance/
+          cp data/paper1_release_artifact_manifest_v0_2.csv build/paper1_bundle/provenance/
+          cp docs/PAPER1_SUBMISSION_BUNDLE_README.md build/paper1_bundle/README.md
+      - name: Audit full submission bundle and freeze checksums
+        run: |
+          python scripts/audit_paper1_submission_bundle.py \
+            --bundle build/paper1_bundle \
+            --out build/paper1_bundle/BUNDLE_MANIFEST.json
+          cat build/paper1_bundle/BUNDLE_MANIFEST.json >> "$GITHUB_STEP_SUMMARY"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: paper1-ajb-submission-bundle-v0-3
+          path: build/paper1_bundle/
+          if-no-files-found: error
