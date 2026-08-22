@@ -1,0 +1,40 @@
+name: Paper 1 source provenance audit
+
+on:
+  pull_request:
+    paths:
+      - 'data/paper1_authoritative_results_v0_1.csv'
+      - 'data/wfo55_accepted_species_wild_colour_registry_v0_1.csv'
+      - 'data/paper1_micro_source_provenance_v0_1.csv'
+      - 'scripts/audit_paper1_source_provenance.py'
+      - 'docs/PAPER1_SOURCE_PROVENANCE_AUDIT.md'
+      - '.github/workflows/paper1-source-provenance.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Audit wild-colour and micro source provenance
+        run: |
+          mkdir -p build/paper1_source_provenance
+          python scripts/audit_paper1_source_provenance.py \
+            --registry data/paper1_authoritative_results_v0_1.csv \
+            --wild-colour data/wfo55_accepted_species_wild_colour_registry_v0_1.csv \
+            --micro-sources data/paper1_micro_source_provenance_v0_1.csv \
+            --out-dir build/paper1_source_provenance
+      - name: Report
+        run: cat build/paper1_source_provenance/summary.json >> "$GITHUB_STEP_SUMMARY"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: paper1-source-provenance-v0-1
+          path: build/paper1_source_provenance/
+          if-no-files-found: error
