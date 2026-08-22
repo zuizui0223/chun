@@ -1,0 +1,38 @@
+name: Paper 1 analysis disposition gate
+
+on:
+  pull_request:
+    paths:
+      - 'data/paper1_authoritative_results_v0_1.csv'
+      - 'data/paper1_analysis_disposition_v0_1.csv'
+      - 'scripts/validate_paper1_analysis_disposition.py'
+      - 'docs/PAPER1_ANALYSIS_DISPOSITION.md'
+      - '.github/workflows/paper1-analysis-disposition.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Validate manuscript disposition
+        run: |
+          mkdir -p build/paper1_analysis_disposition
+          python scripts/validate_paper1_analysis_disposition.py \
+            --registry data/paper1_authoritative_results_v0_1.csv \
+            --disposition data/paper1_analysis_disposition_v0_1.csv \
+            --out-dir build/paper1_analysis_disposition
+      - name: Report
+        run: cat build/paper1_analysis_disposition/summary.json >> "$GITHUB_STEP_SUMMARY"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: paper1-analysis-disposition-v0-1
+          path: build/paper1_analysis_disposition/
+          if-no-files-found: error
