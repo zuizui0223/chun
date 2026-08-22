@@ -4,7 +4,16 @@ on:
   pull_request:
     paths:
       - 'data/paper1_release_artifact_manifest_v0_2.csv'
+      - 'data/paper1_micro_source_provenance_v0_1.csv'
+      - 'data/paper1_ecological_primary_references_v0_1.csv'
+      - 'data/paper1_bibliographic_corrections_v0_1.csv'
+      - 'data/paper1_submission_cleanup_v0_3.json'
+      - 'data/paper1_manuscript_v0_2_corrections.csv'
       - 'docs/PAPER1_SUBMISSION_BUNDLE_README.md'
+      - 'manuscript/PAPER1_AJB_MANUSCRIPT_V0_1.md'
+      - 'scripts/build_paper1_manuscript_v0_2.py'
+      - 'scripts/build_paper1_submission_v0_3.py'
+      - 'scripts/validate_paper1_submission_v0_3.py'
       - 'scripts/audit_paper1_submission_bundle.py'
       - '.github/workflows/paper1-submission-bundle.yml'
   workflow_dispatch:
@@ -76,6 +85,7 @@ jobs:
           cp data/paper1_analysis_disposition_v0_1.csv build/paper1_bundle/provenance/
           cp data/paper1_micro_source_provenance_v0_1.csv build/paper1_bundle/provenance/
           cp data/paper1_ecological_primary_references_v0_1.csv build/paper1_bundle/provenance/
+          cp data/paper1_bibliographic_corrections_v0_1.csv build/paper1_bundle/provenance/
           cp data/wfo55_accepted_species_wild_colour_registry_v0_1.csv build/paper1_bundle/provenance/
           cp data/paper1_release_artifact_manifest_v0_2.csv build/paper1_bundle/provenance/
           cp docs/PAPER1_SUBMISSION_BUNDLE_README.md build/paper1_bundle/README.md

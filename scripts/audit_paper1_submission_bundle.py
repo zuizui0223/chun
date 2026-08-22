@@ -28,6 +28,23 @@ def main() -> int:
     if text.count("[ARCHIVE DOI TO ADD AT SUBMISSION]") != 1:
         raise SystemExit("archive DOI placeholder count is not exactly one")
 
+    required_citation_tokens = [
+        "Berruti et al. (2015)",
+        "Berruti, A., A. Christiaens, E. De Keyser, M.-C. Van Labeke, and V. Scariot. 2015.",
+        "Geng et al., 2022",
+        "Qu et al., 2024",
+        "Wickramaratne and Vitarana, 1985",
+        "Chai et al., 2019",
+        "Li et al., 2021",
+        "World Flora Online Consortium, 2026",
+    ]
+    for token in required_citation_tokens:
+        if token not in text:
+            raise SystemExit(f"submission manuscript missing corrected/explicit citation: {token}")
+    for stale in ["Larcher et al. (2015)", "Larcher, R., et al. 2015."]:
+        if stale in text:
+            raise SystemExit(f"submission manuscript retains stale citation: {stale}")
+
     main_png = sorted((a.bundle / "main_figures").glob("Fig*.png"))
     main_svg = sorted((a.bundle / "main_figures").glob("Fig*.svg"))
     supp_csv = sorted((a.bundle / "supplementary_tables").glob("Table_S*.csv"))
@@ -44,6 +61,7 @@ def main() -> int:
         "paper1_authoritative_results_v0_1.csv",
         "paper1_analysis_disposition_v0_1.csv",
         "paper1_micro_source_provenance_v0_1.csv",
+        "paper1_bibliographic_corrections_v0_1.csv",
         "wfo55_accepted_species_wild_colour_registry_v0_1.csv",
         "paper1_release_artifact_manifest_v0_2.csv",
     ]
@@ -69,6 +87,7 @@ def main() -> int:
         "supplementary_figures_png": len(supp_png),
         "supplementary_figures_svg": len(supp_svg),
         "archive_doi_placeholder_count": 1,
+        "bibliographic_correction_gate": "pass",
         "file_count": len(files),
         "remaining_human_metadata": [
             "author list/order",

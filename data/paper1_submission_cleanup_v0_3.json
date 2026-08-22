@@ -1,6 +1,6 @@
 {
   "version": "v0.3",
-  "scope": "submission presentation only; no scientific result changes",
+  "scope": "submission presentation and bibliographic correction only; no scientific result changes",
   "replacements": [
     {
       "id": "CLEAN001",
@@ -36,6 +36,26 @@
       "id": "CLEAN007",
       "old": "The Supplement should include: ANS/LDOX and ANR copy-aware evidence; accepted-species root-state sensitivity; FastTree topology and colour-conservatism sensitivity; the wild-colour/taxonomy stress test that invalidated legacy W→A events; intermediate Fan aggregation after taxonomy collapse; current machine-readable orthology tables; wild-colour source audit; and micro primary-source/accession audit.\n\nProvenance-only analyses, including consumed runtime91 computation intermediates and historical orthology-ledger versions, should remain in the repository rather than being presented as independent Supplementary biological results. Excluded legacy headlines—the three 93-tip W→A events, definitive white-ancestor framing, A-specific lineage-permissivity headline, and topology-independent global-MPD headline—must not be presented as positive conclusions.",
       "new": "Supplementary Tables S1–S6 provide the analysis disposition, molecular source provenance, wild-colour evidence audit, primary ecological evidence, topology/colour robustness values, and trait-history/identifiability summaries. Supplementary Figures S1–S3 show accepted-species root-state sensitivity, state-specific clustering sensitivity, and the falsification path by which legacy W→A events failed after wild-colour and accepted-taxonomy auditing. Historical superseded results are shown only where needed to document this falsification path and are not treated as positive biological conclusions."
+    },
+    {
+      "id": "CLEAN008",
+      "old": "For DFR, the partial *C. japonica* CjDFR clone `AB524885.1` (Tateishi et al., 2010) was compared with the six tea DFR-family reference candidates classified by Mei et al. (2019). Published CjDFR primer pairs, including the 167-bp assay of Larcher et al. (2015), were used as independent assay-to-sequence links. The white/pink tea source locus `CSA003949` from Zhou et al. (2020) was cross-walked to the tea DFR reference family before paralog classification. ANS/LDOX and ANR evidence was treated more conservatively because several source contrasts use reference-mapped or family-level features rather than deposited species-native orthologs. These analyses support copy-aware directional heterogeneity but were not interpreted as strict-node recurrence.",
+      "new": "For DFR, the partial *C. japonica* CjDFR clone `AB524885.1` (Tateishi et al., 2010) was compared with the six tea DFR-family reference candidates classified by Mei et al. (2019). Published CjDFR primer pairs, including the 167-bp assay of Berruti et al. (2015), were used as independent assay-to-sequence links. The white/pink tea source locus `CSA003949` from Zhou et al. (2020) was cross-walked to the tea DFR reference family before paralog classification. ANS/LDOX and ANR evidence was treated more conservatively because several source contrasts use reference-mapped or family-level features rather than deposited species-native orthologs (Geng et al., 2022; Qu et al., 2024). These analyses support copy-aware directional heterogeneity but were not interpreted as strict-node recurrence."
+    },
+    {
+      "id": "CLEAN009",
+      "old": "Historical *Camellia* names in the nuclear sampling were normalized against a pinned World Flora Online Plant List 2026-06 snapshot (Zenodo DOI `10.5281/zenodo.20782718`).",
+      "new": "Historical *Camellia* names in the nuclear sampling were normalized against a pinned June 2026 snapshot of the World Flora Online Plant List (World Flora Online Consortium, 2026; Zenodo DOI `10.5281/zenodo.20782718`)."
+    },
+    {
+      "id": "CLEAN010",
+      "old": "The pollination synthesis likewise showed that visible hue was not a deterministic reproductive-function state. Primary evidence included contrasting broad pollinator functions within the same visible colour, and pollination weighting could change with season, weather, or disturbance without a visible-hue change (Kunitake et al., 2004; Abe et al., 2013; Sun et al., 2017; Mori et al., 2023; Zhang et al., 2024; Jiang et al., 2025). After updating *C. oleifera* with direct bird-exclusion evidence from the same study that documented pollen toxicity (Zhang et al., 2024), the count-preserving hue–pollinator-function association remained weak in the small evidence seed (*P* = 0.77127). This result was not interpreted as evidence of independence; instead, it indicated that coarse A/W/Y labels are insufficient to represent the full sensory, reward, and reproductive phenotype relevant to ecological filtering.",
+      "new": "The pollination synthesis likewise showed that visible hue was not a deterministic reproductive-function state. Primary evidence included contrasting broad pollinator functions within the same visible colour, and pollination weighting could change with season, weather, or disturbance without a visible-hue change (Wickramaratne and Vitarana, 1985; Kunitake et al., 2004; Abe et al., 2013; Sun et al., 2017; Chai et al., 2019; Li et al., 2021; Mori et al., 2023; Zhang et al., 2024; Jiang et al., 2025). After updating *C. oleifera* with direct bird-exclusion evidence from the same study that documented pollen toxicity (Zhang et al., 2024), the count-preserving hue–pollinator-function association remained weak in the small evidence seed (*P* = 0.77127). This result was not interpreted as evidence of independence; instead, it indicated that coarse A/W/Y labels are insufficient to represent the full sensory, reward, and reproductive phenotype relevant to ecological filtering."
+    },
+    {
+      "id": "CLEAN011",
+      "old": "Larcher, R., et al. 2015. Cold treatment breaks dormancy but jeopardizes flower quality in *Camellia japonica* L. *Frontiers in Plant Science* 6: 983. https://doi.org/10.3389/fpls.2015.00983",
+      "new": "Berruti, A., A. Christiaens, E. De Keyser, M.-C. Van Labeke, and V. Scariot. 2015. Cold treatment breaks dormancy but jeopardizes flower quality in *Camellia japonica* L. *Frontiers in Plant Science* 6: 983. https://doi.org/10.3389/fpls.2015.00983"
     }
   ]
 }
