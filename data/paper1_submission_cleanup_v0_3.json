@@ -1,0 +1,41 @@
+{
+  "version": "v0.3",
+  "scope": "submission presentation only; no scientific result changes",
+  "replacements": [
+    {
+      "id": "CLEAN001",
+      "old": "> Draft v0.2. This manuscript consumes the frozen Paper 1 authoritative-result and analysis-disposition registries. It must not be used to reintroduce provenance-only or excluded results as positive claims.\n\n",
+      "new": ""
+    },
+    {
+      "id": "CLEAN002",
+      "old": "Analyses that were later invalidated by taxonomy, wild-colour polymorphism, or topology sensitivity were retained as provenance but excluded from current positive claims. The current result set, figure dependencies, and analysis disposition are machine-readable in `data/paper1_authoritative_results_v0_1.csv`, `data/paper1_main_figure_manifest_v0_1.csv`, and `data/paper1_analysis_disposition_v0_1.csv`.",
+      "new": "Analyses that were later invalidated by taxonomy, wild-colour polymorphism, or topology sensitivity were retained for reproducibility but excluded from current positive claims. The analysis disposition, including Main, sensitivity, provenance-only, and excluded results, is summarized in Supplementary Table S1."
+    },
+    {
+      "id": "CLEAN003",
+      "old": "All source claims were separated from project inference. The machine-readable source-provenance table lists the primary article, DOI or stable locator, public accession/run, exact claim supported by the source, and the additional inference made by sequence matching or crosswalk (`data/paper1_micro_source_provenance_v0_1.csv`).",
+      "new": "All source claims were separated from project inference. Primary articles, DOI or stable locators, public accessions/runs, exact source-supported claims, and additional sequence-based inferences are summarized in Supplementary Table S2."
+    },
+    {
+      "id": "CLEAN004",
+      "old": "Exact source locators and evidence grades are given in `data/wfo55_accepted_species_wild_colour_registry_v0_1.csv` and the source audit.",
+      "new": "Exact species-level source locators, evidence grades, and strict/dominant treatment decisions are given in Supplementary Table S3."
+    },
+    {
+      "id": "CLEAN005",
+      "old": "All analyses were implemented as versioned scripts and GitHub Actions workflows. Authoritative, sensitivity, superseded, and excluded results are frozen in `data/paper1_authoritative_results_v0_1.csv`. Figure dependencies are frozen separately, and continuous-integration checks prevent superseded results from re-entering the Main figure pipeline. Current analyses are assigned explicitly to Main, Supplement, provenance-only, or excluded categories. The source audit separates primary-source statements from project inferences based on primer matching, crosswalks, sequence comparison, or synteny.",
+      "new": "All analyses were implemented as versioned scripts and automated reproducibility workflows. Analysis disposition is summarized in Supplementary Table S1; primary molecular and ecological source provenance is provided in Supplementary Tables S2–S4; and the numerical robustness values underlying the topology, colour-structure, and trait-history sensitivities are given in Supplementary Tables S5–S6. The source audit explicitly separates primary-source statements from inferences based on primer matching, crosswalks, sequence comparison, or synteny."
+    },
+    {
+      "id": "CLEAN006",
+      "old": "All analyses use public source data and versioned reproducible workflows. The repository records exact public accessions/runs, taxonomy snapshot, species-level wild-colour source locators, sequence-anchor provenance, analysis scripts, GitHub Actions workflows, frozen result registries, and deterministic figure inputs. The WFO Plant List 2026-06 taxonomy snapshot is pinned by DOI `10.5281/zenodo.20782718`. Public nuclear transcriptomic provenance ultimately derives from the Wu et al. (2022) sampling and associated public resources; source-specific sequence accessions are listed in the repository machine-readable provenance files. The final manuscript should provide the archived repository DOI/release rather than a moving branch URL.",
+      "new": "All source datasets used here are public, and the analysis code, frozen derived-data registries, deterministic figure inputs, and reproducibility metadata are assembled in a versioned release for this study [ARCHIVE DOI TO ADD AT SUBMISSION]. The WFO Plant List 2026-06 taxonomy snapshot is independently archived at Zenodo (doi:10.5281/zenodo.20782718). Public nuclear transcriptomic provenance derives from the Wu et al. (2022) sampling and associated public resources; source-specific molecular, taxonomic, colour, and ecological provenance is reported in Supplementary Tables S2–S4."
+    },
+    {
+      "id": "CLEAN007",
+      "old": "The Supplement should include: ANS/LDOX and ANR copy-aware evidence; accepted-species root-state sensitivity; FastTree topology and colour-conservatism sensitivity; the wild-colour/taxonomy stress test that invalidated legacy W→A events; intermediate Fan aggregation after taxonomy collapse; current machine-readable orthology tables; wild-colour source audit; and micro primary-source/accession audit.\n\nProvenance-only analyses, including consumed runtime91 computation intermediates and historical orthology-ledger versions, should remain in the repository rather than being presented as independent Supplementary biological results. Excluded legacy headlines—the three 93-tip W→A events, definitive white-ancestor framing, A-specific lineage-permissivity headline, and topology-independent global-MPD headline—must not be presented as positive conclusions.",
+      "new": "Supplementary Tables S1–S6 provide the analysis disposition, molecular source provenance, wild-colour evidence audit, primary ecological evidence, topology/colour robustness values, and trait-history/identifiability summaries. Supplementary Figures S1–S3 show accepted-species root-state sensitivity, state-specific clustering sensitivity, and the falsification path by which legacy W→A events failed after wild-colour and accepted-taxonomy auditing. Historical superseded results are shown only where needed to document this falsification path and are not treated as positive biological conclusions."
+    }
+  ]
+}
