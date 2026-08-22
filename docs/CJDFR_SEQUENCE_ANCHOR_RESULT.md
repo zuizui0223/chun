@@ -51,8 +51,9 @@ Two independent published CjDFR primer pairs map exactly to `AB524885.1`:
 
 1. the Tateishi 2010 forward and reverse primers each have one exact hit and
    delimit 412 bp within the public partial sequence;
-2. the Larcher 2015 qPCR primers each have one exact hit and reproduce the
-   reported **167-bp** amplicon exactly.
+2. the Berruti et al. 2015 qPCR primers each have one exact hit and reproduce the
+   reported **167-bp** amplicon exactly. The historical computational assay ID
+   `LARCHER2015_CJDFR_QPCR` is retained only for provenance.
 
 Thus the 2010 cloned CjDFR and the 2015 qPCR target are sequence-linked to the
 same public partial CDS. The 2024 CjMYB114–CjbHLH1 promoter target remains
