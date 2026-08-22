@@ -20,12 +20,14 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
-      - name: Validate manuscript structure and claim freeze
+      - name: Validate editable manuscript template structure and claim freeze
         run: |
           mkdir -p build/paper1_manuscript_v0_1
           python scripts/validate_paper1_manuscript_v0_1.py \
             --manuscript manuscript/PAPER1_AJB_MANUSCRIPT_V0_1.md \
-            --out build/paper1_manuscript_v0_1/summary.json
+            --out build/paper1_manuscript_v0_1/summary.json \
+            --max-abstract-words 300 \
+            --version-label editable_v0_1_template
       - name: Report
         run: cat build/paper1_manuscript_v0_1/summary.json >> "$GITHUB_STEP_SUMMARY"
       - uses: actions/upload-artifact@v4
