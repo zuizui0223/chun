@@ -18,14 +18,14 @@ env:
 jobs:
   climate_gate:
     runs-on: ubuntu-latest
-    timeout-minutes: 20
+    timeout-minutes: 40
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
       - name: Install dependencies
-        run: python -m pip install --disable-pip-version-check numpy scipy biopython
+        run: python -m pip install --disable-pip-version-check numpy scipy biopython pandas requests rasterio openpyxl
       - name: Download frozen rooted tree and transition posterior artifacts
         env:
           GH_TOKEN: ${{ github.token }}
@@ -41,16 +41,110 @@ jobs:
           test -n "$tr"; test -s "$tr"
           cp "$tree" build/rooted94_astral4.nwk
           cp "$tr" build/branch_transition_robustness.csv
+      - name: Rebuild the Fan species seed and isolate Camellia albogigas
+        run: |
+          mkdir -p build/fan/package build/albogigas build/chelsa
+          curl --fail --location --retry 3 \
+            'https://www.ncbi.nlm.nih.gov/pmc/utils/oa/oa.fcgi?id=PMC12946509' \
+            -o build/fan/oa.xml
+          python - <<'PY'
+          import xml.etree.ElementTree as ET
+          from pathlib import Path
+          root=ET.fromstring(Path('build/fan/oa.xml').read_bytes())
+          links=[x.attrib.get('href','') for x in root.findall('.//link') if x.attrib.get('format')=='tgz']
+          if len(links)!=1: raise SystemExit(f'unexpected OA links: {links}')
+          u=links[0]
+          if u.startswith('ftp://ftp.ncbi.nlm.nih.gov/'):
+              u='https://ftp.ncbi.nlm.nih.gov/'+u.split('ftp://ftp.ncbi.nlm.nih.gov/',1)[1]
+          Path('build/fan/url').write_text(u+'\n')
+          PY
+          u=$(cat build/fan/url)
+          if ! curl --fail --location --retry 3 --retry-all-errors "$u" -o build/fan/a.tgz; then
+            u2=$(python - <<'PY'
+          from pathlib import Path
+          u=Path('build/fan/url').read_text().strip();m='https://ftp.ncbi.nlm.nih.gov/pub/pmc/'
+          print(u.replace(m,m+'deprecated/',1) if u.startswith(m) and '/deprecated/' not in u else u)
+          PY
+          )
+            curl --fail --location --retry 3 --retry-all-errors "$u2" -o build/fan/a.tgz
+          fi
+          tar -xzf build/fan/a.tgz -C build/fan/package
+          xlsx=$(find build/fan/package -type f -iname '*s002*.xlsx' | head -n 1)
+          test -n "$xlsx"
+          python scripts/build_fan2026_species_colour_seed.py "$xlsx" \
+            --output build/fan/species_colour.csv --audit build/fan/seed_audit.json
+          python - <<'PY'
+          import csv
+          rows=list(csv.DictReader(open('build/fan/species_colour.csv',newline='',encoding='utf-8-sig')))
+          hit=[r for r in rows if r['taxon']=='Camellia albogigas']
+          if len(hit)!=1: raise SystemExit(f'expected one C. albogigas seed row, got {len(hit)}')
+          with open('build/albogigas/seed.csv','w',newline='',encoding='utf-8') as f:
+              w=csv.DictWriter(f,fieldnames=list(hit[0]));w.writeheader();w.writerow(hit[0])
+          print(hit[0])
+          PY
+      - name: Download CHELSA BIO1 and BIO6
+        run: |
+          base='https://os.zhdk.cloud.switch.ch/chelsav2/GLOBAL/climatologies/1981-2010/bio'
+          for b in 1 6; do
+            f="CHELSA_bio${b}_1981-2010_V.2.1.tif"
+            curl --fail --location --retry 3 --retry-all-errors --connect-timeout 20 --max-time 300 \
+              "$base/$f" -o "build/chelsa/$f"
+          done
+      - name: Recompute C. albogigas climate from the same public GBIF-CHELSA route
+        run: |
+          python scripts/run_fan2026_gbif_chelsa_thermal.py \
+            --taxa build/albogigas/seed.csv \
+            --bio1 build/chelsa/CHELSA_bio1_1981-2010_V.2.1.tif \
+            --bio6 build/chelsa/CHELSA_bio6_1981-2010_V.2.1.tif \
+            --out-dir build/albogigas/raw \
+            --min-points 5 --cap-points 80 --gbif-cap-per-country 1000
+          python - <<'PY'
+          import csv,json
+          import numpy as np
+          import pandas as pd
+          pts=pd.read_csv('build/albogigas/raw/thermal_points.csv')
+          flags=pd.read_csv('data/camellia_tail_provenance_flags_v0_1.csv')
+          stages={'A_documented_nonlocal','B_add_generic_center_proxy','C_add_hard_range_or_metadata_conflict'}
+          bad=set(flags.loc[flags['sensitivity_stage'].isin(stages),'gbif_key'].astype(str))
+          keep=pts[~pts['gbif_key'].astype(str).isin(bad)].copy()
+          if keep['taxon'].nunique()!=1 or keep['taxon'].iloc[0]!='Camellia albogigas' or len(keep)<5:
+              raise SystemExit(f'unexpected S3 albogigas point set: n={len(keep)} taxa={keep.taxon.unique().tolist()}')
+          b1=np.asarray(keep['bio1'],float); b6=np.asarray(keep['bio6'],float)
+          row={
+              'taxon':'Camellia albogigas','colour_state':'W','section':'sect. Archecamellia',
+              'n_points':len(keep),'bio1_median':float(np.median(b1)),
+              'bio6_median':float(np.median(b6)),'bio6_q05':float(np.quantile(b6,.05)),
+              'bio1_iqr':float(np.quantile(b1,.75)-np.quantile(b1,.25)),
+          }
+          static=pd.read_csv('data/camellia_boundary_admission_tiers_v0_1.csv')
+          s=static[static['taxon']=='Camellia albogigas']
+          static_q05=float(s.iloc[0]['bio6_q05']) if len(s)==1 else None
+          audit={
+              'live_S3':row,
+              'static_boundary_n':int(s.iloc[0]['n_points']) if len(s)==1 else None,
+              'static_boundary_q05':static_q05,
+              'abs_q05_difference_live_vs_static':abs(row['bio6_q05']-static_q05) if static_q05 is not None else None,
+              'boundary':'live targeted recomputation is used for missing medians; static q05 is retained as a reproducibility diagnostic only'
+          }
+          open('build/albogigas/S3_audit.json','w').write(json.dumps(audit,indent=2)+'\n')
+          base=list(csv.DictReader(open('data/fan2026_chelsa_species_compact_v0_1.csv',newline='',encoding='utf-8-sig')))
+          if any(r['taxon']=='Camellia albogigas' for r in base): raise SystemExit('albogigas unexpectedly already in compact table')
+          fields=list(base[0])
+          with open('build/climate_augmented.csv','w',newline='',encoding='utf-8') as f:
+              w=csv.DictWriter(f,fieldnames=fields);w.writeheader();w.writerows(base);w.writerow({k:row[k] for k in fields})
+          print(json.dumps(audit,indent=2))
+          PY
       - name: Test local sister climate contrasts at frozen colour-transition branches
         run: |
           mkdir -p build/result
           python scripts/test_rooted_transition_climate_contrasts.py \
             --tree build/rooted94_astral4.nwk \
             --transitions build/branch_transition_robustness.csv \
-            --climate data/fan2026_chelsa_species_compact_v0_1.csv \
+            --climate build/climate_augmented.csv \
             --out-dir build/result \
             --permutations 100000 \
             --seed 20260822
+          cp build/albogigas/S3_audit.json build/result/albogigas_S3_recomputation_audit.json
       - name: Audit and report
         run: |
           python - <<'PY'
@@ -59,11 +153,14 @@ jobs:
           assert s['n_camellia_tips']==93,s
           assert s['n_branches']==184,s
           assert len(s['robust_W_to_A_branches'])==3,s
+          assert all(s['metric_results'][m]['n_robust_branches_with_contrast']==3 for m in s['primary_metrics']),s
           assert s['H_direct_cold_branch_status'] in {'supported','falsified_universal_direct_cold','public_data_unidentifiable'},s
           print(json.dumps(s,indent=2))
           PY
           echo '### Rooted branch climate public-data boundary' >> "$GITHUB_STEP_SUMMARY"
           cat build/result/summary.json >> "$GITHUB_STEP_SUMMARY"
+          echo '### C. albogigas targeted S3 audit' >> "$GITHUB_STEP_SUMMARY"
+          cat build/result/albogigas_S3_recomputation_audit.json >> "$GITHUB_STEP_SUMMARY"
       - uses: actions/upload-artifact@v4
         with:
           name: rooted94-branch-climate-public-boundary
