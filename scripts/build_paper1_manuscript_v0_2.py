@@ -4,12 +4,33 @@ from __future__ import annotations
 import argparse
 import csv
 import json
+import re
 from pathlib import Path
 
 
 def read_csv(path: Path) -> list[dict[str, str]]:
     with path.open(newline="", encoding="utf-8-sig") as handle:
         return list(csv.DictReader(handle))
+
+
+def sort_reference_block(text: str) -> tuple[str, int]:
+    start = "# REFERENCES — v0.2 verified core set"
+    stop = "# OPEN ITEMS FOR v0.3"
+    if start not in text or stop not in text:
+        raise SystemExit("cannot locate v0.2 reference block for sorting")
+    before, rest = text.split(start, 1)
+    refs_text, after = rest.split(stop, 1)
+    entries = [x.strip() for x in re.split(r"\n\s*\n", refs_text.strip()) if x.strip()]
+    if len(entries) < 15:
+        raise SystemExit(f"unexpectedly small reference block: {len(entries)} entries")
+
+    def key(entry: str):
+        first = re.sub(r"[*_`]", "", entry).strip()
+        return first.casefold()
+
+    entries = sorted(entries, key=key)
+    rebuilt = before + start + "\n\n" + "\n\n".join(entries) + "\n\n" + stop + after
+    return rebuilt, len(entries)
 
 
 def main() -> int:
@@ -24,7 +45,6 @@ def main() -> int:
     corrections = read_csv(a.corrections)
     applied = []
 
-    # BIB001–BIB003 are exact replacements and must occur at least once.
     for row in corrections:
         cid = row["correction_id"]
         ctype = row["correction_type"]
@@ -42,7 +62,7 @@ def main() -> int:
                 continue
             anchor = "Wu, Q., W. Tong, H. Zhao, R. Ge, R. Li, J. Huang, F. Li, et al. 2022."
             if anchor not in text:
-                raise SystemExit(f"{cid}: WFO insertion anchor not found")
+                raise SystemExit(f"{cid}: reference insertion anchor not found")
             text = text.replace(anchor, new + "\n\n" + anchor, 1)
             applied.append({"correction_id": cid, "type": ctype, "occurrences": 1})
         else:
@@ -56,7 +76,9 @@ def main() -> int:
     text = text.replace("# REFERENCES — v0.1 verified core set", "# REFERENCES — v0.2 verified core set", 1)
     text = text.replace("# OPEN ITEMS FOR v0.2", "# OPEN ITEMS FOR v0.3", 1)
     text = text.replace("- Verify final bibliographic pagination/article numbering for Fan et al. 2026 and all source-register underlying references used in Supplement.\n", "- Verify all source-register underlying references used in Supplement and final AJB punctuation/style at copy-edit stage.\n")
-    text = text.replace("- Resolve the complete AJB-format Literature Cited entries for all non-core ecological primary studies and the WFO Plant List snapshot.\n", "- Resolve complete AJB-format Literature Cited entries for all non-core ecological primary studies used in the final Discussion/Supplement.\n")
+    text = text.replace("- Resolve the complete AJB-format Literature Cited entries for all non-core ecological primary studies and the WFO Plant List snapshot.\n", "- Resolve complete AJB-format Literature Cited entries for any additional ecological primary studies introduced during final Supplement integration.\n")
+
+    text, n_refs = sort_reference_block(text)
 
     required = [
         "Lacey, 2026",
@@ -64,6 +86,9 @@ def main() -> int:
         "1725–1739",
         "World Flora Online Consortium. 2026.",
         "10.5281/zenodo.20782718",
+        "Sun et al., 2017",
+        "Zhang et al., 2024",
+        "10.1111/jipb.13731",
         "> Draft v0.2.",
     ]
     for token in required:
@@ -85,10 +110,12 @@ def main() -> int:
         "output_manuscript": str(a.out),
         "correction_rows": len(corrections),
         "applied": applied,
+        "literature_cited_entries": n_refs,
+        "literature_cited_sorted": True,
         "required_tokens_present": True,
         "stale_tokens_absent": True,
         "scientific_results_changed": False,
-        "scope": "bibliographic/source-text corrections only",
+        "scope": "bibliographic/source-text corrections and reference ordering only",
     }
     a.summary.parent.mkdir(parents=True, exist_ok=True)
     a.summary.write_text(json.dumps(summary, indent=2) + "\n", encoding="utf-8")
