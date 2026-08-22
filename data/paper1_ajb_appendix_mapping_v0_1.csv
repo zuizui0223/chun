@@ -1,0 +1,10 @@
+appendix_id,internal_item,source_file_or_output,upload_name,title_or_legend
+Appendix S1,Table S1,supplementary_tables/Table_S1_analysis_disposition.csv,Appendix_S1.csv,"Paper 1 analysis disposition, including Main, sensitivity, provenance-only, and excluded analyses."
+Appendix S2,Table S2,supplementary_tables/Table_S2_micro_sequence_source_provenance.csv,Appendix_S2.csv,"Primary and public sequence provenance for FLS, DFR, ANS/LDOX, and ANR evidence used in the molecular synthesis."
+Appendix S3,Table S3,supplementary_tables/Table_S3_wild_colour_source_audit.csv,Appendix_S3.csv,"Species-level wild/floristic flower-colour source audit, evidence grade, and strict/dominant trait treatment after accepted-taxonomy normalization."
+Appendix S4,Table S4,supplementary_tables/Table_S4_camellia_pollination_primary_evidence.csv,Appendix_S4.csv,"Primary Camellia pollination, sensory, and reproductive-context evidence used in the ecological screening."
+Appendix S5,Table S5,supplementary_tables/Table_S5_topology_and_colour_robustness_values.csv,Appendix_S5.csv,"Frozen numerical values underlying nuclear-topology sensitivity and local/global flower-colour phylogenetic-structure tests."
+Appendix S6,Table S6,supplementary_tables/Table_S6_trait_history_and_identifiability_sensitivity.csv,Appendix_S6.csv,"Accepted-species ancestral-state sensitivity, negative robustness results, and the branch-event identifiability boundary."
+Appendix S7,Figure S1,supplementary_figures/FigS1_root_state_sensitivity.png,Appendix_S7.png,"Accepted-species ancestral-colour sensitivity showing W as the leading state with residual W/Y uncertainty."
+Appendix S8,Figure S2,supplementary_figures/FigS2_state_specific_clustering.png,Appendix_S8.png,"State-specific A and Y phylogenetic clustering sensitivity across topology and trait scenarios; strict A is not estimable."
+Appendix S9,Figure S3,supplementary_figures/FigS3_legacy_event_falsification.png,Appendix_S9.png,"Falsification path from three legacy W-to-A branches to zero shared robust accepted-species events after wild-colour and taxonomy auditing."

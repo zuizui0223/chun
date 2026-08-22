@@ -1,0 +1,57 @@
+name: Paper 1 AJB upload-format v0.4
+
+on:
+  pull_request:
+    paths:
+      - 'data/paper1_ajb_appendix_mapping_v0_1.csv'
+      - 'scripts/build_paper1_ajb_submission_v0_4.py'
+      - 'scripts/validate_paper1_ajb_submission_v0_4.py'
+      - '.github/workflows/paper1-ajb-upload-v0-4.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  build_validate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Build submission-clean v0.3
+        run: |
+          mkdir -p build/paper1_ajb_upload_v0_4
+          python scripts/build_paper1_manuscript_v0_2.py \
+            --v01 manuscript/PAPER1_AJB_MANUSCRIPT_V0_1.md \
+            --abstract-source docs/PAPER1_TITLE_ABSTRACT_AJB.md \
+            --corrections data/paper1_manuscript_v0_2_corrections.csv \
+            --out build/paper1_ajb_upload_v0_4/PAPER1_AJB_MANUSCRIPT_V0_2.md \
+            --summary build/paper1_ajb_upload_v0_4/v0_2_build_summary.json
+          python scripts/build_paper1_submission_v0_3.py \
+            --v02 build/paper1_ajb_upload_v0_4/PAPER1_AJB_MANUSCRIPT_V0_2.md \
+            --cleanup data/paper1_submission_cleanup_v0_3.json \
+            --out build/paper1_ajb_upload_v0_4/PAPER1_AJB_SUBMISSION_V0_3.md \
+            --summary build/paper1_ajb_upload_v0_4/v0_3_build_summary.json
+      - name: Convert Supporting Information references to AJB Appendix S1–S9
+        run: |
+          python scripts/build_paper1_ajb_submission_v0_4.py \
+            --v03 build/paper1_ajb_upload_v0_4/PAPER1_AJB_SUBMISSION_V0_3.md \
+            --appendix-map data/paper1_ajb_appendix_mapping_v0_1.csv \
+            --out build/paper1_ajb_upload_v0_4/PAPER1_AJB_UPLOAD_V0_4.md \
+            --summary build/paper1_ajb_upload_v0_4/v0_4_build_summary.json
+      - name: Validate AJB upload-format manuscript
+        run: |
+          python scripts/validate_paper1_ajb_submission_v0_4.py \
+            --manuscript build/paper1_ajb_upload_v0_4/PAPER1_AJB_UPLOAD_V0_4.md \
+            --appendix-map data/paper1_ajb_appendix_mapping_v0_1.csv \
+            --out build/paper1_ajb_upload_v0_4/v0_4_validation_summary.json
+          cp data/paper1_ajb_appendix_mapping_v0_1.csv build/paper1_ajb_upload_v0_4/
+          cat build/paper1_ajb_upload_v0_4/v0_4_validation_summary.json >> "$GITHUB_STEP_SUMMARY"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: paper1-ajb-upload-manuscript-v0-4
+          path: build/paper1_ajb_upload_v0_4/
+          if-no-files-found: error
