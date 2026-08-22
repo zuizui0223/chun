@@ -1,0 +1,63 @@
+name: WFO55 wild colour audit gate
+
+on:
+  pull_request:
+    paths:
+      - 'data/wfo55_accepted_species_wild_colour_registry_v0_1.csv'
+      - 'scripts/apply_wfo55_wild_colour_audit.py'
+      - '.github/workflows/wfo55-wild-colour-audit.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  actions: read
+
+env:
+  FAN_AGGREGATION_RUN: '32440245723'
+
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - name: Download frozen WFO55 Fan aggregation
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          mkdir -p build/fan
+          gh run download "$FAN_AGGREGATION_RUN" --repo "$GITHUB_REPOSITORY" \
+            --name wfo55-fan-colour-aggregation --dir build/fan
+          agg=$(find build/fan -name 'wfo55_fan_colour_aggregation.csv' | head -n 1)
+          test -n "$agg"; test -s "$agg"
+          cp "$agg" build/fan_aggregation.csv
+      - name: Apply wild/floristic trait audit
+        run: |
+          python scripts/apply_wfo55_wild_colour_audit.py \
+            --aggregation build/fan_aggregation.csv \
+            --audit data/wfo55_accepted_species_wild_colour_registry_v0_1.csv \
+            --out-dir build/result
+      - name: Gate and report
+        run: |
+          python - <<'PY'
+          import json
+          s=json.load(open('build/result/summary.json'))
+          assert s['n_accepted_camellia_species']==55,s
+          assert s['n_fan_observed_or_conflicting']==36,s
+          assert s['n_audited_observed_species']==36,s
+          assert s['audit_coverage_complete'] is True,s
+          assert s['n_provisional_hard_states_before_wild_audit']==35,s
+          assert s['strict_seed_n']==24,s
+          assert s['strict_state_counts']=={'A':1,'W':19,'Y':4},s
+          assert s['dominant_seed_n']==30,s
+          assert s['dominant_state_counts']=={'A':4,'W':22,'Y':4},s
+          assert s['n_demoted_from_provisional_hard_in_strict']==11,s
+          print(json.dumps(s,indent=2))
+          PY
+          echo '### WFO55 wild colour audit' >> "$GITHUB_STEP_SUMMARY"
+          cat build/result/summary.json >> "$GITHUB_STEP_SUMMARY"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: wfo55-wild-colour-audit
+          path: build/result/
+          if-no-files-found: error
