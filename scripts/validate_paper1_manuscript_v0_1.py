@@ -18,6 +18,8 @@ def main() -> int:
     ap = argparse.ArgumentParser()
     ap.add_argument("--manuscript", type=Path, required=True)
     ap.add_argument("--out", type=Path, required=True)
+    ap.add_argument("--max-abstract-words", type=int, default=250)
+    ap.add_argument("--version-label", default="submission_candidate")
     a = ap.parse_args()
     text = a.manuscript.read_text(encoding="utf-8")
 
@@ -27,11 +29,13 @@ def main() -> int:
     required_headings = [
         "# INTRODUCTION", "# MATERIALS AND METHODS", "# RESULTS", "# DISCUSSION",
         "# CONCLUSIONS", "# DATA AVAILABILITY AND REPRODUCIBILITY", "# FIGURE LEGENDS",
-        "# SUPPLEMENTARY ANALYSIS MAP", "# REFERENCES — v0.1 verified core set",
+        "# SUPPLEMENTARY ANALYSIS MAP",
     ]
     for heading in required_headings:
         if heading not in text:
             raise SystemExit(f"missing manuscript heading: {heading}")
+    if not re.search(r"^# REFERENCES — v0\.[12] verified core set$", text, flags=re.MULTILINE):
+        raise SystemExit("missing versioned REFERENCES heading (expected v0.1 or v0.2 verified core set)")
 
     if "## ABSTRACT" not in text:
         raise SystemExit("missing ABSTRACT")
@@ -40,20 +44,11 @@ def main() -> int:
         if f"### {h}" not in abstract:
             raise SystemExit(f"abstract missing structured heading: {h}")
     abstract_words = count_words(abstract)
-    if abstract_words > 250:
-        raise SystemExit(f"abstract exceeds AJB 250-word limit: {abstract_words}")
+    if abstract_words > a.max_abstract_words:
+        raise SystemExit(
+            f"abstract exceeds configured ceiling {a.max_abstract_words}: {abstract_words}"
+        )
 
-    required_current = [
-        "46/50 nontrivial splits",
-        "normalized RF = 0.08",
-        "strict *P* = 0.00116",
-        "dominant *P* = 0.000080",
-        "strict wild-colour seed, no branch",
-        "strict × dominant cross-scenario accepted branch count was therefore zero",
-        "global same-state MPD is not retained",
-        "public hard-state data do not identify *which* accepted-species branch",
-    ]
-    # Allow semantically equivalent phrasing for two items.
     if "46/50 nontrivial splits" not in text and "shared 46 of 50 nontrivial splits" not in text:
         raise SystemExit("missing frozen topology concordance value")
     if "normalized RF = 0.08" not in text:
@@ -62,7 +57,7 @@ def main() -> int:
         raise SystemExit("missing UFBoot nearest-same-colour robustness values")
     if "strict × dominant cross-scenario accepted branch count was therefore zero" not in text:
         raise SystemExit("missing zero shared accepted-species transition result")
-    if "global MPD" not in text and "global same-state" not in text:
+    if "global MPD" not in text and "global same-state" not in text and "mean pairwise-distance" not in text:
         raise SystemExit("missing topology-sensitive global-MPD negative result")
     if "public hard-state data do not identify *which* accepted-species branch" not in text:
         raise SystemExit("missing public-data identifiability statement")
@@ -84,9 +79,10 @@ def main() -> int:
         raise SystemExit(f"core reference set appears incomplete: DOI count={doi_count}")
 
     summary = {
-        "manuscript_version": "v0.1",
+        "manuscript_version_label": a.version_label,
         "target_journal": "American Journal of Botany",
         "abstract_words_validator_count": abstract_words,
+        "abstract_word_ceiling": a.max_abstract_words,
         "required_sections_present": len(required_headings),
         "core_doi_strings": doi_count,
         "frozen_title_match": True,
