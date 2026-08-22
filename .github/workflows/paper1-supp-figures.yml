@@ -1,0 +1,42 @@
+name: Paper 1 supplementary figures v0.1
+
+on:
+  pull_request:
+    paths:
+      - 'data/paper1_supp_figure_numeric_inputs_v0_1.csv'
+      - 'data/paper1_authoritative_results_v0_1.csv'
+      - 'scripts/build_paper1_supp_figures.py'
+      - '.github/workflows/paper1-supp-figures.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install plotting dependency
+        run: python -m pip install --disable-pip-version-check matplotlib
+      - name: Build Fig S1–S3
+        run: |
+          mkdir -p build/paper1_supp_figures
+          python scripts/build_paper1_supp_figures.py \
+            --inputs data/paper1_supp_figure_numeric_inputs_v0_1.csv \
+            --registry data/paper1_authoritative_results_v0_1.csv \
+            --out-dir build/paper1_supp_figures
+      - name: Audit
+        run: |
+          test "$(find build/paper1_supp_figures -maxdepth 1 -name 'FigS*.svg' | wc -l)" -eq 3
+          test "$(find build/paper1_supp_figures -maxdepth 1 -name 'FigS*.png' | wc -l)" -eq 3
+          cat build/paper1_supp_figures/summary.json >> "$GITHUB_STEP_SUMMARY"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: paper1-supplementary-figures-v0-1
+          path: build/paper1_supp_figures/
+          if-no-files-found: error
