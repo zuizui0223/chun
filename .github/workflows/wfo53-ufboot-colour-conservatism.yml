@@ -1,0 +1,102 @@
+name: WFO53 UFBoot wild-colour phylogenetic conservatism
+
+on:
+  pull_request:
+    paths:
+      - 'scripts/filter_colour_seed_to_tree.py'
+      - 'scripts/test_wfo55_colour_conservatism.py'
+      - '.github/workflows/wfo53-ufboot-colour-conservatism.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  actions: read
+
+env:
+  UFBOOT_WFO53_RUN: '32552618223'
+  WILD_AUDIT_RUN: '32552102861'
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install dependencies
+        run: python -m pip install --disable-pip-version-check numpy biopython
+      - name: Download UFBoot accepted-species topology and audited seeds
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          mkdir -p build/tree build/audit
+          gh run download "$UFBOOT_WFO53_RUN" --repo "$GITHUB_REPOSITORY" \
+            --name wfo53-ufboot-topology-sensitivity --dir build/tree
+          gh run download "$WILD_AUDIT_RUN" --repo "$GITHUB_REPOSITORY" \
+            --name wfo55-wild-colour-audit --dir build/audit
+          tree=$(find build/tree -name 'wfo53_ufboot_astral4.nwk' | head -n 1)
+          strict=$(find build/audit -name 'wfo55_wild_colour_strict_seed.csv' | head -n 1)
+          dominant=$(find build/audit -name 'wfo55_wild_colour_dominant_seed.csv' | head -n 1)
+          test -n "$tree"; test -s "$tree"
+          test -n "$strict"; test -s "$strict"
+          test -n "$dominant"; test -s "$dominant"
+          cp "$tree" build/tree.nwk
+          cp "$strict" build/strict_full.csv
+          cp "$dominant" build/dominant_full.csv
+      - name: Filter audited colour seeds to common WFO53 topology
+        run: |
+          python scripts/filter_colour_seed_to_tree.py \
+            --tree build/tree.nwk --seed build/strict_full.csv \
+            --out build/strict.csv --summary build/strict_filter.json
+          python scripts/filter_colour_seed_to_tree.py \
+            --tree build/tree.nwk --seed build/dominant_full.csv \
+            --out build/dominant.csv --summary build/dominant_filter.json
+          python - <<'PY'
+          import json
+          s=json.load(open('build/strict_filter.json'));d=json.load(open('build/dominant_filter.json'))
+          assert s['tree_tips']==53,s
+          assert s['kept_seed_n']==23,s
+          assert s['state_counts']=={'A':1,'W':19,'Y':3},s
+          assert s['missing_seed_taxa']==['Camellia petelotii'],s
+          assert d['kept_seed_n']==29,d
+          assert d['state_counts']=={'A':4,'W':22,'Y':3},d
+          assert d['missing_seed_taxa']==['Camellia petelotii'],d
+          print(json.dumps({'strict':s,'dominant':d},indent=2))
+          PY
+      - name: Test strict wild-colour conservatism on UFBoot topology
+        run: |
+          python scripts/test_wfo55_colour_conservatism.py \
+            --tree build/tree.nwk --colour build/strict.csv \
+            --scenario strict_wild_ufboot --out-dir build/strict \
+            --permutations 100000 --seed 20260824
+      - name: Test dominant-colour conservatism on UFBoot topology
+        run: |
+          python scripts/test_wfo55_colour_conservatism.py \
+            --tree build/tree.nwk --colour build/dominant.csv \
+            --scenario dominant_wild_ufboot --out-dir build/dominant \
+            --permutations 100000 --seed 20260825
+      - name: Gate and report
+        run: |
+          python - <<'PY'
+          import json
+          s=json.load(open('build/strict/summary.json'));d=json.load(open('build/dominant/summary.json'))
+          assert s['tree_tips_total']==53,s
+          assert s['colour_overlap']==23,s
+          assert s['state_counts']=={'A':1,'W':19,'Y':3},s
+          assert d['tree_tips_total']==53,d
+          assert d['colour_overlap']==29,d
+          assert d['state_counts']=={'A':4,'W':22,'Y':3},d
+          print('STRICT');print(json.dumps(s,indent=2));print('DOMINANT');print(json.dumps(d,indent=2))
+          PY
+          echo '### WFO53 UFBoot wild-colour conservatism' >> "$GITHUB_STEP_SUMMARY"
+          echo '#### Strict' >> "$GITHUB_STEP_SUMMARY"
+          cat build/strict/summary.json >> "$GITHUB_STEP_SUMMARY"
+          echo '#### Dominant' >> "$GITHUB_STEP_SUMMARY"
+          cat build/dominant/summary.json >> "$GITHUB_STEP_SUMMARY"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: wfo53-ufboot-wild-colour-conservatism
+          path: build/
+          if-no-files-found: error
