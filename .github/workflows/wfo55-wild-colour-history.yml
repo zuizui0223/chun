@@ -1,0 +1,105 @@
+name: WFO55 wild colour history and transition gate
+
+on:
+  pull_request:
+    paths:
+      - 'scripts/analyze_wfo55_colour_history.py'
+      - 'scripts/analyze_wfo55_branch_transitions.py'
+      - 'scripts/compare_wfo55_transition_scenarios.py'
+      - '.github/workflows/wfo55-wild-colour-history.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  actions: read
+
+env:
+  WFO55_TREE_RUN: '32440138207'
+  WILD_AUDIT_RUN: '32552102861'
+
+jobs:
+  analyze:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install dependencies
+        run: python -m pip install --disable-pip-version-check numpy scipy biopython
+      - name: Download frozen accepted-species tree and wild-colour seeds
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          mkdir -p build/tree build/audit
+          gh run download "$WFO55_TREE_RUN" --repo "$GITHUB_REPOSITORY" \
+            --name wfo55-accepted-species-rooted-astral4 --dir build/tree
+          gh run download "$WILD_AUDIT_RUN" --repo "$GITHUB_REPOSITORY" \
+            --name wfo55-wild-colour-audit --dir build/audit
+          tree=$(find build/tree -name 'wfo55_rooted_astral4.nwk' | head -n 1)
+          strict=$(find build/audit -name 'wfo55_wild_colour_strict_seed.csv' | head -n 1)
+          dominant=$(find build/audit -name 'wfo55_wild_colour_dominant_seed.csv' | head -n 1)
+          test -n "$tree"; test -s "$tree"
+          test -n "$strict"; test -s "$strict"
+          test -n "$dominant"; test -s "$dominant"
+          cp "$tree" build/tree.nwk
+          cp "$strict" build/strict.csv
+          cp "$dominant" build/dominant.csv
+      - name: Fit accepted-species colour histories
+        run: |
+          python scripts/analyze_wfo55_colour_history.py \
+            --tree build/tree.nwk --colour build/strict.csv \
+            --scenario strict_wild --out-dir build/strict_history
+          python scripts/analyze_wfo55_colour_history.py \
+            --tree build/tree.nwk --colour build/dominant.csv \
+            --scenario dominant_wild --out-dir build/dominant_history
+      - name: Infer branch endpoint posteriors
+        run: |
+          python scripts/analyze_wfo55_branch_transitions.py \
+            --tree build/tree.nwk --colour build/strict.csv \
+            --fits build/strict_history/mk_model_fits.csv \
+            --scenario strict_wild --out-dir build/strict_transitions
+          python scripts/analyze_wfo55_branch_transitions.py \
+            --tree build/tree.nwk --colour build/dominant.csv \
+            --fits build/dominant_history/mk_model_fits.csv \
+            --scenario dominant_wild --out-dir build/dominant_transitions
+      - name: Compare strict and dominant transition scenarios
+        run: |
+          python scripts/compare_wfo55_transition_scenarios.py \
+            --strict build/strict_transitions/branch_transition_robustness.csv \
+            --dominant build/dominant_transitions/branch_transition_robustness.csv \
+            --out-dir build/comparison
+      - name: Gate and report
+        run: |
+          python - <<'PY'
+          import json
+          s=json.load(open('build/strict_history/summary.json'))
+          d=json.load(open('build/dominant_history/summary.json'))
+          c=json.load(open('build/comparison/summary.json'))
+          assert s['n_camellia_tree_tips']==55,s
+          assert s['n_colour_observed']==24,s
+          assert s['state_counts']=={'A':1,'W':19,'Y':4},s
+          assert d['n_camellia_tree_tips']==55,d
+          assert d['n_colour_observed']==30,d
+          assert d['state_counts']=={'A':4,'W':22,'Y':4},d
+          assert c['n_branches_compared']>0,c
+          print('STRICT')
+          print(json.dumps(s,indent=2))
+          print('DOMINANT')
+          print(json.dumps(d,indent=2))
+          print('CROSS-SCENARIO')
+          print(json.dumps(c,indent=2))
+          PY
+          echo '### WFO55 accepted-species wild-colour history' >> "$GITHUB_STEP_SUMMARY"
+          echo '#### Strict history' >> "$GITHUB_STEP_SUMMARY"
+          cat build/strict_history/summary.json >> "$GITHUB_STEP_SUMMARY"
+          echo '#### Dominant history' >> "$GITHUB_STEP_SUMMARY"
+          cat build/dominant_history/summary.json >> "$GITHUB_STEP_SUMMARY"
+          echo '#### Cross-scenario transition gate' >> "$GITHUB_STEP_SUMMARY"
+          cat build/comparison/summary.json >> "$GITHUB_STEP_SUMMARY"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: wfo55-wild-colour-history-transitions
+          path: build/
+          if-no-files-found: error
