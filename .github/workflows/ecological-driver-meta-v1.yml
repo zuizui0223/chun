@@ -1,0 +1,50 @@
+name: Ecological driver meta-analysis v1
+
+on:
+  pull_request:
+    paths:
+      - 'data/ecological_driver_effect_size_registry_v0_1.csv'
+      - 'scripts/analyze_ecological_driver_meta.py'
+      - 'docs/ECOLOGICAL_DRIVER_META_ANALYSIS_PLAN.md'
+      - 'docs/ECOLOGICAL_DRIVER_META_ANALYSIS_STATUS.md'
+      - '.github/workflows/ecological-driver-meta-v1.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  analyze:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Audit registry and run quantitative synthesis
+        run: |
+          mkdir -p build/ecological_driver_meta_v1
+          python scripts/analyze_ecological_driver_meta.py \
+            --registry data/ecological_driver_effect_size_registry_v0_1.csv \
+            --out-dir build/ecological_driver_meta_v1
+      - name: Guard scientific ceiling
+        run: |
+          python - <<'PY'
+          import json
+          s=json.load(open('build/ecological_driver_meta_v1/summary.json'))
+          b=s['bird_service_fruit_set']
+          assert b['k_independent_species'] == 3
+          assert b['positive_direction_count'] == 3
+          assert b['inverse_variance_meta_performed'] is False
+          assert set(b['visible_states_represented']) == {'A','W','Y'}
+          assert s['pollen_limitation_fruit_set']['inverse_variance_meta_performed'] is False
+          print(json.dumps(s, indent=2, ensure_ascii=False))
+          PY
+      - name: Report
+        run: cat build/ecological_driver_meta_v1/summary.json >> "$GITHUB_STEP_SUMMARY"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: ecological-driver-meta-v1
+          path: build/ecological_driver_meta_v1/
+          if-no-files-found: error
