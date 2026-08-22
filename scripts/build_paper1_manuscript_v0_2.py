@@ -13,6 +13,26 @@ def read_csv(path: Path) -> list[dict[str, str]]:
         return list(csv.DictReader(handle))
 
 
+def extract_frozen_abstract(path: Path) -> str:
+    text = path.read_text(encoding="utf-8")
+    start = "### Premise of the study"
+    stop = "## Claim checks"
+    if start not in text or stop not in text:
+        raise SystemExit("cannot locate frozen AJB abstract block")
+    block = text.split(start, 1)[1].split(stop, 1)[0].strip()
+    return start + "\n\n" + block
+
+
+def replace_abstract(text: str, abstract_block: str) -> str:
+    start = "## ABSTRACT"
+    stop = "**Key words:**"
+    if start not in text or stop not in text:
+        raise SystemExit("cannot locate manuscript abstract block")
+    before, rest = text.split(start, 1)
+    _, after = rest.split(stop, 1)
+    return before + start + "\n\n" + abstract_block.strip() + "\n\n" + stop + after
+
+
 def sort_reference_block(text: str) -> tuple[str, int]:
     start = "# REFERENCES — v0.2 verified core set"
     stop = "# OPEN ITEMS FOR v0.3"
@@ -36,12 +56,14 @@ def sort_reference_block(text: str) -> tuple[str, int]:
 def main() -> int:
     ap = argparse.ArgumentParser()
     ap.add_argument("--v01", type=Path, required=True)
+    ap.add_argument("--abstract-source", type=Path, required=True)
     ap.add_argument("--corrections", type=Path, required=True)
     ap.add_argument("--out", type=Path, required=True)
     ap.add_argument("--summary", type=Path, required=True)
     a = ap.parse_args()
 
     text = a.v01.read_text(encoding="utf-8")
+    text = replace_abstract(text, extract_frozen_abstract(a.abstract_source))
     corrections = read_csv(a.corrections)
     applied = []
 
@@ -107,7 +129,9 @@ def main() -> int:
     a.out.write_text(text, encoding="utf-8")
     summary = {
         "source_manuscript": str(a.v01),
+        "abstract_source": str(a.abstract_source),
         "output_manuscript": str(a.out),
+        "frozen_abstract_injected": True,
         "correction_rows": len(corrections),
         "applied": applied,
         "literature_cited_entries": n_refs,
@@ -115,7 +139,7 @@ def main() -> int:
         "required_tokens_present": True,
         "stale_tokens_absent": True,
         "scientific_results_changed": False,
-        "scope": "bibliographic/source-text corrections and reference ordering only",
+        "scope": "frozen abstract injection plus bibliographic/source-text corrections and reference ordering only",
     }
     a.summary.parent.mkdir(parents=True, exist_ok=True)
     a.summary.write_text(json.dumps(summary, indent=2) + "\n", encoding="utf-8")
