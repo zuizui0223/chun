@@ -1,0 +1,177 @@
+name: Rooted94 branch climate public-data boundary
+
+on:
+  pull_request:
+    paths:
+      - 'scripts/test_rooted_transition_climate_contrasts.py'
+      - '.github/workflows/rooted94-branch-climate-public-boundary.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  actions: read
+
+env:
+  ROOTED_TREE_RUN: '32375742772'
+  TRANSITION_RUN: '32437407222'
+
+jobs:
+  climate_gate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install dependencies
+        run: python -m pip install --disable-pip-version-check numpy scipy biopython pandas requests rasterio openpyxl
+      - name: Download frozen rooted tree and transition posterior artifacts
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          mkdir -p build/tree build/transitions
+          gh run download "$ROOTED_TREE_RUN" --repo "$GITHUB_REPOSITORY" \
+            --name wu-angio353-rooted94-fast-astral4 --dir build/tree
+          gh run download "$TRANSITION_RUN" --repo "$GITHUB_REPOSITORY" \
+            --name rooted94-camellia-branch-transition-posteriors --dir build/transitions
+          tree=$(find build/tree -name 'rooted94_astral4.nwk' | head -n 1)
+          tr=$(find build/transitions -name 'branch_transition_robustness.csv' | head -n 1)
+          test -n "$tree"; test -s "$tree"
+          test -n "$tr"; test -s "$tr"
+          cp "$tree" build/rooted94_astral4.nwk
+          cp "$tr" build/branch_transition_robustness.csv
+      - name: Rebuild Fan seed and resolve C. albogigas occurrence alias
+        run: |
+          mkdir -p build/fan/package build/albogigas build/chelsa
+          curl --fail --location --retry 3 \
+            'https://www.ncbi.nlm.nih.gov/pmc/utils/oa/oa.fcgi?id=PMC12946509' \
+            -o build/fan/oa.xml
+          python - <<'PY'
+          import xml.etree.ElementTree as ET
+          from pathlib import Path
+          root=ET.fromstring(Path('build/fan/oa.xml').read_bytes())
+          links=[x.attrib.get('href','') for x in root.findall('.//link') if x.attrib.get('format')=='tgz']
+          if len(links)!=1: raise SystemExit(f'unexpected OA links: {links}')
+          u=links[0]
+          if u.startswith('ftp://ftp.ncbi.nlm.nih.gov/'):
+              u='https://ftp.ncbi.nlm.nih.gov/'+u.split('ftp://ftp.ncbi.nlm.nih.gov/',1)[1]
+          Path('build/fan/url').write_text(u+'\n')
+          PY
+          u=$(cat build/fan/url)
+          if ! curl --fail --location --retry 3 --retry-all-errors "$u" -o build/fan/a.tgz; then
+            u2=$(python - <<'PY'
+          from pathlib import Path
+          u=Path('build/fan/url').read_text().strip();m='https://ftp.ncbi.nlm.nih.gov/pub/pmc/'
+          print(u.replace(m,m+'deprecated/',1) if u.startswith(m) and '/deprecated/' not in u else u)
+          PY
+          )
+            curl --fail --location --retry 3 --retry-all-errors "$u2" -o build/fan/a.tgz
+          fi
+          tar -xzf build/fan/a.tgz -C build/fan/package
+          xlsx=$(find build/fan/package -type f -iname '*s002*.xlsx' | head -n 1)
+          test -n "$xlsx"
+          python scripts/build_fan2026_species_colour_seed.py "$xlsx" \
+            --output build/fan/species_colour.csv --audit build/fan/seed_audit.json
+          python - <<'PY'
+          import csv,json
+          rows=list(csv.DictReader(open('build/fan/species_colour.csv',newline='',encoding='utf-8-sig')))
+          hit=[r for r in rows if r['taxon']=='Camellia albogigas']
+          if len(hit)!=1: raise SystemExit(f'expected one C. albogigas seed row, got {len(hit)}')
+          original=hit[0]
+          accepted=dict(original); accepted['taxon']='Camellia granthamiana'
+          accepted['notes']=(accepted.get('notes','')+'; occurrence sensitivity uses accepted synonym C. granthamiana while the frozen nuclear tip remains C. albogigas').strip('; ')
+          with open('build/albogigas/seed_accepted.csv','w',newline='',encoding='utf-8') as f:
+              w=csv.DictWriter(f,fieldnames=list(accepted));w.writeheader();w.writerow(accepted)
+          open('build/albogigas/taxonomic_alias.json','w').write(json.dumps({
+              'frozen_tree_tip':'Camellia albogigas',
+              'occurrence_query_name':'Camellia granthamiana',
+              'relationship':'C. albogigas is treated as a heterotypic synonym of C. granthamiana by current Flora/POWO treatment and supported by Chen et al. 2023 population-genetic analysis',
+              'evidence':'POWO; doi:10.3389/fgene.2023.1252148',
+              'analysis_boundary':'accepted synonym is a sensitivity only; it cannot replace the exact frozen taxon concept for the primary climate claim'
+          },indent=2)+'\n')
+          print(original);print(accepted)
+          PY
+      - name: Download CHELSA BIO1 and BIO6
+        run: |
+          base='https://os.zhdk.cloud.switch.ch/chelsav2/GLOBAL/climatologies/1981-2010/bio'
+          for b in 1 6; do
+            f="CHELSA_bio${b}_1981-2010_V.2.1.tif"
+            curl --fail --location --retry 3 --retry-all-errors --connect-timeout 20 --max-time 300 \
+              "$base/$f" -o "build/chelsa/$f"
+          done
+      - name: Recompute accepted-synonym climate sensitivity for B011 sister
+        run: |
+          python scripts/run_fan2026_gbif_chelsa_thermal.py \
+            --taxa build/albogigas/seed_accepted.csv \
+            --bio1 build/chelsa/CHELSA_bio1_1981-2010_V.2.1.tif \
+            --bio6 build/chelsa/CHELSA_bio6_1981-2010_V.2.1.tif \
+            --out-dir build/albogigas/raw \
+            --min-points 5 --cap-points 80 --gbif-cap-per-country 1000
+          python - <<'PY'
+          import csv,json
+          import numpy as np
+          import pandas as pd
+          pts=pd.read_csv('build/albogigas/raw/thermal_points.csv')
+          flags=pd.read_csv('data/camellia_tail_provenance_flags_v0_1.csv')
+          stages={'A_documented_nonlocal','B_add_generic_center_proxy','C_add_hard_range_or_metadata_conflict'}
+          bad=set(flags.loc[flags['sensitivity_stage'].isin(stages),'gbif_key'].astype(str))
+          keep=pts[~pts['gbif_key'].astype(str).isin(bad)].copy()
+          if len(keep)<5: raise SystemExit(f'insufficient accepted-synonym S3 points: n={len(keep)}')
+          b1=np.asarray(keep['bio1'],float); b6=np.asarray(keep['bio6'],float)
+          row={'taxon':'Camellia albogigas','colour_state':'W','section':'sect. Archecamellia','n_points':len(keep),'bio1_median':float(np.median(b1)),'bio6_median':float(np.median(b6)),'bio6_q05':float(np.quantile(b6,.05)),'bio1_iqr':float(np.quantile(b1,.75)-np.quantile(b1,.25))}
+          static=pd.read_csv('data/camellia_boundary_admission_tiers_v0_1.csv')
+          s=static[static['taxon']=='Camellia albogigas']; static_q05=float(s.iloc[0]['bio6_q05']) if len(s)==1 else None
+          audit={'live_S3_accepted_synonym':row,'static_albogigas_boundary_n':int(s.iloc[0]['n_points']) if len(s)==1 else None,'static_albogigas_boundary_q05':static_q05,'abs_q05_difference_live_alias_vs_static':abs(row['bio6_q05']-static_q05) if static_q05 is not None else None,'taxonomic_alias':'Camellia albogigas -> Camellia granthamiana','boundary':'alias climate is sensitivity only and cannot rescue exact-tip primary missingness'}
+          open('build/albogigas/S3_audit.json','w').write(json.dumps(audit,indent=2)+'\n')
+          base=list(csv.DictReader(open('data/fan2026_chelsa_species_compact_v0_1.csv',newline='',encoding='utf-8-sig')));fields=list(base[0])
+          with open('build/climate_alias_augmented.csv','w',newline='',encoding='utf-8') as f:
+              w=csv.DictWriter(f,fieldnames=fields);w.writeheader();w.writerows(base);w.writerow({k:row[k] for k in fields})
+          print(json.dumps(audit,indent=2))
+          PY
+      - name: Run exact-tip primary and accepted-synonym sensitivity separately
+        run: |
+          mkdir -p build/result/primary build/result/alias_sensitivity
+          python scripts/test_rooted_transition_climate_contrasts.py \
+            --tree build/rooted94_astral4.nwk --transitions build/branch_transition_robustness.csv \
+            --climate data/fan2026_chelsa_species_compact_v0_1.csv \
+            --out-dir build/result/primary --permutations 100000 --seed 20260822
+          python scripts/test_rooted_transition_climate_contrasts.py \
+            --tree build/rooted94_astral4.nwk --transitions build/branch_transition_robustness.csv \
+            --climate build/climate_alias_augmented.csv \
+            --out-dir build/result/alias_sensitivity --permutations 100000 --seed 20260822
+          cp build/albogigas/S3_audit.json build/result/albogigas_S3_recomputation_audit.json
+          cp build/albogigas/taxonomic_alias.json build/result/albogigas_taxonomic_alias.json
+          python - <<'PY'
+          import json
+          p=json.load(open('build/result/primary/summary.json')); a=json.load(open('build/result/alias_sensitivity/summary.json')); q=json.load(open('build/result/albogigas_S3_recomputation_audit.json'))
+          out={
+            'primary_exact_tip_status':p['H_direct_cold_branch_status'],
+            'primary_exact_tip_reason':p['H_direct_cold_branch_reason'],
+            'alias_sensitivity_status':a['H_direct_cold_branch_status'],
+            'alias_sensitivity_primary_metric_results':{m:a['metric_results'][m] for m in a['primary_metrics']},
+            'alias_q05_provenance_disagreement_C':q['abs_q05_difference_live_alias_vs_static'],
+            'final_public_data_status':'public_data_unidentifiable_taxonomic_alias',
+            'final_interpretation':'B073 and B083 are consistently colder local contrasts. B011 becomes colder only when the broader accepted synonym C. granthamiana is substituted for the frozen C. albogigas taxon concept. Because the alias occurrence set strongly disagrees with the frozen exact-name boundary diagnostic, the universal direct-cold hypothesis is suggestive but not identifiable from current public environmental evidence.',
+            'next_data_needed':'taxon-concept-matched locality/environment data for the actual C. albogigas lineage used in the nuclear backbone; flowering-window climate remains a separate pollination-mediated hypothesis',
+            'claim_ceiling':'do not promote alias sensitivity to a causal climate conclusion'
+          }
+          open('build/result/final_summary.json','w').write(json.dumps(out,indent=2)+'\n');print(json.dumps(out,indent=2))
+          PY
+      - name: Audit and report
+        run: |
+          python - <<'PY'
+          import json
+          s=json.load(open('build/result/final_summary.json'))
+          assert s['primary_exact_tip_status']=='public_data_unidentifiable',s
+          assert s['alias_sensitivity_status']=='supported',s
+          assert s['final_public_data_status']=='public_data_unidentifiable_taxonomic_alias',s
+          print(json.dumps(s,indent=2))
+          PY
+          echo '### Rooted branch climate public-data boundary' >> "$GITHUB_STEP_SUMMARY"
+          cat build/result/final_summary.json >> "$GITHUB_STEP_SUMMARY"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: rooted94-branch-climate-public-boundary
+          path: build/result/
+          if-no-files-found: error
