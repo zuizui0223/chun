@@ -57,7 +57,7 @@ The manuscript must distinguish source-paper facts from project inference: Feng 
 ### DFR headline
 
 - **Tateishi, Ozaki & Okubo 2010**, J. Fac. Agr. Kyushu Univ. 55(1):21–28, institutional repository, `AB524885.1`: 605-bp partial CjDFR clone and source RT-PCR assay.
-- **Larcher et al. 2015**, Frontiers in Plant Science 6:983, DOI `10.3389/fpls.2015.00983`: independent 167-bp CjDFR qPCR assay, linked by the project to `AB524885.1`.
+- **Berruti et al. 2015**, Frontiers in Plant Science 6:983, DOI `10.3389/fpls.2015.00983`: independent 167-bp CjDFR qPCR assay, linked by the project to `AB524885.1`. The historical internal assay ID `LARCHER2015_CJDFR_QPCR` is retained only for computational provenance.
 - **Mei et al. 2019**, PLOS ONE 14:e0227225, DOI `10.1371/journal.pone.0227225`: tea DFR-family reference set separating canonical CsDFRa (`AB018685.1 / TEA032730`) from CsDFRb subclasses including CsDFRb2 (`XM_028243762.1 / TEA024758`).
 - **Zhou et al. 2020**, Molecules 25:190, DOI `10.3390/molecules25010190`, `PRJNA597123 / PRJNA597289`: independent white/pink tea expression cluster containing source DFR/ANS-family loci.
 
@@ -68,7 +68,7 @@ The headline remains a paralog-subclass contrast, not an assumption that all put
 - **Geng et al. 2022**, Frontiers in Genetics 13:1059717, DOI `10.3389/fgene.2022.1059717`, `PRJCA012977`.
 - **Qu et al. 2024**, BMC Plant Biology 24:18, DOI `10.1186/s12870-023-04655-4`, `GSE236364`.
 
-A citation correction was identified during this audit: the historical internal study label `Xu2023_reticulata_mixed_regions` points to the Qu et al. paper above. The internal legacy ID may remain for computational provenance, but manuscript citation must use **Qu et al. 2024**.
+Two bibliographic corrections are preserved explicitly. The historical internal study label `Xu2023_reticulata_mixed_regions` points to **Qu et al. 2024**. The historical internal assay label `LARCHER2015_CJDFR_QPCR` points to the **Berruti et al. 2015** paper above. These legacy computational IDs may remain for reproducibility, but manuscript and source-display citations use the corrected bibliographic metadata.
 
 ## Manuscript citation rule
 

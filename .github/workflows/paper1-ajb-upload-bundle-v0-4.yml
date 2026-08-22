@@ -4,7 +4,16 @@ on:
   pull_request:
     paths:
       - 'data/paper1_ajb_appendix_mapping_v0_1.csv'
+      - 'data/paper1_micro_source_provenance_v0_1.csv'
+      - 'data/paper1_bibliographic_corrections_v0_1.csv'
+      - 'data/paper1_submission_cleanup_v0_3.json'
+      - 'data/cjdfr_public_assays_v0_1.csv'
+      - 'data/cjdfr_assay_linkage_v0_1.csv'
+      - 'docs/CJDFR_SEQUENCE_ANCHOR_RESULT.md'
+      - 'docs/PAPER1_SOURCE_PROVENANCE_AUDIT.md'
       - 'docs/PAPER1_AJB_UPLOAD_BUNDLE_README.md'
+      - 'scripts/build_paper1_ajb_submission_v0_4.py'
+      - 'scripts/validate_paper1_ajb_submission_v0_4.py'
       - 'scripts/materialize_paper1_ajb_appendices.py'
       - 'scripts/audit_paper1_ajb_upload_bundle.py'
       - '.github/workflows/paper1-ajb-upload-bundle-v0-4.yml'
