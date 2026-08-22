@@ -1,0 +1,69 @@
+name: Rooted94 branch pollination-service public-data boundary
+
+on:
+  pull_request:
+    paths:
+      - 'scripts/audit_rooted_transition_pollination_service_coverage.py'
+      - 'data/rooted_transition_pollination_literature_supplement_v0_1.csv'
+      - '.github/workflows/rooted94-branch-pollination-public-boundary.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  actions: read
+
+env:
+  ROOTED_TREE_RUN: '32375742772'
+  TRANSITION_RUN: '32437407222'
+
+jobs:
+  pollination_boundary:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install dependencies
+        run: python -m pip install --disable-pip-version-check scipy biopython
+      - name: Download frozen rooted tree and transition posterior artifacts
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          mkdir -p build/tree build/transitions
+          gh run download "$ROOTED_TREE_RUN" --repo "$GITHUB_REPOSITORY" \
+            --name wu-angio353-rooted94-fast-astral4 --dir build/tree
+          gh run download "$TRANSITION_RUN" --repo "$GITHUB_REPOSITORY" \
+            --name rooted94-camellia-branch-transition-posteriors --dir build/transitions
+          tree=$(find build/tree -name 'rooted94_astral4.nwk' | head -n 1)
+          tr=$(find build/transitions -name 'branch_transition_robustness.csv' | head -n 1)
+          test -n "$tree"; test -s "$tree"
+          test -n "$tr"; test -s "$tr"
+          cp "$tree" build/rooted94_astral4.nwk
+          cp "$tr" build/branch_transition_robustness.csv
+      - name: Audit branch-level public pollination-service identifiability
+        run: |
+          mkdir -p build/result
+          python scripts/audit_rooted_transition_pollination_service_coverage.py \
+            --tree build/rooted94_astral4.nwk \
+            --transitions build/branch_transition_robustness.csv \
+            --meta data/camellia_pollination_function_meta_v0_3.csv \
+            --supplement data/rooted_transition_pollination_literature_supplement_v0_1.csv \
+            --out-dir build/result
+      - name: Report
+        run: |
+          python - <<'PY'
+          import json
+          s=json.load(open('build/result/summary.json'))
+          assert s['n_robust_branches']==3,s
+          assert s['H_pollination_service_branch_status'] in {'testable_with_current_public_data','public_data_unidentifiable'},s
+          print(json.dumps(s,indent=2,ensure_ascii=False))
+          PY
+          echo '### Rooted branch pollination-service public-data boundary' >> "$GITHUB_STEP_SUMMARY"
+          cat build/result/summary.json >> "$GITHUB_STEP_SUMMARY"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: rooted94-branch-pollination-service-public-boundary
+          path: build/result/
+          if-no-files-found: error
