@@ -1,0 +1,37 @@
+release_component,kind,repository_path_or_artifact,workflow_run,required_for_reproduction,role,notes
+result_registry,repository_file,data/paper1_authoritative_results_v0_1.csv,,yes,manuscript_contract,Authoritative sensitivity superseded result IDs and claim boundaries.
+figure_dependency_manifest,repository_file,data/paper1_main_figure_manifest_v0_1.csv,,yes,manuscript_contract,Main Fig 1-6 allowed result dependencies.
+analysis_disposition,repository_file,data/paper1_analysis_disposition_v0_1.csv,,yes,manuscript_contract,Main Supplement provenance-only exclude analysis placement.
+main_figure_numeric_inputs,repository_file,data/paper1_figure_numeric_inputs_v0_1.csv,,yes,figures,Frozen numbers used to build Main Fig 1-6.
+main_figure_builder,repository_file,scripts/build_paper1_main_figures.py,,yes,figures,Deterministic Main figure generator.
+main_figures_qa_artifact,workflow_artifact,paper1-main-figures-v0-1,32558022436,yes,figures,Visual-QA-approved Main Fig 1-6 SVG/PNG artifact.
+supp_table_builder,repository_file,scripts/build_paper1_supp_tables.py,,yes,supplement,Builds Supplementary Tables S1-S6 from frozen registries.
+supp_tables_artifact,workflow_artifact,paper1-supplementary-tables-v0-1,32560226679,yes,supplement,Green Supplementary Tables S1-S6 artifact.
+supp_figure_inputs,repository_file,data/paper1_supp_figure_numeric_inputs_v0_1.csv,,yes,supplement,Frozen values for Fig S1-S3.
+supp_figure_builder,repository_file,scripts/build_paper1_supp_figures.py,,yes,supplement,Deterministic Supplementary figure generator.
+supp_figures_artifact,workflow_artifact,paper1-supplementary-figures-v0-1,32565110886,yes,supplement,Green clean-main Supplementary Fig S1-S3 artifact.
+wfo_snapshot,external_dataset,World Flora Online Plant List 2026-06 / Zenodo 10.5281/zenodo.20782718,,yes,taxonomy,Pinned accepted-taxonomy snapshot.
+wfo_tip_mapping,workflow_artifact,rooted94-wfo2026-06-taxonomy-normalization,32439843289,yes,taxonomy,Legacy tips mapped to WFO accepted groups.
+wfo55_fasttree,workflow_artifact,wfo55-accepted-species-rooted-astral4,32440138207,yes,phylogeny,FastTree-gene-tree accepted-species ASTRAL sensitivity tree.
+ufboot339_gene_trees,workflow_artifact,runtime91-ufboot339-current-aster-species-trees,32439653098,yes,phylogeny,339 IQ-TREE LG+G4 plus 1000 UFBoot gene-tree ensemble.
+wfo53_ufboot_topology,workflow_artifact,wfo53-ufboot-topology-sensitivity,32552618223,yes,phylogeny,Accepted-species UFBoot ASTRAL topology and split comparison.
+wild_colour_registry,repository_file,data/wfo55_accepted_species_wild_colour_registry_v0_1.csv,,yes,trait,Species-level source-audited colour evidence.
+wild_colour_audit_artifact,workflow_artifact,wfo55-wild-colour-audit,32552102861,yes,trait,Strict dominant trait seeds and audit summary.
+accepted_colour_history,workflow_artifact,wfo55-wild-colour-history-transitions,32552321691,yes,trait_history,Strict dominant Mk histories and event-identifiability result.
+fasttree_colour_conservatism,workflow_artifact,wfo55-wild-colour-conservatism,32552524470,yes,macro_pattern,FastTree accepted-species pattern sensitivity.
+ufboot_colour_conservatism,workflow_artifact,wfo53-ufboot-wild-colour-conservatism,32552883081,yes,macro_pattern,Authoritative UFBoot accepted-species nearest-same-colour result.
+micro_source_provenance,repository_file,data/paper1_micro_source_provenance_v0_1.csv,,yes,micro,Primary citations and public accessions for FLS DFR ANS ANR result IDs.
+ecological_primary_references,repository_file,data/paper1_ecological_primary_references_v0_1.csv,,yes,ecology_screen,Primary Camellia pollination and sensory evidence used in Main/Supplement.
+source_provenance_audit,workflow_artifact,paper1-source-provenance-v0-1,32558787798,yes,provenance,Wild source grading and micro-source coverage audit.
+climate_result,repository_file,docs/WITHIN_SECTION_COLOUR_CLIMATE_COUPLING_RESULT.md,,yes,ecology_screen,Universal direct visible-colour climate screen.
+pollination_result,repository_file,docs/POLLINATION_FUNCTION_META_V0_2_RESULTS.md,,yes,ecology_screen,Visible-state aliasing functional pollination synthesis.
+public_data_boundary,repository_file,docs/MACRO_PAPER_PUBLIC_DATA_BOUNDARY.md,,yes,interpretation,Stop rule separating identifiable pattern from unidentifiable branch causation.
+paper1_title_abstract,repository_file,docs/PAPER1_TITLE_ABSTRACT_AJB.md,,yes,submission,Frozen AJB title running head and structured abstract.
+paper1_manuscript_template,repository_file,manuscript/PAPER1_AJB_MANUSCRIPT_V0_1.md,,yes,manuscript,Editable claim-frozen manuscript template.
+paper1_v02_builder,repository_file,scripts/build_paper1_manuscript_v0_2.py,,yes,manuscript,Injects frozen abstract and verified bibliography/source citations.
+paper1_v03_cleanup_spec,repository_file,data/paper1_submission_cleanup_v0_3.json,,yes,manuscript,Removes internal project language and binds Supplement identifiers.
+paper1_v03_builder,repository_file,scripts/build_paper1_submission_v0_3.py,,yes,manuscript,Builds submission-clean AJB manuscript.
+paper1_v03_validator,repository_file,scripts/validate_paper1_submission_v0_3.py,,yes,manuscript,Checks AJB abstract frozen claims internal-token removal and archive placeholder.
+paper1_v03_artifact,workflow_artifact,paper1-ajb-submission-v0-3,32565763522,yes,manuscript,Green submission-clean manuscript artifact; archive DOI placeholder remains.
+paper1_main_figure_freeze,repository_file,docs/PAPER1_MAIN_FIGURE_FREEZE.md,,yes,figures,Visual-QA record for Main figures.
+paper1_source_provenance_doc,repository_file,docs/PAPER1_SOURCE_PROVENANCE_AUDIT.md,,yes,provenance,Human-readable citation/source contract.
