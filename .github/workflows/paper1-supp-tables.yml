@@ -1,0 +1,54 @@
+name: Paper 1 supplementary tables v0.1
+
+on:
+  pull_request:
+    paths:
+      - 'data/paper1_analysis_disposition_v0_1.csv'
+      - 'data/paper1_micro_source_provenance_v0_1.csv'
+      - 'data/wfo55_accepted_species_wild_colour_registry_v0_1.csv'
+      - 'data/paper1_ecological_primary_references_v0_1.csv'
+      - 'data/paper1_figure_numeric_inputs_v0_1.csv'
+      - 'data/paper1_authoritative_results_v0_1.csv'
+      - 'scripts/audit_paper1_source_provenance.py'
+      - 'scripts/build_paper1_supp_tables.py'
+      - '.github/workflows/paper1-supp-tables.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Rebuild wild-colour source audit
+        run: |
+          mkdir -p build/paper1_source_audit
+          python scripts/audit_paper1_source_provenance.py \
+            --registry data/paper1_authoritative_results_v0_1.csv \
+            --wild-colour data/wfo55_accepted_species_wild_colour_registry_v0_1.csv \
+            --micro-sources data/paper1_micro_source_provenance_v0_1.csv \
+            --out-dir build/paper1_source_audit
+      - name: Build Supplementary Tables S1–S6
+        run: |
+          mkdir -p build/paper1_supp_tables
+          python scripts/build_paper1_supp_tables.py \
+            --disposition data/paper1_analysis_disposition_v0_1.csv \
+            --micro data/paper1_micro_source_provenance_v0_1.csv \
+            --wild-audit build/paper1_source_audit/wild_colour_source_audit.csv \
+            --ecology data/paper1_ecological_primary_references_v0_1.csv \
+            --figure-inputs data/paper1_figure_numeric_inputs_v0_1.csv \
+            --results data/paper1_authoritative_results_v0_1.csv \
+            --out-dir build/paper1_supp_tables
+      - name: Report
+        run: cat build/paper1_supp_tables/summary.json >> "$GITHUB_STEP_SUMMARY"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: paper1-supplementary-tables-v0-1
+          path: build/paper1_supp_tables/
+          if-no-files-found: error
