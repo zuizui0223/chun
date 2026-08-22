@@ -1,8 +1,8 @@
-# Paper 1 title and abstract — AJB draft v0.2
+# Paper 1 title and abstract — AJB draft v0.3
 
 ## Primary title
 
-**Flexible molecular routes, locally conserved flower colours: a cross-scale analysis of *Camellia***
+**Flexible molecular routes coexist with locally conserved flower colours in *Camellia***
 
 ## Running head
 
@@ -14,7 +14,7 @@
 2. **Why accessible flower colours are not evolutionarily labile: a cross-scale analysis of *Camellia***
 3. **Flexible pigment pathways, constrained evolutionary outcomes in *Camellia* flower colour**
 
-The primary title is preferred because it states the two demonstrated results without implying a causal mechanism that current public data cannot identify.
+The primary title is preferred because it uses an active result statement, directly juxtaposes the two demonstrated scales, and does not imply a causal mechanism that current public data cannot identify.
 
 ## Structured abstract — 248 words
 
@@ -53,4 +53,4 @@ anthocyanin; *Camellia*; evolutionary constraint; flavonol; flower colour; macro
 - abstract length = 248 words (<=250);
 - 10 keywords, alphabetized except for italicized taxon placement convention to confirm at final formatting;
 - running head is <65 characters;
-- title is specific and result-led rather than causal.
+- title is specific, active and result-led rather than causal.
