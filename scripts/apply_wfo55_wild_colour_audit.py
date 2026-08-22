@@ -8,7 +8,11 @@ from pathlib import Path
 
 def read_csv(path):
     with open(path, newline="", encoding="utf-8-sig") as handle:
-        return list(csv.DictReader(handle))
+        rows = list(csv.DictReader(handle))
+    malformed = [row for row in rows if None in row]
+    if malformed:
+        raise SystemExit(f"malformed CSV rows with extra columns in {path}: {len(malformed)}")
+    return rows
 
 
 def write_csv(path, rows, fieldnames):
