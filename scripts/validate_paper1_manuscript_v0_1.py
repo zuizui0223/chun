@@ -7,11 +7,32 @@ import re
 from pathlib import Path
 
 FROZEN_TITLE = "Flexible molecular routes coexist with locally conserved flower colours in *Camellia*"
+ABSTRACT_HEADINGS = ["Premise of the study", "Methods", "Key results", "Conclusions"]
 
 
 def count_words(text: str) -> int:
     clean = re.sub(r"[*_`]", "", text)
     return len(re.findall(r"\b[\w/–—-]+\b", clean, flags=re.UNICODE))
+
+
+def abstract_body(text: str) -> str:
+    if "## ABSTRACT" not in text:
+        raise SystemExit("missing ABSTRACT")
+    block = text.split("## ABSTRACT", 1)[1].split("**Key words:**", 1)[0]
+    pieces = []
+    for i, heading in enumerate(ABSTRACT_HEADINGS):
+        marker = f"### {heading}"
+        if marker not in block:
+            raise SystemExit(f"abstract missing structured heading: {heading}")
+        after = block.split(marker, 1)[1]
+        if i + 1 < len(ABSTRACT_HEADINGS):
+            next_marker = f"### {ABSTRACT_HEADINGS[i + 1]}"
+            if next_marker not in after:
+                raise SystemExit(f"abstract missing next structured heading: {ABSTRACT_HEADINGS[i + 1]}")
+            pieces.append(after.split(next_marker, 1)[0])
+        else:
+            pieces.append(after)
+    return " ".join(pieces)
 
 
 def main() -> int:
@@ -37,13 +58,7 @@ def main() -> int:
     if not re.search(r"^# REFERENCES — v0\.[12] verified core set$", text, flags=re.MULTILINE):
         raise SystemExit("missing versioned REFERENCES heading (expected v0.1 or v0.2 verified core set)")
 
-    if "## ABSTRACT" not in text:
-        raise SystemExit("missing ABSTRACT")
-    abstract = text.split("## ABSTRACT", 1)[1].split("---", 1)[0]
-    for h in ["Premise of the study", "Methods", "Key results", "Conclusions"]:
-        if f"### {h}" not in abstract:
-            raise SystemExit(f"abstract missing structured heading: {h}")
-    abstract_words = count_words(abstract)
+    abstract_words = count_words(abstract_body(text))
     if abstract_words > a.max_abstract_words:
         raise SystemExit(
             f"abstract exceeds configured ceiling {a.max_abstract_words}: {abstract_words}"
@@ -83,6 +98,7 @@ def main() -> int:
         "target_journal": "American Journal of Botany",
         "abstract_words_validator_count": abstract_words,
         "abstract_word_ceiling": a.max_abstract_words,
+        "abstract_count_rule": "body text under four AJB structured headings; headings excluded",
         "required_sections_present": len(required_headings),
         "core_doi_strings": doi_count,
         "frozen_title_match": True,
