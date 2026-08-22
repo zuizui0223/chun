@@ -25,7 +25,7 @@ jobs:
         with:
           python-version: '3.12'
       - name: Install dependencies
-        run: python -m pip install --disable-pip-version-check numpy biopython
+        run: python -m pip install --disable-pip-version-check numpy scipy biopython
       - name: Download frozen rooted tree and transition posterior artifacts
         env:
           GH_TOKEN: ${{ github.token }}
