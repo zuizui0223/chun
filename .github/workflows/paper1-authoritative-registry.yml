@@ -1,0 +1,40 @@
+name: Paper 1 authoritative result registry
+
+on:
+  pull_request:
+    paths:
+      - 'data/paper1_authoritative_results_v0_1.csv'
+      - 'data/paper1_main_figure_manifest_v0_1.csv'
+      - 'scripts/validate_paper1_result_registry.py'
+      - 'docs/PAPER1_AUTHORITATIVE_RESULT_REGISTRY.md'
+      - '.github/workflows/paper1-authoritative-registry.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Validate result and figure dependency registry
+        run: |
+          mkdir -p build/paper1_registry
+          python scripts/validate_paper1_result_registry.py \
+            --registry data/paper1_authoritative_results_v0_1.csv \
+            --figures data/paper1_main_figure_manifest_v0_1.csv \
+            --out-dir build/paper1_registry
+      - name: Report authoritative contract
+        run: |
+          echo '### Paper 1 authoritative result registry' >> "$GITHUB_STEP_SUMMARY"
+          cat build/paper1_registry/summary.json >> "$GITHUB_STEP_SUMMARY"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: paper1-authoritative-result-registry
+          path: build/paper1_registry/
+          if-no-files-found: error
