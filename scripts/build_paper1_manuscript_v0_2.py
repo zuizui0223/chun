@@ -43,12 +43,7 @@ def sort_reference_block(text: str) -> tuple[str, int]:
     entries = [x.strip() for x in re.split(r"\n\s*\n", refs_text.strip()) if x.strip()]
     if len(entries) < 15:
         raise SystemExit(f"unexpectedly small reference block: {len(entries)} entries")
-
-    def key(entry: str):
-        first = re.sub(r"[*_`]", "", entry).strip()
-        return first.casefold()
-
-    entries = sorted(entries, key=key)
+    entries = sorted(entries, key=lambda entry: re.sub(r"[*_`]", "", entry).strip().casefold())
     rebuilt = before + start + "\n\n" + "\n\n".join(entries) + "\n\n" + stop + after
     return rebuilt, len(entries)
 
@@ -75,6 +70,12 @@ def main() -> int:
         if ctype in {"in_text_year", "reference_entry"}:
             n = text.count(old)
             if n < 1:
+                # ECO001 rewrites the legacy pollination paragraph. The ecological-v2
+                # overlay replaces that whole paragraph upstream, so its absence is
+                # expected and must not block bibliographic corrections downstream.
+                if cid == "ECO001" and "## Ecological synthesis supports reproductive-service filtering" in text:
+                    applied.append({"correction_id": cid, "type": ctype, "occurrences": 0, "status": "superseded_by_ecological_v2_overlay"})
+                    continue
                 raise SystemExit(f"{cid}: old text not found")
             text = text.replace(old, new)
             applied.append({"correction_id": cid, "type": ctype, "occurrences": n})
@@ -116,11 +117,7 @@ def main() -> int:
     for token in required:
         if token not in text:
             raise SystemExit(f"v0.2 output missing required correction token: {token}")
-    forbidden = [
-        "Lacey, 2025",
-        "Lacey, E. P. 2025.",
-        "1725–[final pages to verify in journal export]",
-    ]
+    forbidden = ["Lacey, 2025", "Lacey, E. P. 2025.", "1725–[final pages to verify in journal export]"]
     for token in forbidden:
         if token in text:
             raise SystemExit(f"v0.2 output retains stale token: {token}")
@@ -138,8 +135,8 @@ def main() -> int:
         "literature_cited_sorted": True,
         "required_tokens_present": True,
         "stale_tokens_absent": True,
-        "scientific_results_changed": False,
-        "scope": "frozen abstract injection plus bibliographic/source-text corrections and reference ordering only",
+        "scientific_results_changed_by_this_step": False,
+        "scope": "ecological-v2 integrated input plus abstract injection, bibliographic/source-text corrections, and reference ordering",
     }
     a.summary.parent.mkdir(parents=True, exist_ok=True)
     a.summary.write_text(json.dumps(summary, indent=2) + "\n", encoding="utf-8")
