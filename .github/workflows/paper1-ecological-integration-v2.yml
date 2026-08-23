@@ -1,0 +1,57 @@
+name: Paper 1 ecological integration v2
+
+on:
+  pull_request:
+    paths:
+      - 'docs/PAPER1_ECOLOGICAL_INTEGRATION_V0_1.md'
+      - 'docs/PAPER1_TITLE_ABSTRACT_AJB_ECO_V0_4.md'
+      - 'scripts/build_paper1_ecological_fig6_v2.py'
+      - '.github/workflows/paper1-ecological-integration-v2.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: python -m pip install --disable-pip-version-check matplotlib
+      - name: Re-run ecological meta v2 from frozen main inputs
+        run: |
+          mkdir -p build/ecological_meta build/paper1_ecology
+          python scripts/analyze_ecological_driver_meta_v2.py \
+            --effects data/ecological_driver_effect_size_registry_v0_2.csv \
+            --studies data/ecological_driver_study_registry_v0_2.csv \
+            --out-dir build/ecological_meta
+      - name: Build revised Fig 6
+        run: python scripts/build_paper1_ecological_fig6_v2.py --summary build/ecological_meta/summary.json --out-dir build/paper1_ecology
+      - name: Guard manuscript-level claim boundaries
+        run: |
+          python - <<'PY'
+          import json,re,pathlib
+          s=json.load(open('build/ecological_meta/summary.json'))
+          t=pathlib.Path('docs/PAPER1_TITLE_ABSTRACT_AJB_ECO_V0_4.md').read_text()
+          assert 'geometric mean RR = 3.53' in t
+          assert 'four taxa showed climate/season mediation' in t
+          assert 'Direct abiotic floral-pigment experiments remained under-replicated' in t
+          assert 'No accepted-species colour-transition branch was robust' in t
+          words=re.findall(r"\b[\w.-]+\b",t.split('## Structured abstract — 241 words',1)[1].split('## Claim boundary',1)[0])
+          # headings add words, so enforce the dedicated frozen body count less stringently here.
+          assert len(words) < 270
+          assert s['cross_species_pollinator_service']['k_independent_species']==3
+          assert s['oleifera_within_species_service_replication']['independent_studies']==2
+          assert s['climate_season_pollinator_mediation']['k_taxa']==4
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: paper1-ecological-integration-v2
+          path: |
+            build/paper1_ecology/
+            build/ecological_meta/summary.json
+          if-no-files-found: error
