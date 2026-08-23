@@ -84,7 +84,7 @@ def main() -> int:
         ecological_required = [
             "geometric mean RR was **3.53**",
             "geometric mean was **2.42**",
-            "(**5/5** in the expected direction)",
+            "**5/5** in the expected direction",
             "Five studies across four taxa",
             "direct abiotic evidence for petal pigment deployment remained sparse",
             "reproductive-service filtering",
