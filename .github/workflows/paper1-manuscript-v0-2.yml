@@ -45,7 +45,8 @@ jobs:
             --manuscript build/paper1_manuscript_v0_2/PAPER1_AJB_MANUSCRIPT_V0_2.md \
             --out build/paper1_manuscript_v0_2/claim_gate_summary.json \
             --max-abstract-words 250 \
-            --version-label submission_candidate_v0_2_ecological_v2
+            --version-label submission_candidate_v0_2_ecological_v2 \
+            --require-ecology-v2
       - name: Report
         run: |
           echo '### Paper 1 manuscript v0.2 build' >> "$GITHUB_STEP_SUMMARY"
