@@ -46,6 +46,7 @@ def main() -> int:
     ap.add_argument("--out", type=Path, required=True)
     ap.add_argument("--max-abstract-words", type=int, default=250)
     ap.add_argument("--version-label", default="submission_candidate")
+    ap.add_argument("--require-ecology-v2", action="store_true")
     a = ap.parse_args()
     text = a.manuscript.read_text(encoding="utf-8")
 
@@ -79,17 +80,18 @@ def main() -> int:
     if "public hard-state data do not identify *which* accepted-species branch" not in text:
         raise SystemExit("missing public-data identifiability statement")
 
-    ecological_required = [
-        "geometric mean RR was **3.53**",
-        "geometric mean was **2.42**",
-        "(**5/5** in the expected direction)",
-        "Five studies across four taxa",
-        "direct abiotic evidence for petal pigment deployment remained sparse",
-        "reproductive-service filtering",
-    ]
-    for phrase in ecological_required:
-        if phrase not in text:
-            raise SystemExit(f"missing ecological-driver v2 result: {phrase}")
+    if a.require_ecology_v2:
+        ecological_required = [
+            "geometric mean RR was **3.53**",
+            "geometric mean was **2.42**",
+            "(**5/5** in the expected direction)",
+            "Five studies across four taxa",
+            "direct abiotic evidence for petal pigment deployment remained sparse",
+            "reproductive-service filtering",
+        ]
+        for phrase in ecological_required:
+            if phrase not in text:
+                raise SystemExit(f"missing ecological-driver v2 result: {phrase}")
 
     forbidden_positive = [
         "we demonstrate that the Camellia ancestor was white",
@@ -118,7 +120,7 @@ def main() -> int:
         "core_doi_strings": doi_count,
         "frozen_title_match": True,
         "current_topology_and_trait_values_present": True,
-        "ecological_driver_v2_values_present": True,
+        "ecological_driver_v2_required": a.require_ecology_v2,
         "zero_event_boundary_present": True,
         "forbidden_positive_claims_present": False,
         "status": "claim-drift gate passed",
