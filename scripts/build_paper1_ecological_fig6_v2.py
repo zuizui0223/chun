@@ -16,9 +16,9 @@ def main():
     for i,v in enumerate(vals):ax.text(v+0.08,i,f'{v:.2f}×',va='center')
     ax.text(0.98,0.05,f"geometric mean = {cross['geometric_mean_RR']:.2f}×\nleave-one-out = {cross['leave_one_out_RR_min']:.2f}–{cross['leave_one_out_RR_max']:.2f}×",transform=ax.transAxes,ha='right',va='bottom',fontsize=10)
 
-    ax=fig.add_subplot(gs[0,1]);olevals=[2.2872827081427265,2.56140350877193];labs=['bird access\nZhang 2024','A. cerana cage\nLiu 2025'];ax.bar(labs,olevals);ax.axhline(1,linestyle='--',linewidth=1);ax.set_ylabel('Fruit-set risk ratio');ax.set_ylim(0,3.05);ax.set_title('B  Independent service replication within C. oleifera')
-    for i,v in enumerate(olevals):ax.text(i,v+0.06,f'{v:.2f}×',ha='center')
-    ax.text(0.5,0.94,f"2-study geometric mean = {ole['geometric_mean_RR']:.2f}×\nreliability gradients expected direction = {rel['expected_direction_count']}/{rel['k_effect_rows']}",transform=ax.transAxes,ha='center',va='top',fontsize=10,bbox=dict(boxstyle='round,pad=0.3',fill=False))
+    ax=fig.add_subplot(gs[0,1]);olevals=[2.2872827081427265,2.56140350877193];labs=['bird access\nZhang 2024','A. cerana cage\nLiu 2025'];ax.bar(labs,olevals);ax.axhline(1,linestyle='--',linewidth=1);ax.set_ylabel('Fruit-set risk ratio');ax.set_ylim(0,3.7);ax.set_title('B  Independent service replication within C. oleifera')
+    for i,v in enumerate(olevals):ax.text(i,v+0.07,f'{v:.2f}×',ha='center')
+    ax.text(0.04,0.96,f"2-study geometric mean = {ole['geometric_mean_RR']:.2f}×\nreliability gradients expected direction = {rel['expected_direction_count']}/{rel['k_effect_rows']}",transform=ax.transAxes,ha='left',va='top',fontsize=9.8,bbox=dict(boxstyle='round,pad=0.3',fill=False))
 
     ax=fig.add_subplot(gs[1,:]);ax.set_xlim(0,1);ax.set_ylim(0,1);ax.axis('off');ax.set_title('C  A conditional ecological-filtering model is supported at the mechanism/service level')
     boxes=[
