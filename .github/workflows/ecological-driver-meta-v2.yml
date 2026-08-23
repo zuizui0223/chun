@@ -1,0 +1,57 @@
+name: Ecological driver meta-analysis v2
+
+on:
+  pull_request:
+    paths:
+      - 'data/ecological_driver_effect_size_registry_v0_2.csv'
+      - 'data/ecological_driver_study_registry_v0_2.csv'
+      - 'scripts/analyze_ecological_driver_meta_v2.py'
+      - 'docs/ECOLOGICAL_DRIVER_META_V2_RESULT.md'
+      - '.github/workflows/ecological-driver-meta-v2.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  analyze:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Run v2 ecological synthesis
+        run: |
+          mkdir -p build/ecological_driver_meta_v2
+          python scripts/analyze_ecological_driver_meta_v2.py \
+            --effects data/ecological_driver_effect_size_registry_v0_2.csv \
+            --studies data/ecological_driver_study_registry_v0_2.csv \
+            --out-dir build/ecological_driver_meta_v2
+      - name: Guard scientific interpretation
+        run: |
+          python - <<'PY'
+          import json
+          s=json.load(open('build/ecological_driver_meta_v2/summary.json'))
+          x=s['cross_species_pollinator_service']
+          assert x['k_independent_species']==3
+          assert x['positive']==3
+          assert set(x['visible_states'])=={'A','W','Y'}
+          assert 3.52 < x['geometric_mean_RR'] < 3.55
+          o=s['oleifera_within_species_service_replication']
+          assert o['independent_studies']==2
+          assert 2.40 < o['geometric_mean_RR'] < 2.44
+          r=s['pollinator_reliability_gradients']
+          assert r['k_effect_rows']==5 and r['expected_direction_count']==5
+          m=s['climate_season_pollinator_mediation']
+          assert m['k_taxa']>=4
+          assert s['direct_abiotic_floral_pigment']['k_independent_experiments']==1
+          assert s['direct_abiotic_floral_pigment']['formal_pooling'] is False
+          print(json.dumps(s,indent=2,ensure_ascii=False))
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: ecological-driver-meta-v2
+          path: build/ecological_driver_meta_v2/
+          if-no-files-found: error
