@@ -8,6 +8,7 @@ on:
       - 'docs/PAPER1_ECOLOGICAL_INTEGRATION_V1.md'
       - 'data/paper1_manuscript_v0_2_corrections.csv'
       - 'scripts/build_paper1_ecological_integration_v1.py'
+      - 'scripts/apply_paper1_ecological_citations_v1.py'
       - 'scripts/build_paper1_manuscript_v0_2.py'
       - 'scripts/validate_paper1_manuscript_v0_1.py'
       - '.github/workflows/paper1-manuscript-v0-2.yml'
@@ -30,6 +31,9 @@ jobs:
           mkdir -p build/paper1_manuscript_v0_2
           python scripts/build_paper1_ecological_integration_v1.py \
             --input manuscript/PAPER1_AJB_MANUSCRIPT_V0_1.md \
+            --output build/paper1_manuscript_v0_2/PAPER1_AJB_MANUSCRIPT_ECO_RAW.md
+          python scripts/apply_paper1_ecological_citations_v1.py \
+            --input build/paper1_manuscript_v0_2/PAPER1_AJB_MANUSCRIPT_ECO_RAW.md \
             --output build/paper1_manuscript_v0_2/PAPER1_AJB_MANUSCRIPT_ECO_BASE.md
       - name: Build AJB submission-candidate manuscript v0.2
         run: |
