@@ -60,7 +60,7 @@ Climate and season repeatedly altered the conditions under which pollination ser
 By comparison, direct abiotic evidence for petal pigment deployment remained sparse. Only one admitted flower-specific *Camellia* manipulation measured pigment response directly, and its cold treatment was confounded with darkness. Formal pooling of a direct abiotic floral-pigment response was therefore not justified. Finally, a paired same-visible-red comparison between *C. rusticana* and *C. japonica* showed an approximately **23.45-fold** difference in bumblebee visitation together with UV/fluorescence differences, demonstrating that coarse visible hue is not a unique pollinator-functional state.
 
 The ecological synthesis therefore supports a conditional reproductive-service filter at the mechanism level. It does not resolve the macroevolutionary event level: no accepted-species colour-transition branch was robust to both strict and dominant wild-colour scenarios, so ecological effects could not be assigned causally to particular colour transitions.'''
-    t = replace_between(t, '## Simple visible-colour ecological explanations were insufficient', '# DISCUSSION', results + '\n\n# DISCUSSION')
+    t = replace_between(t, '## Simple visible-colour ecological explanations were insufficient', '# DISCUSSION', results)
 
     discussion = '''## Ecological filtering is supported at the service level, not the branch-causal level
 
