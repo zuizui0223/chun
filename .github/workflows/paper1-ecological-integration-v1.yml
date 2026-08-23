@@ -36,7 +36,7 @@ jobs:
           p=Path('build/paper1_ecological_integration_v1/PAPER1_AJB_MANUSCRIPT_ECO_V1.md')
           t=p.read_text()
           assert t.count('# DISCUSSION') == 1
-          assert 'geometric mean RR = **3.53**' in t
+          assert 'geometric mean RR was **3.53**' in t
           assert 'geometric mean was **2.42**' in t
           assert '(**5/5** in the expected direction)' in t
           assert 'Five studies across four taxa' in t
