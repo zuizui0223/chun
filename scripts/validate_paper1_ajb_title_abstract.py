@@ -59,21 +59,25 @@ def main() -> int:
         raise SystemExit(f"AJB abstract exceeds 250 words: {words}")
 
     required_claims = [
-        "46/50",
         "0.00116",
         "0.000080",
-        "no accepted-species colour-transition branch",
+        "geometric mean RR = 3.53",
+        "five reliability-gradient effects",
+        "five studies across four taxa",
+        "No accepted-species colour-transition branch",
         "topology-sensitive",
+        "reproductive-service filtering",
     ]
     for x in required_claims:
-        if x not in abstract:
-            raise SystemExit(f"abstract missing frozen result/boundary: {x}")
+        if x.casefold() not in abstract.casefold():
+            raise SystemExit(f"abstract missing current result/boundary: {x}")
 
     forbidden = [
         "definitive white ancestor",
         "universal cold adaptation",
         "pollinator-driven evolution",
         "three W→A",
+        "red-specific bird syndrome",
     ]
     lower = abstract.casefold()
     for x in forbidden:
@@ -90,7 +94,7 @@ def main() -> int:
         "abstract_word_limit": 250,
         "required_headings": HEADINGS,
         "format_gate": "pass",
-        "scientific_gate": "contains current robustness values and public-data boundary; no superseded headline phrases",
+        "scientific_gate": "contains current molecular, macro-conservatism, ecological-service, and branch-identifiability results; no superseded headline phrases",
     }
     a.out.parent.mkdir(parents=True, exist_ok=True)
     a.out.write_text(json.dumps(summary, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
