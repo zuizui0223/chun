@@ -6,11 +6,13 @@ on:
       - 'data/candidate_free_cs_white_pink_run_manifest_v0_1.csv'
       - 'data/candidate_free_cs_stage_contrast_registry_v0_1.csv'
       - 'data/candidate_free_pigment_module_schema_v0_1.csv'
+      - 'data/candidate_free_canonical_bridge_v0_1.csv'
       - 'scripts/build_candidate_free_family_map_from_gff_v0_1.py'
       - 'scripts/prepare_candidate_free_reference_v0_1.sh'
       - 'scripts/aggregate_salmon_family_expression_v0_1.py'
       - 'scripts/score_candidate_free_modules_v0_1.py'
       - 'scripts/summarize_candidate_free_stage_series_v0_1.py'
+      - 'scripts/build_candidate_free_measurement_registry_v0_1.py'
       - '.github/workflows/candidate-free-cs-white-pink-pilot-v0-1.yml'
   workflow_dispatch:
 
@@ -115,6 +117,14 @@ jobs:
           print(json.dumps(s,indent=2,ensure_ascii=False))
           PY
 
+      - name: Export canonical candidate-free measurement registry
+        run: |
+          python scripts/build_candidate_free_measurement_registry_v0_1.py \
+            --bridge data/candidate_free_canonical_bridge_v0_1.csv \
+            --cs build/cs_white_pink_pilot_v0_1/stage_summary/stage_series_summary.json \
+            --out build/cs_white_pink_pilot_v0_1/candidate_free_measurements.csv \
+            --summary build/cs_white_pink_pilot_v0_1/candidate_free_measurements.summary.json
+
       - name: Preserve lightweight diagnostics
         if: always()
         run: |
@@ -134,5 +144,7 @@ jobs:
             build/cs_white_pink_pilot_v0_1/family_expression.summary.json
             build/cs_white_pink_pilot_v0_1/scored/
             build/cs_white_pink_pilot_v0_1/stage_summary/
+            build/cs_white_pink_pilot_v0_1/candidate_free_measurements.csv
+            build/cs_white_pink_pilot_v0_1/candidate_free_measurements.summary.json
             build/cs_white_pink_pilot_v0_1/diagnostics/
           if-no-files-found: warn

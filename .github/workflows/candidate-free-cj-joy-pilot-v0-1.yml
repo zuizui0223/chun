@@ -6,10 +6,12 @@ on:
       - 'data/candidate_free_cj_joy_run_manifest_v0_1.csv'
       - 'data/candidate_free_pigment_module_schema_v0_1.csv'
       - 'data/candidate_free_contrast_registry_v0_1.csv'
+      - 'data/candidate_free_canonical_bridge_v0_1.csv'
       - 'scripts/build_candidate_free_family_map_from_gff_v0_1.py'
       - 'scripts/prepare_candidate_free_reference_v0_1.sh'
       - 'scripts/aggregate_salmon_family_expression_v0_1.py'
       - 'scripts/score_candidate_free_modules_v0_1.py'
+      - 'scripts/build_candidate_free_measurement_registry_v0_1.py'
       - '.github/workflows/candidate-free-cj-joy-pilot-v0-1.yml'
   workflow_dispatch:
 
@@ -131,6 +133,14 @@ jobs:
           print(json.dumps(summary,indent=2,ensure_ascii=False))
           PY
 
+      - name: Export canonical candidate-free measurement registry
+        run: |
+          python scripts/build_candidate_free_measurement_registry_v0_1.py \
+            --bridge data/candidate_free_canonical_bridge_v0_1.csv \
+            --joy build/cj_joy_pilot_v0_1/pilot_result.json \
+            --out build/cj_joy_pilot_v0_1/candidate_free_measurements.csv \
+            --summary build/cj_joy_pilot_v0_1/candidate_free_measurements.summary.json
+
       - name: Preserve lightweight diagnostics
         if: always()
         run: |
@@ -150,5 +160,7 @@ jobs:
             build/cj_joy_pilot_v0_1/family_expression.summary.json
             build/cj_joy_pilot_v0_1/scored/
             build/cj_joy_pilot_v0_1/pilot_result.json
+            build/cj_joy_pilot_v0_1/candidate_free_measurements.csv
+            build/cj_joy_pilot_v0_1/candidate_free_measurements.summary.json
             build/cj_joy_pilot_v0_1/diagnostics/
           if-no-files-found: warn

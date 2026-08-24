@@ -6,11 +6,13 @@ on:
       - 'data/candidate_free_cn_stage_run_manifest_v0_1.csv'
       - 'data/candidate_free_cn_endpoint_contrast_v0_1.csv'
       - 'data/candidate_free_pigment_module_schema_v0_1.csv'
+      - 'data/candidate_free_canonical_bridge_v0_1.csv'
       - 'scripts/build_candidate_free_family_map_from_gff_v0_1.py'
       - 'scripts/prepare_candidate_free_reference_v0_1.sh'
       - 'scripts/aggregate_salmon_family_expression_v0_1.py'
       - 'scripts/score_candidate_free_modules_v0_1.py'
       - 'scripts/summarize_candidate_free_ordered_trajectory_v0_1.py'
+      - 'scripts/build_candidate_free_measurement_registry_v0_1.py'
       - '.github/workflows/candidate-free-cn-trajectory-v0-1.yml'
   workflow_dispatch:
 
@@ -115,6 +117,14 @@ jobs:
           print(json.dumps(s,indent=2,ensure_ascii=False))
           PY
 
+      - name: Export canonical candidate-free measurement registry
+        run: |
+          python scripts/build_candidate_free_measurement_registry_v0_1.py \
+            --bridge data/candidate_free_canonical_bridge_v0_1.csv \
+            --cn build/cn_trajectory_v0_1/trajectory/trajectory_summary.json \
+            --out build/cn_trajectory_v0_1/candidate_free_measurements.csv \
+            --summary build/cn_trajectory_v0_1/candidate_free_measurements.summary.json
+
       - name: Preserve lightweight diagnostics
         if: always()
         run: |
@@ -134,5 +144,7 @@ jobs:
             build/cn_trajectory_v0_1/family_expression.summary.json
             build/cn_trajectory_v0_1/scored/
             build/cn_trajectory_v0_1/trajectory/
+            build/cn_trajectory_v0_1/candidate_free_measurements.csv
+            build/cn_trajectory_v0_1/candidate_free_measurements.summary.json
             build/cn_trajectory_v0_1/diagnostics/
           if-no-files-found: warn
