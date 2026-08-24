@@ -1,0 +1,48 @@
+name: Micro recurrence partial identification v0.1
+
+on:
+  pull_request:
+    paths:
+      - 'data/micro_accessibility_edge_registry_v0_1.csv'
+      - 'scripts/bound_micro_recurrence_missingness_v0_1.py'
+      - '.github/workflows/micro-recurrence-partial-id-v0-1.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  bound:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Enumerate all unresolved-axis completions
+        run: |
+          mkdir -p build/micro_recurrence_partial_id_v0_1
+          python scripts/bound_micro_recurrence_missingness_v0_1.py \
+            --registry data/micro_accessibility_edge_registry_v0_1.csv \
+            --out-dir build/micro_recurrence_partial_id_v0_1
+      - name: Guard exact identified set
+        run: |
+          python - <<'PY'
+          import json
+          s=json.load(open('build/micro_recurrence_partial_id_v0_1/summary.json'))
+          assert s['n_dependence_clusters']==5
+          assert s['n_unresolved_cluster_axes']==10
+          assert s['n_exact_completions']==59049
+          b=s['recurrence_identified_set']
+          assert abs(b['minimum']-0.2)<1e-12
+          assert abs(b['maximum']-0.36)<1e-12
+          assert s['completion_space_score_counts']=={'0.2':54027,'0.28':4941,'0.36':81}
+          assert 0.085 < s['completion_space_fraction_above_unique_floor'] < 0.086
+          print(json.dumps(s,indent=2,ensure_ascii=False))
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: micro-recurrence-partial-id-v0-1
+          path: build/micro_recurrence_partial_id_v0_1/
+          if-no-files-found: error
