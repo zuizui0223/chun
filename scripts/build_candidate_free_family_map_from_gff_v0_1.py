@@ -1,17 +1,9 @@
 #!/usr/bin/env python3
 """Map annotated Camellia transcripts to preregistered pigment gene families.
 
-The mapping is deliberately annotation-driven and independent of flower-colour outcome.
-All transcript paralogs whose gene symbol/product annotation matches a frozen family
-pattern are retained. The script never selects transcripts by differential expression.
-
-Inputs:
-- NCBI/GenBank GFF3 annotation
-- corresponding transcript/RNA FASTA
-
-Outputs:
-- transcript_family_map.csv
-- family_mapping_summary.json
+The mapping is annotation-driven and independent of flower-colour outcome. All
+transcript paralogs whose gene, transcript, CDS, or RNA-FASTA annotation matches a
+frozen family pattern are retained. No differential-expression result is consulted.
 """
 
 from __future__ import annotations
@@ -46,25 +38,21 @@ PATTERNS: dict[str, list[str]] = {
     "ZEP": [r"\bZEP\d*\b", r"zeaxanthin epoxidase"],
 }
 COMPILED = {k: [re.compile(p, re.I) for p in ps] for k, ps in PATTERNS.items()}
+TRANSCRIPT_FEATURES = {"mRNA", "transcript", "ncRNA", "RNA"}
 
 
 def attrs(text: str) -> dict[str, str]:
-    out = {}
+    out: dict[str, str] = {}
     for part in text.strip().split(";"):
-        if not part:
+        if not part or "=" not in part:
             continue
-        if "=" in part:
-            k, v = part.split("=", 1)
-            out[k] = unquote(v)
+        k, v = part.split("=", 1)
+        out[k] = unquote(v)
     return out
 
 
 def family_matches(text: str) -> list[str]:
-    found = []
-    for family, patterns in COMPILED.items():
-        if any(p.search(text) for p in patterns):
-            found.append(family)
-    # Avoid classifying F3'5'H as F3'H when both symbols happen to match text.
+    found = [family for family, pats in COMPILED.items() if any(p.search(text) for p in pats)]
     if "F3'5'H" in found and "F3'H" in found:
         found.remove("F3'H")
     return found
@@ -80,34 +68,42 @@ def normalize_id(x: str) -> str:
     return x
 
 
-def fasta_headers(path: Path) -> dict[str, str]:
-    out = {}
+def alias_set(x: str) -> set[str]:
+    if not x:
+        return set()
+    vals = {x, normalize_id(x)}
+    if "|" in x:
+        tail = x.split("|")[-1]
+        vals |= {tail, normalize_id(tail)}
+    return {v for v in vals if v}
+
+
+def fasta_headers(path: Path) -> dict[str, tuple[str, str]]:
+    """Return alias -> (canonical FASTA token, full header)."""
+    out: dict[str, tuple[str, str]] = {}
     with path.open(encoding="utf-8", errors="replace") as fh:
         for line in fh:
             if not line.startswith(">"):
                 continue
             header = line[1:].strip()
             token = header.split()[0]
-            aliases = {token, normalize_id(token)}
-            if "|" in token:
-                aliases.add(token.split("|")[-1])
-                aliases.add(normalize_id(token.split("|")[-1]))
-            # Common NCBI headers expose accession or transcript identifiers in brackets.
+            aliases = set(alias_set(token))
             for m in re.finditer(r"(?:transcript_id|gene|locus_tag)=([^\]\s]+)", header):
-                aliases.add(m.group(1))
-                aliases.add(normalize_id(m.group(1)))
-            for alias in aliases:
-                out[alias] = header
+                aliases |= alias_set(m.group(1))
+            for a in aliases:
+                out[a] = (token, header)
     return out
 
 
-def parse_gff(path: Path) -> tuple[dict[str, tuple[str, str]], dict[str, set[str]], list[dict[str, str]]]:
-    gene_family: dict[str, tuple[str, str]] = {}
-    gene_alias_family: dict[str, tuple[str, str]] = {}
-    transcript_parents: dict[str, set[str]] = defaultdict(set)
-    transcript_rows: list[dict[str, str]] = []
+def family_from_text(text: str) -> tuple[str, str] | None:
+    matches = family_matches(text)
+    if len(matches) == 1:
+        return matches[0], text
+    return None
 
-    raw = []
+
+def parse_gff(path: Path) -> list[dict[str, str]]:
+    records: list[tuple[str, dict[str, str], str]] = []
     with path.open(encoding="utf-8", errors="replace") as fh:
         for line in fh:
             if not line or line.startswith("#"):
@@ -115,62 +111,92 @@ def parse_gff(path: Path) -> tuple[dict[str, tuple[str, str]], dict[str, set[str
             cols = line.rstrip("\n").split("\t")
             if len(cols) != 9:
                 continue
-            feature = cols[2]
-            a = attrs(cols[8])
-            raw.append((feature, a, cols[8]))
-            if feature == "gene":
-                text = " ".join([cols[8], *a.values()])
-                matches = family_matches(text)
-                if len(matches) == 1:
-                    gid = a.get("ID", "")
-                    evidence = text
-                    if gid:
-                        gene_family[gid] = (matches[0], evidence)
-                        gene_alias_family[normalize_id(gid)] = (matches[0], evidence)
-                    for key in ("Name", "gene", "locus_tag"):
-                        if a.get(key):
-                            gene_alias_family[a[key]] = (matches[0], evidence)
-                            gene_alias_family[normalize_id(a[key])] = (matches[0], evidence)
+            records.append((cols[2], attrs(cols[8]), cols[8]))
 
-    for feature, a, raw_attr in raw:
-        if feature not in {"mRNA", "transcript", "ncRNA", "RNA"}:
+    gene_family_by_alias: dict[str, tuple[str, str]] = {}
+    for feature, a, raw_attr in records:
+        if feature != "gene":
+            continue
+        text = " ".join([raw_attr, *a.values()])
+        hit = family_from_text(text)
+        if hit is None:
+            continue
+        for key in ("ID", "Name", "gene", "locus_tag"):
+            for alias in alias_set(a.get(key, "")):
+                gene_family_by_alias[alias] = hit
+
+    transcripts: dict[str, dict[str, object]] = {}
+    transcript_alias_to_key: dict[str, str] = {}
+    for feature, a, raw_attr in records:
+        if feature not in TRANSCRIPT_FEATURES:
             continue
         tid = a.get("ID") or a.get("transcript_id") or a.get("Name")
         if not tid:
             continue
-        parent_values = []
+        parent_values: list[str] = []
         if a.get("Parent"):
             parent_values.extend(a["Parent"].split(","))
-        if a.get("gene"):
-            parent_values.append(a["gene"])
-        if a.get("gene_id"):
-            parent_values.append(a["gene_id"])
-        for p in parent_values:
-            transcript_parents[tid].add(p)
-
+        for key in ("gene", "gene_id"):
+            if a.get(key):
+                parent_values.append(a[key])
+        entry = transcripts.setdefault(tid, {"parents": set(), "candidates": []})
+        entry["parents"].update(parent_values)
         direct_text = " ".join([raw_attr, *a.values()])
-        direct = family_matches(direct_text)
-        candidates: list[tuple[str, str, str]] = []
-        if len(direct) == 1:
-            candidates.append((direct[0], "transcript_annotation", direct_text))
+        direct = family_from_text(direct_text)
+        if direct:
+            entry["candidates"].append((direct[0], "transcript_annotation", direct[1]))
         for p in parent_values:
-            if p in gene_family:
-                candidates.append((gene_family[p][0], "parent_gene_annotation", gene_family[p][1]))
-            elif normalize_id(p) in gene_alias_family:
-                fam, ev = gene_alias_family[normalize_id(p)]
-                candidates.append((fam, "parent_gene_alias", ev))
+            for alias in alias_set(p):
+                if alias in gene_family_by_alias:
+                    fam, evidence = gene_family_by_alias[alias]
+                    entry["candidates"].append((fam, "parent_gene_annotation", evidence))
+        for alias in alias_set(tid):
+            transcript_alias_to_key[alias] = tid
+        for key in ("transcript_id", "Name"):
+            for alias in alias_set(a.get(key, "")):
+                transcript_alias_to_key[alias] = tid
+
+    # CDS products often carry the most informative enzyme names in GenBank GFF3.
+    for feature, a, raw_attr in records:
+        if feature != "CDS":
+            continue
+        direct_text = " ".join([raw_attr, *a.values()])
+        hit = family_from_text(direct_text)
+        if hit is None:
+            continue
+        parents: list[str] = []
+        if a.get("Parent"):
+            parents.extend(a["Parent"].split(","))
+        if a.get("transcript_id"):
+            parents.append(a["transcript_id"])
+        for p in parents:
+            tkey = None
+            if p in transcripts:
+                tkey = p
+            else:
+                for alias in alias_set(p):
+                    if alias in transcript_alias_to_key:
+                        tkey = transcript_alias_to_key[alias]
+                        break
+            if tkey is not None:
+                transcripts[tkey]["candidates"].append((hit[0], "cds_annotation", hit[1]))
+
+    rows: list[dict[str, str]] = []
+    for tid, info in transcripts.items():
+        candidates = list(info["candidates"])
         families = {x[0] for x in candidates}
-        if len(families) == 1:
-            fam = next(iter(families))
-            transcript_rows.append(
-                {
-                    "gff_transcript_id": tid,
-                    "gene_family": fam,
-                    "mapping_basis": "+".join(sorted({x[1] for x in candidates})),
-                    "annotation_evidence": candidates[0][2],
-                }
-            )
-    return gene_family, transcript_parents, transcript_rows
+        if len(families) != 1:
+            continue
+        fam = next(iter(families))
+        rows.append(
+            {
+                "gff_transcript_id": tid,
+                "gene_family": fam,
+                "mapping_basis": "+".join(sorted({x[1] for x in candidates})),
+                "annotation_evidence": candidates[0][2],
+            }
+        )
+    return rows
 
 
 def main() -> None:
@@ -181,70 +207,72 @@ def main() -> None:
     args = ap.parse_args()
 
     headers = fasta_headers(args.rna_fasta)
-    _genes, _parents, gff_rows = parse_gff(args.gff)
+    gff_rows = parse_gff(args.gff)
 
-    resolved = []
-    unresolved = []
-    seen = set()
+    resolved: list[dict[str, str]] = []
+    unresolved: list[dict[str, str]] = []
+    seen: set[tuple[str, str]] = set()
     for row in gff_rows:
-        gff_id = row["gff_transcript_id"]
-        aliases = [gff_id, normalize_id(gff_id)]
-        match = next((a for a in aliases if a in headers), None)
+        match = None
+        for alias in alias_set(row["gff_transcript_id"]):
+            if alias in headers:
+                match = headers[alias]
+                break
         if match is None:
-            # Search exact token aliases only; never fuzzy-match sequence IDs.
             unresolved.append(row)
             continue
-        header = headers[match]
-        fasta_token = header.split()[0]
-        key = (fasta_token, row["gene_family"])
+        token, header = match
+        key = (token, row["gene_family"])
         if key in seen:
             continue
         seen.add(key)
         resolved.append(
             {
-                "transcript_id": fasta_token,
+                "transcript_id": token,
                 "gene_family": row["gene_family"],
                 "mapping_basis": row["mapping_basis"],
-                "gff_transcript_id": gff_id,
+                "gff_transcript_id": row["gff_transcript_id"],
                 "fasta_header": header,
             }
         )
 
-    # Fallback: annotation-bearing RNA FASTA headers can independently establish family.
-    existing_transcripts = {r["transcript_id"] for r in resolved}
-    for alias, header in headers.items():
-        token = header.split()[0]
-        if alias != token or token in existing_transcripts:
+    # Independent fallback when RNA FASTA headers themselves contain product/gene labels.
+    canonical_seen: set[str] = set()
+    for _alias, (token, header) in headers.items():
+        if token in canonical_seen:
             continue
-        matches = family_matches(header)
-        if len(matches) == 1:
+        canonical_seen.add(token)
+        if any(r["transcript_id"] == token for r in resolved):
+            continue
+        hit = family_from_text(header)
+        if hit:
             resolved.append(
                 {
                     "transcript_id": token,
-                    "gene_family": matches[0],
+                    "gene_family": hit[0],
                     "mapping_basis": "rna_fasta_annotation",
                     "gff_transcript_id": "",
                     "fasta_header": header,
                 }
             )
-            existing_transcripts.add(token)
 
     args.out_dir.mkdir(parents=True, exist_ok=True)
-    map_path = args.out_dir / "transcript_family_map.csv"
-    with map_path.open("w", newline="", encoding="utf-8") as fh:
+    with (args.out_dir / "transcript_family_map.csv").open("w", newline="", encoding="utf-8") as fh:
         fields = ["transcript_id", "gene_family", "mapping_basis", "gff_transcript_id", "fasta_header"]
         w = csv.DictWriter(fh, fieldnames=fields)
-        w.writeheader(); w.writerows(sorted(resolved, key=lambda r: (r["gene_family"], r["transcript_id"])))
+        w.writeheader()
+        w.writerows(sorted(resolved, key=lambda r: (r["gene_family"], r["transcript_id"])))
 
     counts = Counter(r["gene_family"] for r in resolved)
     summary = {
         "status": "annotation_driven_candidate_free_family_map",
         "n_mapped_transcripts": len(resolved),
         "mapped_transcripts_per_family": {f: counts.get(f, 0) for f in PATTERNS},
-        "families_with_at_least_one_transcript": sorted([f for f in PATTERNS if counts.get(f, 0) > 0]),
+        "families_with_at_least_one_transcript": sorted(f for f in PATTERNS if counts.get(f, 0) > 0),
         "n_families_with_at_least_one_transcript": sum(counts.get(f, 0) > 0 for f in PATTERNS),
         "n_gff_transcript_candidates_not_matched_to_fasta": len(unresolved),
-        "selection_rule": "annotation pattern only; no expression or colour outcome used",
+        "annotation_sources": ["gene", "transcript", "CDS", "RNA_FASTA_header"],
+        "selection_rule": "annotation pattern only; all matching paralogs retained; no expression or colour outcome used",
     }
     (args.out_dir / "family_mapping_summary.json").write_text(
         json.dumps(summary, indent=2, ensure_ascii=False) + "\n", encoding="utf-8"
