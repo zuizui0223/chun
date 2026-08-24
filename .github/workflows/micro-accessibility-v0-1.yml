@@ -1,0 +1,48 @@
+name: Micro accessibility v0.1
+
+on:
+  pull_request:
+    paths:
+      - 'data/micro_accessibility_edge_registry_v0_1.csv'
+      - 'scripts/analyze_micro_accessibility_v0_1.py'
+      - 'docs/MICRO_MACRO_ACCESSIBILITY_ANALYSIS_PLAN.md'
+      - '.github/workflows/micro-accessibility-v0-1.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  analyze:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Run micro-accessibility analysis
+        run: |
+          mkdir -p build/micro_accessibility_v0_1
+          python scripts/analyze_micro_accessibility_v0_1.py \
+            --registry data/micro_accessibility_edge_registry_v0_1.csv \
+            --out-dir build/micro_accessibility_v0_1 \
+            --permutations 10000 \
+            --seed 230223
+      - name: Guard inference boundary
+        run: |
+          python - <<'PY'
+          import json
+          s=json.load(open('build/micro_accessibility_v0_1/summary.json'))
+          assert s['n_independent_systems'] == 7
+          assert s['macro_transition_test']['status'] == 'blocked'
+          assert s['degree_preserving_graph_null']['status'] == 'blocked'
+          assert s['status'] == 'micro_layer_only_macro_gate_open'
+          assert s['anthocyanin_direction']['up'] >= 4
+          print(json.dumps(s, indent=2, ensure_ascii=False))
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: micro-accessibility-v0-1
+          path: build/micro_accessibility_v0_1/
+          if-no-files-found: error
