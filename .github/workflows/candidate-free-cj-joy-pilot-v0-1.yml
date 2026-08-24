@@ -34,7 +34,7 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y --no-install-recommends sra-toolkit salmon unzip ca-certificates
           salmon --version
-          fastq-dump --version
+          fasterq-dump --version
 
       - name: Download fixed Camellia sinensis annotation reference
         run: |
@@ -47,8 +47,8 @@ jobs:
             --include rna,gff3 \
             --filename build/cj_joy_pilot_v0_1/reference.zip
           unzip -q build/cj_joy_pilot_v0_1/reference.zip -d build/cj_joy_pilot_v0_1/reference/package
-          RNA_FASTA=$(find build/cj_joy_pilot_v0_1/reference/package -type f -name 'rna.fna' | head -n1)
-          GFF=$(find build/cj_joy_pilot_v0_1/reference/package -type f -name 'genomic.gff' | head -n1)
+          RNA_FASTA=$(find build/cj_joy_pilot_v0_1/reference/package -type f \( -name 'rna.fna' -o -name '*rna*.fna' \) | head -n1)
+          GFF=$(find build/cj_joy_pilot_v0_1/reference/package -type f \( -name 'genomic.gff' -o -name '*.gff' -o -name '*.gff3' \) | head -n1)
           test -n "$RNA_FASTA" && test -s "$RNA_FASTA"
           test -n "$GFF" && test -s "$GFF"
           echo "RNA_FASTA=$RNA_FASTA" >> "$GITHUB_ENV"
@@ -63,7 +63,6 @@ jobs:
           python - <<'PY'
           import json
           s=json.load(open('build/cj_joy_pilot_v0_1/family_map/family_mapping_summary.json'))
-          # This is a reference-identifiability guard, not a flower-colour result.
           if s['n_mapped_transcripts'] == 0:
               raise SystemExit('No preregistered family is identifiable from the fixed reference annotation')
           print(json.dumps(s,indent=2,ensure_ascii=False))
@@ -79,12 +78,14 @@ jobs:
           tail -n +2 data/candidate_free_cj_joy_run_manifest_v0_1.csv | cut -d, -f1 | while read -r RUN; do
             echo "Quantifying $RUN from first ${MAX_SPOTS_PER_RUN} SRA spots"
             rm -f build/cj_joy_pilot_v0_1/reads/${RUN}_1.fastq build/cj_joy_pilot_v0_1/reads/${RUN}_2.fastq
+            rm -rf build/cj_joy_pilot_v0_1/reads/tmp_${RUN}
+            mkdir -p build/cj_joy_pilot_v0_1/reads/tmp_${RUN}
             fasterq-dump "$RUN" \
               --split-files \
-              --threads 2 \
-              --mem 1GB \
-              --temp build/cj_joy_pilot_v0_1/reads/tmp_${RUN} \
-              --outdir build/cj_joy_pilot_v0_1/reads \
+              -e 2 \
+              -m 1GB \
+              -t build/cj_joy_pilot_v0_1/reads/tmp_${RUN} \
+              -O build/cj_joy_pilot_v0_1/reads \
               -X "$MAX_SPOTS_PER_RUN"
             test -s build/cj_joy_pilot_v0_1/reads/${RUN}_1.fastq
             test -s build/cj_joy_pilot_v0_1/reads/${RUN}_2.fastq
@@ -149,7 +150,15 @@ jobs:
           print(json.dumps(summary,indent=2,ensure_ascii=False))
           PY
 
+      - name: Preserve diagnostics
+        if: always()
+        run: |
+          mkdir -p build/cj_joy_pilot_v0_1/diagnostics
+          printf 'reference=%s\nmax_spots_per_run=%s\n' "$REF_ACCESSION" "$MAX_SPOTS_PER_RUN" > build/cj_joy_pilot_v0_1/diagnostics/run_contract.txt
+          find build/cj_joy_pilot_v0_1 -maxdepth 3 -type f -printf '%p\t%s bytes\n' 2>/dev/null | sort > build/cj_joy_pilot_v0_1/diagnostics/files.txt || true
+
       - uses: actions/upload-artifact@v4
+        if: always()
         with:
           name: candidate-free-cj-joy-pilot-v0-1
           path: |
@@ -158,4 +167,5 @@ jobs:
             build/cj_joy_pilot_v0_1/family_expression.summary.json
             build/cj_joy_pilot_v0_1/scored/
             build/cj_joy_pilot_v0_1/pilot_result.json
-          if-no-files-found: error
+            build/cj_joy_pilot_v0_1/diagnostics/
+          if-no-files-found: warn
