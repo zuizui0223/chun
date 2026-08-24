@@ -6,6 +6,11 @@ cluster (for example multiple C. japonica studies). The primary recurrence test 
 therefore run after collapsing systems within each dependence cluster. A system-level
 analysis is retained as a descriptive sensitivity only.
 
+The script also audits mechanistic-axis ascertainment. For each row it preserves the
+number of resolved A/F/C/P axes but randomizes *which* axes are resolved, testing
+whether anthocyanin-axis coverage is stronger than expected under axis-symmetric
+ascertainment.
+
 No macroevolutionary transition rates are inferred here. A degree-preserving graph
 null remains gated until explicit mechanistic source/target states are sufficiently
 complete; visible-colour labels are never substituted for biochemical states.
@@ -174,6 +179,58 @@ def direction_summary(rows: list[dict[str, str]], axis: str) -> dict[str, int]:
     return dict(sorted(counts.items()))
 
 
+def axis_coverage(rows: list[dict[str, str]]) -> dict[str, int]:
+    return {
+        axis: sum(r[axis].strip().lower() != "unknown" for r in rows)
+        for axis in AXES
+    }
+
+
+def ascertainment_null(
+    rows: list[dict[str, str]], n_perm: int, seed: int
+) -> dict[str, object]:
+    """Test axis coverage bias conditional on resolved-axis count per row.
+
+    `mixed` is treated as resolved because the axis was investigated but directions
+    disagreed within the dependence cluster.
+    """
+    rng = random.Random(seed)
+    observed = axis_coverage(rows)
+    observed_counts = [observed[a] for a in AXES]
+    observed_a_enrichment = observed["A_change"] - sum(observed[a] for a in AXES[1:]) / 3
+    observed_max_gap = max(observed_counts) - min(observed_counts)
+
+    resolved_per_row = [
+        sum(r[a].strip().lower() != "unknown" for a in AXES) for r in rows
+    ]
+    a_stats: list[float] = []
+    gap_stats: list[int] = []
+
+    for _ in range(n_perm):
+        coverage = [0, 0, 0, 0]
+        for k in resolved_per_row:
+            for idx in rng.sample(range(4), k):
+                coverage[idx] += 1
+        a_stats.append(coverage[0] - sum(coverage[1:]) / 3)
+        gap_stats.append(max(coverage) - min(coverage))
+
+    p_a = (sum(v >= observed_a_enrichment - 1e-15 for v in a_stats) + 1) / (
+        n_perm + 1
+    )
+    p_gap = (sum(v >= observed_max_gap for v in gap_stats) + 1) / (n_perm + 1)
+
+    return {
+        "observed_axis_coverage": observed,
+        "observed_A_minus_mean_other_coverage": observed_a_enrichment,
+        "observed_max_minus_min_coverage": observed_max_gap,
+        "permutation_p_A_enrichment": p_a,
+        "permutation_p_any_axis_imbalance": p_gap,
+        "null_conditioning": "resolved-axis count per row preserved",
+        "n_permutations": n_perm,
+        "seed": seed,
+    }
+
+
 def summarize(rows: list[dict[str, str]], n_perm: int, seed: int) -> dict[str, object]:
     collapsed = collapse_dependence(rows)
     system_sig_counts = Counter(signature(r) for r in rows)
@@ -202,6 +259,12 @@ def summarize(rows: list[dict[str, str]], n_perm: int, seed: int) -> dict[str, o
         "system_level_recurrence_sensitivity": permutation_null(rows, n_perm, seed),
         "dependence_collapsed_recurrence_primary": permutation_null(
             collapsed, n_perm, seed
+        ),
+        "system_level_axis_ascertainment": ascertainment_null(
+            rows, n_perm, seed + 1
+        ),
+        "dependence_collapsed_axis_ascertainment": ascertainment_null(
+            collapsed, n_perm, seed + 1
         ),
         "dependence_clusters": [
             {
