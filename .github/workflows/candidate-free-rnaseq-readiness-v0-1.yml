@@ -39,7 +39,8 @@ jobs:
           assert s['n_clusters_with_public_raw_target'] == 5
           assert s['missing_public_target_clusters'] == []
           assert s['n_clusters_with_frozen_run_manifest'] == 3
-          assert s['n_clusters_with_NCBI_SRA_target'] == 4
+          assert s['n_clusters_with_exact_run_identity'] == 4
+          assert s['n_clusters_with_NCBI_SRA_route'] == 5
           assert s['external_holdout_targets'] == ['CF_EXT_01']
           assert s['bottleneck'].startswith('metadata/reference/ortholog harmonization')
           print(json.dumps(s, indent=2, ensure_ascii=False))
