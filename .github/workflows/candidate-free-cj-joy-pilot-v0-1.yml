@@ -32,11 +32,12 @@ jobs:
       - name: Install RNA-seq tools
         run: |
           sudo apt-get update
-          sudo apt-get install -y --no-install-recommends sra-toolkit salmon unzip ca-certificates
+          sudo apt-get install -y --no-install-recommends sra-toolkit salmon gffread unzip ca-certificates
           salmon --version
           fasterq-dump --version
+          gffread --version
 
-      - name: Download fixed Camellia sinensis annotation reference
+      - name: Download fixed Camellia annotation reference and reconstruct transcripts
         run: |
           mkdir -p build/cj_joy_pilot_v0_1/reference
           curl -fsSL \
@@ -44,13 +45,17 @@ jobs:
             -o build/cj_joy_pilot_v0_1/datasets
           chmod +x build/cj_joy_pilot_v0_1/datasets
           build/cj_joy_pilot_v0_1/datasets download genome accession "$REF_ACCESSION" \
-            --include rna,gff3 \
+            --include genome,gff3 \
             --filename build/cj_joy_pilot_v0_1/reference.zip
           unzip -q build/cj_joy_pilot_v0_1/reference.zip -d build/cj_joy_pilot_v0_1/reference/package
-          RNA_FASTA=$(find build/cj_joy_pilot_v0_1/reference/package -type f \( -name 'rna.fna' -o -name '*rna*.fna' \) | head -n1)
+          GENOME_FASTA=$(find build/cj_joy_pilot_v0_1/reference/package -type f -name 'genomic.fna' | head -n1)
           GFF=$(find build/cj_joy_pilot_v0_1/reference/package -type f \( -name 'genomic.gff' -o -name '*.gff' -o -name '*.gff3' \) | head -n1)
-          test -n "$RNA_FASTA" && test -s "$RNA_FASTA"
+          test -n "$GENOME_FASTA" && test -s "$GENOME_FASTA"
           test -n "$GFF" && test -s "$GFF"
+          RNA_FASTA=build/cj_joy_pilot_v0_1/reference/reconstructed_transcripts.fna
+          gffread "$GFF" -g "$GENOME_FASTA" -w "$RNA_FASTA"
+          test -s "$RNA_FASTA"
+          echo "GENOME_FASTA=$GENOME_FASTA" >> "$GITHUB_ENV"
           echo "RNA_FASTA=$RNA_FASTA" >> "$GITHUB_ENV"
           echo "GFF=$GFF" >> "$GITHUB_ENV"
 
@@ -135,6 +140,7 @@ jobs:
             'run_count':6,
             'max_spots_per_run':1000000,
             'reference':'GCA_013676235.1',
+            'transcriptome_source':'reconstructed_from_fixed_genome_and_GFF_with_gffread',
             'effects':{
               e['axis']:{
                 'effect_status':e['effect_status'],
