@@ -1,0 +1,82 @@
+name: Candidate-free reference audit v0.1
+
+on:
+  pull_request:
+    paths:
+      - 'data/candidate_free_pigment_module_schema_v0_1.csv'
+      - 'scripts/build_candidate_free_family_map_from_gff_v0_1.py'
+      - '.github/workflows/candidate-free-reference-audit-v0-1.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  reference-audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      REF_ACCESSION: GCA_013676235.1
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Download fixed reference annotation
+        run: |
+          mkdir -p build/candidate_free_reference_audit_v0_1/reference
+          curl -fsSL https://ftp.ncbi.nlm.nih.gov/pub/datasets/command-line/v2/linux-amd64/datasets -o build/candidate_free_reference_audit_v0_1/datasets
+          chmod +x build/candidate_free_reference_audit_v0_1/datasets
+          build/candidate_free_reference_audit_v0_1/datasets download genome accession "$REF_ACCESSION" --include rna,gff3 --filename build/candidate_free_reference_audit_v0_1/reference.zip
+          unzip -q build/candidate_free_reference_audit_v0_1/reference.zip -d build/candidate_free_reference_audit_v0_1/reference/package
+          RNA_FASTA=$(find build/candidate_free_reference_audit_v0_1/reference/package -type f \( -name 'rna.fna' -o -name '*rna*.fna' \) | head -n1)
+          GFF=$(find build/candidate_free_reference_audit_v0_1/reference/package -type f \( -name 'genomic.gff' -o -name '*.gff' -o -name '*.gff3' \) | head -n1)
+          test -n "$RNA_FASTA" && test -s "$RNA_FASTA"
+          test -n "$GFF" && test -s "$GFF"
+          echo "RNA_FASTA=$RNA_FASTA" >> "$GITHUB_ENV"
+          echo "GFF=$GFF" >> "$GITHUB_ENV"
+      - name: Map preregistered families from annotation only
+        run: |
+          python scripts/build_candidate_free_family_map_from_gff_v0_1.py \
+            --gff "$GFF" \
+            --rna-fasta "$RNA_FASTA" \
+            --out-dir build/candidate_free_reference_audit_v0_1/family_map
+      - name: Evaluate primary module identifiability
+        run: |
+          python - <<'PY'
+          import csv,json
+          s=json.load(open('build/candidate_free_reference_audit_v0_1/family_map/family_mapping_summary.json'))
+          schema=list(csv.DictReader(open('data/candidate_free_pigment_module_schema_v0_1.csv')))
+          primary=[r for r in schema if r['in_primary_score'].strip().lower()=='yes']
+          expected={}
+          for r in primary:
+              expected.setdefault(r['axis'],[]).append(r['gene_family'])
+          present={f for f,n in s['mapped_transcripts_per_family'].items() if n>0}
+          modules={}
+          for axis,fams in expected.items():
+              resolved=[f for f in fams if f in present]
+              modules[axis]={
+                'expected_families':fams,
+                'resolved_families':resolved,
+                'completeness':len(resolved)/len(fams),
+                'scorable_under_50pct_gate':len(resolved)/len(fams)>=0.5
+              }
+          out={
+            'status':'reference_identifiability_audit',
+            'reference':'GCA_013676235.1',
+            'n_mapped_transcripts':s['n_mapped_transcripts'],
+            'n_families_with_at_least_one_transcript':s['n_families_with_at_least_one_transcript'],
+            'modules':modules,
+            'interpretation':'This tests annotation/reference coverage only; no expression or flower-colour outcome is used.'
+          }
+          open('build/candidate_free_reference_audit_v0_1/reference_audit.json','w').write(json.dumps(out,indent=2,ensure_ascii=False)+'\n')
+          if out['n_mapped_transcripts']==0:
+              raise SystemExit('Reference annotation resolves none of the preregistered pigment families')
+          print(json.dumps(out,indent=2,ensure_ascii=False))
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: candidate-free-reference-audit-v0-1
+          path: build/candidate_free_reference_audit_v0_1/
+          if-no-files-found: warn
