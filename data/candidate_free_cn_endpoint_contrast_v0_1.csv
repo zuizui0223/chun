@@ -1,0 +1,2 @@
+contrast_id,dependence_cluster,dataset_target_id,source_condition,target_condition,contrast_type,independence_role,primary_for_cluster,module_axes,notes
+CF_CN_S1_S5_ENDPOINT,CNITIDISSIMA,CF_CN_01,CN_S1,CN_S5,two_group_developmental,secondary_correlated,false,A;F;C;P,"Endpoint sensitivity only. Primary C. nitidissima inference uses the prespecified ordered S1-S5 trajectory and never selects the stage pair with the largest separation."

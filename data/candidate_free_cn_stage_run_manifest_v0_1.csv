@@ -1,0 +1,16 @@
+run,biosample,archive_sample_name,dependence_cluster,condition_id,visible_observation,replicate,mapping_status,mapping_basis
+SRR5829589,SAMN07350684,10_rep1,CNITIDISSIMA,CN_S1,yellow_development_S1,1,resolved,existing admitted BioSample stage mapping
+SRR5829588,SAMN07350685,10_rep2,CNITIDISSIMA,CN_S1,yellow_development_S1,2,resolved,existing admitted BioSample stage mapping
+SRR5829591,SAMN07350686,10_rep3,CNITIDISSIMA,CN_S1,yellow_development_S1,3,resolved,existing admitted BioSample stage mapping
+SRR5829590,SAMN07350687,6_rep1,CNITIDISSIMA,CN_S2,yellow_development_S2,1,resolved,existing admitted BioSample stage mapping
+SRR5829593,SAMN07350688,6_rep2,CNITIDISSIMA,CN_S2,yellow_development_S2,2,resolved,existing admitted BioSample stage mapping
+SRR5829592,SAMN07350689,6_rep3,CNITIDISSIMA,CN_S2,yellow_development_S2,3,resolved,existing admitted BioSample stage mapping
+SRR5829595,SAMN07350690,7_rep1,CNITIDISSIMA,CN_S3,yellow_development_S3,1,resolved,existing admitted BioSample stage mapping
+SRR5829594,SAMN07350691,7_rep2,CNITIDISSIMA,CN_S3,yellow_development_S3,2,resolved,existing admitted BioSample stage mapping
+SRR5829587,SAMN07350692,7_rep3,CNITIDISSIMA,CN_S3,yellow_development_S3,3,resolved,existing admitted BioSample stage mapping
+SRR5829586,SAMN07350693,8_rep1,CNITIDISSIMA,CN_S4,yellow_development_S4,1,resolved,existing admitted BioSample stage mapping
+SRR5829584,SAMN07350694,8_rep2,CNITIDISSIMA,CN_S4,yellow_development_S4,2,resolved,existing admitted BioSample stage mapping
+SRR5829583,SAMN07350695,8_rep3,CNITIDISSIMA,CN_S4,yellow_development_S4,3,resolved,existing admitted BioSample stage mapping
+SRR5829582,SAMN07350696,9_rep1,CNITIDISSIMA,CN_S5,yellow_development_S5,1,resolved,existing admitted BioSample stage mapping
+SRR5829581,SAMN07350697,9_rep2,CNITIDISSIMA,CN_S5,yellow_development_S5,2,resolved,existing admitted BioSample stage mapping
+SRR5829585,SAMN07350698,9_rep3,CNITIDISSIMA,CN_S5,yellow_development_S5,3,resolved,existing admitted BioSample stage mapping
