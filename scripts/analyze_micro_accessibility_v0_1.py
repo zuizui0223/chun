@@ -7,9 +7,10 @@ therefore run after collapsing systems within each dependence cluster. A system-
 analysis is retained as a descriptive sensitivity only.
 
 The script also audits mechanistic-axis ascertainment. For each row it preserves the
-number of resolved A/F/C/P axes but randomizes *which* axes are resolved, testing
-whether anthocyanin-axis coverage is stronger than expected under axis-symmetric
-ascertainment.
+number of resolved A/F/C/P axes and enumerates every axis-symmetric assignment of
+those resolved slots. This gives an exact conditional null for whether anthocyanin-
+axis coverage or overall axis imbalance is stronger than expected solely from how
+many axes each system/cluster resolved.
 
 No macroevolutionary transition rates are inferred here. A degree-preserving graph
 null remains gated until explicit mechanistic source/target states are sufficiently
@@ -20,6 +21,7 @@ from __future__ import annotations
 
 import argparse
 import csv
+import itertools
 import json
 import math
 import random
@@ -93,7 +95,7 @@ def recurrence_score(counts: Counter[str]) -> float:
 def permutation_null(
     rows: list[dict[str, str]], n_perm: int, seed: int
 ) -> dict[str, object]:
-    """Break cross-axis coupling while preserving each axis' marginal frequencies."""
+    """Break cross-axis direction coupling while preserving each axis' marginals."""
     rng = random.Random(seed)
     observed = Counter(signature(r) for r in rows)
     observed_score = recurrence_score(observed)
@@ -186,48 +188,64 @@ def axis_coverage(rows: list[dict[str, str]]) -> dict[str, int]:
     }
 
 
-def ascertainment_null(
-    rows: list[dict[str, str]], n_perm: int, seed: int
-) -> dict[str, object]:
-    """Test axis coverage bias conditional on resolved-axis count per row.
+def ascertainment_exact_null(rows: list[dict[str, str]]) -> dict[str, object]:
+    """Exact axis-symmetric ascertainment null conditional on row-wise coverage.
 
-    `mixed` is treated as resolved because the axis was investigated but directions
-    disagreed within the dependence cluster.
+    If a row resolves k of the four A/F/C/P axes, every C(4,k) assignment of those
+    k resolved slots is given equal weight under the null. The Cartesian product over
+    rows is enumerated by dynamic programming over coverage vectors, so no Monte Carlo
+    approximation or arbitrary seed enters the ascertainment p-values.
+
+    `mixed` counts as resolved because the axis was measured/interpreted but known
+    member systems disagreed in direction.
     """
-    rng = random.Random(seed)
     observed = axis_coverage(rows)
-    observed_counts = [observed[a] for a in AXES]
-    observed_a_enrichment = observed["A_change"] - sum(observed[a] for a in AXES[1:]) / 3
+    observed_counts = tuple(observed[a] for a in AXES)
+    observed_a_enrichment = observed_counts[0] - sum(observed_counts[1:]) / 3
     observed_max_gap = max(observed_counts) - min(observed_counts)
 
     resolved_per_row = [
         sum(r[a].strip().lower() != "unknown" for a in AXES) for r in rows
     ]
-    a_stats: list[float] = []
-    gap_stats: list[int] = []
 
-    for _ in range(n_perm):
-        coverage = [0, 0, 0, 0]
-        for k in resolved_per_row:
-            for idx in rng.sample(range(4), k):
-                coverage[idx] += 1
-        a_stats.append(coverage[0] - sum(coverage[1:]) / 3)
-        gap_stats.append(max(coverage) - min(coverage))
+    distribution: Counter[tuple[int, int, int, int]] = Counter({(0, 0, 0, 0): 1})
+    total_assignments = 1
+    for k in resolved_per_row:
+        choices = list(itertools.combinations(range(4), k))
+        total_assignments *= len(choices)
+        updated: Counter[tuple[int, int, int, int]] = Counter()
+        for coverage, multiplicity in distribution.items():
+            for choice in choices:
+                nxt = list(coverage)
+                for idx in choice:
+                    nxt[idx] += 1
+                updated[tuple(nxt)] += multiplicity
+        distribution = updated
 
-    p_a = (sum(v >= observed_a_enrichment - 1e-15 for v in a_stats) + 1) / (
-        n_perm + 1
-    )
-    p_gap = (sum(v >= observed_max_gap for v in gap_stats) + 1) / (n_perm + 1)
+    if sum(distribution.values()) != total_assignments:
+        raise AssertionError("exact ascertainment null enumeration is inconsistent")
+
+    n_a_extreme = 0
+    n_gap_extreme = 0
+    for coverage, multiplicity in distribution.items():
+        a_enrichment = coverage[0] - sum(coverage[1:]) / 3
+        gap = max(coverage) - min(coverage)
+        if a_enrichment >= observed_a_enrichment - 1e-15:
+            n_a_extreme += multiplicity
+        if gap >= observed_max_gap:
+            n_gap_extreme += multiplicity
 
     return {
         "observed_axis_coverage": observed,
         "observed_A_minus_mean_other_coverage": observed_a_enrichment,
         "observed_max_minus_min_coverage": observed_max_gap,
-        "permutation_p_A_enrichment": p_a,
-        "permutation_p_any_axis_imbalance": p_gap,
-        "null_conditioning": "resolved-axis count per row preserved",
-        "n_permutations": n_perm,
-        "seed": seed,
+        "exact_p_A_enrichment": n_a_extreme / total_assignments,
+        "exact_p_any_axis_imbalance": n_gap_extreme / total_assignments,
+        "n_exact_axis_assignments": total_assignments,
+        "n_distinct_coverage_vectors": len(distribution),
+        "resolved_axis_count_per_row": resolved_per_row,
+        "null_conditioning": "resolved-axis count per row preserved; axis labels exchangeable under null",
+        "method": "exact combinatorial dynamic-programming enumeration",
     }
 
 
@@ -260,12 +278,8 @@ def summarize(rows: list[dict[str, str]], n_perm: int, seed: int) -> dict[str, o
         "dependence_collapsed_recurrence_primary": permutation_null(
             collapsed, n_perm, seed
         ),
-        "system_level_axis_ascertainment": ascertainment_null(
-            rows, n_perm, seed + 1
-        ),
-        "dependence_collapsed_axis_ascertainment": ascertainment_null(
-            collapsed, n_perm, seed + 1
-        ),
+        "system_level_axis_ascertainment": ascertainment_exact_null(rows),
+        "dependence_collapsed_axis_ascertainment": ascertainment_exact_null(collapsed),
         "dependence_clusters": [
             {
                 "cluster": r["dependence_cluster"],
