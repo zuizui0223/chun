@@ -7,6 +7,7 @@ on:
       - 'data/candidate_free_cn_endpoint_contrast_v0_1.csv'
       - 'data/candidate_free_pigment_module_schema_v0_1.csv'
       - 'scripts/build_candidate_free_family_map_from_gff_v0_1.py'
+      - 'scripts/prepare_candidate_free_reference_v0_1.sh'
       - 'scripts/aggregate_salmon_family_expression_v0_1.py'
       - 'scripts/score_candidate_free_modules_v0_1.py'
       - 'scripts/summarize_candidate_free_ordered_trajectory_v0_1.py'
@@ -15,6 +16,10 @@ on:
 
 permissions:
   contents: read
+
+concurrency:
+  group: candidate-free-cn-trajectory-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
 
 jobs:
   trajectory:
@@ -29,7 +34,7 @@ jobs:
         with:
           python-version: '3.12'
 
-      - name: Install RNA-seq tools
+      - name: Install RNA-seq and fallback reference tools
         run: |
           sudo apt-get update
           sudo apt-get install -y --no-install-recommends sra-toolkit salmon gffread unzip ca-certificates
@@ -37,30 +42,15 @@ jobs:
           fasterq-dump --version
           gffread --version
 
-      - name: Reconstruct fixed transcriptome from genome and GFF
+      - name: Prepare fixed reference through direct-RNA route with fallback
         run: |
-          mkdir -p build/cn_trajectory_v0_1/reference
-          curl -fsSL https://ftp.ncbi.nlm.nih.gov/pub/datasets/command-line/v2/linux-amd64/datasets -o build/cn_trajectory_v0_1/datasets
-          chmod +x build/cn_trajectory_v0_1/datasets
-          build/cn_trajectory_v0_1/datasets download genome accession "$REF_ACCESSION" \
-            --include genome,gff3 \
-            --filename build/cn_trajectory_v0_1/reference.zip
-          unzip -q build/cn_trajectory_v0_1/reference.zip -d build/cn_trajectory_v0_1/reference/package
-          GENOME_FASTA=$(find build/cn_trajectory_v0_1/reference/package -type f -name 'genomic.fna' | head -n1)
-          GFF=$(find build/cn_trajectory_v0_1/reference/package -type f \( -name 'genomic.gff' -o -name '*.gff' -o -name '*.gff3' \) | head -n1)
-          test -n "$GENOME_FASTA" && test -s "$GENOME_FASTA"
-          test -n "$GFF" && test -s "$GFF"
-          RNA_FASTA=build/cn_trajectory_v0_1/reference/reconstructed_transcripts.fna
-          gffread "$GFF" -g "$GENOME_FASTA" -w "$RNA_FASTA"
-          test -s "$RNA_FASTA"
-          echo "RNA_FASTA=$RNA_FASTA" >> "$GITHUB_ENV"
-          echo "GFF=$GFF" >> "$GITHUB_ENV"
+          bash scripts/prepare_candidate_free_reference_v0_1.sh build/cn_trajectory_v0_1
+          cat build/cn_trajectory_v0_1/reference_route_diagnostic.txt
 
       - name: Build outcome-independent family map and Salmon index
         run: |
           python scripts/build_candidate_free_family_map_from_gff_v0_1.py \
-            --gff "$GFF" \
-            --rna-fasta "$RNA_FASTA" \
+            --gff "$GFF" --rna-fasta "$RNA_FASTA" \
             --out-dir build/cn_trajectory_v0_1/family_map
           python - <<'PY'
           import json
@@ -79,19 +69,15 @@ jobs:
             rm -f build/cn_trajectory_v0_1/reads/${RUN}_1.fastq build/cn_trajectory_v0_1/reads/${RUN}_2.fastq
             rm -rf build/cn_trajectory_v0_1/reads/tmp_${RUN}
             mkdir -p build/cn_trajectory_v0_1/reads/tmp_${RUN}
-            fasterq-dump "$RUN" \
-              --split-files -e 2 -m 1GB \
+            fasterq-dump "$RUN" --split-files -e 2 -m 1GB \
               -t build/cn_trajectory_v0_1/reads/tmp_${RUN} \
-              -O build/cn_trajectory_v0_1/reads \
-              -X "$MAX_SPOTS_PER_RUN"
+              -O build/cn_trajectory_v0_1/reads -X "$MAX_SPOTS_PER_RUN"
             test -s build/cn_trajectory_v0_1/reads/${RUN}_1.fastq
             test -s build/cn_trajectory_v0_1/reads/${RUN}_2.fastq
-            salmon quant \
-              -i build/cn_trajectory_v0_1/salmon_index -l A \
+            salmon quant -i build/cn_trajectory_v0_1/salmon_index -l A \
               -1 build/cn_trajectory_v0_1/reads/${RUN}_1.fastq \
               -2 build/cn_trajectory_v0_1/reads/${RUN}_2.fastq \
-              --validateMappings -p 2 \
-              -o build/cn_trajectory_v0_1/quant/${RUN}
+              --validateMappings -p 2 -o build/cn_trajectory_v0_1/quant/${RUN}
             rm -f build/cn_trajectory_v0_1/reads/${RUN}_1.fastq build/cn_trajectory_v0_1/reads/${RUN}_2.fastq
             rm -rf build/cn_trajectory_v0_1/reads/tmp_${RUN}
           done
@@ -102,8 +88,7 @@ jobs:
             --quant-root build/cn_trajectory_v0_1/quant \
             --manifest data/candidate_free_cn_stage_run_manifest_v0_1.csv \
             --family-map build/cn_trajectory_v0_1/family_map/transcript_family_map.csv \
-            --dataset-id CF_CN_01 \
-            --min-percent-mapped 10 \
+            --dataset-id CF_CN_01 --min-percent-mapped 10 \
             --out build/cn_trajectory_v0_1/family_expression.csv
 
       - name: Score fixed modules and ordered trajectory
@@ -134,6 +119,8 @@ jobs:
         if: always()
         run: |
           mkdir -p build/cn_trajectory_v0_1/diagnostics
+          cp build/cn_trajectory_v0_1/reference_contract.txt build/cn_trajectory_v0_1/diagnostics/ 2>/dev/null || true
+          cp build/cn_trajectory_v0_1/reference_route_diagnostic.txt build/cn_trajectory_v0_1/diagnostics/ 2>/dev/null || true
           printf 'reference=%s\nmax_spots_per_run=%s\nruns=15\nstages=5\nprimary=ordered_S1_to_S5_trajectory\n' "$REF_ACCESSION" "$MAX_SPOTS_PER_RUN" > build/cn_trajectory_v0_1/diagnostics/run_contract.txt
           find build/cn_trajectory_v0_1 -maxdepth 3 -type f -printf '%p\t%s bytes\n' 2>/dev/null | sort > build/cn_trajectory_v0_1/diagnostics/files.txt || true
 
