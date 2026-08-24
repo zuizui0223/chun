@@ -1,6 +1,6 @@
-# Ecological-driver meta-analysis — Paper 1 gate complete
+# Ecological-driver meta-analysis — Paper 1 v0.5 integration complete locally
 
-The ecological-driver layer has now been carried through v2 quantitative synthesis. The previously generated AJB submission bundle remains **provisional only because the manuscript must be regenerated to include the v2 ecological result**; no further ecological search is required before that revision unless a study supplies missing sampling variances for the three cross-species bird-access effects.
+The ecological-driver layer has been carried through v2 quantitative synthesis and propagated into a versioned AJB v0.5 build contract. The deterministic local build passes the manuscript claim gate, AJB style gate, revised ecological Fig. 6 generation, ecological Appendix S4 materialization, and final bundle checksum audit. No further ecological search is required before submission unless a study supplies missing sampling variances for the three cross-species bird-access effects.
 
 ## Resolved question
 
@@ -25,6 +25,12 @@ The strongest evidence is for the middle of this chain: reproductive-service/rel
 
 The ecological filtering mechanism is quantitatively supported at the service/reliability level, but accepted-species branch-specific colour-transition causes remain unidentifiable after taxonomy and wild-polymorphism audit. Direct abiotic floral-pigment effects also remain too sparse/confounded for formal meta-analysis.
 
-## Paper 1 next action
+## Paper 1 integration result
 
-Regenerate the manuscript/results/discussion and ecological figure/table layer from `docs/ECOLOGICAL_DRIVER_META_V2_RESULT.md` and the v0.2 registries. Submission metadata/archive DOI work remains paused until that regenerated bundle passes the existing claim-drift gates.
+- AJB structured abstract: 237 words;
+- Literature Cited: 32 entries, alphabetized and style-gated;
+- Main figures: frozen Figs 1–5 plus registry-backed ecological Fig. 6;
+- Supporting Information: nine appendices, with Appendix S4 carrying 17 studies and 25 registered ecological effects plus variance and claim-ceiling fields;
+- final local bundle audit: 6 main figures, 9 appendices, 47 files, one archive-DOI placeholder, SHA256 manifest generated.
+
+Submission metadata and archive DOI work remains paused until the v0.5 branch is reviewed and the regenerated bundle passes hosted CI. The remaining scientific boundary is unchanged: mechanism/service-level filtering is supported, but accepted-species branch-specific historical causation is not identified.

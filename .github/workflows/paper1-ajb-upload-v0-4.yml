@@ -1,13 +1,12 @@
 name: Paper 1 AJB upload-format v0.4
 
 on:
-  pull_request:
-    paths:
-      - 'data/paper1_ajb_appendix_mapping_v0_1.csv'
-      - 'scripts/build_paper1_ajb_submission_v0_4.py'
-      - 'scripts/validate_paper1_ajb_submission_v0_4.py'
-      - '.github/workflows/paper1-ajb-upload-v0-4.yml'
   workflow_dispatch:
+    inputs:
+      source_ref:
+        description: Historical commit containing the frozen pre-ecological v0.4 bundle
+        required: true
+        default: b8a1983fd957fe45f3b399dbc4df2d6f773dfd5c
 
 permissions:
   contents: read
@@ -18,6 +17,8 @@ jobs:
     timeout-minutes: 8
     steps:
       - uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.source_ref }}
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'

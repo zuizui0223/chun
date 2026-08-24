@@ -9,8 +9,21 @@ on:
       - 'data/paper1_bibliographic_corrections_v0_1.csv'
       - 'data/paper1_submission_cleanup_v0_3.json'
       - 'data/paper1_manuscript_v0_2_corrections.csv'
+      - 'data/ecological_driver_effect_size_registry_v0_2.csv'
+      - 'data/ecological_driver_study_registry_v0_2.csv'
+      - 'data/paper1_main_figure_manifest_v0_2.csv'
+      - 'data/paper1_ecological_release_delta_manifest_v0_1.csv'
+      - 'docs/PAPER1_MAIN_FIGURE_V0_2_FREEZE.md'
       - 'docs/PAPER1_SUBMISSION_BUNDLE_README.md'
+      - 'docs/PAPER1_TITLE_ABSTRACT_AJB.md'
+      - 'docs/PAPER1_ECOLOGICAL_INTEGRATION_V1.md'
       - 'manuscript/PAPER1_AJB_MANUSCRIPT_V0_1.md'
+      - 'scripts/build_paper1_ecological_integration_v1.py'
+      - 'scripts/apply_paper1_ecological_citations_v1.py'
+      - 'scripts/analyze_ecological_driver_meta_v2.py'
+      - 'scripts/build_paper1_ecological_fig6_v2.py'
+      - 'scripts/build_paper1_main_figures.py'
+      - 'scripts/build_paper1_supp_tables.py'
       - 'scripts/build_paper1_manuscript_v0_2.py'
       - 'scripts/build_paper1_submission_v0_3.py'
       - 'scripts/validate_paper1_submission_v0_3.py'
@@ -35,11 +48,23 @@ jobs:
       - name: Prepare directories
         run: |
           mkdir -p build/paper1_bundle/{manuscript,main_figures,supplementary_tables,supplementary_figures,provenance}
-          mkdir -p build/paper1_bundle_work
-      - name: Build AJB manuscript v0.2 then submission-clean v0.3
+          mkdir -p build/paper1_bundle_work/{ecological_meta,source_audit}
+      - name: Reproduce ecological-driver meta-analysis v2
         run: |
+          python scripts/analyze_ecological_driver_meta_v2.py \
+            --effects data/ecological_driver_effect_size_registry_v0_2.csv \
+            --studies data/ecological_driver_study_registry_v0_2.csv \
+            --out-dir build/paper1_bundle_work/ecological_meta
+      - name: Build ecological-v2 AJB manuscript then submission-clean v0.3
+        run: |
+          python scripts/build_paper1_ecological_integration_v1.py \
+            --input manuscript/PAPER1_AJB_MANUSCRIPT_V0_1.md \
+            --output build/paper1_bundle_work/PAPER1_AJB_MANUSCRIPT_ECO_RAW.md
+          python scripts/apply_paper1_ecological_citations_v1.py \
+            --input build/paper1_bundle_work/PAPER1_AJB_MANUSCRIPT_ECO_RAW.md \
+            --output build/paper1_bundle_work/PAPER1_AJB_MANUSCRIPT_ECO_BASE.md
           python scripts/build_paper1_manuscript_v0_2.py \
-            --v01 manuscript/PAPER1_AJB_MANUSCRIPT_V0_1.md \
+            --v01 build/paper1_bundle_work/PAPER1_AJB_MANUSCRIPT_ECO_BASE.md \
             --abstract-source docs/PAPER1_TITLE_ABSTRACT_AJB.md \
             --corrections data/paper1_manuscript_v0_2_corrections.csv \
             --out build/paper1_bundle_work/PAPER1_AJB_MANUSCRIPT_V0_2.md \
@@ -52,11 +77,16 @@ jobs:
           python scripts/validate_paper1_submission_v0_3.py \
             --manuscript build/paper1_bundle/manuscript/PAPER1_AJB_SUBMISSION_V0_3.md \
             --out build/paper1_bundle/provenance/v0_3_validation_summary.json
-      - name: Build Main Fig 1–6
+      - name: Build Main Figs 1–5 and ecological Fig. 6
         run: |
           python scripts/build_paper1_main_figures.py \
             --registry data/paper1_authoritative_results_v0_1.csv \
             --inputs data/paper1_figure_numeric_inputs_v0_1.csv \
+            --out-dir build/paper1_bundle/main_figures \
+            --skip-fig6
+          python scripts/build_paper1_ecological_fig6_v2.py \
+            --summary build/paper1_bundle_work/ecological_meta/summary.json \
+            --effects data/ecological_driver_effect_size_registry_v0_2.csv \
             --out-dir build/paper1_bundle/main_figures
       - name: Build Supplementary Tables S1–S6
         run: |
@@ -70,6 +100,8 @@ jobs:
             --micro data/paper1_micro_source_provenance_v0_1.csv \
             --wild-audit build/paper1_bundle_work/source_audit/wild_colour_source_audit.csv \
             --ecology data/paper1_ecological_primary_references_v0_1.csv \
+            --ecology-effects data/ecological_driver_effect_size_registry_v0_2.csv \
+            --ecology-studies data/ecological_driver_study_registry_v0_2.csv \
             --figure-inputs data/paper1_figure_numeric_inputs_v0_1.csv \
             --results data/paper1_authoritative_results_v0_1.csv \
             --out-dir build/paper1_bundle/supplementary_tables
@@ -85,6 +117,13 @@ jobs:
           cp data/paper1_analysis_disposition_v0_1.csv build/paper1_bundle/provenance/
           cp data/paper1_micro_source_provenance_v0_1.csv build/paper1_bundle/provenance/
           cp data/paper1_ecological_primary_references_v0_1.csv build/paper1_bundle/provenance/
+          cp data/ecological_driver_effect_size_registry_v0_2.csv build/paper1_bundle/provenance/
+          cp data/ecological_driver_study_registry_v0_2.csv build/paper1_bundle/provenance/
+          cp docs/ECOLOGICAL_DRIVER_META_V2_RESULT.md build/paper1_bundle/provenance/
+          cp build/paper1_bundle_work/ecological_meta/summary.json build/paper1_bundle/provenance/ecological_meta_v2_summary.json
+          cp data/paper1_main_figure_manifest_v0_2.csv build/paper1_bundle/provenance/
+          cp docs/PAPER1_MAIN_FIGURE_V0_2_FREEZE.md build/paper1_bundle/provenance/
+          cp data/paper1_ecological_release_delta_manifest_v0_1.csv build/paper1_bundle/provenance/
           cp data/paper1_bibliographic_corrections_v0_1.csv build/paper1_bundle/provenance/
           cp data/wfo55_accepted_species_wild_colour_registry_v0_1.csv build/paper1_bundle/provenance/
           cp data/paper1_release_artifact_manifest_v0_2.csv build/paper1_bundle/provenance/
@@ -93,10 +132,11 @@ jobs:
         run: |
           python scripts/audit_paper1_submission_bundle.py \
             --bundle build/paper1_bundle \
-            --out build/paper1_bundle/BUNDLE_MANIFEST.json
+            --out build/paper1_bundle/BUNDLE_MANIFEST.json \
+            --require-ecology-v2
           cat build/paper1_bundle/BUNDLE_MANIFEST.json >> "$GITHUB_STEP_SUMMARY"
       - uses: actions/upload-artifact@v4
         with:
-          name: paper1-ajb-submission-bundle-v0-3
+          name: paper1-ajb-submission-bundle-v0-3-ecological-v2
           path: build/paper1_bundle/
           if-no-files-found: error

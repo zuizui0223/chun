@@ -24,8 +24,8 @@ def apply_ajb_style_corrections(text: str) -> tuple[str, list[str]]:
     corrections = [
         (
             "CITE_ORDER_2026",
-            "(Lacey, 2026; Berardi et al., 2026)",
-            "(Berardi et al., 2026; Lacey, 2026)",
+            "Lacey, 2026; Berardi et al., 2026",
+            "Berardi et al., 2026; Lacey, 2026",
         ),
         (
             "REF_GENG_FIRST7_ETAL",
@@ -60,8 +60,27 @@ def apply_ajb_style_corrections(text: str) -> tuple[str, list[str]]:
     ]
     applied: list[str] = []
     for label, old, new in corrections:
-        text = exact_replace(text, old, new, label)
-        applied.append(label)
+        old_count = text.count(old)
+        new_count = text.count(new)
+        if label == "CITE_ORDER_2026":
+            if old_count:
+                text = text.replace(old, new)
+                applied.append(f"{label}:{old_count}_occurrences")
+                continue
+            if new_count:
+                applied.append(f"{label}:already_applied_{new_count}_occurrences")
+                continue
+            raise SystemExit(f"{label}: citation-order target not found")
+        if old_count == 1:
+            text = text.replace(old, new, 1)
+            applied.append(label)
+        elif old_count == 0 and new_count == 1:
+            applied.append(f"{label}:already_applied")
+        else:
+            raise SystemExit(
+                f"{label}: expected one old or already-applied match, "
+                f"found old={old_count}, new={new_count}"
+            )
     return text, applied
 
 
@@ -88,6 +107,8 @@ def main() -> int:
     ap.add_argument("--appendix-map", type=Path, required=True)
     ap.add_argument("--out", type=Path, required=True)
     ap.add_argument("--summary", type=Path, required=True)
+    ap.add_argument("--submission-version", default="v0.4")
+    ap.add_argument("--source-version", default="v0.3")
     a = ap.parse_args()
 
     text = a.v03.read_text(encoding="utf-8")
@@ -154,8 +175,8 @@ def main() -> int:
     a.out.parent.mkdir(parents=True, exist_ok=True)
     a.out.write_text(text, encoding="utf-8")
     summary = {
-        "submission_version": "v0.4",
-        "source_version": "v0.3",
+        "submission_version": a.submission_version,
+        "source_version": a.source_version,
         "appendix_count": len(appendix_rows),
         "data_availability_ajb_statement_present": True,
         "supplementary_map_section_removed": True,

@@ -5,7 +5,10 @@ on:
     paths:
       - 'manuscript/PAPER1_AJB_MANUSCRIPT_V0_1.md'
       - 'docs/PAPER1_TITLE_ABSTRACT_AJB.md'
+      - 'docs/PAPER1_ECOLOGICAL_INTEGRATION_V1.md'
       - 'data/paper1_manuscript_v0_2_corrections.csv'
+      - 'scripts/build_paper1_ecological_integration_v1.py'
+      - 'scripts/apply_paper1_ecological_citations_v1.py'
       - 'scripts/build_paper1_manuscript_v0_2.py'
       - 'scripts/validate_paper1_manuscript_v0_1.py'
       - '.github/workflows/paper1-manuscript-v0-2.yml'
@@ -23,22 +26,31 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
-      - name: Build AJB submission-candidate manuscript v0.2
+      - name: Build ecological-integrated manuscript base
         run: |
           mkdir -p build/paper1_manuscript_v0_2
+          python scripts/build_paper1_ecological_integration_v1.py \
+            --input manuscript/PAPER1_AJB_MANUSCRIPT_V0_1.md \
+            --output build/paper1_manuscript_v0_2/PAPER1_AJB_MANUSCRIPT_ECO_RAW.md
+          python scripts/apply_paper1_ecological_citations_v1.py \
+            --input build/paper1_manuscript_v0_2/PAPER1_AJB_MANUSCRIPT_ECO_RAW.md \
+            --output build/paper1_manuscript_v0_2/PAPER1_AJB_MANUSCRIPT_ECO_BASE.md
+      - name: Build AJB submission-candidate manuscript v0.2
+        run: |
           python scripts/build_paper1_manuscript_v0_2.py \
-            --v01 manuscript/PAPER1_AJB_MANUSCRIPT_V0_1.md \
+            --v01 build/paper1_manuscript_v0_2/PAPER1_AJB_MANUSCRIPT_ECO_BASE.md \
             --abstract-source docs/PAPER1_TITLE_ABSTRACT_AJB.md \
             --corrections data/paper1_manuscript_v0_2_corrections.csv \
             --out build/paper1_manuscript_v0_2/PAPER1_AJB_MANUSCRIPT_V0_2.md \
             --summary build/paper1_manuscript_v0_2/build_summary.json
-      - name: Re-run frozen manuscript claim gate on v0.2
+      - name: Re-run current manuscript claim gate on v0.2
         run: |
           python scripts/validate_paper1_manuscript_v0_1.py \
             --manuscript build/paper1_manuscript_v0_2/PAPER1_AJB_MANUSCRIPT_V0_2.md \
             --out build/paper1_manuscript_v0_2/claim_gate_summary.json \
             --max-abstract-words 250 \
-            --version-label submission_candidate_v0_2
+            --version-label submission_candidate_v0_2_ecological_v2 \
+            --require-ecology-v2
       - name: Report
         run: |
           echo '### Paper 1 manuscript v0.2 build' >> "$GITHUB_STEP_SUMMARY"
