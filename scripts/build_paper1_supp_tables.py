@@ -23,12 +23,84 @@ def write_csv(path: Path, rows: list[dict[str, str]], fields: list[str] | None =
         writer.writeheader(); writer.writerows(rows)
 
 
+def build_ecological_v2_rows(
+    studies: list[dict[str, str]], effects: list[dict[str, str]]
+) -> tuple[list[dict[str, str]], list[str]]:
+    source_to_study: dict[str, dict[str, str]] = {}
+    for study in studies:
+        source = study["source"].strip()
+        if not source or source in source_to_study:
+            raise SystemExit(f"ecological v2 study registry has missing/duplicate source: {source}")
+        source_to_study[source] = study
+
+    effects_by_source: dict[str, list[dict[str, str]]] = {source: [] for source in source_to_study}
+    for effect in effects:
+        source = effect["source"].strip()
+        if source not in source_to_study:
+            raise SystemExit(f"ecological effect {effect['effect_id']} has no study-registry source match")
+        effects_by_source[source].append(effect)
+
+    fields = [
+        "record_type", "study_id", "year", "taxon", "ecological_axis", "design",
+        "quantitative_status", "primary_outcome", "admission_status", "source",
+        "study_role", "claim_ceiling", "effect_id", "effect_taxon", "visible_state",
+        "contrast", "outcome", "effect_metric", "numerator_value", "denominator_value",
+        "effect_value", "se_value", "variance_status", "events_num", "n_num",
+        "events_den", "n_den", "independence_unit", "effect_notes",
+    ]
+    rows: list[dict[str, str]] = []
+    for study in studies:
+        linked_effects = effects_by_source[study["source"].strip()]
+        records = linked_effects or [None]
+        for effect in records:
+            row = {
+                "record_type": "effect" if effect else "context_only_study",
+                "study_id": study["study_id"],
+                "year": study["year"],
+                "taxon": study["taxon"],
+                "ecological_axis": study["ecological_axis"],
+                "design": study["design"],
+                "quantitative_status": study["quantitative_status"],
+                "primary_outcome": study["primary_outcome"],
+                "admission_status": study["admission_status"],
+                "source": study["source"],
+                "study_role": study["role"],
+                "claim_ceiling": study["claim_ceiling"],
+            }
+            if effect:
+                row.update({
+                    "effect_id": effect["effect_id"],
+                    "effect_taxon": effect["taxon"],
+                    "visible_state": effect["visible_state"],
+                    "contrast": effect["contrast"],
+                    "outcome": effect["outcome"],
+                    "effect_metric": effect["effect_metric"],
+                    "numerator_value": effect["numerator_value"],
+                    "denominator_value": effect["denominator_value"],
+                    "effect_value": effect["effect_value"],
+                    "se_value": effect["se_value"],
+                    "variance_status": effect["variance_status"],
+                    "events_num": effect["events_num"],
+                    "n_num": effect["n_num"],
+                    "events_den": effect["events_den"],
+                    "n_den": effect["n_den"],
+                    "independence_unit": effect["independence_unit"],
+                    "effect_notes": effect["notes"],
+                })
+            rows.append(row)
+    if {row.get("effect_id", "") for row in rows} - {""} != {e["effect_id"] for e in effects}:
+        raise SystemExit("ecological v2 supplementary table lost one or more effect IDs")
+    return rows, fields
+
+
 def main() -> int:
     ap = argparse.ArgumentParser()
     ap.add_argument("--disposition", type=Path, required=True)
     ap.add_argument("--micro", type=Path, required=True)
     ap.add_argument("--wild-audit", type=Path, required=True)
     ap.add_argument("--ecology", type=Path, required=True)
+    ap.add_argument("--ecology-effects", type=Path)
+    ap.add_argument("--ecology-studies", type=Path)
     ap.add_argument("--figure-inputs", type=Path, required=True)
     ap.add_argument("--results", type=Path, required=True)
     ap.add_argument("--out-dir", type=Path, required=True)
@@ -38,6 +110,10 @@ def main() -> int:
     micro = read_csv(a.micro)
     wild = read_csv(a.wild_audit)
     ecology = read_csv(a.ecology)
+    ecology_effects = read_csv(a.ecology_effects) if a.ecology_effects else []
+    ecology_studies = read_csv(a.ecology_studies) if a.ecology_studies else []
+    if bool(a.ecology_effects) != bool(a.ecology_studies):
+        raise SystemExit("--ecology-effects and --ecology-studies must be supplied together")
     figure_inputs = read_csv(a.figure_inputs)
     results = read_csv(a.results)
 
@@ -52,8 +128,24 @@ def main() -> int:
     # S3: accepted-species wild-colour source grading and seed treatment.
     write_csv(a.out_dir / "Table_S3_wild_colour_source_audit.csv", wild)
 
-    # S4: primary ecological/pollination evidence with exact bibliographic links.
-    write_csv(a.out_dir / "Table_S4_camellia_pollination_primary_evidence.csv", ecology)
+    # S4: v0.1 primary evidence, or the versioned v0.2 study/effect registry join.
+    if ecology_effects:
+        ecological_rows, ecological_fields = build_ecological_v2_rows(ecology_studies, ecology_effects)
+        ecological_file = "Table_S4_camellia_ecological_driver_evidence_v0_2.csv"
+        write_csv(a.out_dir / ecological_file, ecological_rows, ecological_fields)
+        ecological_caption = (
+            "Study-level Camellia ecological-driver evidence joined to the v0.2 effect-size "
+            "registry, including admission status, variance limitations, independence units, "
+            "and claim ceilings."
+        )
+    else:
+        ecological_rows = ecology
+        ecological_file = "Table_S4_camellia_pollination_primary_evidence.csv"
+        write_csv(a.out_dir / ecological_file, ecology)
+        ecological_caption = (
+            "Primary Camellia pollination, sensory, and reproductive-context studies used to "
+            "evaluate visible-state aliasing and context dependence."
+        )
 
     # S5: numerical topology/trait robustness values plotted in Main Figs 4–5.
     s5 = [r for r in figure_inputs if r["figure_id"] in {"Fig4", "Fig5"}]
@@ -90,8 +182,8 @@ def main() -> int:
         },
         {
             "table": "Table S4",
-            "file": "Table_S4_camellia_pollination_primary_evidence.csv",
-            "caption": "Primary Camellia pollination, sensory, and reproductive-context studies used to evaluate visible-state aliasing and context dependence.",
+            "file": ecological_file,
+            "caption": ecological_caption,
         },
         {
             "table": "Table S5",
@@ -117,12 +209,15 @@ def main() -> int:
         raise SystemExit("Table S3 contains C-grade source admitted into strict/dominant state seed")
 
     summary = {
-        "supplement_version": "v0.1",
+        "supplement_version": "v0.2 ecological integration" if ecology_effects else "v0.1",
         "tables": {x["table"]: x["file"] for x in descriptions},
         "n_analysis_disposition_rows": len(disposition),
         "n_micro_source_rows": len(micro),
         "n_wild_colour_source_rows": len(wild),
         "n_ecological_primary_references": len(ecology),
+        "n_ecological_v2_studies": len(ecology_studies),
+        "n_ecological_v2_effects": len(ecology_effects),
+        "n_ecological_v2_appendix_rows": len(ecological_rows),
         "n_topology_trait_numeric_rows": len(s5),
         "n_trait_history_boundary_rows": len(s6),
         "new_scientific_analysis": False,

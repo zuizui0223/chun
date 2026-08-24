@@ -1,0 +1,12 @@
+release_component,kind,repository_path_or_artifact,required_for_reproduction,role,notes
+ecological_effect_registry,repository_file,data/ecological_driver_effect_size_registry_v0_2.csv,yes,ecology_quantitative,"Frozen study-level effect values, variance status, independence units, and source locators."
+ecological_study_registry,repository_file,data/ecological_driver_study_registry_v0_2.csv,yes,ecology_quantitative,"Frozen systematic study registry with admission decisions and claim ceilings."
+ecological_meta_result,repository_file,docs/ECOLOGICAL_DRIVER_META_V2_RESULT.md,yes,ecology_quantitative,"Authoritative v2 synthesis and public-data boundary."
+ecological_analyzer,repository_file,scripts/analyze_ecological_driver_meta_v2.py,yes,ecology_quantitative,"Deterministically regenerates the ecological summary from v0.2 registries."
+paper1_ecological_overlay,repository_file,scripts/build_paper1_ecological_integration_v1.py,yes,manuscript,"Integrates ecological Methods Results Discussion Conclusions and Fig. 6 legend into the frozen manuscript template."
+paper1_ecological_citations,repository_file,scripts/apply_paper1_ecological_citations_v1.py,yes,manuscript,"Adds exact primary ecological citation anchors before bibliography correction and sorting."
+paper1_ecological_figure_builder,repository_file,scripts/build_paper1_ecological_fig6_v2.py,yes,figures,"Builds revised Main Fig. 6 from the frozen effect registry and regenerated summary."
+paper1_main_figure_manifest_v0_2,repository_file,data/paper1_main_figure_manifest_v0_2.csv,yes,figures,"Carries forward Figs 1-5 and replaces Fig. 6 dependencies with ecological-v2 inputs."
+paper1_main_figure_v0_2_freeze,repository_file,docs/PAPER1_MAIN_FIGURE_V0_2_FREEZE.md,yes,figures,"Records registry dependencies, full-resolution visual QA, and the Fig. 6 claim ceiling."
+paper1_appendix_mapping_v0_2,repository_file,data/paper1_ajb_appendix_mapping_v0_2.csv,yes,supplement,"Replaces Appendix S4 with the joined ecological study/effect evidence table."
+paper1_ajb_upload_bundle_v0_5,workflow_artifact,paper1-ajb-upload-bundle-v0-5,yes,submission,"Ecological-v2 integrated manuscript, revised Fig. 6, Appendix S4, provenance, and checksums."

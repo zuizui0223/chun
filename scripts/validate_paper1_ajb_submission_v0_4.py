@@ -51,6 +51,8 @@ def main() -> int:
     ap.add_argument("--manuscript", type=Path, required=True)
     ap.add_argument("--appendix-map", type=Path, required=True)
     ap.add_argument("--out", type=Path, required=True)
+    ap.add_argument("--submission-version", default="v0.4")
+    ap.add_argument("--require-ecology-v2", action="store_true")
     a = ap.parse_args()
     text = a.manuscript.read_text(encoding="utf-8")
 
@@ -80,15 +82,27 @@ def main() -> int:
         raise SystemExit("expected exactly one archive DOI placeholder")
 
     required_claims = [
-        "46/50 nontrivial splits", "normalized RF = 0.08", "strict *P* = 0.00116",
+        "46 of 50 nontrivial splits", "normalized RF = 0.08", "strict *P* = 0.00116",
         "dominant *P* = 0.000080", "strict × dominant cross-scenario accepted branch count was therefore zero",
         "Berruti et al. (2015)", "Geng et al., 2022", "Qu et al., 2024",
         "World Flora Online Consortium, 2026", "Wickramaratne and Vitarana, 1985",
-        "(Berardi et al., 2026; Lacey, 2026)",
+        "Berardi et al., 2026; Lacey, 2026",
     ]
     for x in required_claims:
         if x not in text:
             raise SystemExit(f"missing frozen claim/citation: {x}")
+    if a.require_ecology_v2:
+        ecological_claims = [
+            "geometric mean RR was **3.53**",
+            "geometric mean was **2.42**",
+            "(**5/5** in the expected direction",
+            "Five studies across four taxa",
+            "no accepted-species colour-transition branch was robust to both strict and dominant",
+            "direct abiotic evidence for petal pigment deployment remained sparse",
+        ]
+        for claim in ecological_claims:
+            if claim not in text:
+                raise SystemExit(f"missing ecological-v2 claim: {claim}")
 
     required_reference_forms = [
         "Berruti, A., A. Christiaens, E. De Keyser, M.-C. Van Labeke, and V. Scariot. 2015.",
@@ -105,7 +119,7 @@ def main() -> int:
     forbidden = [
         "Larcher et al. (2015)", "Larcher, R., et al. 2015.", "Draft v0", "# OPEN ITEMS",
         "`data/", "`docs/", "`scripts/", "GitHub Actions", "PR #", "PR#",
-        "(Lacey, 2026; Berardi et al., 2026)",
+        "Lacey, 2026; Berardi et al., 2026",
         "Geng, F., R. Nie, N. Yang, L. Cai, Y. Hu, S. Chen, X. Cheng, Z. Wang, and L. Chen. 2022.",
         "Jiang, H.-D., D.-J. Zeng, H.-Z. Qin, L.-H. Peng, Y.-S. Yang, Z.-Y. Chen, R. Zou, J.-M. Tang,",
         "Qu, Y., Z. Ou, Q. Q. Yong, X. Yao, et al. 2024.",
@@ -128,7 +142,7 @@ def main() -> int:
         raise SystemExit("AJB appendix mapping does not contain 9 entries")
 
     summary = {
-        "submission_version": "v0.4",
+        "submission_version": a.submission_version,
         "target_journal": "American Journal of Botany",
         "abstract_words": words,
         "appendix_count": 9,
@@ -141,6 +155,7 @@ def main() -> int:
         "bibliographic_correction_gate": True,
         "internal_project_tokens_absent": True,
         "scientific_results_changed": False,
+        "ecological_v2_claim_gate": a.require_ecology_v2,
         "status": "AJB upload-format and reference-style gate passed",
     }
     a.out.parent.mkdir(parents=True, exist_ok=True)

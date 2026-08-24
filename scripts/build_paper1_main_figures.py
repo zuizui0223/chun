@@ -175,6 +175,11 @@ def main() -> int:
     ap.add_argument("--registry", type=Path, required=True)
     ap.add_argument("--inputs", type=Path, required=True)
     ap.add_argument("--out-dir", type=Path, required=True)
+    ap.add_argument(
+        "--skip-fig6",
+        action="store_true",
+        help="Build frozen Figs 1-5 only; a versioned downstream builder must supply Fig. 6.",
+    )
     args = ap.parse_args()
 
     registry = {r["result_id"]: r for r in read_csv(args.registry)}
@@ -194,8 +199,9 @@ def main() -> int:
         "F3_STRICT_SEED","F3_DOMINANT_SEED","F3_DEMOTED","F4_TOTAL_SPLITS","F4_SHARED_SPLITS","F4_RF",
         "F4_NRF","F4_JACCARD","F5_FAST_STRICT_NEAR","F5_FAST_DOM_NEAR","F5_UF_STRICT_NEAR",
         "F5_UF_DOM_NEAR","F5_FAST_STRICT_MPD","F5_FAST_DOM_MPD","F5_UF_STRICT_MPD","F5_UF_DOM_MPD",
-        "F6_STRICT_EVENTS","F6_DOM_EVENTS","F6_SHARED_EVENTS",
     }
+    if not args.skip_fig6:
+        expected.update({"F6_STRICT_EVENTS", "F6_DOM_EVENTS", "F6_SHARED_EVENTS"})
     missing = sorted(expected - set(values))
     if missing:
         raise SystemExit(f"missing figure inputs: {missing}")
@@ -206,14 +212,18 @@ def main() -> int:
     fig3(args.out_dir, values)
     fig4(args.out_dir, values)
     fig5(args.out_dir, values)
-    fig6(args.out_dir, values)
+    if not args.skip_fig6:
+        fig6(args.out_dir, values)
 
     svg = sorted(p.name for p in args.out_dir.glob("Fig*.svg"))
     png = sorted(p.name for p in args.out_dir.glob("Fig*.png"))
-    if len(svg) != 6 or len(png) != 6:
-        raise SystemExit(f"expected 6 SVG + 6 PNG, got svg={svg}, png={png}")
+    expected_count = 5 if args.skip_fig6 else 6
+    if len(svg) != expected_count or len(png) != expected_count:
+        raise SystemExit(
+            f"expected {expected_count} SVG + {expected_count} PNG, got svg={svg}, png={png}"
+        )
     summary = {
-        "figure_set": "Paper1 Main Fig1-Fig6 v0.1",
+        "figure_set": "Paper1 Main Fig1-Fig5 frozen base" if args.skip_fig6 else "Paper1 Main Fig1-Fig6 v0.1",
         "n_svg": len(svg),
         "n_png": len(png),
         "svg_files": svg,
@@ -221,6 +231,7 @@ def main() -> int:
         "numeric_input_rows": len(rows),
         "registry_guard": "all numeric inputs reference non-superseded Paper 1 result IDs",
         "scientific_boundary": "figure generation only; no new analysis",
+        "fig6_delegated_to_versioned_builder": args.skip_fig6,
     }
     (args.out_dir / "figure_build_summary.json").write_text(json.dumps(summary, indent=2) + "\n", encoding="utf-8")
     print(json.dumps(summary, indent=2))

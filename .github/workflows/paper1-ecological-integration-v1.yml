@@ -1,0 +1,71 @@
+name: Paper 1 ecological integration v1
+
+on:
+  pull_request:
+    paths:
+      - 'docs/ECOLOGICAL_DRIVER_META_ANALYSIS_STATUS.md'
+      - 'docs/PAPER1_ECOLOGICAL_INTEGRATION_V1.md'
+      - 'docs/PAPER1_TITLE_ABSTRACT_AJB.md'
+      - 'scripts/build_paper1_ecological_integration_v1.py'
+      - 'scripts/apply_paper1_ecological_citations_v1.py'
+      - '.github/workflows/paper1-ecological-integration-v1.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  build-and-audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Build ecological-integrated manuscript
+        run: |
+          mkdir -p build/paper1_ecological_integration_v1
+          python scripts/build_paper1_ecological_integration_v1.py \
+            --input manuscript/PAPER1_AJB_MANUSCRIPT_V0_1.md \
+            --output build/paper1_ecological_integration_v1/PAPER1_AJB_MANUSCRIPT_ECO_RAW.md
+          python scripts/apply_paper1_ecological_citations_v1.py \
+            --input build/paper1_ecological_integration_v1/PAPER1_AJB_MANUSCRIPT_ECO_RAW.md \
+            --output build/paper1_ecological_integration_v1/PAPER1_AJB_MANUSCRIPT_ECO_V1.md
+      - name: Guard ecological claims, citations and abstract
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import re
+          p=Path('build/paper1_ecological_integration_v1/PAPER1_AJB_MANUSCRIPT_ECO_V1.md')
+          t=p.read_text()
+          assert t.count('# DISCUSSION') == 1
+          assert 'geometric mean RR was **3.53**' in t
+          assert 'geometric mean was **2.42**' in t
+          assert '(**5/5** in the expected direction; Xie et al., 2013; Li et al., 2021)' in t
+          assert 'Five studies across four taxa' in t
+          assert 'Yuan et al., 2025' in t
+          assert 'Liu et al., 2025' in t
+          assert 'Kunitake et al., 2004; Sun et al., 2017; Zhang et al., 2024' in t
+          assert 'no accepted-species colour-transition branch was robust to both strict and dominant wild-colour scenarios' in t
+          assert 'direct abiotic evidence for petal pigment deployment remained sparse' in t
+          assert 'red-specific bird-pollination syndrome' in t
+          assert 'ask five linked questions' in t
+          assert 'Reproductive-service filtering is quantitatively supported, but historical colour-transition causation remains unresolved' in t
+          start=t.index('## ABSTRACT')
+          end=t.index('**Key words:**', start)
+          abstract=t[start:end]
+          body=[]
+          for line in abstract.splitlines():
+              s=line.strip()
+              if not s or s.startswith('#'): continue
+              body.extend(re.findall(r"\b[\w*./–-]+\b", s))
+          assert len(body) <= 250, len(body)
+          print('abstract_tokens', len(body))
+          print('manuscript_chars', len(t))
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: paper1-ecological-integration-v1
+          path: build/paper1_ecological_integration_v1/
+          if-no-files-found: error

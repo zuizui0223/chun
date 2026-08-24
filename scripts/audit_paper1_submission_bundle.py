@@ -19,6 +19,7 @@ def main() -> int:
     ap = argparse.ArgumentParser()
     ap.add_argument("--bundle", type=Path, required=True)
     ap.add_argument("--out", type=Path, required=True)
+    ap.add_argument("--require-ecology-v2", action="store_true")
     a = ap.parse_args()
 
     manuscript = a.bundle / "manuscript" / "PAPER1_AJB_SUBMISSION_V0_3.md"
@@ -52,6 +53,19 @@ def main() -> int:
     supp_svg = sorted((a.bundle / "supplementary_figures").glob("FigS*.svg"))
     if (len(main_png), len(main_svg)) != (6, 6):
         raise SystemExit(f"expected 6 Main PNG/SVG figures, got {len(main_png)}/{len(main_svg)}")
+    if a.require_ecology_v2:
+        if not (a.bundle / "main_figures" / "Fig6_ecological_filtering.png").exists():
+            raise SystemExit("ecological-v2 Main Fig. 6 PNG missing")
+        if not (a.bundle / "main_figures" / "Fig6_ecological_filtering.svg").exists():
+            raise SystemExit("ecological-v2 Main Fig. 6 SVG missing")
+        for claim in [
+            "geometric mean RR was **3.53**",
+            "geometric mean was **2.42**",
+            "Five studies across four taxa",
+            "no accepted-species colour-transition branch was robust to both strict and dominant",
+        ]:
+            if claim not in text:
+                raise SystemExit(f"submission manuscript missing ecological-v2 claim: {claim}")
     if len(supp_csv) != 6:
         raise SystemExit(f"expected 6 Supplementary Tables, got {len(supp_csv)}")
     if (len(supp_png), len(supp_svg)) != (3, 3):
@@ -65,6 +79,16 @@ def main() -> int:
         "wfo55_accepted_species_wild_colour_registry_v0_1.csv",
         "paper1_release_artifact_manifest_v0_2.csv",
     ]
+    if a.require_ecology_v2:
+        required_prov.extend([
+            "ecological_driver_effect_size_registry_v0_2.csv",
+            "ecological_driver_study_registry_v0_2.csv",
+            "ECOLOGICAL_DRIVER_META_V2_RESULT.md",
+            "ecological_meta_v2_summary.json",
+            "paper1_main_figure_manifest_v0_2.csv",
+            "PAPER1_MAIN_FIGURE_V0_2_FREEZE.md",
+            "paper1_ecological_release_delta_manifest_v0_1.csv",
+        ])
     for name in required_prov:
         if not (a.bundle / "provenance" / name).exists():
             raise SystemExit(f"missing provenance file: {name}")
@@ -98,6 +122,7 @@ def main() -> int:
             "versioned archive DOI",
         ],
         "new_scientific_analysis": False,
+        "ecological_v2_gate": a.require_ecology_v2,
         "files": manifest,
     }
     a.out.parent.mkdir(parents=True, exist_ok=True)

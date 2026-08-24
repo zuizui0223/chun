@@ -1,0 +1,15 @@
+figure_id,panel_id,panel_title,result_ids,plot_design,manuscript_status
+Fig1,A,"Hypothesis trajectory: generation to persistence","E01_UNIVERSAL_COLD_CHAIN_NOT_SUPPORTED;E02_VISIBLE_HUE_POLLINATOR_ALIASING;C01_CROSS_SCALE_MISMATCH;C02_PUBLIC_DATA_IDENTIFIABILITY_BOUNDARY","Conceptual flow with each rejected/refined hypothesis tied to an authoritative result ID.",main
+Fig1,B,"Public-data stop rule","B01_NO_ROBUST_ACCEPTED_BRANCH_EVENTS;C02_PUBLIC_DATA_IDENTIFIABILITY_BOUNDARY","Boundary diagram separating identifiable macro pattern from unidentifiable branch causation.",main
+Fig2,A,"FLS same-lineage recurrence","M01_FLS_SAME_LINEAGE","Sequence/lineage schematic with source anchors and same-lineage recurrence.",main
+Fig2,B,"DFR paralog substitution","M02_DFR_PARALOG_SUBSTITUTION","Paired DFR-family schematic contrasting CsDFRa-like and CsDFRb2 implementations.",main
+Fig2,C,"Copy-aware family heterogeneity","M03_ANS_COPY_DIRECTION_HETEROGENEITY;M04_ANR_COPY_DIRECTION_HETEROGENEITY","Compact support panel showing copy-specific directional heterogeneity without claiming strict-node recurrence.",main
+Fig3,A,"Taxonomy attrition","T01_WFO_ACCEPTED_TAXONOMY","Flow: 93 legacy Camellia tips -> 55 WFO accepted species.",main
+Fig3,B,"Wild-colour evidence attrition","T02_WILD_COLOUR_AUDIT","Flow: 35 provisional hard states -> strict 24 / dominant 30; annotate polymorphism and insufficient evidence.",main
+Fig4,A,"Accepted-species topology concordance","P01_NUCLEAR_TOPOLOGY_CONCORDANCE","Split-concordance/RF summary for FastTree-ASTRAL vs IQ-TREE/UFBoot-ASTRAL on 53 shared species.",main
+Fig5,A,"FastTree local colour conservatism","P02_LOCAL_COLOUR_CONSERV_FASTTREE","Observed nearest-same-colour statistic against permutation null for strict and dominant seeds.",main
+Fig5,B,"UFBoot local colour conservatism","P03_LOCAL_COLOUR_CONSERV_UFBOOT","Observed nearest-same-colour statistic against permutation null for strict and dominant seeds.",main
+Fig5,C,"What did not survive topology sensitivity","P04_GLOBAL_MPD_TOPOLOGY_SENSITIVE;P05_A_SPECIFIC_PERMISSIVITY_NOT_STRICT","Negative robustness panel: global MPD and A-specific claims explicitly demoted.",main
+Fig6,A,"Cross-species pollinator-service magnitude","ECO_BIRD_JAPONICA_FRUIT;ECO_BIRD_PETELOTII_FRUIT;ECO_BIRD_OLEIFERA_FRUIT","Fruit-set response ratios from the frozen ecological effect-size registry, with equal-weight geometric mean and leave-one-out sensitivity.",main
+Fig6,B,"Within-species service replication and reliability","ECO_BIRD_OLEIFERA_FRUIT;ECO_BEE_OLEIFERA_LIU2025_CAGE;ECO_RELIABILITY_OLEIFERA_PL_VD;ECO_BEEABUND_OLEIFERA_2018;ECO_BEEABUND_OLEIFERA_2019;ECO_BEE_DIST_OLEIFERA_2018;ECO_BEE_DIST_OLEIFERA_2019","Independent C. oleifera service experiments plus directionally replicated reliability gradients.",main
+Fig6,C,"Conditional filtering model and causal boundary","ECOLOGICAL_DRIVER_META_V2_RESULT;B01_NO_ROBUST_ACCEPTED_BRANCH_EVENTS;C02_PUBLIC_DATA_IDENTIFIABILITY_BOUNDARY","Mechanism/service support, flowering-window mediation, sparse direct abiotic evidence, and the retained branch-causal boundary.",main
