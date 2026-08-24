@@ -1,0 +1,7 @@
+run,biosample,archive_sample_name,dependence_cluster,condition_id,visible_observation,replicate,mapping_status,mapping_basis
+SRR22904726,SAMN32301769,Pink1,CJAPONICA,CJ_JK_PINK,pink,1,resolved,"archive SampleName directly encodes petal region and replicate"
+SRR22904725,SAMN32301770,Pink2,CJAPONICA,CJ_JK_PINK,pink,2,resolved,"archive SampleName directly encodes petal region and replicate"
+SRR22904724,SAMN32301771,Pink3,CJAPONICA,CJ_JK_PINK,pink,3,resolved,"archive SampleName directly encodes petal region and replicate"
+SRR22904723,SAMN32301772,Red1,CJAPONICA,CJ_JK_RED,red,1,resolved,"archive SampleName directly encodes petal region and replicate"
+SRR22904722,SAMN32301773,Red2,CJAPONICA,CJ_JK_RED,red,2,resolved,"archive SampleName directly encodes petal region and replicate"
+SRR22904727,SAMN32301774,Red3,CJAPONICA,CJ_JK_RED,red,3,resolved,"archive SampleName directly encodes petal region and replicate"
