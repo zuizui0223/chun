@@ -47,9 +47,13 @@ jobs:
           sysa=s['system_level_axis_ascertainment']
           cla=s['dependence_collapsed_axis_ascertainment']
           assert sysa['observed_axis_coverage'] == {'A_change':8,'F_change':4,'C_change':1,'P_change':3}
-          assert sysa['permutation_p_A_enrichment'] < 0.02
-          assert sysa['permutation_p_any_axis_imbalance'] < 0.05
-          assert cla['permutation_p_A_enrichment'] > 0.05
+          assert sysa['n_exact_axis_assignments'] == 5308416
+          assert abs(sysa['exact_p_A_enrichment'] - 0.00836181640625) < 1e-15
+          assert abs(sysa['exact_p_any_axis_imbalance'] - 0.023948386863425927) < 1e-15
+          assert cla['observed_axis_coverage'] == {'A_change':4,'F_change':3,'C_change':1,'P_change':2}
+          assert cla['n_exact_axis_assignments'] == 576
+          assert abs(cla['exact_p_A_enrichment'] - 0.140625) < 1e-15
+          assert abs(cla['exact_p_any_axis_imbalance'] - (5/12)) < 1e-15
           print(json.dumps(s, indent=2, ensure_ascii=False))
           PY
       - uses: actions/upload-artifact@v4
