@@ -44,6 +44,12 @@ jobs:
           assert abs(primary['observed_recurrence'] - 0.2) < 1e-12
           assert primary['permutation_p_upper'] > 0.9
           assert sensitivity['permutation_p_upper'] > 0.05
+          sysa=s['system_level_axis_ascertainment']
+          cla=s['dependence_collapsed_axis_ascertainment']
+          assert sysa['observed_axis_coverage'] == {'A_change':8,'F_change':4,'C_change':1,'P_change':3}
+          assert sysa['permutation_p_A_enrichment'] < 0.02
+          assert sysa['permutation_p_any_axis_imbalance'] < 0.05
+          assert cla['permutation_p_A_enrichment'] > 0.05
           print(json.dumps(s, indent=2, ensure_ascii=False))
           PY
       - uses: actions/upload-artifact@v4
