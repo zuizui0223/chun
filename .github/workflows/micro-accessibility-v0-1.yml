@@ -34,11 +34,16 @@ jobs:
           python - <<'PY'
           import json
           s=json.load(open('build/micro_accessibility_v0_1/summary.json'))
-          assert s['n_independent_systems'] == 7
+          assert s['n_biological_systems'] == 10
+          assert s['n_dependence_clusters'] == 5
           assert s['macro_transition_test']['status'] == 'blocked'
           assert s['degree_preserving_graph_null']['status'] == 'blocked'
-          assert s['status'] == 'micro_layer_only_macro_gate_open'
-          assert s['anthocyanin_direction']['up'] >= 4
+          assert s['status'] == 'micro_layer_dependence_aware_macro_gate_open'
+          primary=s['dependence_collapsed_recurrence_primary']
+          sensitivity=s['system_level_recurrence_sensitivity']
+          assert abs(primary['observed_recurrence'] - 0.2) < 1e-12
+          assert primary['permutation_p_upper'] > 0.9
+          assert sensitivity['permutation_p_upper'] > 0.05
           print(json.dumps(s, indent=2, ensure_ascii=False))
           PY
       - uses: actions/upload-artifact@v4
