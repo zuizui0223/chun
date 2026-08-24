@@ -14,13 +14,13 @@ The expanded seed registry contains **10 biological systems** but only **5 broad
 - `CSIN_WHITE_PINK` — 1 system;
 - `CPERPETUA` — 1 system.
 
-This distinction matters because repeated *C. japonica* or *C. reticulata* studies cannot be treated as independent macroevolutionary replicates.
+Repeated *C. japonica*, *C. reticulata* or *C. nitidissima* experiments are therefore retained as system-level sensitivities but not treated as independent macroevolutionary replicates.
 
 ## System-level recurrence sensitivity
 
 Across all 10 biological systems, the observed mechanistic-signature recurrence score is **0.2200**.
 
-A 10,000-permutation null independently shuffles A/F/C/P change labels across systems while preserving each axis' marginal frequencies:
+A 10,000-permutation null independently shuffles A/F/C/P directional labels across systems while preserving each axis' marginal frequencies:
 
 - observed recurrence = **0.2200**;
 - null mean = **0.1531**;
@@ -28,13 +28,13 @@ A 10,000-permutation null independently shuffles A/F/C/P change labels across sy
 - z = **2.13**;
 - upper-tail permutation P = **0.0840**.
 
-This is suggestive but does not cross the 0.05 threshold, and it ignores broader taxonomic dependence.
+This is suggestive only and ignores broader taxonomic dependence.
 
-## Dependence-collapsed primary recurrence test
+## Dependence-collapsed observed recurrence
 
-Within each dependence cluster, an axis is coded as the common known direction when studies agree, `unknown` when no study resolves it, and `mixed` when studies conflict.
+Within each dependence cluster, an axis is coded as the common known direction when studies agree, `unknown` when no study resolves it, and `mixed` when known member studies conflict.
 
-After collapse, all five clusters have different multivariate signatures. The primary recurrence test gives:
+With literal `unknown` labels retained, all five observed cluster signatures differ:
 
 - observed recurrence = **0.2000**;
 - null mean = **0.2031**;
@@ -42,7 +42,9 @@ After collapse, all five clusters have different multivariate signatures. The pr
 - z = **-0.20**;
 - upper-tail permutation P = **1.000**.
 
-Thus the current literature-coded evidence provides **no dependence-aware support that complete A/F/C/P transition packages are recurrent across independent Camellia systems**.
+This means the **observed literature-coded signatures** do not show dependence-aware recurrence. It does **not** prove that the complete underlying mechanistic signatures are all different, because unmeasured axes remain unresolved.
+
+The separate exact partial-identification analysis (`docs/MICRO_RECURRENCE_PARTIAL_IDENTIFICATION_V0_1.md`) shows that after allowing the 10 unresolved cluster-axis cells to take any `up/down/same` value, the recurrence identified set is **0.20–0.36**. Thus multivariate recurrence is currently not point-identified from the published evidence.
 
 ## Mechanistic-axis ascertainment bias
 
@@ -53,33 +55,40 @@ The literature-coded systems do not resolve all pigment axes equally often. Acro
 - C / carotenoid = **1**;
 - P / proanthocyanidin = **3**.
 
-A second permutation test preserves the number of resolved axes in every biological system but randomizes which A/F/C/P axes are resolved. Under this axis-symmetric ascertainment null:
+The ascertainment null conditions on the exact number of resolved axes in every biological system. Instead of Monte Carlo randomization, all **5,308,416** axis-symmetric assignments compatible with those row-wise coverage counts are enumerated exactly by dynamic programming.
 
-- observed A coverage minus mean coverage of F/C/P = **5.33**;
-- A-enrichment permutation P = **0.0081**;
-- max-minus-min axis-coverage imbalance P = **0.0245**.
+Observed system-level imbalance:
 
-After collapsing repeated studies into the five dependence clusters, coverage becomes A=4, F=3, C=1, P=2 and the A-enrichment test weakens to **P ≈ 0.141**.
+- A coverage minus mean coverage of F/C/P = **5.3333**;
+- exact conditional P for A enrichment = **0.0083618164**;
+- observed max-minus-min coverage gap = **7**;
+- exact conditional P for any axis imbalance at least this large = **0.0239483869**.
 
-Therefore the apparent anthocyanin dominance in the literature matrix is partly entangled with repeated study of anthocyanin-focused focal systems. This does not erase the anthocyanin directional result, but it makes candidate-free multi-axis reanalysis necessary before claiming that anthocyanin is uniquely recurrent relative to alternative pigment branches.
+After collapsing repeated studies into five dependence clusters, coverage becomes A=4, F=3, C=1, P=2. There are only **576** exact axis-symmetric assignments under the corresponding cluster-level null:
 
-## Why this is scientifically useful
+- exact conditional P for A enrichment = **0.140625**;
+- exact conditional P for an axis imbalance at least as large as observed = **0.416667**.
 
-The earlier directional synthesis remains valid at its own level: redder contrasts repeatedly show stronger anthocyanin deployment and several low-anthocyanin/yellow systems show competing-branch deployment. What fails here is the stronger claim that the *same multivariate molecular transition package* is repeatedly reused across independent lineages.
+Therefore the anthocyanin-heavy literature matrix is not simply a property of ten exchangeable independent systems. A substantial part of the system-level signal is entangled with repeated mechanistic study of a few anthocyanin-focused focal taxa.
 
-The apparent system-level recurrence is partly generated by repeated sampling of *C. japonica* and by many unresolved non-anthocyanin axes. This exposes exactly the weakness that a candidate-free public-RNA-seq reanalysis must address.
+This does not erase the repeated directional association between redder states and anthocyanin deployment. It does mean that the current literature cannot establish that anthocyanin is uniquely recurrent relative to F/C/P without a standardized multi-axis observation protocol.
 
-## Revised hypothesis
+## Method correction before raw-data results
 
-The paper should distinguish two levels:
+The primary candidate-free A module has been narrowed before inspection of the real RNA-seq pilot. It now measures **anthocyanin branch commitment** (`DFR`, `ANS/LDOX`, `UFGT/3GT`) rather than mixing shared flavonoid backbone genes into A.
 
-1. **coarse pathway accessibility** — currently supported directionally;
-2. **recurrent multivariate mechanistic state transitions** — currently unproven.
+`CHS`, `CHI`, `F3H` are retained as shared-backbone diagnostics, and `F3'H`/`F3'5'H` as hydroxylation/composition diagnostics, but neither group contributes to the primary A score. This prevents a general increase in flavonoid throughput from being misclassified as anthocyanin-specific allocation.
 
-The sharper hypothesis is:
+## Current inference
 
-> short-timescale colour change is repeatedly accessible, but convergence on the same multivariate pigment-state transition must be demonstrated from uniformly quantified pathway modules rather than inferred from heterogeneous candidate-gene studies.
+The strongest defensible conclusion is not `one molecular package repeatedly evolves` and not `all lineages use different mechanisms`.
+
+It is:
+
+> **The published Camellia flower-colour literature is insufficient to identify dependence-aware multivariate mechanistic recurrence because pathway axes are measured unevenly and many cluster-axis cells are missing.**
+
+Candidate-free public RNA-seq is therefore an identification experiment: it applies one predefined branch-specific A/F/C/P observation protocol to already-public raw datasets, reduces missing-axis ambiguity without visible-colour imputation, and tests whether the identified set contracts toward recurrence or persistent heterogeneity.
 
 ## Next gate
 
-Re-score admitted public petal RNA-seq datasets with one predefined ortholog/module panel, reduce the `unknown` A/F/C/P axes, then repeat both the system-level sensitivity and dependence-collapsed primary null before activating a mechanistic-state graph.
+Run the frozen candidate-free raw-data pipeline, beginning with the within-genotype *C. japonica* Joy Kendrick red/pink contrast, then propagate the same branch-specific module definitions across all five dependence clusters. Only after source/target biochemical states are sufficiently resolved should the mechanistic-state graph be activated.
