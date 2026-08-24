@@ -52,13 +52,21 @@ def main() -> None:
     target_clusters = {r["dependence_cluster"] for r in fitting}
     missing_target_clusters = sorted(micro_clusters - target_clusters)
 
-    ready_clusters = {
+    frozen_manifest_clusters = {
         r["dependence_cluster"]
         for r in fitting
         if r["current_run_manifest_status"].startswith("resolved_")
     }
+    exact_run_identity_clusters = {
+        r["dependence_cluster"]
+        for r in fitting
+        if r["current_run_manifest_status"].startswith("resolved_")
+        or r["current_run_manifest_status"].startswith("exact_")
+    }
     ncbi_clusters = {
-        r["dependence_cluster"] for r in fitting if r["provider"] == "NCBI_SRA"
+        r["dependence_cluster"]
+        for r in fitting
+        if r["provider"].startswith("NCBI_SRA")
     }
     external = [r for r in targets if r["analysis_role"] == "external_holdout_not_micro_model_fit"]
 
@@ -71,9 +79,11 @@ def main() -> None:
                 "unknown_axes_before_candidate_free": unknown[cluster],
                 "n_unknown_axes": len(unknown[cluster]),
                 "n_public_targets": len(t),
-                "has_frozen_run_manifest": cluster in ready_clusters,
-                "has_NCBI_SRA_target": cluster in ncbi_clusters,
+                "has_frozen_run_manifest": cluster in frozen_manifest_clusters,
+                "has_exact_run_identity": cluster in exact_run_identity_clusters,
+                "has_NCBI_SRA_route": cluster in ncbi_clusters,
                 "accessions": [r["accession"] for r in t],
+                "run_statuses": [r["current_run_manifest_status"] for r in t],
                 "priorities": [r["priority"] for r in t],
             }
         )
@@ -82,10 +92,12 @@ def main() -> None:
         "n_micro_dependence_clusters": len(micro_clusters),
         "n_clusters_with_public_raw_target": len(target_clusters & micro_clusters),
         "missing_public_target_clusters": missing_target_clusters,
-        "n_clusters_with_frozen_run_manifest": len(ready_clusters & micro_clusters),
-        "clusters_with_frozen_run_manifest": sorted(ready_clusters & micro_clusters),
-        "n_clusters_with_NCBI_SRA_target": len(ncbi_clusters & micro_clusters),
-        "clusters_with_NCBI_SRA_target": sorted(ncbi_clusters & micro_clusters),
+        "n_clusters_with_frozen_run_manifest": len(frozen_manifest_clusters & micro_clusters),
+        "clusters_with_frozen_run_manifest": sorted(frozen_manifest_clusters & micro_clusters),
+        "n_clusters_with_exact_run_identity": len(exact_run_identity_clusters & micro_clusters),
+        "clusters_with_exact_run_identity": sorted(exact_run_identity_clusters & micro_clusters),
+        "n_clusters_with_NCBI_SRA_route": len(ncbi_clusters & micro_clusters),
+        "clusters_with_NCBI_SRA_route": sorted(ncbi_clusters & micro_clusters),
         "external_holdout_targets": [r["target_id"] for r in external],
         "cluster_audit": cluster_rows,
         "bottleneck": (
@@ -95,8 +107,8 @@ def main() -> None:
         ),
         "execution_order": [
             "validate module quantification on already run-mapped CSIN_WHITE_PINK, CJAPONICA and CNITIDISSIMA datasets",
-            "admit PRJNA981682 for CPERPETUA because it is an independent cluster with three unresolved axes",
-            "admit GSE236364/PRJCA012977 for CRETICULATA to resolve F/C under a within-genotype/cultivar contrast",
+            "freeze run-to-condition mapping for CPERPETUA PRJNA981682 (five stages x three replicates already confirmed)",
+            "freeze run-to-condition mapping for CRETICULATA SRR24413180-SRR24413206 (27 runs and experimental design already confirmed)",
             "freeze candidate-free directions and rerun dependence-aware recurrence null",
             "evaluate frozen state representation on the PRJNA1136134 external between-species holdout",
         ],
