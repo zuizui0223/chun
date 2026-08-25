@@ -21,20 +21,19 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 45
     env:
-      REF_ACCESSION: GCA_013676235.1
+      REF_ACCESSION: GCF_004153795.1
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
 
-      - name: Install reference fallback tools
+      - name: Install reference tools
         run: |
           sudo apt-get update
-          sudo apt-get install -y --no-install-recommends gffread unzip ca-certificates
-          gffread --version
+          sudo apt-get install -y --no-install-recommends unzip ca-certificates
 
-      - name: Prepare fixed reference through direct-RNA route with fallback
+      - name: Prepare fixed annotation-informative reference
         run: |
           bash scripts/prepare_candidate_free_reference_v0_1.sh build/candidate_free_reference_audit_v0_1
           cat build/candidate_free_reference_audit_v0_1/reference_route_diagnostic.txt
@@ -68,7 +67,7 @@ jobs:
               }
           out={
             'status':'reference_identifiability_audit',
-            'reference':'GCA_013676235.1',
+            'reference':os.environ['REF_ACCESSION'],
             'reference_route':os.environ.get('REFERENCE_ROUTE','unknown'),
             'n_mapped_transcripts':s['n_mapped_transcripts'],
             'n_families_with_at_least_one_transcript':s['n_families_with_at_least_one_transcript'],
