@@ -20,122 +20,220 @@ on:
 
 permissions:
   contents: read
+  actions: read
 
 concurrency:
   group: candidate-free-cs-white-pink-${{ github.event.pull_request.number || github.ref }}
   cancel-in-progress: true
 
+env:
+  REF_ACCESSION: GCF_004153795.1
+  MAX_SPOTS_PER_RUN: '500000'
+  ROOT: build/cs_white_pink_pilot_v0_1
+
 jobs:
-  pilot:
+  family-map:
     runs-on: ubuntu-latest
-    timeout-minutes: 120
-    env:
-      REF_ACCESSION: GCF_004153795.1
-      MAX_SPOTS_PER_RUN: '500000'
+    timeout-minutes: 20
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
+      - name: Install reference tools
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends unzip ca-certificates
+      - name: Prepare fixed annotation-informative reference and family map
+        run: |
+          bash scripts/prepare_candidate_free_reference_v0_1.sh "$ROOT"
+          python scripts/build_candidate_free_family_map_from_gff_v0_1.py \
+            --gff "$GFF" --rna-fasta "$RNA_FASTA" \
+            --out-dir "$ROOT/family_map"
+          python - <<'PY'
+          import json,os
+          root=os.environ['ROOT']
+          s=json.load(open(f'{root}/family_map/family_mapping_summary.json'))
+          if s['n_mapped_transcripts']==0:
+              raise SystemExit('fixed reference resolves no preregistered pigment family')
+          print(json.dumps(s,indent=2,ensure_ascii=False))
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: candidate-free-cs-family-map-v0-1
+          path: |
+            build/cs_white_pink_pilot_v0_1/family_map/
+            build/cs_white_pink_pilot_v0_1/reference_contract.txt
+            build/cs_white_pink_pilot_v0_1/reference_route_diagnostic.txt
+          if-no-files-found: error
 
-      - name: Install RNA-seq, local SRA fallback, and reference tools
+  quantify:
+    needs: family-map
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    strategy:
+      fail-fast: false
+      max-parallel: 5
+      matrix:
+        chunk: [0, 1, 2, 3, 4]
+    env:
+      CHUNK: ${{ matrix.chunk }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install RNA-seq and local SRA fallback tools
         run: |
           sudo apt-get update
           sudo apt-get install -y --no-install-recommends salmon sra-toolkit unzip ca-certificates
           salmon --version
           fastq-dump --version
           vdb-validate --version || true
-
-      - name: Prepare fixed annotation-informative reference
+      - name: Prepare identical fixed reference and Salmon index
         run: |
-          bash scripts/prepare_candidate_free_reference_v0_1.sh build/cs_white_pink_pilot_v0_1
-          cat build/cs_white_pink_pilot_v0_1/reference_route_diagnostic.txt
-
-      - name: Build outcome-independent family map and Salmon index
+          bash scripts/prepare_candidate_free_reference_v0_1.sh "$ROOT"
+          salmon index -t "$RNA_FASTA" -i "$ROOT/salmon_index" -p 2
+      - name: Freeze six manifest runs for this execution chunk
         run: |
-          python scripts/build_candidate_free_family_map_from_gff_v0_1.py \
-            --gff "$GFF" --rna-fasta "$RNA_FASTA" \
-            --out-dir build/cs_white_pink_pilot_v0_1/family_map
           python - <<'PY'
-          import json
-          s=json.load(open('build/cs_white_pink_pilot_v0_1/family_map/family_mapping_summary.json'))
-          if s['n_mapped_transcripts']==0:
-              raise SystemExit('fixed reference resolves no preregistered pigment family')
-          print(json.dumps(s,indent=2,ensure_ascii=False))
+          import csv,os
+          from pathlib import Path
+          manifest=Path('data/candidate_free_cs_white_pink_run_manifest_v0_1.csv')
+          rows=list(csv.DictReader(manifest.open(newline='',encoding='utf-8')))
+          if len(rows)!=30: raise SystemExit(f'expected exactly 30 frozen runs, got {len(rows)}')
+          chunk=int(os.environ['CHUNK'])
+          selected=rows[chunk*6:(chunk+1)*6]
+          if len(selected)!=6: raise SystemExit(f'chunk {chunk}: expected 6 runs, got {len(selected)}')
+          out=Path(os.environ['ROOT'])/f'chunk_{chunk}_runs.txt'
+          out.parent.mkdir(parents=True,exist_ok=True)
+          out.write_text(''.join(r['run']+'\n' for r in selected),encoding='utf-8')
+          print({'chunk':chunk,'runs':[r['run'] for r in selected]})
           PY
-          salmon index -t "$RNA_FASTA" -i build/cs_white_pink_pilot_v0_1/salmon_index -p 2
-
-      - name: Retrieve and quantify all 30 prespecified stage-matched runs
+      - name: Retrieve and quantify the six frozen runs
         run: |
-          mkdir -p build/cs_white_pink_pilot_v0_1/quant build/cs_white_pink_pilot_v0_1/reads build/cs_white_pink_pilot_v0_1/ena
-          tail -n +2 data/candidate_free_cs_white_pink_run_manifest_v0_1.csv | cut -d, -f1 | while read -r RUN; do
-            echo "Quantifying $RUN from first ${MAX_SPOTS_PER_RUN} paired reads; ENA primary, validated AWS local-SRA fallback only if needed"
-            rm -f build/cs_white_pink_pilot_v0_1/reads/${RUN}_1.fastq build/cs_white_pink_pilot_v0_1/reads/${RUN}_2.fastq
+          mkdir -p "$ROOT/quant" "$ROOT/reads" "$ROOT/ena"
+          while read -r RUN; do
+            echo "chunk=$CHUNK run=$RUN first=${MAX_SPOTS_PER_RUN} paired reads; ENA primary, validated AWS local-SRA fallback only if needed"
+            rm -f "$ROOT/reads/${RUN}_1.fastq" "$ROOT/reads/${RUN}_2.fastq"
             bash scripts/download_candidate_free_fastq_prefix_v0_1.sh \
               "$RUN" "$MAX_SPOTS_PER_RUN" \
-              build/cs_white_pink_pilot_v0_1/reads/${RUN}_1.fastq \
-              build/cs_white_pink_pilot_v0_1/reads/${RUN}_2.fastq \
-              build/cs_white_pink_pilot_v0_1/ena/${RUN}.tsv \
-              build/cs_white_pink_pilot_v0_1/ena/${RUN}.json
-            test -s build/cs_white_pink_pilot_v0_1/reads/${RUN}_1.fastq
-            test -s build/cs_white_pink_pilot_v0_1/reads/${RUN}_2.fastq
-            salmon quant -i build/cs_white_pink_pilot_v0_1/salmon_index -l A \
-              -1 build/cs_white_pink_pilot_v0_1/reads/${RUN}_1.fastq \
-              -2 build/cs_white_pink_pilot_v0_1/reads/${RUN}_2.fastq \
-              --validateMappings -p 2 -o build/cs_white_pink_pilot_v0_1/quant/${RUN}
-            rm -f build/cs_white_pink_pilot_v0_1/reads/${RUN}_1.fastq build/cs_white_pink_pilot_v0_1/reads/${RUN}_2.fastq
-          done
+              "$ROOT/reads/${RUN}_1.fastq" \
+              "$ROOT/reads/${RUN}_2.fastq" \
+              "$ROOT/ena/${RUN}.tsv" \
+              "$ROOT/ena/${RUN}.json"
+            test -s "$ROOT/reads/${RUN}_1.fastq"
+            test -s "$ROOT/reads/${RUN}_2.fastq"
+            salmon quant -i "$ROOT/salmon_index" -l A \
+              -1 "$ROOT/reads/${RUN}_1.fastq" \
+              -2 "$ROOT/reads/${RUN}_2.fastq" \
+              --validateMappings -p 2 -o "$ROOT/quant/${RUN}"
+            rm -f "$ROOT/reads/${RUN}_1.fastq" "$ROOT/reads/${RUN}_2.fastq"
+          done < "$ROOT/chunk_${CHUNK}_runs.txt"
+          python - <<'PY'
+          import os
+          from pathlib import Path
+          root=Path(os.environ['ROOT']); chunk=os.environ['CHUNK']
+          runs=[x for x in (root/f'chunk_{chunk}_runs.txt').read_text().splitlines() if x]
+          missing=[r for r in runs if not (root/'quant'/r/'quant.sf').is_file() or not (root/'ena'/f'{r}.json').is_file()]
+          if missing: raise SystemExit(f'chunk {chunk}: incomplete outputs {missing}')
+          if len(runs)!=6: raise SystemExit(f'chunk {chunk}: expected 6 completed runs')
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: candidate-free-cs-quant-chunk-${{ matrix.chunk }}
+          path: |
+            build/cs_white_pink_pilot_v0_1/quant/
+            build/cs_white_pink_pilot_v0_1/ena/
+            build/cs_white_pink_pilot_v0_1/chunk_${{ matrix.chunk }}_runs.txt
+          if-no-files-found: error
 
+  aggregate:
+    needs: [family-map, quantify]
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Restore the frozen family map
+        uses: actions/download-artifact@v4
+        with:
+          name: candidate-free-cs-family-map-v0-1
+          path: build/cs_white_pink_pilot_v0_1
+      - name: Merge all five quantification chunks
+        uses: actions/download-artifact@v4
+        with:
+          pattern: candidate-free-cs-quant-chunk-*
+          path: build/cs_white_pink_pilot_v0_1
+          merge-multiple: true
+      - name: Guard all 30 prespecified runs before any scoring
+        run: |
+          python - <<'PY'
+          import csv,os,json
+          from pathlib import Path
+          root=Path(os.environ['ROOT'])
+          rows=list(csv.DictReader(open('data/candidate_free_cs_white_pink_run_manifest_v0_1.csv',newline='',encoding='utf-8')))
+          if len(rows)!=30: raise SystemExit(f'expected 30 manifest rows, got {len(rows)}')
+          runs=[r['run'] for r in rows]
+          missing_quant=[r for r in runs if not (root/'quant'/r/'quant.sf').is_file()]
+          missing_meta=[r for r in runs if not (root/'ena'/f'{r}.json').is_file()]
+          extras=sorted({p.parent.name for p in (root/'quant').glob('*/quant.sf')}-set(runs))
+          if missing_quant or missing_meta or extras:
+              raise SystemExit({'missing_quant':missing_quant,'missing_transport_meta':missing_meta,'extra_quant':extras})
+          routes={}
+          for r in runs:
+              s=json.load(open(root/'ena'/f'{r}.json'))
+              routes[s['route']]=routes.get(s['route'],0)+1
+          print({'n_runs':len(runs),'transport_routes':routes})
+          PY
       - name: Aggregate candidate-free family expression
         run: |
           python scripts/aggregate_salmon_family_expression_v0_1.py \
-            --quant-root build/cs_white_pink_pilot_v0_1/quant \
+            --quant-root "$ROOT/quant" \
             --manifest data/candidate_free_cs_white_pink_run_manifest_v0_1.csv \
-            --family-map build/cs_white_pink_pilot_v0_1/family_map/transcript_family_map.csv \
+            --family-map "$ROOT/family_map/transcript_family_map.csv" \
             --dataset-id CF_CS_01 --min-percent-mapped 15 \
-            --out build/cs_white_pink_pilot_v0_1/family_expression.csv
-
+            --out "$ROOT/family_expression.csv"
       - name: Score all five stage strata with frozen A/F/C/P modules
         run: |
           python scripts/score_candidate_free_modules_v0_1.py \
-            --expression build/cs_white_pink_pilot_v0_1/family_expression.csv \
+            --expression "$ROOT/family_expression.csv" \
             --modules data/candidate_free_pigment_module_schema_v0_1.csv \
             --contrasts data/candidate_free_cs_stage_contrast_registry_v0_1.csv \
-            --out-dir build/cs_white_pink_pilot_v0_1/scored
+            --out-dir "$ROOT/scored"
           python scripts/summarize_candidate_free_stage_series_v0_1.py \
-            --effects build/cs_white_pink_pilot_v0_1/scored/contrast_effects.csv \
+            --effects "$ROOT/scored/contrast_effects.csv" \
             --dependence-cluster CSIN_WHITE_PINK \
-            --out-dir build/cs_white_pink_pilot_v0_1/stage_summary
-
+            --out-dir "$ROOT/stage_summary"
       - name: Guard design without forcing biological direction
         run: |
           python - <<'PY'
-          import json
-          s=json.load(open('build/cs_white_pink_pilot_v0_1/stage_summary/stage_series_summary.json'))
+          import json,os
+          root=os.environ['ROOT']
+          s=json.load(open(f'{root}/stage_summary/stage_series_summary.json'))
           assert s['prespecified_stages']==['S1','S2','S3','S4','S5']
           assert set(s['axes'])=={'A','F','C','P'}
           assert all(x['n_stages_total']==5 for x in s['axes'].values())
           assert 'largest' in s['forbidden_rule']
           print(json.dumps(s,indent=2,ensure_ascii=False))
           PY
-
       - name: Export canonical candidate-free measurement registry
         run: |
           python scripts/build_candidate_free_measurement_registry_v0_1.py \
             --bridge data/candidate_free_canonical_bridge_v0_1.csv \
-            --cs build/cs_white_pink_pilot_v0_1/stage_summary/stage_series_summary.json \
-            --out build/cs_white_pink_pilot_v0_1/candidate_free_measurements.csv \
-            --summary build/cs_white_pink_pilot_v0_1/candidate_free_measurements.summary.json
-
+            --cs "$ROOT/stage_summary/stage_series_summary.json" \
+            --out "$ROOT/candidate_free_measurements.csv" \
+            --summary "$ROOT/candidate_free_measurements.summary.json"
       - name: Preserve lightweight diagnostics
         if: always()
         run: |
-          mkdir -p build/cs_white_pink_pilot_v0_1/diagnostics
-          cp build/cs_white_pink_pilot_v0_1/reference_contract.txt build/cs_white_pink_pilot_v0_1/diagnostics/ 2>/dev/null || true
-          cp build/cs_white_pink_pilot_v0_1/reference_route_diagnostic.txt build/cs_white_pink_pilot_v0_1/diagnostics/ 2>/dev/null || true
-          printf 'reference=%s\nread_route=ENA_then_NCBI_AWS_normalized_SRA_local_fastq_dump\nmax_spots_per_run=%s\nruns=30\nstages=5\n' "$REF_ACCESSION" "$MAX_SPOTS_PER_RUN" > build/cs_white_pink_pilot_v0_1/diagnostics/run_contract.txt
-          find build/cs_white_pink_pilot_v0_1 -maxdepth 3 -type f -printf '%p\t%s bytes\n' 2>/dev/null | sort > build/cs_white_pink_pilot_v0_1/diagnostics/files.txt || true
-
+          mkdir -p "$ROOT/diagnostics"
+          cp "$ROOT/reference_contract.txt" "$ROOT/diagnostics/" 2>/dev/null || true
+          cp "$ROOT/reference_route_diagnostic.txt" "$ROOT/diagnostics/" 2>/dev/null || true
+          printf 'reference=%s\nread_route=ENA_then_NCBI_AWS_normalized_SRA_local_fastq_dump\nmax_spots_per_run=%s\nruns=30\nstages=5\nexecution=5_chunks_x_6_runs_then_single_aggregate\n' "$REF_ACCESSION" "$MAX_SPOTS_PER_RUN" > "$ROOT/diagnostics/run_contract.txt"
+          find "$ROOT" -maxdepth 3 -type f -printf '%p\t%s bytes\n' 2>/dev/null | sort > "$ROOT/diagnostics/files.txt" || true
       - uses: actions/upload-artifact@v4
         if: always()
         with:
