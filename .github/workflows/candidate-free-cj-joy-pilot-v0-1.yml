@@ -27,7 +27,7 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 90
     env:
-      REF_ACCESSION: GCA_013676235.1
+      REF_ACCESSION: GCF_004153795.1
       MAX_SPOTS_PER_RUN: '1000000'
     steps:
       - uses: actions/checkout@v4
@@ -35,15 +35,14 @@ jobs:
         with:
           python-version: '3.12'
 
-      - name: Install RNA-seq and fallback reference tools
+      - name: Install RNA-seq and reference tools
         run: |
           sudo apt-get update
-          sudo apt-get install -y --no-install-recommends sra-toolkit salmon gffread unzip ca-certificates
+          sudo apt-get install -y --no-install-recommends sra-toolkit salmon unzip ca-certificates
           salmon --version
           fasterq-dump --version
-          gffread --version
 
-      - name: Prepare fixed reference through direct-RNA route with fallback
+      - name: Prepare fixed annotation-informative reference
         run: |
           bash scripts/prepare_candidate_free_reference_v0_1.sh build/cj_joy_pilot_v0_1
           cat build/cj_joy_pilot_v0_1/reference_route_diagnostic.txt
@@ -122,7 +121,7 @@ jobs:
             'contrast':'CF_CJ_JOY_RED_PINK',
             'source':'pink petal region','target':'red petal region',
             'run_count':6,'max_spots_per_run':1000000,
-            'reference':'GCA_013676235.1','reference_route':os.environ.get('REFERENCE_ROUTE','unknown'),
+            'reference':os.environ['REF_ACCESSION'],'reference_route':os.environ.get('REFERENCE_ROUTE','unknown'),
             'effects':{e['axis']:{'effect_status':e['effect_status'],
               'hedges_g':None if not e['hedges_g'] else float(e['hedges_g']),
               'direction':e['direction_target_minus_source'],
