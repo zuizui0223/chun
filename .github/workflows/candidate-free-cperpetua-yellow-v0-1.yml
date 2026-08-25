@@ -62,8 +62,10 @@ jobs:
       - name: Install RNA-seq and reference tools
         run: |
           sudo apt-get update
-          sudo apt-get install -y --no-install-recommends salmon unzip ca-certificates
+          sudo apt-get install -y --no-install-recommends salmon sra-toolkit unzip ca-certificates
           salmon --version
+          prefetch --version
+          fastq-dump --version
 
       - name: Prepare fixed annotation-informative reference
         run: |
@@ -85,22 +87,63 @@ jobs:
 
       - name: Stream and quantify all fifteen frozen S1-S5 runs
         run: |
-          mkdir -p "$ROOT/quant" "$ROOT/reads" "$ROOT/ena"
+          mkdir -p "$ROOT/quant" "$ROOT/reads" "$ROOT/ena" "$ROOT/sra_cache" "$ROOT/sra_fastq"
+          export NCBI_SETTINGS="/"
           tail -n +2 data/candidate_free_cperpetua_run_manifest_v0_1.csv | cut -d, -f1 | while read -r RUN; do
-            echo "Quantifying $RUN from first ${MAX_SPOTS_PER_RUN} paired reads via ENA HTTPS"
+            echo "Quantifying $RUN from first ${MAX_SPOTS_PER_RUN} paired reads; ENA HTTPS primary, NCBI SRA fallback"
             rm -f "$ROOT/reads/${RUN}_1.fastq" "$ROOT/reads/${RUN}_2.fastq"
-            python scripts/download_ena_fastq_prefix_v0_1.py \
+            rm -rf "$ROOT/sra_cache/${RUN}" "$ROOT/sra_fastq/${RUN}"
+
+            if python scripts/download_ena_fastq_prefix_v0_1.py \
               --run "$RUN" --max-spots "$MAX_SPOTS_PER_RUN" \
               --out-r1 "$ROOT/reads/${RUN}_1.fastq" \
               --out-r2 "$ROOT/reads/${RUN}_2.fastq" \
               --metadata-out "$ROOT/ena/${RUN}.tsv" \
-              --summary-out "$ROOT/ena/${RUN}.json"
+              --summary-out "$ROOT/ena/${RUN}.json"; then
+              echo "$RUN retrieved through ENA HTTPS"
+            else
+              echo "$RUN ENA transport failed; using exact-accession NCBI SRA Toolkit fallback"
+              rm -f "$ROOT/reads/${RUN}_1.fastq" "$ROOT/reads/${RUN}_2.fastq"
+              mkdir -p "$ROOT/sra_fastq/${RUN}"
+              prefetch "$RUN" --max-size u --output-directory "$ROOT/sra_cache"
+              test -s "$ROOT/sra_cache/${RUN}/${RUN}.sra"
+              fastq-dump "$ROOT/sra_cache/${RUN}/${RUN}.sra" \
+                --split-files --skip-technical -N 1 -X "$MAX_SPOTS_PER_RUN" \
+                --outdir "$ROOT/sra_fastq/${RUN}"
+              R1_SRC="$(find "$ROOT/sra_fastq/${RUN}" -maxdepth 1 -type f -name '*_1.fastq' -print -quit)"
+              R2_SRC="$(find "$ROOT/sra_fastq/${RUN}" -maxdepth 1 -type f -name '*_2.fastq' -print -quit)"
+              test -n "$R1_SRC" && test -s "$R1_SRC"
+              test -n "$R2_SRC" && test -s "$R2_SRC"
+              mv "$R1_SRC" "$ROOT/reads/${RUN}_1.fastq"
+              mv "$R2_SRC" "$ROOT/reads/${RUN}_2.fastq"
+              python - "$RUN" "$ROOT/reads/${RUN}_1.fastq" "$ROOT/reads/${RUN}_2.fastq" "$MAX_SPOTS_PER_RUN" "$ROOT/ena/${RUN}.json" <<'PY'
+          import json,sys
+          from pathlib import Path
+          from scripts.download_ena_fastq_prefix_v0_1 import validate_pairs
+          run,r1,r2,requested,summary=sys.argv[1:]
+          requested=int(requested)
+          n=validate_pairs(Path(r1),Path(r2))
+          if n != requested:
+              raise SystemExit(f'{run}: NCBI SRA fallback yielded {n} validated pairs, expected frozen prefix {requested}')
+          payload={
+              'status':'ready','run':run,'route':'NCBI_SRA_toolkit_exact_accession_prefix_fallback',
+              'library_layout':'PAIRED','requested_max_pairs':requested,'actual_pairs':n,
+              'source_accession':run,
+              'transport_note':'ENA HTTPS prefix/full-download route failed; biological contract unchanged. Exact SRA run was prefetched, then fastq-dump emitted spot IDs 1..MAX_SPOTS with split paired files.',
+              'integrity_note':'Paired FASTQ structure, equal pair count, and normalized pair IDs were validated after fallback retrieval.'
+          }
+          Path(summary).write_text(json.dumps(payload,indent=2,ensure_ascii=False)+'\n',encoding='utf-8')
+          print(json.dumps(payload,indent=2,ensure_ascii=False))
+          PY
+            fi
+
             test -s "$ROOT/reads/${RUN}_1.fastq"
             test -s "$ROOT/reads/${RUN}_2.fastq"
             salmon quant -i "$ROOT/salmon_index" -l A \
               -1 "$ROOT/reads/${RUN}_1.fastq" -2 "$ROOT/reads/${RUN}_2.fastq" \
               --validateMappings -p 2 -o "$ROOT/quant/${RUN}"
             rm -f "$ROOT/reads/${RUN}_1.fastq" "$ROOT/reads/${RUN}_2.fastq"
+            rm -rf "$ROOT/sra_cache/${RUN}" "$ROOT/sra_fastq/${RUN}"
           done
 
       - name: Aggregate preregistered family expression and score frozen contrasts
