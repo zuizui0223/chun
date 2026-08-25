@@ -44,9 +44,12 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get install -y --no-install-recommends unzip ca-certificates
-      - name: Prepare fixed annotation-informative reference and family map
+      - name: Prepare fixed annotation-informative reference
         run: |
           bash scripts/prepare_candidate_free_reference_v0_1.sh "$ROOT"
+          cat "$ROOT/reference_route_diagnostic.txt"
+      - name: Build outcome-independent family map
+        run: |
           python scripts/build_candidate_free_family_map_from_gff_v0_1.py \
             --gff "$GFF" --rna-fasta "$RNA_FASTA" \
             --out-dir "$ROOT/family_map"
@@ -90,9 +93,11 @@ jobs:
           salmon --version
           fastq-dump --version
           vdb-validate --version || true
-      - name: Prepare identical fixed reference and Salmon index
+      - name: Prepare identical fixed reference
         run: |
           bash scripts/prepare_candidate_free_reference_v0_1.sh "$ROOT"
+      - name: Build identical Salmon index
+        run: |
           salmon index -t "$RNA_FASTA" -i "$ROOT/salmon_index" -p 2
       - name: Freeze six manifest runs for this execution chunk
         run: |
