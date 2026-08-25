@@ -18,7 +18,7 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
-      - name: Fetch GEO and ENA metadata without accession-order inference
+      - name: Resolve GEO samples to runs without BioProject or accession-order inference
         run: |
           python - <<'PY'
           import csv,gzip,io,json,re,urllib.parse,urllib.request
@@ -29,23 +29,18 @@ jobs:
           ua={'User-Agent':'chun-candidate-free-archive-audit/0.1 contact=github.com/zuizui0223/chun'}
           def get(url):
               req=urllib.request.Request(url,headers=ua)
-              with urllib.request.urlopen(req,timeout=120) as r:
-                  return r.read()
+              with urllib.request.urlopen(req,timeout=120) as r: return r.read()
 
           geo_url='https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE236364&targ=gsm&view=full&form=text'
           try:
-              raw=get(geo_url)
-              text=raw.decode('utf-8','replace')
-              geo_route='NCBI_GEO_accession_text'
+              text=get(geo_url).decode('utf-8','replace'); geo_route='NCBI_GEO_accession_text'
           except Exception as e:
               ftp='https://ftp.ncbi.nlm.nih.gov/geo/series/GSE236nnn/GSE236364/soft/GSE236364_family.soft.gz'
-              raw=get(ftp)
-              text=gzip.decompress(raw).decode('utf-8','replace')
+              text=gzip.decompress(get(ftp)).decode('utf-8','replace')
               geo_route=f'GEO_family_soft_fallback_after:{type(e).__name__}'
           (out/'GSE236364_family.txt').write_text(text,encoding='utf-8')
 
-          samples=[]
-          cur=None
+          samples=[]; cur=None
           for line in text.splitlines():
               if line.startswith('^SAMPLE = '):
                   if cur: samples.append(cur)
@@ -57,15 +52,21 @@ jobs:
                   elif line.startswith('!Sample_relation = '): cur['relations'].append(line.split('=',1)[1].strip())
                   cur['all_accessions'] += re.findall(r'(?:SRX|SRR|SRS|SAMN)\d+',line)
           if cur: samples.append(cur)
+          if len(samples)!=27: raise SystemExit(f'GSE236364 should expose 27 GSM samples; got {len(samples)}')
 
-          by_srx={}; by_samn={}
+          # Freeze and print GEO biology BEFORE touching SRA/ENA so any later transport failure remains diagnosable.
+          geo_rows=[]
           for s in samples:
-              for x in sorted(set(s['all_accessions'])):
-                  target=by_srx if x.startswith('SRX') else by_samn if x.startswith('SAMN') else None
-                  if target is not None:
-                      if x in target and target[x]['gsm']!=s['gsm']:
-                          raise SystemExit(f'duplicate GEO archive relation {x}')
-                      target[x]=s
+              srx=sorted(set(x for x in s['all_accessions'] if x.startswith('SRX')))
+              samn=sorted(set(x for x in s['all_accessions'] if x.startswith('SAMN')))
+              geo_rows.append({'gsm':s['gsm'],'title':s['title'],'source':s['source'],
+                               'characteristics':' | '.join(s['characteristics']),'relations':' | '.join(s['relations']),
+                               'srx':';'.join(srx),'samn':';'.join(samn)})
+          with (out/'geo_samples.tsv').open('w',newline='',encoding='utf-8') as f:
+              w=csv.DictWriter(f,fieldnames=list(geo_rows[0]),delimiter='\t');w.writeheader();w.writerows(geo_rows)
+          print(f'GEO_ROUTE={geo_route}; N_GEO_SAMPLES={len(samples)}')
+          print('GEO SAMPLE LABELS (verbatim):')
+          for r in geo_rows: print('\t'.join(r.values()))
 
           fields_raw=get('https://www.ebi.ac.uk/ena/portal/api/returnFields?result=read_run').decode('utf-8','replace')
           (out/'ena_read_run_fields.tsv').write_text(fields_raw,encoding='utf-8')
@@ -77,55 +78,42 @@ jobs:
           fields=[x for x in desired if x in available]
           if 'run_accession' not in fields:
               fields=['run_accession','experiment_accession','sample_accession','secondary_sample_accession','study_accession','secondary_study_accession','sample_alias','experiment_alias','library_name','scientific_name']
-          url='https://www.ebi.ac.uk/ena/portal/api/filereport?'+urllib.parse.urlencode({
-              'accession':'PRJNA976199','result':'read_run','fields':','.join(fields),'format':'tsv','download':'true'})
-          ena_text=get(url).decode('utf-8','replace')
-          (out/'PRJNA976199_read_run.tsv').write_text(ena_text,encoding='utf-8')
-          project_runs=list(csv.DictReader(io.StringIO(ena_text),delimiter='\t'))
 
-          # The publication itself freezes the admitted run set. Project-level extras must not enter by proximity/order.
           expected={f'SRR{i}' for i in range(24413180,24413207)}
-          by_run={r['run_accession']:r for r in project_runs}
-          missing=sorted(expected-set(by_run))
-          extras=sorted(set(by_run)-expected)
-          if missing:
-              raise SystemExit({'missing_published_runs':missing,'project_extras':extras})
-          runs=[by_run[x] for x in sorted(expected)]
-          with (out/'project_extra_runs.txt').open('w',encoding='utf-8') as f:
-              for x in extras: f.write(x+'\n')
+          cross=[]
+          for s in samples:
+              srx=sorted(set(x for x in s['all_accessions'] if x.startswith('SRX')))
+              if len(srx)!=1:
+                  raise SystemExit(f"{s['gsm']} expected exactly one SRX relation, got {srx}; relations={s['relations']}")
+              url='https://www.ebi.ac.uk/ena/portal/api/filereport?'+urllib.parse.urlencode({
+                  'accession':srx[0],'result':'read_run','fields':','.join(fields),'format':'tsv','download':'true'})
+              et=get(url).decode('utf-8','replace')
+              rr=list(csv.DictReader(io.StringIO(et),delimiter='\t'))
+              if len(rr)!=1:
+                  raise SystemExit(f'{s["gsm"]}/{srx[0]} expected one run, got {len(rr)}')
+              r=rr[0]
+              cross.append({
+                  'run':r.get('run_accession',''),'experiment':r.get('experiment_accession',''),
+                  'sample_accession':r.get('sample_accession',''),'secondary_sample_accession':r.get('secondary_sample_accession',''),
+                  'sample_alias':r.get('sample_alias',''),'experiment_alias':r.get('experiment_alias',''),'library_name':r.get('library_name',''),
+                  'ena_sample_title':r.get('sample_title',''),'gsm':s['gsm'],'geo_title':s['title'],'geo_source':s['source'],
+                  'geo_characteristics':' | '.join(s['characteristics']),'geo_relations':' | '.join(s['relations'])})
 
-          rows=[]
-          for r in runs:
-              s=by_srx.get(r.get('experiment_accession',''))
-              if s is None:
-                  for k in ('secondary_sample_accession','sample_accession'):
-                      if r.get(k,'').startswith('SAMN') and r[k] in by_samn:
-                          s=by_samn[r[k]]; break
-              rows.append({
-                  'run':r.get('run_accession',''),
-                  'experiment':r.get('experiment_accession',''),
-                  'sample_accession':r.get('sample_accession',''),
-                  'secondary_sample_accession':r.get('secondary_sample_accession',''),
-                  'sample_alias':r.get('sample_alias',''),
-                  'experiment_alias':r.get('experiment_alias',''),
-                  'library_name':r.get('library_name',''),
-                  'ena_sample_title':r.get('sample_title',''),
-                  'gsm':s['gsm'] if s else '',
-                  'geo_title':s['title'] if s else '',
-                  'geo_source':s['source'] if s else '',
-                  'geo_characteristics':' | '.join(s['characteristics']) if s else '',
-                  'geo_relations':' | '.join(s['relations']) if s else '',
-              })
+          observed={r['run'] for r in cross}
+          if observed!=expected:
+              raise SystemExit({'missing_published_runs':sorted(expected-observed),'unexpected_geo_linked_runs':sorted(observed-expected)})
+          if len(cross)!=27 or len(observed)!=27: raise SystemExit('GEO-to-run mapping is not one-to-one across 27 samples')
           with (out/'run_geo_crosswalk.tsv').open('w',newline='',encoding='utf-8') as f:
-              w=csv.DictWriter(f,fieldnames=list(rows[0]),delimiter='\t');w.writeheader();w.writerows(rows)
+              w=csv.DictWriter(f,fieldnames=list(cross[0]),delimiter='\t');w.writeheader();w.writerows(sorted(cross,key=lambda x:x['run']))
 
-          summary={'geo_route':geo_route,'n_geo_samples':len(samples),'n_geo_srx_links':len(by_srx),'n_geo_samn_links':len(by_samn),
-                   'n_project_runs':len(project_runs),'n_published_runs':len(runs),'n_project_extras_excluded':len(extras),'ena_fields':fields}
+          summary={'status':'gse236364_27_samples_resolved_one_to_one','geo_route':geo_route,'n_geo_samples':27,
+                   'n_runs':27,'run_set_min':'SRR24413180','run_set_max':'SRR24413206',
+                   'bioproject_rule':'none; resolve each GSM via its own GEO SRX relation','ena_fields':fields}
           (out/'summary.json').write_text(json.dumps(summary,indent=2)+'\n',encoding='utf-8')
           print(json.dumps(summary,indent=2))
-          print('\nRUN-LEVEL ARCHIVE LABELS (verbatim; no condition inference):')
-          for x in rows:
-              print('\t'.join([x['run'],x['experiment'],x['sample_accession'],x['secondary_sample_accession'],x['sample_alias'],x['experiment_alias'],x['library_name'],x['ena_sample_title'],x['gsm'],x['geo_title'],x['geo_source'],x['geo_characteristics']]))
+          print('RUN-LEVEL CROSSWALK (archive labels only):')
+          for x in sorted(cross,key=lambda x:x['run']):
+              print('\t'.join([x['run'],x['experiment'],x['gsm'],x['geo_title'],x['geo_source'],x['geo_characteristics']]))
           PY
       - uses: actions/upload-artifact@v4
         if: always()
