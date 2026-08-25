@@ -29,7 +29,7 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get install -y --no-install-recommends sra-toolkit ca-certificates
-          fasterq-dump --version
+          fastq-dump --version
           vdb-validate --version || true
       - name: Download normalized SRA object from public AWS bucket
         run: |
@@ -45,8 +45,8 @@ jobs:
           vdb-validate build/candidate_free_sra_cloud_fallback_v0_1/${RUN}.sra
       - name: Convert exactly the frozen paired-read prefix locally
         run: |
-          fasterq-dump build/candidate_free_sra_cloud_fallback_v0_1/${RUN}.sra \
-            --split-files -e 2 -m 1GB \
+          fastq-dump build/candidate_free_sra_cloud_fallback_v0_1/${RUN}.sra \
+            --split-files \
             -O build/candidate_free_sra_cloud_fallback_v0_1/reads \
             -X "$MAX_SPOTS"
           test -s build/candidate_free_sra_cloud_fallback_v0_1/reads/${RUN}_1.fastq
@@ -73,7 +73,7 @@ jobs:
           finally:
               [f.close() for f in fs]
           if n!=expected: raise SystemExit(f'expected {expected} pairs, got {n}')
-          s={'status':'ready','run':run,'route':'NCBI_AWS_normalized_SRA_local_fasterq','actual_pairs':n}
+          s={'status':'ready','run':run,'route':'NCBI_AWS_normalized_SRA_local_fastq_dump','actual_pairs':n}
           Path('build/candidate_free_sra_cloud_fallback_v0_1/summary.json').write_text(json.dumps(s,indent=2)+'\n')
           print(json.dumps(s,indent=2))
           PY
