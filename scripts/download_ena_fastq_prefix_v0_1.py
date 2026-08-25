@@ -1,11 +1,13 @@
 #!/usr/bin/env python3
-"""Stream a paired FASTQ prefix for one SRA run from ENA over HTTPS.
+"""Retrieve a paired FASTQ prefix for one SRA run from ENA over HTTPS.
 
 The route is intentionally independent of any expression or colour outcome.
-ENA run metadata resolves the archived paired FASTQ payloads; each gzip stream is
-read only until the preregistered number of read pairs has been written locally.
-Full-file MD5 values are recorded for provenance but cannot be validated against
-a deliberately truncated prefix.
+ENA run metadata resolves the archived paired FASTQ payloads. The primary route
+streams only the preregistered prefix. If repeated gzip streaming fails because a
+remote response terminates before the gzip trailer, that mate falls back to a
+complete archive download, verifies ENA byte count and MD5, and extracts the same
+prefix locally. Biological thresholds and requested read counts are never changed
+by the transport fallback.
 """
 
 from __future__ import annotations
@@ -13,6 +15,7 @@ from __future__ import annotations
 import argparse
 import csv
 import gzip
+import hashlib
 import io
 import json
 import re
@@ -23,6 +26,7 @@ from pathlib import Path
 
 ENA_API = "https://www.ebi.ac.uk/ena/portal/api/filereport"
 USER_AGENT = "chun-candidate-free-rnaseq/0.1"
+CHUNK_BYTES = 1024 * 1024
 
 
 def fetch_bytes(url: str, attempts: int = 3, timeout: int = 60) -> bytes:
@@ -61,10 +65,15 @@ def ena_metadata(run: str) -> tuple[str, dict[str, str]]:
     return text, row
 
 
+def split_exact_pair(value: str, label: str) -> list[str]:
+    parts = [x.strip() for x in (value or "").split(";") if x.strip()]
+    if len(parts) != 2:
+        raise SystemExit(f"expected exactly two paired {label} values, got {parts}")
+    return parts
+
+
 def https_fastq_urls(row: dict[str, str]) -> list[str]:
-    values = [x.strip() for x in (row.get("fastq_ftp") or "").split(";") if x.strip()]
-    if len(values) != 2:
-        raise SystemExit(f"expected exactly two paired ENA FASTQ payloads, got {values}")
+    values = split_exact_pair(row.get("fastq_ftp") or "", "ENA FASTQ payload")
     urls = []
     for value in values:
         if value.startswith("ftp://"):
@@ -97,12 +106,32 @@ def read_record(handle: io.TextIOBase, mate: int, record_index: int) -> tuple[st
     return h, s, p, q
 
 
-def stream_prefix(url: str, out_path: Path, max_records: int, mate: int, attempts: int = 3) -> int:
+def copy_fastq_prefix(src: io.TextIOBase, out_path: Path, max_records: int, mate: int) -> int:
     out_path.parent.mkdir(parents=True, exist_ok=True)
+    tmp = out_path.with_suffix(out_path.suffix + ".part")
+    tmp.unlink(missing_ok=True)
+    try:
+        with tmp.open("w", encoding="utf-8", newline="") as dst:
+            n = 0
+            while n < max_records:
+                record = read_record(src, mate=mate, record_index=n + 1)
+                if record is None:
+                    break
+                dst.writelines(record)
+                n += 1
+        if n <= 0:
+            raise RuntimeError(f"mate {mate}: zero FASTQ records retrieved")
+        tmp.replace(out_path)
+        return n
+    except Exception:
+        tmp.unlink(missing_ok=True)
+        raise
+
+
+def stream_prefix(url: str, out_path: Path, max_records: int, mate: int, attempts: int = 3) -> int:
     last: Exception | None = None
     for attempt in range(1, attempts + 1):
-        tmp = out_path.with_suffix(out_path.suffix + ".part")
-        tmp.unlink(missing_ok=True)
+        out_path.unlink(missing_ok=True)
         try:
             req = urllib.request.Request(url, headers={"User-Agent": USER_AGENT})
             with urllib.request.urlopen(req, timeout=120) as response:
@@ -111,26 +140,103 @@ def stream_prefix(url: str, out_path: Path, max_records: int, mate: int, attempt
                     binary = gzip.GzipFile(fileobj=response, mode="rb")
                 else:
                     binary = response
-                with io.TextIOWrapper(binary, encoding="utf-8", newline="") as src, tmp.open(
-                    "w", encoding="utf-8", newline=""
-                ) as dst:
-                    n = 0
-                    while n < max_records:
-                        record = read_record(src, mate=mate, record_index=n + 1)
-                        if record is None:
-                            break
-                        dst.writelines(record)
-                        n += 1
-            if n <= 0:
-                raise RuntimeError(f"mate {mate}: zero FASTQ records retrieved")
-            tmp.replace(out_path)
-            return n
+                with io.TextIOWrapper(binary, encoding="utf-8", newline="") as src:
+                    return copy_fastq_prefix(src, out_path, max_records, mate)
         except Exception as exc:  # pragma: no cover - exercised by network CI
             last = exc
-            tmp.unlink(missing_ok=True)
+            out_path.unlink(missing_ok=True)
             if attempt < attempts:
                 time.sleep(2 * attempt)
     raise RuntimeError(f"mate {mate}: failed to stream {url} after {attempts} attempts: {last}")
+
+
+def download_full_verified(
+    url: str,
+    expected_md5: str,
+    expected_bytes: int,
+    archive_path: Path,
+    mate: int,
+    attempts: int = 3,
+) -> dict[str, object]:
+    archive_path.parent.mkdir(parents=True, exist_ok=True)
+    last: Exception | None = None
+    for attempt in range(1, attempts + 1):
+        archive_path.unlink(missing_ok=True)
+        tmp = archive_path.with_suffix(archive_path.suffix + ".part")
+        tmp.unlink(missing_ok=True)
+        try:
+            req = urllib.request.Request(url, headers={"User-Agent": USER_AGENT})
+            digest = hashlib.md5()
+            n_bytes = 0
+            with urllib.request.urlopen(req, timeout=180) as response, tmp.open("wb") as dst:
+                while True:
+                    chunk = response.read(CHUNK_BYTES)
+                    if not chunk:
+                        break
+                    dst.write(chunk)
+                    digest.update(chunk)
+                    n_bytes += len(chunk)
+            observed_md5 = digest.hexdigest()
+            if n_bytes != expected_bytes:
+                raise RuntimeError(
+                    f"mate {mate}: full-download byte mismatch {n_bytes} != {expected_bytes}"
+                )
+            if observed_md5.lower() != expected_md5.lower():
+                raise RuntimeError(
+                    f"mate {mate}: full-download MD5 mismatch {observed_md5} != {expected_md5}"
+                )
+            tmp.replace(archive_path)
+            return {
+                "verified_full_bytes": n_bytes,
+                "verified_full_md5": observed_md5,
+                "full_download_attempt": attempt,
+            }
+        except Exception as exc:  # pragma: no cover - exercised by network CI
+            last = exc
+            tmp.unlink(missing_ok=True)
+            archive_path.unlink(missing_ok=True)
+            if attempt < attempts:
+                time.sleep(2 * attempt)
+    raise RuntimeError(
+        f"mate {mate}: failed verified full download after {attempts} attempts: {url}: {last}"
+    )
+
+
+def extract_local_gzip_prefix(archive_path: Path, out_path: Path, max_records: int, mate: int) -> int:
+    with gzip.open(archive_path, mode="rt", encoding="utf-8", newline="") as src:
+        return copy_fastq_prefix(src, out_path, max_records, mate)
+
+
+def obtain_prefix(
+    url: str,
+    out_path: Path,
+    max_records: int,
+    mate: int,
+    expected_md5: str,
+    expected_bytes: int,
+) -> tuple[int, dict[str, object]]:
+    try:
+        n = stream_prefix(url, out_path, max_records, mate=mate)
+        return n, {"route": "stream_prefix", "stream_failure": None}
+    except Exception as stream_exc:
+        archive_path = out_path.with_suffix(out_path.suffix + ".source.fastq.gz")
+        verified: dict[str, object] = {}
+        try:
+            verified = download_full_verified(
+                url=url,
+                expected_md5=expected_md5,
+                expected_bytes=expected_bytes,
+                archive_path=archive_path,
+                mate=mate,
+            )
+            n = extract_local_gzip_prefix(archive_path, out_path, max_records, mate=mate)
+            return n, {
+                "route": "verified_full_download_fallback",
+                "stream_failure": str(stream_exc),
+                **verified,
+            }
+        finally:
+            archive_path.unlink(missing_ok=True)
 
 
 def normalized_read_id(header: str) -> str:
@@ -173,23 +279,38 @@ def main() -> None:
 
     metadata_text, row = ena_metadata(args.run)
     urls = https_fastq_urls(row)
+    full_md5 = split_exact_pair(row.get("fastq_md5") or "", "ENA FASTQ MD5")
+    full_bytes_text = split_exact_pair(row.get("fastq_bytes") or "", "ENA FASTQ byte-count")
+    try:
+        full_bytes = [int(x) for x in full_bytes_text]
+    except ValueError as exc:
+        raise SystemExit(f"invalid ENA fastq_bytes values: {full_bytes_text}") from exc
+    if any(x <= 0 for x in full_bytes):
+        raise SystemExit(f"non-positive ENA fastq_bytes values: {full_bytes}")
+
     args.metadata_out.parent.mkdir(parents=True, exist_ok=True)
     args.metadata_out.write_text(metadata_text, encoding="utf-8")
 
-    n1 = stream_prefix(urls[0], args.out_r1, args.max_spots, mate=1)
-    n2 = stream_prefix(urls[1], args.out_r2, args.max_spots, mate=2)
+    n1, route1 = obtain_prefix(
+        urls[0], args.out_r1, args.max_spots, mate=1,
+        expected_md5=full_md5[0], expected_bytes=full_bytes[0],
+    )
+    n2, route2 = obtain_prefix(
+        urls[1], args.out_r2, args.max_spots, mate=2,
+        expected_md5=full_md5[1], expected_bytes=full_bytes[1],
+    )
     if n1 != n2:
         raise SystemExit(f"mates yielded different prefix sizes: R1={n1}, R2={n2}")
     n_pairs = validate_pairs(args.out_r1, args.out_r2)
     if n_pairs != n1:
-        raise SystemExit(f"pair validation count differs from stream count: {n_pairs} != {n1}")
+        raise SystemExit(f"pair validation count differs from retrieval count: {n_pairs} != {n1}")
 
-    full_md5 = [x for x in (row.get("fastq_md5") or "").split(";") if x]
-    full_bytes = [x for x in (row.get("fastq_bytes") or "").split(";") if x]
+    used_fallback = any(x["route"] == "verified_full_download_fallback" for x in (route1, route2))
     summary = {
         "status": "ready",
         "run": args.run,
-        "route": "ENA_https_fastq_prefix",
+        "route": "ENA_https_prefix_with_verified_full_fallback" if used_fallback else "ENA_https_fastq_prefix",
+        "mate_routes": {"R1": route1, "R2": route2},
         "library_layout": row.get("library_layout"),
         "requested_max_pairs": args.max_spots,
         "actual_pairs": n_pairs,
@@ -198,7 +319,10 @@ def main() -> None:
         "source_full_file_bytes": full_bytes,
         "local_r1_bytes": args.out_r1.stat().st_size,
         "local_r2_bytes": args.out_r2.stat().st_size,
-        "integrity_note": "FASTQ structure and pair IDs validated on the streamed prefix; archive MD5 values describe full remote files and are not compared to truncated local prefixes.",
+        "integrity_note": (
+            "FASTQ structure and pair IDs are validated on every local prefix. "
+            "A mate using fallback is additionally validated against ENA full-file byte count and MD5 before prefix extraction."
+        ),
     }
     args.summary_out.parent.mkdir(parents=True, exist_ok=True)
     args.summary_out.write_text(json.dumps(summary, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
