@@ -29,6 +29,7 @@ def main():
     ap.add_argument("--edge-registry", type=Path, required=True)
     ap.add_argument("--orientation", type=Path, required=True)
     ap.add_argument("--joy-contrasts", type=Path, required=True)
+    ap.add_argument("--cr-contrasts", type=Path, required=True)
     ap.add_argument("--cs-contrasts", type=Path, required=True)
     ap.add_argument("--cn-contrasts", type=Path, required=True)
     ap.add_argument("--out", type=Path)
@@ -40,7 +41,7 @@ def main():
     if set(edges) != set(orient):
         raise ValueError("orientation registry must match edge registry exactly")
 
-    required_systems = {"CJAPONICA", "CSIN_WHITE_PINK", "CNITIDISSIMA"}
+    required_systems = {"CJAPONICA", "CRETICULATA", "CSIN_WHITE_PINK", "CNITIDISSIMA"}
     bm = {r["system_key"]: r for r in bridge}
     if set(bm) != required_systems:
         raise ValueError(f"bridge systems must be exactly {sorted(required_systems)}; got {sorted(bm)}")
@@ -76,6 +77,15 @@ def main():
     ):
         raise ValueError("Joy contrast is not in canonical pink-to-red frame")
 
+    cr = one(read(a.cr_contrasts), "contrast_id", "CF_CR_MN_FB_WHITE_RED")
+    b = bm["CRETICULATA"]
+    if (cr["dependence_cluster"], cr["source_condition"], cr["target_condition"]) != (
+        b["dependence_cluster"], b["source_condition_rule"], b["target_condition_rule"]
+    ):
+        raise ValueError("C. reticulata MN contrast is not in canonical white-region-to-red-region frame")
+    if b["direction_frame"] != "target_minus_source":
+        raise ValueError("C. reticulata bridge must use target_minus_source")
+
     cs = read(a.cs_contrasts)
     if len(cs) != 5:
         raise ValueError(f"C. sinensis bridge expects five stage strata; found {len(cs)}")
@@ -101,7 +111,7 @@ def main():
     summary = {
         "status": "candidate_free_canonical_bridge_valid",
         "systems": checked,
-        "anthocyanin_candidate_free_clusters": ["CJAPONICA", "CSIN_WHITE_PINK"],
+        "anthocyanin_candidate_free_clusters": ["CJAPONICA", "CRETICULATA", "CSIN_WHITE_PINK"],
         "yellow_candidate_free_clusters": ["CNITIDISSIMA"],
         "direction_rule": "all candidate-free directions are already expressed toward the canonical biological target",
     }

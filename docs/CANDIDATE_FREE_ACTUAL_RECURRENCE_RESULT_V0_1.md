@@ -2,100 +2,132 @@
 
 ## Status
 
-**Primary two-cluster anthocyanin-gain observation-process test: COMPLETE.**
+**Primary three-cluster anthocyanin-gain observation-process test: COMPLETE.**
 
 Frozen successful raw-result runs:
 
 - *Camellia japonica* Joy Kendrick: `32803242153`;
+- *C. reticulata* Manao full-bloom white/red petal regions: `32823901705`;
 - *C. sinensis* white-pink stage series: `32817229591`;
 - *C. nitidissima* ordered yellow-development trajectory: `32803242174`;
-- integrated actual-results recurrence: `32820995797`.
+- integrated four-system actual-results recurrence: `32826059965`.
 
-The integrated workflow combines only the canonical `candidate_free_measurements.csv` outputs from the three frozen raw-data runs. It does not borrow literature directions to fill candidate-free missing cells and does not filter axes by significance or expected biological direction.
+The integrated workflow combines only canonical `candidate_free_measurements.csv` outputs from frozen successful raw-data runs. It does not borrow literature directions to fill candidate-free missing cells and does not filter axes by significance or expected biological direction.
 
 ## Primary anthocyanin-gain test
 
 The common independent dependence-cluster set is fixed to:
 
 - `CJAPONICA`;
+- `CRETICULATA`;
 - `CSIN_WHITE_PINK`.
 
-Both are canonically oriented as `anthocyanin_gain`, target = more red/pink.
+All three are canonically oriented toward more red/pink before expression inspection.
 
-### Literature observation regime on the same two clusters
+### Literature observation regime on the same three clusters
 
-Five cluster × axis cells remain unresolved. Exact enumeration over `{up, down, same}` gives 243 admissible completions.
+Seven cluster × axis cells remain unresolved. Exact enumeration over `{up, down, same}` gives 2,187 admissible completions.
 
-- exact-signature recurrence: **0.5–1.0**;
+- exact-signature recurrence: **1/3–1.0**;
 - pairwise A/F/C/P concordance: **0.25–1.0**;
 - pairwise-concordance identified-set width: **0.75**.
 
-The literature therefore permits anything from weak to complete multivariate recurrence on these two systems.
+The selected literature representation therefore still permits complete multivariate recurrence.
 
 ### Candidate-free observation regime
 
-Only one cluster × axis cell remains unresolved, leaving three exact completions.
+Only one cluster × axis cell remains unresolved (`CSIN_WHITE_PINK`, P), leaving three exact completions.
 
-- exact-signature recurrence: **0.5 exactly**;
-- pairwise A/F/C/P concordance: **0.25–0.5**;
-- pairwise-concordance identified-set width: **0.25**.
+- exact-signature recurrence: **1/3 exactly**;
+- pairwise A/F/C/P concordance: **1/3–1/2**;
+- pairwise-concordance identified-set width: **1/6 = 0.1667**.
 
-The standardized candidate-free observation regime therefore reduces identified-set width by **0.50** (`0.75 -> 0.25`).
+The standardized candidate-free regime reduces identified-set width by **7/12 = 0.5833** (`0.75 -> 0.1667`). More importantly, it removes complete multivariate recurrence from the admissible set: no completion can make all three independent anthocyanin-gain clusters share one complete A/F/C/P signature.
 
-This is not merely more precision around the literature conclusion: the admissible recurrence region shifts away from complete concordance.
+## Direct literature-versus-candidate-free overlap
 
-## Direct literature-versus-candidate-free conflicts
+Across cells resolved independently in both regimes:
 
-Across independently resolved cells in the two common anthocyanin-gain clusters:
+- comparable cells: **5**;
+- agreement: **2/5 = 0.40**;
+- conflicts: **3/5**.
 
-- comparable resolved cells: **3**;
-- agreement: **1/3 = 0.3333**;
-- conflicts: **2/3**.
+| dependence cluster | axis | literature | candidate-free | interpretation |
+|---|---|---|---|---|
+| `CJAPONICA` | A | up | down | candidate-free effect is essentially near-flat (`g=-0.0168`), so treat as non-reproduction rather than a strong biological reversal |
+| `CRETICULATA` | A | up | up | agreement; candidate-free pathway-wide effect is weak (`g=+0.1175`) |
+| `CRETICULATA` | P | down | up | conflict |
+| `CSIN_WHITE_PINK` | A | up | down | conflict; strong and stage-consistent candidate-free decrease |
+| `CSIN_WHITE_PINK` | F | down | down | agreement |
 
-Both conflicts are on the anthocyanin axis itself:
+The observation-process effect is therefore **system- and axis-dependent**, not a mechanical reversal produced by the pipeline.
 
-| dependence cluster | axis | literature | candidate-free |
-|---|---|---|---|
-| `CJAPONICA` | A | up | **down** |
-| `CSIN_WHITE_PINK` | A | up | **down** |
+## C. reticulata third-cluster result
 
-Thus the selected literature representation `more red/pink -> A up` is not reproduced by the frozen pathway-wide candidate-free module in either of the two independently remeasured anthocyanin-gain clusters.
+The third independent anthocyanin-gain system was frozen before expression inspection as a within-genotype, same-stage 3 × 3 comparison in cultivar Manao:
 
-This does **not** imply that anthocyanin is biologically irrelevant. The A module is a predefined pathway-wide transcript score (`DFR`, `ANS/LDOX`, `UFGT/3GT` families). Specific paralogs, upstream regulators, spatial expression, substrate availability, enzyme activity, post-transcriptional effects, and metabolite pools may differ from the module-level transcript direction.
+- source: full-bloom white petal region (`SRR24413192`, `SRR24413191`, `SRR24413190`);
+- target: full-bloom red petal region (`SRR24413189`, `SRR24413188`, `SRR24413187`).
 
-## C. sinensis result that closes the gate
+Run identities were resolved by the auditable chain `GSE236364 GSM -> GEO SRX relation -> SRR`, not by BioProject membership or accession ordering. The mapping-audit run is `32822609384`.
 
-The white -> pink stage series retained all five prespecified stages and all four A/F/C/P axes passed the module-scoring computation. Under the frozen rule (`>=4/5` estimable stages and `>=0.8` same-sign consistency):
+Candidate-free results (red region minus white region):
 
-- A: mean Hedges' g = **-2.8595**, 5/5 same sign, **down**;
-- F: mean Hedges' g = **-0.3679**, 4/5 same sign, **down**;
-- C: mean Hedges' g = **+0.8820**, 4/5 same sign, **up**;
-- P: mean Hedges' g = **-0.7558**, 3/5 same sign, **unresolved**.
+- A: Hedges' g = **+0.1175**, up;
+- F: **+0.3233**, up;
+- C: **-3.4590**, down;
+- P: **+0.3990**, up.
 
-Mapping across the 30 frozen runs was 77.55–84.29%, mean 81.16%; all 30 prespecified runs were present before scoring.
+All four axes were estimable with 3 source and 3 target replicates. Salmon mapping was 77.22–79.41%, mean 78.42%.
+
+The literature anchor `MICRO_CR_SECTOR_01` resolves A=up and P=down. Candidate-free remeasurement therefore reproduces A only weakly and conflicts on P, while independently resolving F and C.
+
+## C. japonica result
+
+Joy Kendrick pink -> red, 3 × 3, first 1,000,000 paired reads/run:
+
+- A: Hedges' g = **-0.0168**, technically down but effectively near-flat;
+- F: **+0.4287**, up;
+- C: **-0.9379**, down;
+- P: **+1.9002**, up.
+
+Mapping min/mean/max was approximately 76.18/77.57/79.10%.
+
+This does not establish a meaningful opposite anthocyanin response; it shows that the literature A-up representation is not reproduced as a pathway-wide transcript-module increase in this within-genotype sector contrast.
+
+## C. sinensis result
+
+The white -> pink stage series retained all five prespecified stages and all 30 runs. Under the frozen rule (`>=4/5` estimable stages and `>=0.8` same-sign consistency):
+
+- A: mean Hedges' g = **-2.8595**, 5/5 same sign, down;
+- F: **-0.3679**, 4/5 same sign, down;
+- C: **+0.8820**, 4/5 same sign, up;
+- P: **-0.7558**, 3/5 same sign, unresolved.
+
+Mapping was 77.55–84.29%, mean 81.16%.
 
 ## Yellow-development control
 
-`CNITIDISSIMA` is currently the only candidate-free yellow-development cluster, so recurrence contraction cannot yet be tested for that class.
+`CNITIDISSIMA` is still the only candidate-free yellow-development cluster, so class-level recurrence contraction is not yet testable.
 
-However, the four literature-resolved cells and candidate-free ordered trajectory agree **4/4** on the same cluster:
+However, all four literature-resolved cells agree with the candidate-free ordered trajectory:
 
 - A down;
 - F up;
 - C up;
 - P down.
 
-This matters because it shows the standardized observation regime does not mechanically reverse published directions. Observation-process disagreement is system/class dependent.
+This 4/4 control, together with the weak A-up result in `CRETICULATA`, rejects the explanation that the standardized pipeline simply forces published directions to reverse.
 
 ## Primary inference
 
-The old simple hypothesis — that repeated visible red/pink gains reveal a recurrent anthocyanin-up molecular package — is **not supported by the first standardized two-cluster remeasurement**.
+The old simple hypothesis — that repeated visible red/pink gains reveal one recurrent whole-module anthocyanin-up package — is **not supported by the standardized three-cluster remeasurement**.
 
-The result instead supports the narrower and more defensible statement:
+The defensible result is:
 
-> **Published mechanistic recurrence depends materially on the observation regime. Standardizing the same biological systems with a frozen pathway-wide A/F/C/P protocol contracts the identified state space and, for the anthocyanin axis, reverses the published direction in both independently remeasured anthocyanin-gain clusters.**
+> **Published mechanistic recurrence is materially observation-regime dependent. On the same three independent anthocyanin-gain systems, selected literature leaves complete multivariate recurrence admissible, whereas one frozen pathway-wide candidate-free regime identifies exact-signature recurrence at only 1/3 and contracts pairwise-concordance uncertainty from 0.75 to 0.1667. The disagreements are system- and axis-specific rather than a uniform pipeline-induced reversal.**
 
-This is evidence for an observation-process contribution to apparent mechanistic convergence. It is not evidence that all candidate-gene studies are wrong, nor does it identify mutation-level causes or macroevolutionary transition branches.
+This does not show that anthocyanins are irrelevant, that candidate-gene studies are generally wrong, or that mutation-level reuse has been disproved. The A axis is a predefined pathway-wide transcript score; specific paralogs, upstream regulators, spatial expression, substrate flux, enzyme activity, post-transcriptional effects, and metabolites may behave differently.
 
 ## Consequence for the paper
 
@@ -103,15 +135,14 @@ The molecular mainline is now:
 
 `demonstrated feasibility -> observation regime -> identified mechanistic recurrence -> macroevolutionary realization`
 
-not:
+rather than:
 
 `visible transition -> recurrent anthocyanin mechanism -> macro transition`.
 
-The macro nuclear result remains independent: visible-colour clustering is reproducible while robust individual historical transition branches are not. Together, the two layers support a general identification argument: **patterns and apparent recurrence can be measurable even when the underlying event-level mechanism is not directly identified, and the observation process must be modeled rather than silently equated with biology.**
+The independent macro nuclear result remains: visible-colour phylogenetic clustering is reproducible while robust individual historical transition branches are not. Together, these results support an identification argument: **an apparent recurrent pattern can be measurable while its event-level mechanism is not identified, and the observation process itself must be measured rather than silently equated with biology.**
 
 ## Remaining gates
 
-1. Expand candidate-free remeasurement to an additional independent anthocyanin-gain cluster if a defensible public raw-data route can be frozen; this tests whether the current two-cluster result generalizes.
-2. Add a second independent yellow-development candidate-free cluster before claiming class-level yellow recurrence.
-3. Do not map A/F/C/P states onto the 53-tip nuclear tree from visible hue; direct mechanistic tip coverage remains inadequate.
-4. Do not assign ecological causes to individual colour-transition branches; ecology remains strongest at reproductive-service/persistence level.
+1. Add a second independent `yellow_development` candidate-free cluster before claiming class-level yellow recurrence; `CPERPETUA` is the highest-information target once its run-to-stage map is frozen.
+2. Do not map A/F/C/P states onto the 53-tip nuclear tree from visible hue; direct mechanistic tip coverage remains inadequate.
+3. Do not assign ecological causes to individual colour-transition branches; ecology remains strongest at reproductive-service/persistence level.

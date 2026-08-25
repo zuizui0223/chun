@@ -16,7 +16,7 @@ from pathlib import Path
 
 AXES = ("A", "F", "C", "P")
 DIRS = {"up", "down", "same"}
-SYSTEMS = ("CJAPONICA", "CSIN_WHITE_PINK", "CNITIDISSIMA")
+SYSTEMS = ("CJAPONICA", "CRETICULATA", "CSIN_WHITE_PINK", "CNITIDISSIMA")
 
 
 def load_json(path: Path) -> dict:
@@ -97,6 +97,31 @@ def from_joy(path: Path, cfg):
     return out
 
 
+def from_cr(path: Path, cfg):
+    if cfg["direction_frame"] != "target_minus_source":
+        raise ValueError("C. reticulata bridge must use target_minus_source")
+    s = load_json(path)
+    if s.get("contrast") != "CF_CR_MN_FB_WHITE_RED" or s.get("dependence_cluster") != cfg["dependence_cluster"]:
+        raise ValueError("unexpected C. reticulata contrast or cluster")
+    out = []
+    for axis in AXES:
+        e = s.get("effects", {}).get(axis, {})
+        d = e.get("direction", "unresolved")
+        ok = e.get("effect_status") == "ok" and d in DIRS
+        out.append(base(
+            f"CF_CR_MN_FB_WHITE_RED:{axis}", cfg, axis, d,
+            "resolved" if ok else "unresolved", "C_reticulata_MN_sector_candidate_free",
+            estimator="red_region_minus_white_region_Hedges_g",
+            effect_value=e.get("hedges_g", ""),
+            uncertainty_metric="not_thresholded",
+            uncertainty_value="",
+            consistency_metric="same_cultivar_same_stage_3v3",
+            consistency_value="1" if ok else "",
+            resolution_rule="effect_status_ok_and_direction_resolved; significance not required",
+        ))
+    return out
+
+
 def from_cs(path: Path, cfg):
     if cfg["direction_frame"] != "target_minus_source":
         raise ValueError("C. sinensis bridge must use target_minus_source")
@@ -159,6 +184,7 @@ def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--bridge", type=Path, required=True)
     ap.add_argument("--joy", type=Path)
+    ap.add_argument("--cr", type=Path)
     ap.add_argument("--cs", type=Path)
     ap.add_argument("--cn", type=Path)
     ap.add_argument("--out", type=Path, required=True)
@@ -170,6 +196,9 @@ def main():
     if a.joy:
         rows.extend(from_joy(a.joy, bridge["CJAPONICA"]))
         systems.append("CJAPONICA")
+    if a.cr:
+        rows.extend(from_cr(a.cr, bridge["CRETICULATA"]))
+        systems.append("CRETICULATA")
     if a.cs:
         rows.extend(from_cs(a.cs, bridge["CSIN_WHITE_PINK"]))
         systems.append("CSIN_WHITE_PINK")
@@ -197,6 +226,7 @@ def main():
         "direction_policy": "direction is retained whenever the prespecified design identifies it; significance thresholds never select favourable axes",
         "system_rules": {
             "CJAPONICA": "effect status ok in frozen same-cultivar 3v3 contrast",
+            "CRETICULATA": "effect status ok in frozen same-cultivar same-stage white-region vs red-region 3v3 contrast",
             "CSIN_WHITE_PINK": ">=4/5 stage effects and >=0.8 same-sign consistency (pre-frozen upstream)",
             "CNITIDISSIMA": "all 5 stages scorable + finite ordered slope; exact permutation P retained as uncertainty only",
         },
