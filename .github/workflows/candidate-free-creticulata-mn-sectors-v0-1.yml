@@ -68,7 +68,7 @@ jobs:
           assert q['biological_design']=='within_genotype_same_stage_petal_region'
           edge=next(r for r in e if r['edge_id']=='MICRO_CR_SECTOR_01')
           orient=next(r for r in o if r['edge_id']=='MICRO_CR_SECTOR_01')
-          assert edge['dependence_cluster']=='CRETICULATA' and edge['source_visible']=='white' and edge['target_visible']=='red'
+          assert edge['dependence_cluster']=='CRETICULATA' and edge['source_state_visible']=='white' and edge['target_state_visible']=='red'
           assert orient['transition_class']=='anthocyanin_gain' and orient['orientation']=='forward' and orient['canonical_target']=='more_red_or_pink'
           print(json.dumps({'status':'frozen_before_expression','mapping_audit_run':32822609384,'runs':sorted(expected),'contrast':x},indent=2))
           PY
