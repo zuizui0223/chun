@@ -9,6 +9,7 @@ on:
       - 'data/candidate_free_canonical_bridge_v0_1.csv'
       - 'scripts/build_candidate_free_family_map_from_gff_v0_1.py'
       - 'scripts/prepare_candidate_free_reference_v0_1.sh'
+      - 'scripts/download_ena_fastq_prefix_v0_1.py'
       - 'scripts/aggregate_salmon_family_expression_v0_1.py'
       - 'scripts/score_candidate_free_modules_v0_1.py'
       - 'scripts/summarize_candidate_free_stage_series_v0_1.py'
@@ -39,9 +40,8 @@ jobs:
       - name: Install RNA-seq and reference tools
         run: |
           sudo apt-get update
-          sudo apt-get install -y --no-install-recommends sra-toolkit salmon unzip ca-certificates
+          sudo apt-get install -y --no-install-recommends salmon unzip ca-certificates
           salmon --version
-          fasterq-dump --version
 
       - name: Prepare fixed annotation-informative reference
         run: |
@@ -62,17 +62,18 @@ jobs:
           PY
           salmon index -t "$RNA_FASTA" -i build/cs_white_pink_pilot_v0_1/salmon_index -p 2
 
-      - name: Quantify all 30 prespecified stage-matched runs
+      - name: Stream and quantify all 30 prespecified stage-matched runs
         run: |
-          mkdir -p build/cs_white_pink_pilot_v0_1/quant build/cs_white_pink_pilot_v0_1/reads
+          mkdir -p build/cs_white_pink_pilot_v0_1/quant build/cs_white_pink_pilot_v0_1/reads build/cs_white_pink_pilot_v0_1/ena
           tail -n +2 data/candidate_free_cs_white_pink_run_manifest_v0_1.csv | cut -d, -f1 | while read -r RUN; do
-            echo "Quantifying $RUN from first ${MAX_SPOTS_PER_RUN} SRA spots"
+            echo "Quantifying $RUN from first ${MAX_SPOTS_PER_RUN} paired reads via ENA HTTPS"
             rm -f build/cs_white_pink_pilot_v0_1/reads/${RUN}_1.fastq build/cs_white_pink_pilot_v0_1/reads/${RUN}_2.fastq
-            rm -rf build/cs_white_pink_pilot_v0_1/reads/tmp_${RUN}
-            mkdir -p build/cs_white_pink_pilot_v0_1/reads/tmp_${RUN}
-            fasterq-dump "$RUN" --split-files -e 2 -m 1GB \
-              -t build/cs_white_pink_pilot_v0_1/reads/tmp_${RUN} \
-              -O build/cs_white_pink_pilot_v0_1/reads -X "$MAX_SPOTS_PER_RUN"
+            python scripts/download_ena_fastq_prefix_v0_1.py \
+              --run "$RUN" --max-spots "$MAX_SPOTS_PER_RUN" \
+              --out-r1 build/cs_white_pink_pilot_v0_1/reads/${RUN}_1.fastq \
+              --out-r2 build/cs_white_pink_pilot_v0_1/reads/${RUN}_2.fastq \
+              --metadata-out build/cs_white_pink_pilot_v0_1/ena/${RUN}.tsv \
+              --summary-out build/cs_white_pink_pilot_v0_1/ena/${RUN}.json
             test -s build/cs_white_pink_pilot_v0_1/reads/${RUN}_1.fastq
             test -s build/cs_white_pink_pilot_v0_1/reads/${RUN}_2.fastq
             salmon quant -i build/cs_white_pink_pilot_v0_1/salmon_index -l A \
@@ -80,7 +81,6 @@ jobs:
               -2 build/cs_white_pink_pilot_v0_1/reads/${RUN}_2.fastq \
               --validateMappings -p 2 -o build/cs_white_pink_pilot_v0_1/quant/${RUN}
             rm -f build/cs_white_pink_pilot_v0_1/reads/${RUN}_1.fastq build/cs_white_pink_pilot_v0_1/reads/${RUN}_2.fastq
-            rm -rf build/cs_white_pink_pilot_v0_1/reads/tmp_${RUN}
           done
 
       - name: Aggregate candidate-free family expression
@@ -130,7 +130,7 @@ jobs:
           mkdir -p build/cs_white_pink_pilot_v0_1/diagnostics
           cp build/cs_white_pink_pilot_v0_1/reference_contract.txt build/cs_white_pink_pilot_v0_1/diagnostics/ 2>/dev/null || true
           cp build/cs_white_pink_pilot_v0_1/reference_route_diagnostic.txt build/cs_white_pink_pilot_v0_1/diagnostics/ 2>/dev/null || true
-          printf 'reference=%s\nmax_spots_per_run=%s\nruns=30\nstages=5\n' "$REF_ACCESSION" "$MAX_SPOTS_PER_RUN" > build/cs_white_pink_pilot_v0_1/diagnostics/run_contract.txt
+          printf 'reference=%s\nread_route=ENA_https_fastq_prefix\nmax_spots_per_run=%s\nruns=30\nstages=5\n' "$REF_ACCESSION" "$MAX_SPOTS_PER_RUN" > build/cs_white_pink_pilot_v0_1/diagnostics/run_contract.txt
           find build/cs_white_pink_pilot_v0_1 -maxdepth 3 -type f -printf '%p\t%s bytes\n' 2>/dev/null | sort > build/cs_white_pink_pilot_v0_1/diagnostics/files.txt || true
 
       - uses: actions/upload-artifact@v4
@@ -139,6 +139,7 @@ jobs:
           name: candidate-free-cs-white-pink-pilot-v0-1
           path: |
             build/cs_white_pink_pilot_v0_1/family_map/
+            build/cs_white_pink_pilot_v0_1/ena/
             build/cs_white_pink_pilot_v0_1/family_expression.csv
             build/cs_white_pink_pilot_v0_1/family_expression.summary.json
             build/cs_white_pink_pilot_v0_1/scored/

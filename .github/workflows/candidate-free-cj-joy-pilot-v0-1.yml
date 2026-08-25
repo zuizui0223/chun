@@ -9,6 +9,7 @@ on:
       - 'data/candidate_free_canonical_bridge_v0_1.csv'
       - 'scripts/build_candidate_free_family_map_from_gff_v0_1.py'
       - 'scripts/prepare_candidate_free_reference_v0_1.sh'
+      - 'scripts/download_ena_fastq_prefix_v0_1.py'
       - 'scripts/aggregate_salmon_family_expression_v0_1.py'
       - 'scripts/score_candidate_free_modules_v0_1.py'
       - 'scripts/build_candidate_free_measurement_registry_v0_1.py'
@@ -38,9 +39,8 @@ jobs:
       - name: Install RNA-seq and reference tools
         run: |
           sudo apt-get update
-          sudo apt-get install -y --no-install-recommends sra-toolkit salmon unzip ca-certificates
+          sudo apt-get install -y --no-install-recommends salmon unzip ca-certificates
           salmon --version
-          fasterq-dump --version
 
       - name: Prepare fixed annotation-informative reference
         run: |
@@ -65,19 +65,18 @@ jobs:
         run: |
           salmon index -t "$RNA_FASTA" -i build/cj_joy_pilot_v0_1/salmon_index -p 2
 
-      - name: Subsample and quantify six resolved Joy Kendrick runs
+      - name: Stream and quantify six resolved Joy Kendrick runs
         run: |
-          mkdir -p build/cj_joy_pilot_v0_1/quant build/cj_joy_pilot_v0_1/reads
+          mkdir -p build/cj_joy_pilot_v0_1/quant build/cj_joy_pilot_v0_1/reads build/cj_joy_pilot_v0_1/ena
           tail -n +2 data/candidate_free_cj_joy_run_manifest_v0_1.csv | cut -d, -f1 | while read -r RUN; do
-            echo "Quantifying $RUN from first ${MAX_SPOTS_PER_RUN} SRA spots"
+            echo "Quantifying $RUN from first ${MAX_SPOTS_PER_RUN} paired reads via ENA HTTPS"
             rm -f build/cj_joy_pilot_v0_1/reads/${RUN}_1.fastq build/cj_joy_pilot_v0_1/reads/${RUN}_2.fastq
-            rm -rf build/cj_joy_pilot_v0_1/reads/tmp_${RUN}
-            mkdir -p build/cj_joy_pilot_v0_1/reads/tmp_${RUN}
-            fasterq-dump "$RUN" \
-              --split-files -e 2 -m 1GB \
-              -t build/cj_joy_pilot_v0_1/reads/tmp_${RUN} \
-              -O build/cj_joy_pilot_v0_1/reads \
-              -X "$MAX_SPOTS_PER_RUN"
+            python scripts/download_ena_fastq_prefix_v0_1.py \
+              --run "$RUN" --max-spots "$MAX_SPOTS_PER_RUN" \
+              --out-r1 build/cj_joy_pilot_v0_1/reads/${RUN}_1.fastq \
+              --out-r2 build/cj_joy_pilot_v0_1/reads/${RUN}_2.fastq \
+              --metadata-out build/cj_joy_pilot_v0_1/ena/${RUN}.tsv \
+              --summary-out build/cj_joy_pilot_v0_1/ena/${RUN}.json
             test -s build/cj_joy_pilot_v0_1/reads/${RUN}_1.fastq
             test -s build/cj_joy_pilot_v0_1/reads/${RUN}_2.fastq
             salmon quant \
@@ -87,7 +86,6 @@ jobs:
               --validateMappings -p 2 \
               -o build/cj_joy_pilot_v0_1/quant/${RUN}
             rm -f build/cj_joy_pilot_v0_1/reads/${RUN}_1.fastq build/cj_joy_pilot_v0_1/reads/${RUN}_2.fastq
-            rm -rf build/cj_joy_pilot_v0_1/reads/tmp_${RUN}
           done
 
       - name: Aggregate preregistered gene-family expression
@@ -121,6 +119,7 @@ jobs:
             'contrast':'CF_CJ_JOY_RED_PINK',
             'source':'pink petal region','target':'red petal region',
             'run_count':6,'max_spots_per_run':1000000,
+            'read_route':'ENA_https_fastq_prefix',
             'reference':os.environ['REF_ACCESSION'],'reference_route':os.environ.get('REFERENCE_ROUTE','unknown'),
             'effects':{e['axis']:{'effect_status':e['effect_status'],
               'hedges_g':None if not e['hedges_g'] else float(e['hedges_g']),
@@ -146,7 +145,7 @@ jobs:
           mkdir -p build/cj_joy_pilot_v0_1/diagnostics
           cp build/cj_joy_pilot_v0_1/reference_contract.txt build/cj_joy_pilot_v0_1/diagnostics/ 2>/dev/null || true
           cp build/cj_joy_pilot_v0_1/reference_route_diagnostic.txt build/cj_joy_pilot_v0_1/diagnostics/ 2>/dev/null || true
-          printf 'reference=%s\nmax_spots_per_run=%s\n' "$REF_ACCESSION" "$MAX_SPOTS_PER_RUN" > build/cj_joy_pilot_v0_1/diagnostics/run_contract.txt
+          printf 'reference=%s\nread_route=ENA_https_fastq_prefix\nmax_spots_per_run=%s\n' "$REF_ACCESSION" "$MAX_SPOTS_PER_RUN" > build/cj_joy_pilot_v0_1/diagnostics/run_contract.txt
           find build/cj_joy_pilot_v0_1 -maxdepth 3 -type f -printf '%p\t%s bytes\n' 2>/dev/null | sort > build/cj_joy_pilot_v0_1/diagnostics/files.txt || true
 
       - uses: actions/upload-artifact@v4
@@ -155,6 +154,7 @@ jobs:
           name: candidate-free-cj-joy-pilot-v0-1
           path: |
             build/cj_joy_pilot_v0_1/family_map/
+            build/cj_joy_pilot_v0_1/ena/
             build/cj_joy_pilot_v0_1/family_expression.csv
             build/cj_joy_pilot_v0_1/family_expression.summary.json
             build/cj_joy_pilot_v0_1/scored/
