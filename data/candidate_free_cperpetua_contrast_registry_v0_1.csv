@@ -1,0 +1,3 @@
+contrast_id,dependence_cluster,dataset_target_id,source_condition,target_condition,contrast_type,independence_role,primary_for_cluster,module_axes,notes
+CF_CP_YELLOW_ONSET,CPERPETUA,CF_CP_01,CP_S1,CP_S3,two_group_developmental,primary,true,A;F;C;P,"Primary early-to-yellowing contrast frozen before expression inspection. S3 is the published yellowing stage; target minus source defines direction toward yellow onset."
+CF_CP_YELLOW_ENDPOINT,CPERPETUA,CF_CP_01,CP_S1,CP_S5,two_group_developmental,secondary_correlated,false,A;F;C;P,"Endpoint sensitivity only; same developmental series and never counted as an independent transition."
