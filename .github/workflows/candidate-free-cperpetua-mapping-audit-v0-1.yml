@@ -1,0 +1,111 @@
+name: Candidate-free C. perpetua mapping audit v0.1
+
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/candidate-free-cperpetua-mapping-audit-v0-1.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  archive-mapping:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Resolve PRJNA981682 runs from archive labels without accession-order inference
+        run: |
+          python - <<'PY'
+          import csv,io,json,re,urllib.parse,urllib.request
+          from pathlib import Path
+
+          out=Path('build/cperpetua_mapping_audit_v0_1')
+          out.mkdir(parents=True,exist_ok=True)
+          ua={'User-Agent':'chun-candidate-free-archive-audit/0.1 contact=github.com/zuizui0223/chun'}
+          def get(url):
+              req=urllib.request.Request(url,headers=ua)
+              with urllib.request.urlopen(req,timeout=120) as r: return r.read()
+
+          fields_raw=get('https://www.ebi.ac.uk/ena/portal/api/returnFields?result=read_run').decode('utf-8','replace')
+          (out/'ena_read_run_fields.tsv').write_text(fields_raw,encoding='utf-8')
+          available=set()
+          for row in csv.DictReader(io.StringIO(fields_raw),delimiter='\t'):
+              for k in ('columnId','field','id'):
+                  if row.get(k): available.add(row[k])
+          desired=['run_accession','experiment_accession','sample_accession','secondary_sample_accession','study_accession','secondary_study_accession','sample_alias','experiment_alias','library_name','sample_title','scientific_name','library_layout','library_strategy','fastq_ftp','fastq_md5','fastq_bytes']
+          fields=[x for x in desired if x in available]
+          if 'run_accession' not in fields:
+              raise SystemExit('ENA field catalog did not expose run_accession')
+          url='https://www.ebi.ac.uk/ena/portal/api/filereport?'+urllib.parse.urlencode({
+              'accession':'PRJNA981682','result':'read_run','fields':','.join(fields),'format':'tsv','download':'true'})
+          text=get(url).decode('utf-8','replace')
+          (out/'PRJNA981682_read_run.tsv').write_text(text,encoding='utf-8')
+          runs=list(csv.DictReader(io.StringIO(text),delimiter='\t'))
+          if not runs: raise SystemExit('PRJNA981682 returned no ENA read_run rows')
+
+          print(f'N_PROJECT_RUNS={len(runs)}')
+          print('ARCHIVE LABELS (verbatim; no stage inference from run order):')
+          label_fields=['run_accession','experiment_accession','sample_accession','secondary_sample_accession','sample_alias','experiment_alias','library_name','sample_title']
+          for r in runs:
+              print('\t'.join(r.get(k,'') for k in label_fields))
+
+          # Infer S1-S5 / replicate only from explicit archive label strings, never SRR order.
+          def explicit_stage_rep(r):
+              label=' | '.join(r.get(k,'') for k in ('sample_alias','experiment_alias','library_name','sample_title'))
+              stage_hits=set()
+              rep_hits=set()
+              for pat in [r'(?i)(?:^|[^A-Za-z0-9])S([1-5])(?:[_\-\. ](?:R|rep)?([1-3]))?(?:$|[^0-9])',
+                          r'(?i)stage[_\-\. ]*([1-5])(?:[_\-\. ]*(?:R|rep)?([1-3]))?']:
+                  for m in re.finditer(pat,label):
+                      stage_hits.add(int(m.group(1)))
+                      if m.group(2): rep_hits.add(int(m.group(2)))
+              return label,stage_hits,rep_hits
+
+          mapped=[]
+          for r in runs:
+              label,stages,reps=explicit_stage_rep(r)
+              mapped.append({
+                  'run':r.get('run_accession',''),
+                  'experiment':r.get('experiment_accession',''),
+                  'sample_accession':r.get('sample_accession',''),
+                  'secondary_sample_accession':r.get('secondary_sample_accession',''),
+                  'sample_alias':r.get('sample_alias',''),
+                  'experiment_alias':r.get('experiment_alias',''),
+                  'library_name':r.get('library_name',''),
+                  'sample_title':r.get('sample_title',''),
+                  'label_blob':label,
+                  'stage':str(next(iter(stages))) if len(stages)==1 else '',
+                  'replicate':str(next(iter(reps))) if len(reps)==1 else '',
+                  'stage_hit_count':str(len(stages)),
+                  'replicate_hit_count':str(len(reps)),
+              })
+          with (out/'run_stage_candidates.tsv').open('w',newline='',encoding='utf-8') as f:
+              w=csv.DictWriter(f,fieldnames=list(mapped[0]),delimiter='\t'); w.writeheader(); w.writerows(mapped)
+
+          explicit=[x for x in mapped if x['stage'] and x['replicate']]
+          pairs={(int(x['stage']),int(x['replicate'])) for x in explicit}
+          expected={(s,r) for s in range(1,6) for r in range(1,4)}
+          summary={
+              'n_project_runs':len(runs),
+              'n_explicit_stage_rep':len(explicit),
+              'resolved_pairs':sorted([list(x) for x in pairs]),
+              'expected_pairs':sorted([list(x) for x in expected]),
+              'status':'resolved_5x3_from_archive_labels' if len(runs)==15 and len(explicit)==15 and pairs==expected else 'stage_mapping_not_yet_frozen',
+              'rule':'stage/replicate may only be frozen from explicit archive labels; SRR order is forbidden',
+          }
+          (out/'summary.json').write_text(json.dumps(summary,indent=2)+'\n',encoding='utf-8')
+          print(json.dumps(summary,indent=2))
+          if summary['status']!='resolved_5x3_from_archive_labels':
+              raise SystemExit('archive labels did not yet uniquely resolve S1-S5 x 3; inspect preserved metadata rather than infer from run order')
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: candidate-free-cperpetua-mapping-audit-v0-1
+          path: build/cperpetua_mapping_audit_v0_1/
+          if-no-files-found: error
