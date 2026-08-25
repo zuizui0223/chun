@@ -1,0 +1,96 @@
+name: Candidate-free actual-results recurrence v0.1
+
+on:
+  pull_request:
+    paths:
+      - 'data/micro_accessibility_edge_registry_v0_1.csv'
+      - 'data/micro_transition_canonical_orientation_v0_1.csv'
+      - 'scripts/analyze_observation_corrected_recurrence_v0_1.py'
+      - '.github/workflows/candidate-free-actual-results-recurrence-v0-1.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  actions: read
+
+concurrency:
+  group: candidate-free-actual-results-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+env:
+  JOY_RUN_ID: '32803242153'
+  CN_RUN_ID: '32803242174'
+
+jobs:
+  actual-results:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Download frozen successful raw-result artifacts
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          mkdir -p build/candidate_free_actual_results_v0_1/joy build/candidate_free_actual_results_v0_1/cn
+          gh run download "$JOY_RUN_ID" --repo "$GITHUB_REPOSITORY" \
+            --name candidate-free-cj-joy-pilot-v0-1 \
+            --dir build/candidate_free_actual_results_v0_1/joy
+          gh run download "$CN_RUN_ID" --repo "$GITHUB_REPOSITORY" \
+            --name candidate-free-cn-trajectory-v0-1 \
+            --dir build/candidate_free_actual_results_v0_1/cn
+      - name: Combine only canonical measurement registries
+        run: |
+          python - <<'PY'
+          import csv,json,os
+          from pathlib import Path
+          root=Path('build/candidate_free_actual_results_v0_1')
+          def one(d):
+              hits=list(d.rglob('candidate_free_measurements.csv'))
+              if len(hits)!=1: raise SystemExit(f'{d}: expected one candidate_free_measurements.csv, got {hits}')
+              with hits[0].open(newline='',encoding='utf-8') as f: return list(csv.DictReader(f)),hits[0]
+          jr,jp=one(root/'joy'); cr,cp=one(root/'cn')
+          rows=jr+cr
+          if len(jr)!=4 or len(cr)!=4 or len(rows)!=8: raise SystemExit((len(jr),len(cr)))
+          fields=list(rows[0])
+          out=root/'candidate_free_measurements_actual.csv'
+          with out.open('w',newline='',encoding='utf-8') as f:
+              w=csv.DictWriter(f,fieldnames=fields);w.writeheader();w.writerows(rows)
+          prov={'status':'actual_raw_results_frozen','joy_run_id':os.environ['JOY_RUN_ID'],'cn_run_id':os.environ['CN_RUN_ID'],
+                'joy_measurement_file':str(jp),'cn_measurement_file':str(cp),'n_measurements':len(rows)}
+          (root/'provenance.json').write_text(json.dumps(prov,indent=2)+'\n')
+          print(json.dumps(prov,indent=2))
+          PY
+      - name: Recompute literature-versus-candidate-free recurrence on actual results
+        run: |
+          ROOT=build/candidate_free_actual_results_v0_1
+          python scripts/analyze_observation_corrected_recurrence_v0_1.py \
+            --registry data/micro_accessibility_edge_registry_v0_1.csv \
+            --orientation data/micro_transition_canonical_orientation_v0_1.csv \
+            --candidate-free "$ROOT/candidate_free_measurements_actual.csv" \
+            --out-dir "$ROOT/recurrence"
+      - name: Guard actual cluster identity without forcing biological direction
+        run: |
+          python - <<'PY'
+          import csv,json
+          root='build/candidate_free_actual_results_v0_1'
+          rows=list(csv.DictReader(open(f'{root}/candidate_free_measurements_actual.csv')))
+          assert {(r['transition_class'],r['dependence_cluster']) for r in rows}=={
+              ('anthocyanin_gain','CJAPONICA'),('yellow_development','CNITIDISSIMA')}
+          s=json.load(open(f'{root}/recurrence/summary.json'))
+          assert s['identified_set_contraction_on_common_clusters']['anthocyanin_gain']['status']=='not_testable_fewer_than_two_common_clusters'
+          assert s['identified_set_contraction_on_common_clusters']['yellow_development']['status']=='not_testable_fewer_than_two_common_clusters'
+          print(json.dumps({
+              'anthocyanin_overlap':s['literature_vs_candidate_free_overlap']['anthocyanin_gain'],
+              'yellow_overlap':s['literature_vs_candidate_free_overlap']['yellow_development']},indent=2))
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: candidate-free-actual-results-recurrence-v0-1
+          path: |
+            build/candidate_free_actual_results_v0_1/candidate_free_measurements_actual.csv
+            build/candidate_free_actual_results_v0_1/provenance.json
+            build/candidate_free_actual_results_v0_1/recurrence/
+          if-no-files-found: error
