@@ -50,7 +50,7 @@ These intervals are intentionally broad. The literature alone does not identify 
 
 ## Primary candidate-free test
 
-The new primary question is not whether candidate-free results reproduce the paper authors' highlighted genes. It is:
+The primary question is:
 
 > **How much does the identified set for class-specific mechanistic recurrence contract or shift when the same public biological systems are remeasured with one frozen, candidate-independent A/F/C/P protocol?**
 
@@ -63,14 +63,70 @@ For each class it reports:
 - agreement/conflict in cells independently resolved by both regimes;
 - reduction in identified-set width on the common cluster set.
 
-Candidate-free input must be tidy rows with:
+Candidate-free input is tidy rows with:
 
 `measurement_id, dependence_cluster, transition_class, axis, direction, status, source`
 
 where `direction` is already expressed in the frozen canonical orientation and can only be `up`, `down`, or `same` when `status=resolved`.
 
-## Claim rule
+## Gate closure — actual frozen result
 
-A narrower candidate-free interval is evidence that standardized measurement resolves literature missingness. A shift in the interval or conflicts with published cells is evidence that the literature observation process changes the apparent mechanistic recurrence. Neither result by itself proves mutation-level causal reuse or branch-specific macroevolutionary causation.
+**Status: CLOSED for the first >=2-cluster anthocyanin-gain test.**
 
-This gate is deliberately outcome-agnostic: confirmation, attenuation, and reversal of published recurrence are all admissible results.
+Frozen raw-result runs:
+
+- Joy Kendrick `CJAPONICA`: `32803242153`;
+- *C. sinensis* `CSIN_WHITE_PINK`: `32817229591`;
+- *C. nitidissima* `CNITIDISSIMA`: `32803242174`;
+- integrated recurrence: `32820995797`.
+
+The common `anthocyanin_gain` cluster set is `CJAPONICA + CSIN_WHITE_PINK`.
+
+### Literature regime on the same two clusters
+
+- unresolved cluster × axis cells: 5;
+- exact completions: 243;
+- exact-signature recurrence: **0.5–1.0**;
+- pairwise concordance: **0.25–1.0**;
+- pairwise identified-set width: **0.75**.
+
+### Candidate-free regime on the same two clusters
+
+- unresolved cluster × axis cells: 1;
+- exact completions: 3;
+- exact-signature recurrence: **0.5 exactly**;
+- pairwise concordance: **0.25–0.5**;
+- pairwise identified-set width: **0.25**;
+- width reduction: **0.50**.
+
+Thus standardized observation both **contracts** and **shifts** the admissible recurrence region: complete multivariate concordance is no longer supported on the common two-cluster set.
+
+### Independently resolved cell agreement
+
+Across three comparable resolved cells:
+
+- agreement: **1/3**;
+- conflict: **2/3**.
+
+Both conflicts are the A axis:
+
+- `CJAPONICA`: literature `up`, candidate-free `down`;
+- `CSIN_WHITE_PINK`: literature `up`, candidate-free `down`.
+
+The *C. sinensis* result is especially strong at the frozen module level: A is down in 5/5 prespecified stages with mean Hedges' g **-2.8595**.
+
+### Yellow-development control
+
+`CNITIDISSIMA` remains a single candidate-free yellow cluster, so class-level recurrence contraction is not testable yet. However, literature and candidate-free directions agree **4/4** for A/F/C/P on that cluster.
+
+This rejects a simple interpretation that the standardized pipeline mechanically reverses published directions. Observation effects are system/class dependent.
+
+## Claim rule after closure
+
+The first real standardized two-cluster test supports:
+
+> **Published anthocyanin-gain mechanistic recurrence is materially observation-regime dependent. A frozen pathway-wide candidate-free remeasurement reduces the identified recurrence space and reverses the published A-axis direction in both independently remeasured common clusters.**
+
+It does **not** support the stronger claims that anthocyanin is irrelevant, all candidate-gene studies are wrong, mutation-level reuse has been disproved, or branch-specific macroevolutionary causes are identified.
+
+The authoritative numerical record is `docs/CANDIDATE_FREE_ACTUAL_RECURRENCE_RESULT_V0_1.md`.
