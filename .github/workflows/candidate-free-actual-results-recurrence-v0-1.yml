@@ -21,6 +21,7 @@ env:
   JOY_RUN_ID: '32803242153'
   CS_RUN_ID: '32817229591'
   CN_RUN_ID: '32803242174'
+  CR_RUN_ID: '32823901705'
 
 jobs:
   actual-results:
@@ -35,7 +36,7 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          mkdir -p build/candidate_free_actual_results_v0_1/joy build/candidate_free_actual_results_v0_1/cs build/candidate_free_actual_results_v0_1/cn
+          mkdir -p build/candidate_free_actual_results_v0_1/joy build/candidate_free_actual_results_v0_1/cs build/candidate_free_actual_results_v0_1/cn build/candidate_free_actual_results_v0_1/cr
           gh run download "$JOY_RUN_ID" --repo "$GITHUB_REPOSITORY" \
             --name candidate-free-cj-joy-pilot-v0-1 \
             --dir build/candidate_free_actual_results_v0_1/joy
@@ -45,6 +46,9 @@ jobs:
           gh run download "$CN_RUN_ID" --repo "$GITHUB_REPOSITORY" \
             --name candidate-free-cn-trajectory-v0-1 \
             --dir build/candidate_free_actual_results_v0_1/cn
+          gh run download "$CR_RUN_ID" --repo "$GITHUB_REPOSITORY" \
+            --name candidate-free-creticulata-mn-sectors-v0-1 \
+            --dir build/candidate_free_actual_results_v0_1/cr
       - name: Combine only canonical measurement registries
         run: |
           python - <<'PY'
@@ -55,11 +59,16 @@ jobs:
               hits=list(d.rglob('candidate_free_measurements.csv'))
               if len(hits)!=1: raise SystemExit(f'{d}: expected one candidate_free_measurements.csv, got {hits}')
               with hits[0].open(newline='',encoding='utf-8') as f: return list(csv.DictReader(f)),hits[0]
-          jr,jp=one(root/'joy'); sr,sp=one(root/'cs'); cr,cp=one(root/'cn')
-          rows=jr+sr+cr
-          if len(jr)!=4 or len(sr)!=4 or len(cr)!=4 or len(rows)!=12:
-              raise SystemExit((len(jr),len(sr),len(cr),len(rows)))
+          jr,jp=one(root/'joy')
+          sr,sp=one(root/'cs')
+          nr,np=one(root/'cn')
+          rr,rp=one(root/'cr')
+          rows=jr+sr+nr+rr
+          if any(len(x)!=4 for x in (jr,sr,nr,rr)) or len(rows)!=16:
+              raise SystemExit((len(jr),len(sr),len(nr),len(rr),len(rows)))
           fields=list(rows[0])
+          if any(list(r.keys())!=fields for r in rows):
+              raise SystemExit('candidate-free measurement schemas drifted across frozen artifacts')
           out=root/'candidate_free_measurements_actual.csv'
           with out.open('w',newline='',encoding='utf-8') as f:
               w=csv.DictWriter(f,fieldnames=fields); w.writeheader(); w.writerows(rows)
@@ -68,9 +77,11 @@ jobs:
               'joy_run_id':os.environ['JOY_RUN_ID'],
               'cs_run_id':os.environ['CS_RUN_ID'],
               'cn_run_id':os.environ['CN_RUN_ID'],
+              'cr_run_id':os.environ['CR_RUN_ID'],
               'joy_measurement_file':str(jp),
               'cs_measurement_file':str(sp),
-              'cn_measurement_file':str(cp),
+              'cn_measurement_file':str(np),
+              'cr_measurement_file':str(rp),
               'n_measurements':len(rows),
           }
           (root/'provenance.json').write_text(json.dumps(prov,indent=2)+'\n')
@@ -90,20 +101,21 @@ jobs:
           import csv,json
           root='build/candidate_free_actual_results_v0_1'
           rows=list(csv.DictReader(open(f'{root}/candidate_free_measurements_actual.csv')))
-          assert len(rows)==12
+          assert len(rows)==16
           assert {(r['transition_class'],r['dependence_cluster']) for r in rows}=={
               ('anthocyanin_gain','CJAPONICA'),
               ('anthocyanin_gain','CSIN_WHITE_PINK'),
+              ('anthocyanin_gain','CRETICULATA'),
               ('yellow_development','CNITIDISSIMA')}
           s=json.load(open(f'{root}/recurrence/summary.json'))
           anth=s['identified_set_contraction_on_common_clusters']['anthocyanin_gain']
           assert anth['status']=='comparable_common_cluster_set'
-          assert anth['common_clusters']==['CJAPONICA','CSIN_WHITE_PINK']
+          assert anth['common_clusters']==['CJAPONICA','CRETICULATA','CSIN_WHITE_PINK']
           yellow=s['identified_set_contraction_on_common_clusters']['yellow_development']
           assert yellow['status']=='not_testable_fewer_than_two_common_clusters'
           assert yellow['common_clusters']==['CNITIDISSIMA']
           overlap=s['literature_vs_candidate_free_overlap']['anthocyanin_gain']
-          assert overlap['common_clusters']==['CJAPONICA','CSIN_WHITE_PINK']
+          assert overlap['common_clusters']==['CJAPONICA','CRETICULATA','CSIN_WHITE_PINK']
           print(json.dumps({'anthocyanin':anth,'yellow':yellow,'overlap':overlap},indent=2))
           PY
       - uses: actions/upload-artifact@v4
