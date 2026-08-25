@@ -65,6 +65,7 @@ jobs:
                 'completeness':len(resolved)/len(fams),
                 'scorable_under_50pct_gate':len(resolved)/len(fams)>=0.5
               }
+          unscorable=sorted(axis for axis,x in modules.items() if not x['scorable_under_50pct_gate'])
           out={
             'status':'reference_identifiability_audit',
             'reference':os.environ['REF_ACCESSION'],
@@ -72,11 +73,14 @@ jobs:
             'n_mapped_transcripts':s['n_mapped_transcripts'],
             'n_families_with_at_least_one_transcript':s['n_families_with_at_least_one_transcript'],
             'modules':modules,
+            'unscorable_primary_axes':unscorable,
             'interpretation':'Reference/annotation coverage only; no expression or flower-colour outcome is used.'
           }
           open('build/candidate_free_reference_audit_v0_1/reference_audit.json','w').write(json.dumps(out,indent=2,ensure_ascii=False)+'\n')
           if out['n_mapped_transcripts']==0:
               raise SystemExit('Reference annotation resolves none of the preregistered pigment families')
+          if unscorable:
+              raise SystemExit(f'Primary module axes below frozen 50% family-completeness gate: {unscorable}')
           print(json.dumps(out,indent=2,ensure_ascii=False))
           PY
 
