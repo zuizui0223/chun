@@ -121,4 +121,4 @@ It becomes:
 
 > how many **taxonomically independent and molecularly distinguishable lineages** deploy yellow pigmentation, which pigment branches do they use, and did those deployments arise by retention, repeated recruitment, hybrid transfer, or regulatory switching?
 
-This makes the yellow comparison directly commensurable with the East Asian *Cirsium* question, where a coloured descendant is not called a reactivation until both history and latent pathway retention are demonstrated.
+This makes the yellow comparison compatible with the repository-wide claim rule: a coloured descendant is not called a reactivation until both history and latent pathway retention are demonstrated.

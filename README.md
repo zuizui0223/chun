@@ -1,45 +1,49 @@
 # chun
 
-Comparative project on **reversible floral pigment deployment** in East Asian and Southeast Asian plants.
+**Camellia flower-colour evolution from molecular accessibility to macroevolutionary persistence.**
 
-The starting question is whether repeated flower-colour transitions reflect irreversible pathway loss and de novo gain, or repeated **silencing, flux redirection, recruitment and reactivation of conserved pigment machinery**.
+The project asks whether pigment-network changes that recur at developmental or within-lineage scales predict flower-colour transitions across *Camellia*. Visible colour and biochemical state remain separate: anthocyanin, flavonol, proanthocyanidin and carotenoid evidence are never inferred from hue alone.
 
-## Current comparative systems
+## Current answer
 
-- **East Asian *Cirsium*** — white versus pink/purple lineages in the Ryukyus, Taiwan, Japan and nearby continental relatives; test loss, retention, ancestral polymorphism and true anthocyanin reactivation as separate histories.
-- ***Camellia*** — white, red/pink and yellow evolution, with special attention to early-diverging yellow-rich lineages in southwestern China and Vietnam and phylogenetically distinct yellow trajectories in Southeast Asia.
+The direct prediction is **not yet demonstrated**.
 
-Visible yellow is **not** treated as one biochemical state. Anthocyanin, flavonol and carotenoid evidence are stored on separate axes; a visible colour is never used by itself to infer a pigment mechanism.
+- A micro-only predictor now exists: independent evidence-cluster recurrence is highest for anthocyanin-downstream, flavonol and regulatory modules, with FLS and ANS the most recurrent explicit nodes in the current ledger.
+- Sequence-aware resolution supports flexible molecular implementation: FLS includes a same-lineage recurrence mode, whereas DFR shows module reuse through different paralogs.
+- At macro scale, accepted wild flower colour shows topology-robust **local phylogenetic conservatism**, not unrestricted lability.
+- The decisive enrichment test cannot yet be run: strict and dominant wild-colour encodings share **zero robust accepted-species transition branches**.
 
-## Research rule
+The supported result is therefore a cross-scale mismatch—molecular implementation can be flexible while macroevolutionary colour remains locally constrained. Current public data do **not** show that high micro-accessibility predicts which macro transition occurs.
 
-The term **reactivation/re-expression** is reserved for cases supported by both:
+## Claim boundary
 
-1. a phylogenetic history of active → suppressed/absent → active floral pigmentation; and
-2. molecular evidence that the underlying pathway remained available during the suppressed interval.
+This repository supports pattern-level comparison, not branch-specific causation. It does not establish:
 
-Otherwise use `retention`, `recruitment`, or `gain`.
+- transition probabilities or mutation rates from the micro recurrence score;
+- exact gene/module reuse on a reconstructed macro transition branch;
+- a universal white ancestor, cold-adaptation route or pollinator-driven transition;
+- causal ecological filtering of a particular accepted-species colour event.
 
-## Current evidence products
+The macro test reopens only when new data identify transition events that are robust to accepted taxonomy, wild-colour uncertainty and nuclear topology.
 
-- [Flower-colour reactivation hypotheses](docs/FLOWER_COLOR_REACTIVATION_HYPOTHESES.md)
-- [Pigment-state schema](docs/PIGMENT_STATE_SCHEMA.md) — **authoritative biochemical state definition; supersedes the earlier simplified A/W/Y shorthand**
-- [Evidence audit — 2026-08-14](docs/EVIDENCE_AUDIT_2026-08-14.md)
-- [Taxon × colour × pigment evidence matrix v0.1](data/evidence_matrix_v0_1.csv)
+## Scope
+
+`chun` is now *Camellia*-only. East Asian *Cirsium* phylogenomics, colour history and molecular mechanism belong to [EAzami](https://github.com/zuizui0223/EAzami). The initial cross-family scaffold remains recoverable in Git history but is not an active analysis input here. See [repository scope and handoff](docs/REPOSITORY_SCOPE.md).
+
+## Authoritative evidence products
+
+- [Paper 1 authoritative result registry](docs/PAPER1_AUTHORITATIVE_RESULT_REGISTRY.md)
+- [Current micro-to-macro evidence audit](docs/EVIDENCE_AUDIT_2026-08-26.md)
+- [Micro-accessibility score v0.1](docs/MICRO_ACCESSIBILITY_SCORE_V0_1_RESULT.md)
+- [Pigment-state schema](docs/PIGMENT_STATE_SCHEMA.md)
+- [Camellia evidence matrix v0.1](data/evidence_matrix_v0_1.csv)
+- [Camellia hypothesis ledger v0.1](data/hypothesis_test_ledger_v0_1.csv)
 - [Source/provenance registry v0.1](data/source_registry_v0_1.csv)
-- [Issue #1 — comparative problem, hypotheses and analysis gates](../../issues/1)
 
-## Public raw-data anchors
+## Public raw-data anchor
 
-- *Cirsium*: `PRJNA1311153` — leaf RNA-seq; usable for nuclear phylogeny and coding-integrity screens, **not** petal-expression evidence.
-- *Camellia nitidissima*: `SRP112181` — developmental flower RNA-seq; usable for anthocyanin/flavonol/carotenoid pathway-expression reanalysis.
+`SRP112181` provides 15 *Camellia nitidissima* flower RNA-seq runs spanning five developmental stages and three biological replicates. It supports developmental pigment-pathway analysis; it does not by itself identify genus-scale transition direction.
 
-## Immediate execution goal
+## Next execution gate
 
-1. freeze accession/sample manifests for `PRJNA1311153` and `SRP112181`;
-2. screen anthocyanin-pathway coding integrity across the focal *Cirsium* lineages;
-3. reconstruct developmental pigment-pathway deployment in *C. nitidissima*;
-4. expand the evidence matrix across the broad *Camellia* nuclear framework and the China–Vietnam yellow lineages;
-5. run ancestral-state/transition models only after tree provenance and biochemical state definitions pass their evidence gates.
-
-The first phylogenetic analyses will keep **visible colour** and **biochemically supported pigment profiles** separate. A white-bridge/accessibility model is a hypothesis to compare, not an assumed transition rule.
+Paper 1 remains at its public-data stop rule. The next direct test requires population-resolved wild pigment states and an independently reconstructed set of accepted-species transition branches, followed by a preregistered enrichment comparison against the frozen micro-only recurrence score.
