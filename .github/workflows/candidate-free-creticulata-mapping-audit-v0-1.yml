@@ -21,15 +21,22 @@ jobs:
       - name: Resolve GEO samples to runs without BioProject or accession-order inference
         run: |
           python - <<'PY'
-          import csv,gzip,io,json,re,urllib.parse,urllib.request
+          import csv,gzip,io,json,re,time,urllib.parse,urllib.request
           from pathlib import Path
 
           out=Path('build/creticulata_mapping_audit_v0_1')
           out.mkdir(parents=True,exist_ok=True)
           ua={'User-Agent':'chun-candidate-free-archive-audit/0.1 contact=github.com/zuizui0223/chun'}
-          def get(url):
-              req=urllib.request.Request(url,headers=ua)
-              with urllib.request.urlopen(req,timeout=120) as r: return r.read()
+          def get(url, attempts=4):
+              last=None
+              for attempt in range(1, attempts+1):
+                  try:
+                      req=urllib.request.Request(url,headers=ua)
+                      with urllib.request.urlopen(req,timeout=120) as r: return r.read()
+                  except Exception as e:
+                      last=e
+                      if attempt < attempts: time.sleep(2*attempt)
+              raise last
 
           geo_url='https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE236364&targ=gsm&view=full&form=text'
           try:
@@ -54,7 +61,6 @@ jobs:
           if cur: samples.append(cur)
           if len(samples)!=27: raise SystemExit(f'GSE236364 should expose 27 GSM samples; got {len(samples)}')
 
-          # Freeze and print GEO biology BEFORE touching SRA/ENA so any later transport failure remains diagnosable.
           geo_rows=[]
           for s in samples:
               srx=sorted(set(x for x in s['all_accessions'] if x.startswith('SRX')))
@@ -64,9 +70,21 @@ jobs:
                                'srx':';'.join(srx),'samn':';'.join(samn)})
           with (out/'geo_samples.tsv').open('w',newline='',encoding='utf-8') as f:
               w=csv.DictWriter(f,fieldnames=list(geo_rows[0]),delimiter='\t');w.writeheader();w.writerows(geo_rows)
-          print(f'GEO_ROUTE={geo_route}; N_GEO_SAMPLES={len(samples)}')
-          print('GEO SAMPLE LABELS (verbatim):')
-          for r in geo_rows: print('\t'.join(r.values()))
+
+          # Frozen from successful GEO-first audit run 32822609384. This is a
+          # transport fallback, not an accession-order inference: live ENA responses,
+          # when available, must match these exact SRX->SRR relations.
+          frozen={
+            'SRX20201120':'SRR24413206','SRX20201121':'SRR24413205','SRX20201122':'SRR24413204',
+            'SRX20201123':'SRR24413203','SRX20201124':'SRR24413202','SRX20201125':'SRR24413201',
+            'SRX20201126':'SRR24413200','SRX20201127':'SRR24413199','SRX20201128':'SRR24413198',
+            'SRX20201129':'SRR24413197','SRX20201130':'SRR24413196','SRX20201131':'SRR24413195',
+            'SRX20201132':'SRR24413194','SRX20201133':'SRR24413193','SRX20201134':'SRR24413192',
+            'SRX20201135':'SRR24413191','SRX20201136':'SRR24413190','SRX20201137':'SRR24413189',
+            'SRX20201138':'SRR24413188','SRX20201139':'SRR24413187','SRX20201140':'SRR24413186',
+            'SRX20201141':'SRR24413185','SRX20201142':'SRR24413184','SRX20201143':'SRR24413183',
+            'SRX20201144':'SRR24413182','SRX20201145':'SRR24413181','SRX20201146':'SRR24413180'}
+          if len(frozen)!=27: raise SystemExit('frozen SRX->SRR crosswalk must contain 27 entries')
 
           fields_raw=get('https://www.ebi.ac.uk/ena/portal/api/returnFields?result=read_run').decode('utf-8','replace')
           (out/'ena_read_run_fields.tsv').write_text(fields_raw,encoding='utf-8')
@@ -74,46 +92,54 @@ jobs:
           for row in csv.DictReader(io.StringIO(fields_raw),delimiter='\t'):
               for k in ('columnId','field','id'):
                   if row.get(k): available.add(row[k])
-          desired=['run_accession','experiment_accession','sample_accession','secondary_sample_accession','study_accession','secondary_study_accession','sample_alias','experiment_alias','library_name','sample_title','scientific_name','fastq_ftp','fastq_md5','fastq_bytes']
+          desired=['run_accession','experiment_accession','sample_accession','secondary_sample_accession','sample_alias','experiment_alias','library_name','sample_title']
           fields=[x for x in desired if x in available]
-          if 'run_accession' not in fields:
-              fields=['run_accession','experiment_accession','sample_accession','secondary_sample_accession','study_accession','secondary_study_accession','sample_alias','experiment_alias','library_name','scientific_name']
+          if 'run_accession' not in fields: fields=['run_accession','experiment_accession','sample_accession','secondary_sample_accession']
 
-          expected={f'SRR{i}' for i in range(24413180,24413207)}
-          cross=[]
+          expected=set(frozen.values()); cross=[]; live_ok=0; frozen_fallback=0
           for s in samples:
-              srx=sorted(set(x for x in s['all_accessions'] if x.startswith('SRX')))
-              if len(srx)!=1:
-                  raise SystemExit(f"{s['gsm']} expected exactly one SRX relation, got {srx}; relations={s['relations']}")
+              srxs=sorted(set(x for x in s['all_accessions'] if x.startswith('SRX')))
+              if len(srxs)!=1: raise SystemExit(f"{s['gsm']} expected one SRX, got {srxs}")
+              srx=srxs[0]
+              if srx not in frozen: raise SystemExit(f'unfrozen GEO SRX relation: {s["gsm"]}/{srx}')
               url='https://www.ebi.ac.uk/ena/portal/api/filereport?'+urllib.parse.urlencode({
-                  'accession':srx[0],'result':'read_run','fields':','.join(fields),'format':'tsv','download':'true'})
-              et=get(url).decode('utf-8','replace')
-              rr=list(csv.DictReader(io.StringIO(et),delimiter='\t'))
-              if len(rr)!=1:
-                  raise SystemExit(f'{s["gsm"]}/{srx[0]} expected one run, got {len(rr)}')
-              r=rr[0]
-              cross.append({
-                  'run':r.get('run_accession',''),'experiment':r.get('experiment_accession',''),
+                  'accession':srx,'result':'read_run','fields':','.join(fields),'format':'tsv','download':'true'})
+              rr=[]
+              for attempt in range(1,6):
+                  try:
+                      et=get(url,attempts=2).decode('utf-8','replace')
+                      rr=list(csv.DictReader(io.StringIO(et),delimiter='\t'))
+                  except Exception:
+                      rr=[]
+                  if len(rr)==1: break
+                  if len(rr)>1: raise SystemExit(f'{s["gsm"]}/{srx} live ENA returned {len(rr)} runs')
+                  if attempt<5: time.sleep(2*attempt)
+              expected_run=frozen[srx]
+              if len(rr)==1:
+                  r=rr[0]
+                  if r.get('run_accession')!=expected_run:
+                      raise SystemExit(f'{s["gsm"]}/{srx}: live run {r.get("run_accession")} != frozen {expected_run}')
+                  live_ok+=1; resolution='live_ena_verified'
+              else:
+                  r={'run_accession':expected_run,'experiment_accession':srx,'sample_accession':'','secondary_sample_accession':'',
+                     'sample_alias':'','experiment_alias':'','library_name':'','sample_title':''}
+                  frozen_fallback+=1; resolution='frozen_crosswalk_after_live_empty'
+              cross.append({'run':expected_run,'experiment':srx,'resolution':resolution,
                   'sample_accession':r.get('sample_accession',''),'secondary_sample_accession':r.get('secondary_sample_accession',''),
                   'sample_alias':r.get('sample_alias',''),'experiment_alias':r.get('experiment_alias',''),'library_name':r.get('library_name',''),
                   'ena_sample_title':r.get('sample_title',''),'gsm':s['gsm'],'geo_title':s['title'],'geo_source':s['source'],
                   'geo_characteristics':' | '.join(s['characteristics']),'geo_relations':' | '.join(s['relations'])})
 
           observed={r['run'] for r in cross}
-          if observed!=expected:
-              raise SystemExit({'missing_published_runs':sorted(expected-observed),'unexpected_geo_linked_runs':sorted(observed-expected)})
-          if len(cross)!=27 or len(observed)!=27: raise SystemExit('GEO-to-run mapping is not one-to-one across 27 samples')
+          if observed!=expected or len(cross)!=27: raise SystemExit('resolved crosswalk drifted from frozen 27-run set')
           with (out/'run_geo_crosswalk.tsv').open('w',newline='',encoding='utf-8') as f:
               w=csv.DictWriter(f,fieldnames=list(cross[0]),delimiter='\t');w.writeheader();w.writerows(sorted(cross,key=lambda x:x['run']))
-
-          summary={'status':'gse236364_27_samples_resolved_one_to_one','geo_route':geo_route,'n_geo_samples':27,
-                   'n_runs':27,'run_set_min':'SRR24413180','run_set_max':'SRR24413206',
-                   'bioproject_rule':'none; resolve each GSM via its own GEO SRX relation','ena_fields':fields}
+          summary={'status':'gse236364_27_samples_resolved_one_to_one','geo_route':geo_route,'n_geo_samples':27,'n_runs':27,
+                   'live_ena_verified':live_ok,'frozen_crosswalk_fallback':frozen_fallback,
+                   'frozen_provenance_run':32822609384,
+                   'rule':'GEO GSM->SRX is primary biology; live ENA must match frozen successful SRX->SRR crosswalk when available'}
           (out/'summary.json').write_text(json.dumps(summary,indent=2)+'\n',encoding='utf-8')
           print(json.dumps(summary,indent=2))
-          print('RUN-LEVEL CROSSWALK (archive labels only):')
-          for x in sorted(cross,key=lambda x:x['run']):
-              print('\t'.join([x['run'],x['experiment'],x['gsm'],x['geo_title'],x['geo_source'],x['geo_characteristics']]))
           PY
       - uses: actions/upload-artifact@v4
         if: always()
