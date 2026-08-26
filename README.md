@@ -1,45 +1,71 @@
 # chun
 
-Comparative project on **reversible floral pigment deployment** in East Asian and Southeast Asian plants.
+Comparative project on **floral pigment-state recurrence, observation regimes, and macroevolutionary realization** in *Camellia*, with related comparative work in East Asian plants.
 
-The starting question is whether repeated flower-colour transitions reflect irreversible pathway loss and de novo gain, or repeated **silencing, flux redirection, recruitment and reactivation of conserved pigment machinery**.
+## Current Paper 1 mainline
 
-## Current comparative systems
+**Working title:** *Repeated flower-colour change does not imply repeated pigment-state packages in Camellia*
 
-- **East Asian *Cirsium*** — white versus pink/purple lineages in the Ryukyus, Taiwan, Japan and nearby continental relatives; test loss, retention, ancestral polymorphism and true anthocyanin reactivation as separate histories.
-- ***Camellia*** — white, red/pink and yellow evolution, with special attention to early-diverging yellow-rich lineages in southwestern China and Vietnam and phylogenetically distinct yellow trajectories in Southeast Asia.
+The paper asks whether repeated visible flower-colour change really implies repeated use of one molecular mechanism. Instead of equating a visible colour with a pigment mechanism, the analysis separates four pathway-wide transcript-state axes:
 
-Visible yellow is **not** treated as one biochemical state. Anthocyanin, flavonol and carotenoid evidence are stored on separate axes; a visible colour is never used by itself to infer a pigment mechanism.
+- **A** — anthocyanin branch;
+- **F** — flavonol branch;
+- **C** — carotenoid core;
+- **P** — proanthocyanidin diversion.
 
-## Research rule
+The inferential hierarchy is:
 
-The term **reactivation/re-expression** is reserved for cases supported by both:
+`feasibility -> observation regime -> identified mechanistic recurrence -> macroevolutionary realization -> persistence/filtering`
 
-1. a phylogenetic history of active → suppressed/absent → active floral pigmentation; and
-2. molecular evidence that the underlying pathway remained available during the suppressed interval.
+Visible hue is never used to fill a missing molecular axis, and candidate-free directions are never selected by expected direction or statistical significance.
 
-Otherwise use `retention`, `recruitment`, or `gain`.
+## Main result
 
-## Current evidence products
+Five public RNA-seq systems were remeasured with one frozen annotation-driven A/F/C/P pipeline: three independent `anthocyanin_gain` clusters and two independent `yellow_development` clusters.
 
-- [Flower-colour reactivation hypotheses](docs/FLOWER_COLOR_REACTIVATION_HYPOTHESES.md)
-- [Pigment-state schema](docs/PIGMENT_STATE_SCHEMA.md) — **authoritative biochemical state definition; supersedes the earlier simplified A/W/Y shorthand**
-- [Evidence audit — 2026-08-14](docs/EVIDENCE_AUDIT_2026-08-14.md)
-- [Taxon × colour × pigment evidence matrix v0.1](data/evidence_matrix_v0_1.csv)
-- [Source/provenance registry v0.1](data/source_registry_v0_1.csv)
-- [Issue #1 — comparative problem, hypotheses and analysis gates](../../issues/1)
+### Anthocyanin gain
 
-## Public raw-data anchors
+- literature exact whole-signature recurrence: **0.333–1.0**;
+- candidate-free exact recurrence: **0.333 exactly**;
+- literature pairwise A/F/C/P concordance: **0.25–1.0**;
+- candidate-free concordance: **0.333–0.5**.
 
-- *Cirsium*: `PRJNA1311153` — leaf RNA-seq; usable for nuclear phylogeny and coding-integrity screens, **not** petal-expression evidence.
-- *Camellia nitidissima*: `SRP112181` — developmental flower RNA-seq; usable for anthocyanin/flavonol/carotenoid pathway-expression reanalysis.
+### Yellow development
 
-## Immediate execution goal
+- literature exact whole-signature recurrence: **0.5–1.0**;
+- candidate-free exact recurrence: **0.5 exactly**;
+- literature pairwise concordance: **0.25–1.0**;
+- candidate-free concordance: **0.75 exactly**.
 
-1. freeze accession/sample manifests for `PRJNA1311153` and `SRP112181`;
-2. screen anthocyanin-pathway coding integrity across the focal *Cirsium* lineages;
-3. reconstruct developmental pigment-pathway deployment in *C. nitidissima*;
-4. expand the evidence matrix across the broad *Camellia* nuclear framework and the China–Vietnam yellow lineages;
-5. run ancestral-state/transition models only after tree provenance and biochemical state definitions pass their evidence gates.
+The two standardized yellow trajectories agree on **A down / C up / P down** and differ at F. The supported interpretation is therefore **transition-class-dependent modular recurrence**, not recurrence of one invariant whole pigment-state package.
 
-The first phylogenetic analyses will keep **visible colour** and **biochemically supported pigment profiles** separate. A white-bridge/accessibility model is a hypothesis to compare, not an assumed transition rule.
+At the macro scale, accepted-species nuclear analyses retain non-random visible-colour phylogenetic structure across topology and wild-colour sensitivities, while no individual transition branch survives the strict × dominant colour-coding robustness gate. Thus a **macroevolutionary pattern can be identifiable even when individual historical events and causes are not**.
+
+## Authoritative Paper 1 files
+
+- [`manuscript/PAPER1_AJB_MANUSCRIPT_V0_2.md`](manuscript/PAPER1_AJB_MANUSCRIPT_V0_2.md) — current manuscript; v0.1 is provenance only.
+- [`docs/CANDIDATE_FREE_ACTUAL_RECURRENCE_RESULT_V0_1.md`](docs/CANDIDATE_FREE_ACTUAL_RECURRENCE_RESULT_V0_1.md) — authoritative molecular recurrence result.
+- [`docs/YELLOW_TWO_CLUSTER_RECURRENCE_RESULT_V0_1.md`](docs/YELLOW_TWO_CLUSTER_RECURRENCE_RESULT_V0_1.md) — dedicated yellow-development result.
+- [`data/paper1_authoritative_results_v0_2.csv`](data/paper1_authoritative_results_v0_2.csv) — frozen result hierarchy.
+- [`data/paper1_main_figure_manifest_v0_2.csv`](data/paper1_main_figure_manifest_v0_2.csv) — Main/Supp figure roles.
+- [`data/paper1_reference_registry_v0_2.csv`](data/paper1_reference_registry_v0_2.csv) — governed reference set.
+
+Main Fig1–Fig6, reference governance, candidate-free recurrence, and AJB submission-bundle workflows have passed hosted CI.
+
+## Frozen boundaries
+
+- Do **not** infer taxon-level A/F/C/P states from visible flower colour.
+- Do **not** assign ecological causes to individual colour-transition branches while event identity is not robust.
+- Do **not** restore the obsolete `visible transition -> recurrent whole pathway package -> macro transition` narrative.
+- The term **reactivation/re-expression** remains reserved for cases with both an active→suppressed/absent→active history and evidence that the underlying machinery persisted; otherwise use retention, recruitment, or gain.
+
+## Current execution goal
+
+The molecular recurrence discovery gate is closed. The active work is now:
+
+1. final manuscript and figure consistency checks;
+2. AJB submission-package polishing and reference/QC cleanup;
+3. repository consolidation around the v0.2 authoritative result hierarchy;
+4. later mechanistic-phylogeny extension only when direct taxon-level A/F/C/P coverage is adequate.
+
+PR #95 was squash-merged into `main`; Issue #94 records the completed hypothesis test and final claim boundary.
