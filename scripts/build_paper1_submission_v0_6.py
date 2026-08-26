@@ -4,7 +4,6 @@ from __future__ import annotations
 import argparse
 import csv
 import json
-import re
 from collections import defaultdict
 from pathlib import Path
 
@@ -106,7 +105,6 @@ def main() -> int:
     )
     text = before + "\n\n" + data_block + "\n\n" + lit_marker + "\n\n" + refs
 
-    # Human-supplied metadata are explicit submission placeholders rather than hidden repository tasks.
     running = "**Running head:** Modular recurrence and flower-colour realization"
     front = (
         running
@@ -134,7 +132,7 @@ def main() -> int:
         raise SystemExit(f"submission output retains internal/stale tokens: {retained}")
 
     required = [
-        "candidate-free exact-signature recurrence at 0.333",
+        "Candidate-free remeasurement fixed exact-signature recurrence at 0.333",
         "pairwise concordance at 0.75",
         "strict×dominant shared robust event count was therefore zero",
         "# DATA AVAILABILITY STATEMENT",
