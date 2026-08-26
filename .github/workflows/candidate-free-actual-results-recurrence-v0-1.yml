@@ -66,9 +66,14 @@ jobs:
           from pathlib import Path
           root=Path('build/candidate_free_actual_results_v0_1')
           def one(d):
-              hits=list(d.rglob('candidate_free_measurements.csv'))
-              if len(hits)!=1: raise SystemExit(f'{d}: expected one candidate_free_measurements.csv, got {hits}')
-              with hits[0].open(newline='',encoding='utf-8') as f: return list(csv.DictReader(f)),hits[0]
+              direct=d/'candidate_free_measurements.csv'
+              if direct.is_file():
+                  p=direct
+              else:
+                  hits=list(d.rglob('candidate_free_measurements.csv'))
+                  if len(hits)!=1: raise SystemExit(f'{d}: expected one candidate_free_measurements.csv, got {hits}')
+                  p=hits[0]
+              with p.open(newline='',encoding='utf-8') as f: return list(csv.DictReader(f)),p
           jr,jp=one(root/'joy')
           sr,sp=one(root/'cs')
           nr,np=one(root/'cn')
