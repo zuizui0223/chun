@@ -1,0 +1,5 @@
+layer,headline,value,claim_boundary,result_ids
+molecular_anthocyanin,Anthocyanin gain: no recurrent whole package,"exact signature=0.333; pairwise concordance=0.333-0.5","3 independent clusters; one unresolved CS P axis; modular heterogeneity, not no recurrence","M05_ANTHOCYANIN_OBSERVATION_REGIME;C03_WHOLE_PACKAGE_VS_MODULAR_RECURRENCE"
+molecular_yellow,Yellow development: modular reuse,"exact signature=0.5; pairwise concordance=0.75; A/C/P reused","2 independent clusters; F differs; no exact whole A/F/C/P recurrence","M06_YELLOW_MODULAR_RECURRENCE;C03_WHOLE_PACKAGE_VS_MODULAR_RECURRENCE"
+macro_pattern,Visible states: local phylogenetic structure survives,"nearest-same-colour observed < null in 4/4 topology x coding scenarios","unrooted pattern only; global MPD and A-specific clustering are sensitivities","P02_LOCAL_COLOUR_CONSERV_FASTTREE;P03_LOCAL_COLOUR_CONSERV_UFBOOT"
+event_identity,Individual accepted-species events: not robust,"strict=0; dominant=1; shared=0","branch-specific molecular/ecological causation stops when cross-scenario event identity fails","B01_NO_ROBUST_ACCEPTED_BRANCH_EVENTS;C02_PUBLIC_DATA_IDENTIFIABILITY_BOUNDARY"
