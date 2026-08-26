@@ -65,7 +65,7 @@ def main() -> int:
         raise SystemExit(f"submission manuscript retains stale/internal tokens: {retained}")
 
     required_claims = [
-        "candidate-free exact-signature recurrence at 0.333",
+        "Candidate-free remeasurement fixed exact-signature recurrence at 0.333",
         "pairwise concordance at 0.75",
         "strict×dominant shared robust event count was therefore zero",
         "Repeated flower-colour change in *Camellia* does not imply repetition of one complete A/F/C/P pigment-state package.",
