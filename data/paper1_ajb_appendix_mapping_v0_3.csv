@@ -1,0 +1,9 @@
+appendix_id,source_file_or_output,upload_name,title_or_legend
+Appendix S1,data/paper1_authoritative_results_v0_2.csv,Appendix_S1.csv,"Authoritative Paper 1 v0.2 result registry, including claim status, manuscript role, source references, supersession semantics, and claim boundaries."
+Appendix S2,data/paper1_fig2_candidate_free_signature_v0_2.csv,Appendix_S2.csv,"Candidate-free A/F/C/P direction signatures for the five frozen Camellia RNA-seq systems used in the standardized recurrence analysis."
+Appendix S3,data/paper1_fig2_recurrence_intervals_v0_2.csv,Appendix_S3.csv,"Identified sets for exact-signature recurrence and pairwise A/F/C/P concordance under literature-selected and candidate-free observation regimes."
+Appendix S4,data/paper1_fig2_direct_overlap_v0_2.csv,Appendix_S4.csv,"Direct literature-versus-candidate-free agreement for molecular cells independently resolved under both observation regimes."
+Appendix S5,data/wfo55_accepted_species_wild_colour_registry_v0_1.csv,Appendix_S5.csv,"Accepted-species wild flower-colour evidence registry and strict versus dominant trait-treatment decisions used in macroevolutionary sensitivity analyses."
+Appendix S6,data/ecological_driver_effect_size_registry_v0_2.csv,Appendix_S6.csv,"Study-level ecological effect-size registry retained as persistence/filtering context and explicitly excluded from branch-specific causal attribution."
+Appendix S7,build/paper1_supp_v0_2/FigS1_molecular_support_v0_2.png,Appendix_S7.png,"Sequence- and copy-aware molecular support for implementation flexibility: FLS same-lineage recurrence, DFR paralog substitution, and ANS/LDOX and ANR copy heterogeneity."
+Appendix S8,build/paper1_supp_v0_2/FigS2_ecology_boundary_v0_2.png,Appendix_S8.png,"Ecological-screen boundary: current climate and pollination evidence informs filtering and persistence context but does not identify causes of individual accepted-species colour-transition branches."
