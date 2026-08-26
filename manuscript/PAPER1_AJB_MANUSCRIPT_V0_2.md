@@ -180,6 +180,14 @@ This is not a paradox. Aggregate structure can be estimable even when event assi
 
 This identification perspective provides a useful stop rule. We stop branch-specific causal inference when transition identity is not robust, and we stop whole-package recurrence claims when standardized molecular state rejects them. Negative gates therefore narrow the scientific question rather than merely reducing statistical power.
 
+## Scope and limitations
+
+The standardized RNA-seq analysis compares frozen transcript-state modules; it is not a direct assay of pigment concentrations, enzyme activity, cell-specific expression, or causal regulatory variants. A/F/C/P directions therefore define recurrence of this prespecified transcript-state representation. Candidate-selected studies and the standardized protocol answer related but non-identical questions, so disagreement shows that identified recurrence depends on observation scale rather than that either regime uniquely recovers the “true” mechanism.
+
+All five systems were quantified against one annotation-informative *C. sinensis* RefSeq. Using one reference prevents outcome-dependent reference switching and produced high mapping rates in all admitted systems, but it can still miss species-specific paralogs or create differential mappability. Accordingly, our cross-system claims are at the gene-family/module level, not exact ortholog or paralog equivalence across species. Species-native genomes and metabolite, protein, or enzyme assays are important future sensitivities where comparable resources exist.
+
+The raw workflows also use frozen read-prefix depths rather than full-depth differential-expression inference. Prefix depth and contrasts were fixed before outcomes, read integrity and fallback routes were audited, and module directions were not selected by significance. The present claims are therefore restricted to the reproducible fixed-depth observation regime. Full-depth and depth-sensitivity analyses remain useful robustness tests for precision and direction stability rather than hidden evidence that is being outcome-selected here.
+
 ## Ecology should enter as filtering and persistence, not as an assumed branch cause
 
 The current ecological screens do not support a universal visible-colour syndrome and are deliberately secondary in v0.2. Coarse A/W/Y state does not uniquely encode ultraviolet reflectance, fluorescence, reward, morphology, flowering phenology, visitor effectiveness, or physiological pigment function. Pollination and abiotic selection remain plausible filters, but branch-specific causal assignment would require transition events that current public hard-state data do not identify.
@@ -200,12 +208,13 @@ At the macro scale, accepted-species wild flower colours retain topology-robust 
 
 # DATA AVAILABILITY AND REPRODUCIBILITY
 
-All analysis contracts, source registries, frozen contrasts, workflow definitions, and authoritative-result summaries are versioned in this repository. The five-system candidate-free molecular synthesis is reproduced by GitHub Actions run `32929846096`. The pre-outcome yellow decision rule is preserved separately from its result in `docs/YELLOW_TWO_CLUSTER_RECURRENCE_GATE_V0_1.md` and `docs/YELLOW_TWO_CLUSTER_RECURRENCE_RESULT_V0_1.md`. The current manuscript consumes `data/paper1_authoritative_results_v0_2.csv` and `data/paper1_main_figure_manifest_v0_2.csv`.
+All analysis contracts, source registries, frozen contrasts, workflow definitions, and authoritative-result summaries are versioned in this repository. The five-system candidate-free molecular synthesis is frozen in GitHub Actions run `32929846096` and independently reproduced on the current merged head by run `32933792890`. The pre-outcome yellow decision rule is preserved separately from its result in `docs/YELLOW_TWO_CLUSTER_RECURRENCE_GATE_V0_1.md` and `docs/YELLOW_TWO_CLUSTER_RECURRENCE_RESULT_V0_1.md`. The current manuscript consumes `data/paper1_authoritative_results_v0_2.csv` and `data/paper1_main_figure_manifest_v0_2.csv`.
 
-# OPEN ITEMS FOR v0.2
+# FINAL SUBMISSION ITEMS FOR v0.2
 
-- Reconcile the full AJB Literature Cited list from v0.1 with the new candidate-free RNA-seq source studies and exact accession citations.
+The analysis, Main Fig. 1–6 generation, and manuscript-result governance gates are complete. Remaining items are editorial or archival rather than scientific-analysis gates.
+
+- Reconcile the full AJB Literature Cited list from v0.1 with the candidate-free RNA-seq source studies and exact accession citations.
 - Add author names, affiliations, acknowledgments, contributions, funding, and final repository archive DOI.
-- Generate Main Fig. 1–6 from `data/paper1_main_figure_manifest_v0_2.csv`; move FLS/DFR and ecological screens to Supplement.
-- Add Supplementary tables for the 20-row candidate-free registry, frozen contrast/run manifests, literature partial-identification matrix, and complete raw-data provenance.
-- Run final manuscript-result governance so every numeric Main-text claim maps to a v0.2 authoritative result ID.
+- Assemble and verify Supplementary tables for the 20-row candidate-free registry, frozen contrast/run manifests, literature partial-identification matrix, and complete raw-data provenance.
+- Archive the accepted code/result state and mint the final repository DOI after the merge target is fixed.
