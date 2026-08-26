@@ -1,25 +1,34 @@
-# Paper 1 AJB upload bundle v0.5 — ecological integration
+# Paper 1 AJB upload bundle v0.5 — historical ecological-integration snapshot
 
-This is the first journal-facing bundle in which ecological-driver meta-analysis v2 is propagated through the manuscript, Main Fig. 6, Appendix S4, provenance, and claim gates. The earlier v0.4 bundle remains a reproducible pre-ecological snapshot.
+> **Provenance only. Do not use this bundle as the current journal submission route.**
 
-## Files ready for journal upload
+v0.5 captured the paper state in which ecological-driver meta-analysis v2 was propagated through the manuscript and used as Main Fig. 6. That hierarchy predates the candidate-free Paper 1 v0.2 molecular recurrence result and the current identifiability/synthesis Fig. 6.
 
-- `manuscript/PAPER1_AJB_UPLOAD_V0_5.md` — AJB-formatted manuscript with the ecological-v2 Methods, Results, Discussion, Conclusions, citations, and structured abstract.
-- `main_figures/` — Main Figs 1–5 from the frozen molecular/macro layer plus registry-backed ecological Fig. 6 in PNG and SVG.
-- `appendices/Appendix_S1.csv` through `Appendix_S6.csv` — tabular Supporting Information; Appendix S4 is the joined v0.2 ecological study/effect registry with variance limitations and claim ceilings.
-- `appendices/Appendix_S7.png` through `Appendix_S9.png` — Supporting Information figures.
-- `provenance/` — molecular/macro registries, ecological-v2 registries and summary, figure/appendix dependency contracts, full-resolution Fig. 6 QA record, bibliographic corrections, and validation summaries.
-- `BUNDLE_MANIFEST.json` — SHA256 digest and byte size for every generated file.
+The current journal-facing route is **v0.6**, documented in `docs/PAPER1_AJB_UPLOAD_BUNDLE_V0_6_README.md`.
 
-## Scientific boundary
+## What v0.5 preserves
 
-The bundle supports reproductive-service/reliability filtering at the study/mechanism level and documents climate/season mediation. It does not assign those effects as causes of individual accepted-species colour transitions. Direct abiotic floral-pigment evidence remains too sparse and confounded for formal synthesis.
+The historical bundle recorded:
 
-## Remaining submission inputs
+- the pre-candidate-free ecological-integration manuscript lineage;
+- Main Figs 1–5 from the earlier molecular/macro layer plus the former ecological Fig. 6;
+- the earlier Appendix S1–S9 layout;
+- ecological-driver v2 provenance and validation summaries;
+- a SHA256 bundle manifest.
 
-1. final author list and order;
-2. affiliations and corresponding-author details;
-3. author contributions;
-4. funding and acknowledgments;
-5. conflict-of-interest statement if required;
-6. DOI for the versioned archived release, replacing `[ARCHIVE DOI TO ADD AT SUBMISSION]`.
+These files remain scientifically useful for provenance and for reconstructing how the paper framing changed. They must not be treated as the current figure, registry, or submission contract.
+
+## Why it was retired
+
+Paper 1 v0.2 established a different primary result hierarchy:
+
+1. standardized candidate-free A/F/C/P remeasurement rejects invariant whole-package recurrence while retaining transition-class-dependent modular reuse;
+2. accepted-species wild colour retains topology-robust local phylogenetic structure;
+3. no accepted-species transition branch survives the strict × dominant event-identification gate;
+4. ecological evidence is therefore retained as filtering/persistence context rather than assigned to individual macroevolutionary branches.
+
+Accordingly, v0.6 rebuilds the manuscript, Main Fig. 1–6, Supporting Information, and provenance directly from the current v0.2 scientific source files.
+
+## Historical human inputs
+
+The v0.5 snapshot also left author metadata, affiliations, contributions, funding/acknowledgments, conflict statement, and archive DOI for later human completion. Those unresolved metadata are not a reason to revive v0.5; current submission metadata belong to v0.6.
