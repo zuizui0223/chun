@@ -2,78 +2,76 @@
 
 ## Purpose
 
-Paper 1 has reached a public-data identifiability boundary. From this point onward, the manuscript must not drift back toward older legacy-tip, provisional-trait, or topology-sensitive claims simply because they are visually convenient or narratively stronger.
+Paper 1 v0.2 is the current claim contract. The manuscript, Main Fig. 1–6, Supplementary figures, and repository summaries must follow the v0.2 result hierarchy rather than re-entering older accessibility, ancestral-state, ecological-causation, or legacy-tip framings.
 
 The machine-readable contract is:
 
-- `data/paper1_authoritative_results_v0_1.csv` — all current Paper 1 results, including explicit negative/sensitivity results and superseded historical claims;
-- `data/paper1_main_figure_manifest_v0_1.csv` — every Main Fig 1–6 panel and the exact result IDs it is allowed to display;
-- `scripts/validate_paper1_result_registry.py` — CI gate that prevents superseded/excluded results from re-entering Main figures.
+- `data/paper1_authoritative_results_v0_2.csv` — current Paper 1 results, including authoritative, sensitivity, and explicitly superseded claims;
+- `data/paper1_main_figure_manifest_v0_2.csv` — Main Fig. 1–6 plus the permitted Supplementary figure dependencies;
+- `scripts/validate_paper1_result_registry.py` — CI gate for result IDs, Main/Supp figure dependencies, excluded claims, and local source-reference existence;
+- `.github/workflows/paper1-authoritative-registry.yml` — runs the v0.2 contract on every pull request.
+
+The v0.1 registry and manifest remain provenance only.
 
 ## Current headline
 
-The manuscript is **not** a causal adaptation paper and is **not** a new Camellia phylogeny or ancestral-colour paper.
+> Repeated flower-colour change in *Camellia* does not imply recurrence of one invariant whole pigment-state package. Standardized A/F/C/P remeasurement removes literature-permitted complete whole-package recurrence in both canonical transition classes while retaining transition-class-dependent modular reuse. At macro scale, wild flower colour remains locally phylogenetically structured, but current public hard-state data do not identify individual accepted-species transition branches robustly enough for branch-specific causal attribution.
 
-The current integrative claim is:
+This is not a claim that molecular recurrence is absent, that candidate-gene studies are generally wrong, or that one ecological driver explains *Camellia* flower-colour evolution.
 
-> Camellia pigment states show flexible molecular implementation but limited macroevolutionary lability: accepted wild flower colour retains topology-robust local phylogenetic conservatism, while current public species-level hard-state data do not identify robust branch-specific colour events that can be assigned ecological or molecular causes.
+## Main molecular results
 
-## Results retained in the Main text
+1. `M05_ANTHOCYANIN_OBSERVATION_REGIME` — across three independent anthocyanin-gain clusters, literature exact-signature recurrence spans 0.333–1.0 and pairwise concordance 0.25–1.0, whereas candidate-free remeasurement fixes exact-signature recurrence at 0.333 and narrows pairwise concordance to 0.333–0.5.
+2. `M06_YELLOW_MODULAR_RECURRENCE` — the two yellow-development trajectories share A down / C up / P down and differ at F; candidate-free pairwise concordance is 0.75, not exact whole-signature recurrence.
+3. `C03_WHOLE_PACKAGE_VS_MODULAR_RECURRENCE` — the integrated molecular conclusion is modular, transition-class-dependent repeatability rather than recurrence of one complete A/F/C/P package.
 
-### Molecular accessibility
+Sequence-aware FLS, DFR, ANS/LDOX, and ANR results remain authoritative supporting evidence in Supplement; they are not substitutes for the frozen candidate-free recurrence estimator.
 
-1. FLS includes a resolved same-lineage recurrence mode (`M01_FLS_SAME_LINEAGE`).
-2. DFR shows a resolved different-paralog implementation of the same pathway module (`M02_DFR_PARALOG_SUBSTITUTION`).
-3. ANS/LDOX and ANR copy-aware directional heterogeneity remain supporting evidence, not strict macro-node recurrence.
+## Main macro and identifiability results
 
-### Ecological screening
+1. `T01_WFO_ACCEPTED_TAXONOMY` — 93 historical nuclear tips collapse to 55 accepted *Camellia* species under the pinned WFO Plant List 2026-06 taxonomy.
+2. `T02_WILD_COLOUR_AUDIT` — 35 provisional hard colour states reduce to a strict 24-species seed and a dominant-colour 30-species sensitivity.
+3. `P01_NUCLEAR_TOPOLOGY_CONCORDANCE` — the two accepted-species nuclear pipelines share 46/50 nontrivial splits on 53 common species (normalized RF=0.08).
+4. `P03_LOCAL_COLOUR_CONSERV_UFBOOT` — local nearest-same-colour conservatism survives the stronger UFBoot topology and wild-colour sensitivities.
+5. `B01_NO_ROBUST_ACCEPTED_BRANCH_EVENTS` — strict and dominant colour codings share zero robust accepted-species transition branches.
+6. `C02_PUBLIC_DATA_IDENTIFIABILITY_BOUNDARY` — pattern-level persistence is identifiable, but branch-specific ecological or molecular causation is not.
 
-4. Current climate screens do not support a universal visible A/W -> colder niche chain (`E01_UNIVERSAL_COLD_CHAIN_NOT_SUPPORTED`).
-5. Coarse human-visible hue is not a deterministic pollinator-function state in the current primary-evidence synthesis (`E02_VISIBLE_HUE_POLLINATOR_ALIASING`).
+## Results retained as robustness or background
 
-### Taxonomy and trait evidence
-
-6. The legacy nuclear panel contains 93 Camellia tips but only 55 WFO Plant List 2026-06 accepted Camellia species (`T01_WFO_ACCEPTED_TAXONOMY`).
-7. Wild/floristic evidence reduces 35 provisional hard colour states to a strict 24-species seed; the dominant-colour sensitivity contains 30 species (`T02_WILD_COLOUR_AUDIT`).
-
-### Nuclear topology and macro pattern
-
-8. FastTree- and IQ-TREE/UFBoot-derived accepted-species topologies share 46/50 nontrivial splits on 53 common species (normalized RF 0.08; `P01_NUCLEAR_TOPOLOGY_CONCORDANCE`).
-9. The robust macro pattern is **local nearest-same-colour conservatism**, which survives strict/dominant trait scenarios and the stronger UFBoot topology (`P03_LOCAL_COLOUR_CONSERV_UFBOOT`).
-10. Broad/global same-colour MPD clustering is topology-sensitive and is therefore a negative robustness result, not a headline (`P04_GLOBAL_MPD_TOPOLOGY_SENSITIVE`).
-11. A-specific lineage permissivity is not a strict accepted-species result (`P05_A_SPECIFIC_PERMISSIVITY_NOT_STRICT`).
-
-### Identifiability boundary
-
-12. No accepted-species branch transition is robust to both strict wild-colour and dominant-colour assumptions (`B01_NO_ROBUST_ACCEPTED_BRANCH_EVENTS`).
-13. Therefore branch-specific climate, pollinator, or micro-to-macro causal enrichment must stop with current public hard-state data (`C02_PUBLIC_DATA_IDENTIFIABILITY_BOUNDARY`).
-
-## Results retained only as sensitivity/background
-
+- FLS same-lineage recurrence and DFR paralog substitution;
 - ANS/LDOX and ANR copy-specific directional heterogeneity;
-- accepted-species ancestral state, where W is favoured but W/Y uncertainty remains;
-- FastTree local-conservatism result as a sensitivity complement to the UFBoot result.
+- climate and pollination screens as persistence context rather than branch causes;
+- FastTree local-colour conservatism as a topology sensitivity;
+- global same-colour MPD and A-specific permissivity as explicitly demoted robustness results;
+- accepted-species ancestral-state sensitivity, where W is favoured but W/Y uncertainty remains.
+
+## `supersedes` semantics in v0.2
+
+In v0.2, `supersedes` can mean that a newer result replaces an older result as the **primary estimator or framing** without making the older result scientifically false. A result is excluded from current claims only when it is explicitly marked:
+
+`status = superseded` and `manuscript_role = exclude`.
+
+This distinction allows, for example, sequence-aware FLS/DFR results to remain valid supporting evidence even though the candidate-free A/F/C/P recurrence analysis supersedes them as the primary molecular recurrence test.
 
 ## Superseded results that must not return to Main figures
 
 - legacy A-specific lineage-permissivity headline;
-- legacy/global same-colour MPD headline as if topology-independent;
-- definitive/novel white-ancestor framing;
-- the three legacy 93-tip W->A branches as secure macro events.
+- legacy/global same-colour MPD as if topology-independent;
+- definitive or novel white-ancestor framing;
+- three legacy 93-tip W→A branches as secure accepted-species events.
 
-These remain useful provenance and may be described in Supplementary sensitivity history where necessary.
+## Figure contract
 
-## Main figure contract
-
-- **Fig 1** — literature alternatives -> falsification/refinement -> cross-scale mismatch -> public-data boundary.
-- **Fig 2** — micro implementation modes: FLS same-lineage, DFR paralog substitution, ANS/ANR copy-aware uncertainty.
-- **Fig 3** — data audit: 93 legacy tips -> 55 accepted species; 35 provisional hard states -> strict 24 / dominant 30.
-- **Fig 4** — nuclear topology sensitivity: 46/50 shared accepted-species splits, normalized RF=0.08.
-- **Fig 5** — local nearest-same-colour permutation results across trait and topology sensitivities, with the failed global-MPD headline shown explicitly as a robustness failure.
-- **Fig 6** — pattern-without-identifiable-events boundary and measurements required for Empirical Study 1.
+- **Fig. 1** — observation-to-realization framework and what standardized observation changes.
+- **Fig. 2** — five candidate-free A/F/C/P systems, anthocyanin identified-set contraction, and yellow modular recurrence.
+- **Fig. 3** — taxonomy and wild-colour evidence attrition.
+- **Fig. 4** — accepted-species nuclear-topology concordance.
+- **Fig. 5** — local colour conservatism across topologies plus explicit demotion of non-robust macro claims.
+- **Fig. 6** — pattern without robust event identity and the cross-scale synthesis.
+- **Fig. S1–S2** — sequence/copy-level molecular support and ecological-screen boundaries.
 
 ## Stop rule
 
-Do not add new branch-specific climate, pollination, or molecular-causation models unless a genuinely new data source changes the accepted-species trait identifiability boundary.
+Do not infer taxon-level A/F/C/P states from visible colour, and do not run branch-specific climate, pollination, or molecular enrichment unless new data produce transition events robust to accepted taxonomy, wild-colour uncertainty, and nuclear topology.
 
-The next Paper 1 work is figure generation, provenance audit, and manuscript freezing. The next scientific causal work belongs to Empirical Study 1.
+The current repository task is submission/QC consolidation around this v0.2 contract. New branch-causal science requires new empirical information rather than additional tuning of the present public hard-state data.
