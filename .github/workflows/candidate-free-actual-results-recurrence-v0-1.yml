@@ -1,5 +1,6 @@
 name: Candidate-free actual-results recurrence v0.1
 
+# Third anthocyanin-gain cluster (CRETICULATA) is frozen from successful raw run 32823901705.
 on:
   pull_request:
     paths:
