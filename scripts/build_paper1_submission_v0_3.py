@@ -21,6 +21,9 @@ def main() -> int:
         old = row["old"]
         new = row["new"]
         n = text.count(old)
+        if n == 0 and row.get("allow_missing", False):
+            applied.append(f"{row['id']}:not_applicable")
+            continue
         if n != 1:
             raise SystemExit(f"{row['id']}: expected exactly one match, found {n}")
         text = text.replace(old, new, 1)

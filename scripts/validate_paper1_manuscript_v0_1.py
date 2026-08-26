@@ -35,12 +35,18 @@ def abstract_body(text: str) -> str:
     return " ".join(pieces)
 
 
+def require_any(text: str, choices: list[str], label: str) -> None:
+    if not any(x in text for x in choices):
+        raise SystemExit(f"missing {label}")
+
+
 def main() -> int:
     ap = argparse.ArgumentParser()
     ap.add_argument("--manuscript", type=Path, required=True)
     ap.add_argument("--out", type=Path, required=True)
     ap.add_argument("--max-abstract-words", type=int, default=250)
     ap.add_argument("--version-label", default="submission_candidate")
+    ap.add_argument("--require-ecology-v2", action="store_true")
     a = ap.parse_args()
     text = a.manuscript.read_text(encoding="utf-8")
 
@@ -60,12 +66,9 @@ def main() -> int:
 
     abstract_words = count_words(abstract_body(text))
     if abstract_words > a.max_abstract_words:
-        raise SystemExit(
-            f"abstract exceeds configured ceiling {a.max_abstract_words}: {abstract_words}"
-        )
+        raise SystemExit(f"abstract exceeds configured ceiling {a.max_abstract_words}: {abstract_words}")
 
-    if "46/50 nontrivial splits" not in text and "shared 46 of 50 nontrivial splits" not in text:
-        raise SystemExit("missing frozen topology concordance value")
+    require_any(text, ["46/50 nontrivial splits", "46 of 50 nontrivial splits"], "frozen topology concordance value")
     if "normalized RF = 0.08" not in text:
         raise SystemExit("missing normalized RF value")
     if "strict *P* = 0.00116" not in text or "dominant *P* = 0.000080" not in text:
@@ -77,12 +80,26 @@ def main() -> int:
     if "public hard-state data do not identify *which* accepted-species branch" not in text:
         raise SystemExit("missing public-data identifiability statement")
 
+    if a.require_ecology_v2:
+        ecological_required = [
+            "geometric mean RR was **3.53**",
+            "geometric mean was **2.42**",
+            "**5/5** in the expected direction",
+            "Five studies across four taxa",
+            "direct abiotic evidence for petal pigment deployment remained sparse",
+            "reproductive-service filtering",
+        ]
+        for phrase in ecological_required:
+            if phrase not in text:
+                raise SystemExit(f"missing ecological-driver v2 result: {phrase}")
+
     forbidden_positive = [
         "we demonstrate that the Camellia ancestor was white",
         "we demonstrate that cold adaptation drove",
         "pollinators drove genus-level flower-colour evolution",
         "three robust W→A branches provide",
         "exact gene reuse explains Camellia flower-colour evolution",
+        "red-specific bird syndrome",
     ]
     low = text.casefold()
     for phrase in forbidden_positive:
@@ -103,6 +120,7 @@ def main() -> int:
         "core_doi_strings": doi_count,
         "frozen_title_match": True,
         "current_topology_and_trait_values_present": True,
+        "ecological_driver_v2_required": a.require_ecology_v2,
         "zero_event_boundary_present": True,
         "forbidden_positive_claims_present": False,
         "status": "claim-drift gate passed",

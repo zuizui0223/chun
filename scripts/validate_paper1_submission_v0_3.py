@@ -54,16 +54,22 @@ def main() -> int:
             raise SystemExit(f"missing submission section: {s}")
 
     required_claims = [
-        "46/50 nontrivial splits",
         "normalized RF = 0.08",
         "strict *P* = 0.00116",
         "dominant *P* = 0.000080",
         "strict × dominant cross-scenario accepted branch count was therefore zero",
         "public hard-state data do not identify *which* accepted-species branch",
+        "geometric mean RR was **3.53**",
+        "geometric mean was **2.42**",
+        "**5/5** in the expected direction",
+        "Five studies across four taxa",
+        "reproductive-service filtering",
     ]
     for x in required_claims:
         if x not in text:
-            raise SystemExit(f"missing frozen manuscript claim/value: {x}")
+            raise SystemExit(f"missing current manuscript claim/value: {x}")
+    if "46/50 nontrivial splits" not in text and "46 of 50 nontrivial splits" not in text:
+        raise SystemExit("missing topology concordance value")
 
     forbidden = [
         "Draft v0",
@@ -72,6 +78,7 @@ def main() -> int:
         "we demonstrate that the Camellia ancestor was white",
         "pollinators drove genus-level flower-colour evolution",
         "three robust W→A branches provide",
+        "red-specific bird syndrome",
     ]
     lower = text.casefold()
     for x in forbidden:
@@ -84,18 +91,22 @@ def main() -> int:
         if token not in text:
             raise SystemExit(f"missing formal Supplementary reference: {token}")
 
+    for citation in ["Liu et al., 2025", "Xie et al., 2013", "Yuan et al., 2025", "Kunitake et al., 2004", "Sun et al., 2017"]:
+        if citation not in text:
+            raise SystemExit(f"missing ecological primary citation: {citation}")
+
     doi_count = len(re.findall(r"10\.\d{4,9}/[-._;()/:A-Za-z0-9]+", text))
-    if doi_count < 20:
+    if doi_count < 24:
         raise SystemExit(f"unexpectedly sparse Literature Cited DOI count: {doi_count}")
 
     summary = {
-        "submission_version": "v0.3",
+        "submission_version": "v0.3-ecological-v2",
         "target_journal": "American Journal of Botany",
         "abstract_words": words,
         "abstract_limit": 250,
         "core_doi_strings": doi_count,
         "internal_project_tokens_absent": True,
-        "frozen_scientific_values_present": True,
+        "current_molecular_macro_ecological_values_present": True,
         "public_data_boundary_present": True,
         "archive_doi_placeholder_count": 1,
         "status": "submission-clean claim/style gate passed",
