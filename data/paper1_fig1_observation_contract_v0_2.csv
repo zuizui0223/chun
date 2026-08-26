@@ -1,0 +1,9 @@
+regime,feature,value,interpretation,source_ref
+published_literature,A_axis_system_coverage,8,Anthocyanin axis is observed most often,docs/CANDIDATE_FREE_ACTUAL_RECURRENCE_RESULT_V0_1.md
+published_literature,F_axis_system_coverage,4,Flavonol is less often observed,docs/CANDIDATE_FREE_ACTUAL_RECURRENCE_RESULT_V0_1.md
+published_literature,C_axis_system_coverage,1,Carotenoid is rarely observed in the selected mechanism matrix,docs/CANDIDATE_FREE_ACTUAL_RECURRENCE_RESULT_V0_1.md
+published_literature,P_axis_system_coverage,3,Proanthocyanidin diversion is incompletely observed,docs/CANDIDATE_FREE_ACTUAL_RECURRENCE_RESULT_V0_1.md
+candidate_free,canonical_systems,5,Five public systems are remeasured with the same A/F/C/P protocol,run32929846096
+candidate_free,canonical_cluster_axis_cells,20,All five systems enter the common four-axis schema,run32929846096
+candidate_free,resolved_cluster_axis_cells,19,One cell remains unresolved rather than imputed,run32929846096
+candidate_free,significance_filter,0,Expected direction and P value never decide axis retention,run32929846096
