@@ -1,0 +1,28 @@
+name: Paper 1 reference governance v0.2
+
+on:
+  pull_request:
+    paths:
+      - 'manuscript/PAPER1_AJB_MANUSCRIPT_V0_2.md'
+      - 'data/paper1_reference_registry_v0_2.csv'
+      - 'scripts/audit_paper1_references_v0_2.py'
+      - '.github/workflows/paper1-reference-governance-v0-2.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Audit in-text citations and Literature Cited against frozen registry
+        run: |
+          python scripts/audit_paper1_references_v0_2.py \
+            --manuscript manuscript/PAPER1_AJB_MANUSCRIPT_V0_2.md \
+            --registry data/paper1_reference_registry_v0_2.csv

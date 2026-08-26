@@ -1,0 +1,201 @@
+name: Candidate-free C. reticulata MN sector pilot v0.1
+
+on:
+  pull_request:
+    paths:
+      - 'data/candidate_free_creticulata_run_manifest_v0_1.csv'
+      - 'data/candidate_free_creticulata_contrast_registry_v0_1.csv'
+      - 'data/candidate_free_creticulata_primary_contrast_v0_1.csv'
+      - 'data/candidate_free_pigment_module_schema_v0_1.csv'
+      - 'data/micro_accessibility_edge_registry_v0_1.csv'
+      - 'data/micro_transition_canonical_orientation_v0_1.csv'
+      - 'scripts/build_candidate_free_family_map_from_gff_v0_1.py'
+      - 'scripts/prepare_candidate_free_reference_v0_1.sh'
+      - 'scripts/download_ena_fastq_prefix_v0_1.py'
+      - 'scripts/aggregate_salmon_family_expression_v0_1.py'
+      - 'scripts/score_candidate_free_modules_v0_1.py'
+      - '.github/workflows/candidate-free-creticulata-mn-sectors-v0-1.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: candidate-free-creticulata-mn-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  pilot:
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    env:
+      REF_ACCESSION: GCF_004153795.1
+      MAX_SPOTS_PER_RUN: '1000000'
+      ROOT: build/creticulata_mn_sector_pilot_v0_1
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Guard frozen biological contrast and GEO-first six-run manifest
+        run: |
+          python - <<'PY'
+          import csv,json
+          m=list(csv.DictReader(open('data/candidate_free_creticulata_run_manifest_v0_1.csv',newline='',encoding='utf-8')))
+          c=list(csv.DictReader(open('data/candidate_free_creticulata_contrast_registry_v0_1.csv',newline='',encoding='utf-8')))
+          p=list(csv.DictReader(open('data/candidate_free_creticulata_primary_contrast_v0_1.csv',newline='',encoding='utf-8')))
+          e=list(csv.DictReader(open('data/micro_accessibility_edge_registry_v0_1.csv',newline='',encoding='utf-8')))
+          o=list(csv.DictReader(open('data/micro_transition_canonical_orientation_v0_1.csv',newline='',encoding='utf-8')))
+          assert len(m)==6 and len(c)==1 and len(p)==1
+          expected={
+            'SRR24413192':('SAMN34549987','MN_Full_white_1','CR_MN_FULL_BLOOM_WHITE_REGION','white','1'),
+            'SRR24413191':('SAMN34549988','MN_Full_white_2','CR_MN_FULL_BLOOM_WHITE_REGION','white','2'),
+            'SRR24413190':('SAMN34549989','MN_Full_white_3','CR_MN_FULL_BLOOM_WHITE_REGION','white','3'),
+            'SRR24413189':('SAMN34549990','MN_Full_red_1','CR_MN_FULL_BLOOM_RED_REGION','red','1'),
+            'SRR24413188':('SAMN34549991','MN_Full_red_2','CR_MN_FULL_BLOOM_RED_REGION','red','2'),
+            'SRR24413187':('SAMN34549992','MN_Full_red_3','CR_MN_FULL_BLOOM_RED_REGION','red','3'),
+          }
+          got={r['run']:(r['biosample'],r['archive_sample_name'],r['condition_id'],r['visible_observation'],r['replicate']) for r in m}
+          assert got==expected
+          assert all(r['dependence_cluster']=='CRETICULATA' and r['mapping_status']=='resolved' for r in m)
+          x=c[0]; q=p[0]
+          assert x['contrast_id']==q['contrast_id']=='CF_CR_MN_FB_WHITE_RED'
+          assert x['source_condition']==q['source_condition']=='CR_MN_FULL_BLOOM_WHITE_REGION'
+          assert x['target_condition']==q['target_condition']=='CR_MN_FULL_BLOOM_RED_REGION'
+          assert x['dependence_cluster']==q['dependence_cluster']=='CRETICULATA'
+          assert x['dataset_target_id']==q['dataset_id']=='CF_CR_01'
+          assert q['biological_design']=='within_genotype_same_stage_petal_region'
+          edge=next(r for r in e if r['edge_id']=='MICRO_CR_SECTOR_01')
+          orient=next(r for r in o if r['edge_id']=='MICRO_CR_SECTOR_01')
+          assert edge['dependence_cluster']=='CRETICULATA' and edge['source_state_visible']=='white' and edge['target_state_visible']=='red'
+          assert orient['transition_class']=='anthocyanin_gain' and orient['orientation']=='forward' and orient['canonical_target']=='more_red_or_pink'
+          print(json.dumps({'status':'frozen_before_expression','mapping_audit_run':32822609384,'runs':sorted(expected),'contrast':x},indent=2))
+          PY
+
+      - name: Install RNA-seq and reference tools
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends salmon unzip ca-certificates
+          salmon --version
+
+      - name: Prepare fixed annotation-informative reference
+        run: |
+          bash scripts/prepare_candidate_free_reference_v0_1.sh "$ROOT"
+          cat "$ROOT/reference_route_diagnostic.txt"
+
+      - name: Build outcome-independent transcript family map and Salmon index
+        run: |
+          python scripts/build_candidate_free_family_map_from_gff_v0_1.py \
+            --gff "$GFF" --rna-fasta "$RNA_FASTA" \
+            --out-dir "$ROOT/family_map"
+          python - <<'PY'
+          import json,os
+          s=json.load(open(os.environ['ROOT']+'/family_map/family_mapping_summary.json'))
+          if s['n_mapped_transcripts']==0: raise SystemExit('fixed reference resolves no preregistered pigment family')
+          print(json.dumps(s,indent=2,ensure_ascii=False))
+          PY
+          salmon index -t "$RNA_FASTA" -i "$ROOT/salmon_index" -p 2
+
+      - name: Stream and quantify the six frozen MN full-bloom sector runs
+        run: |
+          mkdir -p "$ROOT/quant" "$ROOT/reads" "$ROOT/ena"
+          tail -n +2 data/candidate_free_creticulata_run_manifest_v0_1.csv | cut -d, -f1 | while read -r RUN; do
+            echo "Quantifying $RUN from first ${MAX_SPOTS_PER_RUN} paired reads via ENA HTTPS"
+            rm -f "$ROOT/reads/${RUN}_1.fastq" "$ROOT/reads/${RUN}_2.fastq"
+            python scripts/download_ena_fastq_prefix_v0_1.py \
+              --run "$RUN" --max-spots "$MAX_SPOTS_PER_RUN" \
+              --out-r1 "$ROOT/reads/${RUN}_1.fastq" \
+              --out-r2 "$ROOT/reads/${RUN}_2.fastq" \
+              --metadata-out "$ROOT/ena/${RUN}.tsv" \
+              --summary-out "$ROOT/ena/${RUN}.json"
+            test -s "$ROOT/reads/${RUN}_1.fastq"
+            test -s "$ROOT/reads/${RUN}_2.fastq"
+            salmon quant -i "$ROOT/salmon_index" -l A \
+              -1 "$ROOT/reads/${RUN}_1.fastq" -2 "$ROOT/reads/${RUN}_2.fastq" \
+              --validateMappings -p 2 -o "$ROOT/quant/${RUN}"
+            rm -f "$ROOT/reads/${RUN}_1.fastq" "$ROOT/reads/${RUN}_2.fastq"
+          done
+
+      - name: Aggregate preregistered family expression and score frozen A/F/C/P modules
+        run: |
+          python scripts/aggregate_salmon_family_expression_v0_1.py \
+            --quant-root "$ROOT/quant" \
+            --manifest data/candidate_free_creticulata_run_manifest_v0_1.csv \
+            --family-map "$ROOT/family_map/transcript_family_map.csv" \
+            --dataset-id CF_CR_01 --min-percent-mapped 15 \
+            --out "$ROOT/family_expression.csv"
+          python scripts/score_candidate_free_modules_v0_1.py \
+            --expression "$ROOT/family_expression.csv" \
+            --modules data/candidate_free_pigment_module_schema_v0_1.csv \
+            --contrasts data/candidate_free_creticulata_contrast_registry_v0_1.csv \
+            --out-dir "$ROOT/scored"
+
+      - name: Freeze biological result and canonical measurement rows without expected-direction assertions
+        run: |
+          python - <<'PY'
+          import csv,json,os
+          from pathlib import Path
+          root=Path(os.environ['ROOT'])
+          effects=list(csv.DictReader(open(root/'scored/contrast_effects.csv',newline='',encoding='utf-8')))
+          cr=[e for e in effects if e['contrast_id']=='CF_CR_MN_FB_WHITE_RED']
+          if len(cr)!=4 or {e['axis'] for e in cr}!={'A','F','C','P'}:
+              raise SystemExit(f'expected four A/F/C/P rows, got {cr}')
+          result={
+            'status':'computed_no_direction_forced',
+            'contrast':'CF_CR_MN_FB_WHITE_RED',
+            'dependence_cluster':'CRETICULATA',
+            'transition_class':'anthocyanin_gain',
+            'source':'MN full-bloom white region','target':'MN full-bloom red region',
+            'run_count':6,'max_spots_per_run':int(os.environ['MAX_SPOTS_PER_RUN']),
+            'mapping_audit_run_id':'32822609384','mapping_rule':'GSE236364 GSM -> GEO SRX relation -> SRR; no BioProject or accession-order inference',
+            'reference':os.environ['REF_ACCESSION'],'reference_route':os.environ.get('REFERENCE_ROUTE','unknown'),
+            'effects':{e['axis']:{'effect_status':e['effect_status'],'hedges_g':None if not e['hedges_g'] else float(e['hedges_g']),
+              'direction':e['direction_target_minus_source'],'n_source':int(e['n_source']),'n_target':int(e['n_target'])} for e in cr},
+            'interpretation_rule':'directions are read from the frozen target-minus-source output; no expected A/F/C/P direction or significance threshold is a CI pass condition'
+          }
+          (root/'pilot_result.json').write_text(json.dumps(result,indent=2,ensure_ascii=False)+'\n',encoding='utf-8')
+          fields=['measurement_id','dependence_cluster','transition_class','axis','direction','status','source','literature_anchor_edge','canonical_target','direction_frame','estimator','effect_value','uncertainty_metric','uncertainty_value','consistency_metric','consistency_value','resolution_rule']
+          rows=[]
+          for axis in ('A','F','C','P'):
+              e=result['effects'][axis]; d=e['direction']; ok=e['effect_status']=='ok' and d in {'up','down','same'}
+              rows.append({
+                'measurement_id':f'CF_CR_MN_FB_WHITE_RED:{axis}','dependence_cluster':'CRETICULATA','transition_class':'anthocyanin_gain',
+                'axis':axis,'direction':d if ok else 'unresolved','status':'resolved' if ok else 'unresolved','source':'C_reticulata_MN_sector_candidate_free',
+                'literature_anchor_edge':'MICRO_CR_SECTOR_01','canonical_target':'more_red_or_pink','direction_frame':'target_minus_source',
+                'estimator':'red_region_minus_white_region_Hedges_g','effect_value':e['hedges_g'] if e['hedges_g'] is not None else '',
+                'uncertainty_metric':'not_thresholded','uncertainty_value':'','consistency_metric':'same_cultivar_same_stage_3v3',
+                'consistency_value':'1' if ok else '','resolution_rule':'effect_status_ok_and_direction_resolved; significance not required'})
+          with (root/'candidate_free_measurements.csv').open('w',newline='',encoding='utf-8') as f:
+              w=csv.DictWriter(f,fieldnames=fields); w.writeheader(); w.writerows(rows)
+          (root/'candidate_free_measurements.summary.json').write_text(json.dumps({
+            'status':'candidate_free_measurement_registry_built','system':'CRETICULATA','n_rows':4,
+            'resolved_rows':sum(r['status']=='resolved' for r in rows),
+            'direction_policy':'prespecified target-minus-source direction retained without significance filtering'},indent=2)+'\n')
+          print(json.dumps(result,indent=2,ensure_ascii=False))
+          PY
+
+      - name: Preserve lightweight diagnostics
+        if: always()
+        run: |
+          mkdir -p "$ROOT/diagnostics"
+          cp "$ROOT/reference_contract.txt" "$ROOT/diagnostics/" 2>/dev/null || true
+          cp "$ROOT/reference_route_diagnostic.txt" "$ROOT/diagnostics/" 2>/dev/null || true
+          printf 'reference=%s\nread_route=ENA_https_fastq_prefix\nmax_spots_per_run=%s\nruns=6\ncontrast=MN_full_bloom_white_region_to_red_region\nmapping_audit_run=32822609384\n' "$REF_ACCESSION" "$MAX_SPOTS_PER_RUN" > "$ROOT/diagnostics/run_contract.txt"
+          find "$ROOT" -maxdepth 3 -type f -printf '%p\t%s bytes\n' 2>/dev/null | sort > "$ROOT/diagnostics/files.txt" || true
+
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: candidate-free-creticulata-mn-sectors-v0-1
+          path: |
+            build/creticulata_mn_sector_pilot_v0_1/family_map/
+            build/creticulata_mn_sector_pilot_v0_1/ena/
+            build/creticulata_mn_sector_pilot_v0_1/family_expression.csv
+            build/creticulata_mn_sector_pilot_v0_1/family_expression.summary.json
+            build/creticulata_mn_sector_pilot_v0_1/scored/
+            build/creticulata_mn_sector_pilot_v0_1/pilot_result.json
+            build/creticulata_mn_sector_pilot_v0_1/candidate_free_measurements.csv
+            build/creticulata_mn_sector_pilot_v0_1/candidate_free_measurements.summary.json
+            build/creticulata_mn_sector_pilot_v0_1/diagnostics/
+          if-no-files-found: warn

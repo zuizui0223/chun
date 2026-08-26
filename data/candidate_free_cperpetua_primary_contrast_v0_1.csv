@@ -1,0 +1,2 @@
+contrast_id,dependence_cluster,dataset_id,source_condition,target_condition,transition_class,canonical_target,biological_design,mapping_audit_run_id,notes
+CF_CP_YELLOW_ONSET,CPERPETUA,CF_CP_01,CP_S1,CP_S3,yellow_development,later_or_more_yellow,prespecified_developmental_onset_3v3,32826721885,"S1 young bud -> S3 yellowing onset is primary and was frozen before expression inspection; S1->S5 remains secondary correlated sensitivity."

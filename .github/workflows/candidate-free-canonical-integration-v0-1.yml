@@ -1,0 +1,130 @@
+name: Candidate-free canonical integration v0.1
+
+on:
+  pull_request:
+    paths:
+      - 'data/candidate_free_canonical_bridge_v0_1.csv'
+      - 'data/micro_accessibility_edge_registry_v0_1.csv'
+      - 'data/micro_transition_canonical_orientation_v0_1.csv'
+      - 'data/candidate_free_contrast_registry_v0_1.csv'
+      - 'data/candidate_free_creticulata_contrast_registry_v0_1.csv'
+      - 'data/candidate_free_cs_stage_contrast_registry_v0_1.csv'
+      - 'data/candidate_free_cn_endpoint_contrast_v0_1.csv'
+      - 'scripts/validate_candidate_free_canonical_bridge_v0_1.py'
+      - 'scripts/build_candidate_free_measurement_registry_v0_1.py'
+      - 'scripts/analyze_observation_corrected_recurrence_v0_1.py'
+      - '.github/workflows/candidate-free-canonical-integration-v0-1.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  integration:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Validate canonical bridge against frozen registries
+        run: |
+          mkdir -p build/candidate_free_canonical_integration_v0_1
+          python scripts/validate_candidate_free_canonical_bridge_v0_1.py \
+            --bridge data/candidate_free_canonical_bridge_v0_1.csv \
+            --edge-registry data/micro_accessibility_edge_registry_v0_1.csv \
+            --orientation data/micro_transition_canonical_orientation_v0_1.csv \
+            --joy-contrasts data/candidate_free_contrast_registry_v0_1.csv \
+            --cr-contrasts data/candidate_free_creticulata_contrast_registry_v0_1.csv \
+            --cs-contrasts data/candidate_free_cs_stage_contrast_registry_v0_1.csv \
+            --cn-contrasts data/candidate_free_cn_endpoint_contrast_v0_1.csv \
+            --out build/candidate_free_canonical_integration_v0_1/bridge_validation.json
+
+      - name: Build synthetic real-data summaries
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          p=Path('build/candidate_free_canonical_integration_v0_1')
+          joy={
+            'contrast':'CF_CJ_JOY_RED_PINK',
+            'effects':{
+              'A':{'effect_status':'ok','direction':'up','hedges_g':1.0},
+              'F':{'effect_status':'ok','direction':'down','hedges_g':-0.5},
+              'C':{'effect_status':'ok','direction':'same','hedges_g':0.0},
+              'P':{'effect_status':'ok','direction':'up','hedges_g':0.4},
+            }
+          }
+          cr={
+            'contrast':'CF_CR_MN_FB_WHITE_RED','dependence_cluster':'CRETICULATA',
+            'effects':{
+              'A':{'effect_status':'ok','direction':'up','hedges_g':0.2},
+              'F':{'effect_status':'ok','direction':'up','hedges_g':0.3},
+              'C':{'effect_status':'ok','direction':'down','hedges_g':-1.0},
+              'P':{'effect_status':'ok','direction':'up','hedges_g':0.4},
+            }
+          }
+          cs={'dependence_cluster':'CSIN_WHITE_PINK','axes':{
+            'A':{'status':'stage_consistent','primary_direction':'up','equal_weight_mean_hedges_g':0.8,'sign_consistency':1.0,'n_stages_estimable':5},
+            'F':{'status':'stage_consistent','primary_direction':'down','equal_weight_mean_hedges_g':-0.6,'sign_consistency':0.8,'n_stages_estimable':5},
+            'C':{'status':'stage_heterogeneous','primary_direction':'unresolved','equal_weight_mean_hedges_g':0.1,'sign_consistency':0.6,'n_stages_estimable':5},
+            'P':{'status':'stage_consistent','primary_direction':'same','equal_weight_mean_hedges_g':0.0,'sign_consistency':1.0,'n_stages_estimable':4},
+          }}
+          cn={'dependence_cluster':'CNITIDISSIMA','axes':{
+            'A':{'status':'computed_all_five_prespecified_stages','n_stages_resolved':5,'trend_direction':'down','slope':-0.4,'exact_order_p_two_sided':0.9,'adjacent_direction_consistency':0.75},
+            'F':{'status':'computed_all_five_prespecified_stages','n_stages_resolved':5,'trend_direction':'up','slope':0.7,'exact_order_p_two_sided':0.7,'adjacent_direction_consistency':1.0},
+            'C':{'status':'computed_all_five_prespecified_stages','n_stages_resolved':5,'trend_direction':'flat','slope':0.0,'exact_order_p_two_sided':1.0,'adjacent_direction_consistency':0.5},
+            'P':{'status':'computed_all_five_prespecified_stages','n_stages_resolved':5,'trend_direction':'down','slope':-0.2,'exact_order_p_two_sided':0.8,'adjacent_direction_consistency':0.5},
+          }}
+          for name,obj in [('joy',joy),('cr',cr),('cs',cs),('cn',cn)]:
+              (p/f'{name}.json').write_text(json.dumps(obj,indent=2)+'\n')
+          PY
+
+      - name: Adapt without significance filtering and run recurrence
+        run: |
+          OUT=build/candidate_free_canonical_integration_v0_1
+          python scripts/build_candidate_free_measurement_registry_v0_1.py \
+            --bridge data/candidate_free_canonical_bridge_v0_1.csv \
+            --joy "$OUT/joy.json" --cr "$OUT/cr.json" --cs "$OUT/cs.json" --cn "$OUT/cn.json" \
+            --out "$OUT/candidate_free_measurements.csv" \
+            --summary "$OUT/candidate_free_measurements.summary.json"
+          python scripts/analyze_observation_corrected_recurrence_v0_1.py \
+            --registry data/micro_accessibility_edge_registry_v0_1.csv \
+            --orientation data/micro_transition_canonical_orientation_v0_1.csv \
+            --candidate-free "$OUT/candidate_free_measurements.csv" \
+            --out-dir "$OUT/recurrence"
+
+      - name: Guard common-cluster contraction and no P-value gate
+        run: |
+          python - <<'PY'
+          import csv,json
+          root='build/candidate_free_canonical_integration_v0_1'
+          rows=list(csv.DictReader(open(f'{root}/candidate_free_measurements.csv')))
+          assert len(rows)==16
+          assert {(r['transition_class'],r['dependence_cluster']) for r in rows}=={
+              ('anthocyanin_gain','CJAPONICA'),
+              ('anthocyanin_gain','CRETICULATA'),
+              ('anthocyanin_gain','CSIN_WHITE_PINK'),
+              ('yellow_development','CNITIDISSIMA')}
+          cn_a=next(r for r in rows if r['measurement_id']=='CF_CN_ORDERED_S1_S5:A')
+          assert cn_a['status']=='resolved' and cn_a['direction']=='down'
+          assert float(cn_a['uncertainty_value'])==0.9  # deliberately non-small: P is metadata, never a filter
+          s=json.load(open(f'{root}/recurrence/summary.json'))
+          anth=s['identified_set_contraction_on_common_clusters']['anthocyanin_gain']
+          assert anth['status']=='comparable_common_cluster_set'
+          assert anth['common_clusters']==['CJAPONICA','CRETICULATA','CSIN_WHITE_PINK']
+          yellow=s['identified_set_contraction_on_common_clusters']['yellow_development']
+          assert yellow['status']=='not_testable_fewer_than_two_common_clusters'
+          assert yellow['common_clusters']==['CNITIDISSIMA']
+          overlap=s['literature_vs_candidate_free_overlap']['anthocyanin_gain']
+          assert overlap['common_clusters']==['CJAPONICA','CRETICULATA','CSIN_WHITE_PINK']
+          print(json.dumps({'anthocyanin':anth,'yellow':yellow,'overlap':overlap},indent=2))
+          PY
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: candidate-free-canonical-integration-v0-1
+          path: build/candidate_free_canonical_integration_v0_1/
+          if-no-files-found: error

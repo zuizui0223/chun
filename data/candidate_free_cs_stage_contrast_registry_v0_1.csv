@@ -1,0 +1,6 @@
+contrast_id,dependence_cluster,dataset_target_id,source_condition,target_condition,contrast_type,independence_role,primary_for_cluster,module_axes,notes
+CF_CS_S1_WHITE_PINK,CSIN_WHITE_PINK,CF_CS_01,CS_WHITE_S1,CS_PINK_S1,two_group_stage_matched,stage_stratum,false,A;F;C;P,"Stage S1 white vs pink; one of five prespecified developmental strata."
+CF_CS_S2_WHITE_PINK,CSIN_WHITE_PINK,CF_CS_01,CS_WHITE_S2,CS_PINK_S2,two_group_stage_matched,stage_stratum,false,A;F;C;P,"Stage S2 white vs pink; one of five prespecified developmental strata."
+CF_CS_S3_WHITE_PINK,CSIN_WHITE_PINK,CF_CS_01,CS_WHITE_S3,CS_PINK_S3,two_group_stage_matched,stage_stratum,false,A;F;C;P,"Stage S3 white vs pink; one of five prespecified developmental strata."
+CF_CS_S4_WHITE_PINK,CSIN_WHITE_PINK,CF_CS_01,CS_WHITE_S4,CS_PINK_S4,two_group_stage_matched,stage_stratum,false,A;F;C;P,"Stage S4 white vs pink; one of five prespecified developmental strata."
+CF_CS_S5_WHITE_PINK,CSIN_WHITE_PINK,CF_CS_01,CS_WHITE_S5,CS_PINK_S5,two_group_stage_matched,stage_stratum,false,A;F;C;P,"Stage S5 white vs pink; one of five prespecified developmental strata. No stage is selected post hoc as primary."

@@ -1,0 +1,67 @@
+name: Candidate-free ENA FASTQ route audit v0.1
+
+on:
+  pull_request:
+    paths:
+      - 'scripts/download_ena_fastq_prefix_v0_1.py'
+      - '.github/workflows/candidate-free-ena-fastq-route-audit-v0-1.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: candidate-free-ena-route-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  ena-route-audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      RUN: SRR22904726
+      MAX_SPOTS: '10000'
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Stream a frozen paired FASTQ prefix from ENA
+        run: |
+          mkdir -p build/candidate_free_ena_route_audit_v0_1
+          python scripts/download_ena_fastq_prefix_v0_1.py \
+            --run "$RUN" --max-spots "$MAX_SPOTS" \
+            --out-r1 build/candidate_free_ena_route_audit_v0_1/R1.fastq \
+            --out-r2 build/candidate_free_ena_route_audit_v0_1/R2.fastq \
+            --metadata-out build/candidate_free_ena_route_audit_v0_1/ena_metadata.tsv \
+            --summary-out build/candidate_free_ena_route_audit_v0_1/summary.json
+
+      - name: Guard exact prefix contract
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          s=json.load(open('build/candidate_free_ena_route_audit_v0_1/summary.json'))
+          assert s['status']=='ready',s
+          assert s['run']=='SRR22904726',s
+          assert s['route']=='ENA_https_fastq_prefix',s
+          assert s['library_layout']=='PAIRED',s
+          assert s['requested_max_pairs']==10000,s
+          assert s['actual_pairs']==10000,s
+          for p in ['R1.fastq','R2.fastq']:
+              lines=sum(1 for _ in open(Path('build/candidate_free_ena_route_audit_v0_1')/p))
+              assert lines==40000,(p,lines)
+          print(json.dumps(s,indent=2,ensure_ascii=False))
+          PY
+          rm -f build/candidate_free_ena_route_audit_v0_1/R1.fastq \
+                build/candidate_free_ena_route_audit_v0_1/R2.fastq
+
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: candidate-free-ena-fastq-route-audit-v0-1
+          path: |
+            build/candidate_free_ena_route_audit_v0_1/ena_metadata.tsv
+            build/candidate_free_ena_route_audit_v0_1/summary.json
+          if-no-files-found: warn

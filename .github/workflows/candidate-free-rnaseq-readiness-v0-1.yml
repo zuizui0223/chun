@@ -1,0 +1,52 @@
+name: Candidate-free RNA-seq readiness v0.1
+
+on:
+  pull_request:
+    paths:
+      - 'data/micro_accessibility_edge_registry_v0_1.csv'
+      - 'data/candidate_free_rnaseq_target_registry_v0_1.csv'
+      - 'data/candidate_free_pigment_module_schema_v0_1.csv'
+      - 'scripts/audit_candidate_free_rnaseq_targets_v0_1.py'
+      - 'docs/CANDIDATE_FREE_RNASEQ_REANALYSIS_SPEC.md'
+      - '.github/workflows/candidate-free-rnaseq-readiness-v0-1.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Audit public raw-data readiness
+        run: |
+          mkdir -p build/candidate_free_rnaseq_readiness_v0_1
+          python scripts/audit_candidate_free_rnaseq_targets_v0_1.py \
+            --micro data/micro_accessibility_edge_registry_v0_1.csv \
+            --targets data/candidate_free_rnaseq_target_registry_v0_1.csv \
+            --out build/candidate_free_rnaseq_readiness_v0_1/summary.json
+      - name: Guard readiness interpretation
+        run: |
+          python - <<'PY'
+          import json
+          s=json.load(open('build/candidate_free_rnaseq_readiness_v0_1/summary.json'))
+          assert s['n_micro_dependence_clusters'] == 5
+          assert s['n_clusters_with_public_raw_target'] == 5
+          assert s['missing_public_target_clusters'] == []
+          assert s['n_clusters_with_frozen_run_manifest'] == 3
+          assert s['n_clusters_with_exact_run_identity'] == 4
+          assert s['n_clusters_with_NCBI_SRA_route'] == 5
+          assert s['external_holdout_targets'] == ['CF_EXT_01']
+          assert s['bottleneck'].startswith('metadata/reference/ortholog harmonization')
+          print(json.dumps(s, indent=2, ensure_ascii=False))
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: candidate-free-rnaseq-readiness-v0-1
+          path: build/candidate_free_rnaseq_readiness_v0_1/
+          if-no-files-found: error

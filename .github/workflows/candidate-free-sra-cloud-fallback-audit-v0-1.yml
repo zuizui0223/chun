@@ -1,0 +1,90 @@
+name: Candidate-free SRA cloud fallback audit v0.1
+
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/candidate-free-sra-cloud-fallback-audit-v0-1.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: candidate-free-sra-cloud-fallback-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  cloud-sra-audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    env:
+      RUN: SRR10752658
+      MAX_SPOTS: '500000'
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install local SRA conversion tools
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends sra-toolkit ca-certificates
+          fastq-dump --version
+          vdb-validate --version || true
+      - name: Download normalized SRA object from public AWS bucket
+        run: |
+          mkdir -p build/candidate_free_sra_cloud_fallback_v0_1/reads
+          URL="https://sra-pub-run-odp.s3.amazonaws.com/sra/${RUN}/${RUN}"
+          printf 'run=%s\nurl=%s\nmax_spots=%s\n' "$RUN" "$URL" "$MAX_SPOTS" > build/candidate_free_sra_cloud_fallback_v0_1/contract.txt
+          curl --fail --location --retry 5 --retry-all-errors --connect-timeout 30 "$URL" \
+            -o build/candidate_free_sra_cloud_fallback_v0_1/${RUN}.sra
+          test -s build/candidate_free_sra_cloud_fallback_v0_1/${RUN}.sra
+          BYTES=$(stat -c %s build/candidate_free_sra_cloud_fallback_v0_1/${RUN}.sra)
+          test "$BYTES" -gt 1000000
+          printf 'sra_bytes=%s\n' "$BYTES" >> build/candidate_free_sra_cloud_fallback_v0_1/contract.txt
+          vdb-validate build/candidate_free_sra_cloud_fallback_v0_1/${RUN}.sra
+      - name: Convert exactly the frozen paired-read prefix locally
+        run: |
+          fastq-dump build/candidate_free_sra_cloud_fallback_v0_1/${RUN}.sra \
+            --split-files \
+            -O build/candidate_free_sra_cloud_fallback_v0_1/reads \
+            -X "$MAX_SPOTS"
+          test -s build/candidate_free_sra_cloud_fallback_v0_1/reads/${RUN}_1.fastq
+          test -s build/candidate_free_sra_cloud_fallback_v0_1/reads/${RUN}_2.fastq
+      - name: Guard exact paired-prefix contract
+        run: |
+          python - <<'PY'
+          import json,re,os
+          from pathlib import Path
+          run=os.environ['RUN']; expected=int(os.environ['MAX_SPOTS'])
+          root=Path('build/candidate_free_sra_cloud_fallback_v0_1/reads')
+          paths=[root/f'{run}_1.fastq',root/f'{run}_2.fastq']
+          def rid(h):
+              return re.sub(r'(?:/|_)[12]$','',h[1:].strip().split()[0])
+          fs=[p.open() for p in paths]; n=0
+          try:
+              while True:
+                  a=[fs[0].readline() for _ in range(4)]; b=[fs[1].readline() for _ in range(4)]
+                  if not a[0] and not b[0]: break
+                  if not a[0] or not b[0]: raise SystemExit('paired FASTQ length mismatch')
+                  if any(not x for x in a[1:]) or any(not x for x in b[1:]): raise SystemExit('truncated FASTQ')
+                  if rid(a[0])!=rid(b[0]): raise SystemExit(f'pair ID mismatch at {n+1}')
+                  n+=1
+          finally:
+              [f.close() for f in fs]
+          if n!=expected: raise SystemExit(f'expected {expected} pairs, got {n}')
+          s={'status':'ready','run':run,'route':'NCBI_AWS_normalized_SRA_local_fastq_dump','actual_pairs':n}
+          Path('build/candidate_free_sra_cloud_fallback_v0_1/summary.json').write_text(json.dumps(s,indent=2)+'\n')
+          print(json.dumps(s,indent=2))
+          PY
+          rm -f build/candidate_free_sra_cloud_fallback_v0_1/${RUN}.sra \
+                build/candidate_free_sra_cloud_fallback_v0_1/reads/${RUN}_1.fastq \
+                build/candidate_free_sra_cloud_fallback_v0_1/reads/${RUN}_2.fastq
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: candidate-free-sra-cloud-fallback-audit-v0-1
+          path: |
+            build/candidate_free_sra_cloud_fallback_v0_1/contract.txt
+            build/candidate_free_sra_cloud_fallback_v0_1/summary.json
+          if-no-files-found: warn

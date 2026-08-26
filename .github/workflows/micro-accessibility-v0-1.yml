@@ -1,0 +1,63 @@
+name: Micro accessibility v0.1
+
+on:
+  pull_request:
+    paths:
+      - 'data/micro_accessibility_edge_registry_v0_1.csv'
+      - 'scripts/analyze_micro_accessibility_v0_1.py'
+      - 'docs/MICRO_MACRO_ACCESSIBILITY_ANALYSIS_PLAN.md'
+      - '.github/workflows/micro-accessibility-v0-1.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  analyze:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Run micro-accessibility analysis
+        run: |
+          mkdir -p build/micro_accessibility_v0_1
+          python scripts/analyze_micro_accessibility_v0_1.py \
+            --registry data/micro_accessibility_edge_registry_v0_1.csv \
+            --out-dir build/micro_accessibility_v0_1 \
+            --permutations 10000 \
+            --seed 230223
+      - name: Guard inference boundary
+        run: |
+          python - <<'PY'
+          import json
+          s=json.load(open('build/micro_accessibility_v0_1/summary.json'))
+          assert s['n_biological_systems'] == 10
+          assert s['n_dependence_clusters'] == 5
+          assert s['macro_transition_test']['status'] == 'blocked'
+          assert s['degree_preserving_graph_null']['status'] == 'blocked'
+          assert s['status'] == 'micro_layer_dependence_aware_macro_gate_open'
+          primary=s['dependence_collapsed_recurrence_primary']
+          sensitivity=s['system_level_recurrence_sensitivity']
+          assert abs(primary['observed_recurrence'] - 0.2) < 1e-12
+          assert primary['permutation_p_upper'] > 0.9
+          assert sensitivity['permutation_p_upper'] > 0.05
+          sysa=s['system_level_axis_ascertainment']
+          cla=s['dependence_collapsed_axis_ascertainment']
+          assert sysa['observed_axis_coverage'] == {'A_change':8,'F_change':4,'C_change':1,'P_change':3}
+          assert sysa['n_exact_axis_assignments'] == 5308416
+          assert abs(sysa['exact_p_A_enrichment'] - 0.00836181640625) < 1e-15
+          assert abs(sysa['exact_p_any_axis_imbalance'] - 0.023948386863425927) < 1e-15
+          assert cla['observed_axis_coverage'] == {'A_change':4,'F_change':3,'C_change':1,'P_change':2}
+          assert cla['n_exact_axis_assignments'] == 576
+          assert abs(cla['exact_p_A_enrichment'] - 0.140625) < 1e-15
+          assert abs(cla['exact_p_any_axis_imbalance'] - (5/12)) < 1e-15
+          print(json.dumps(s, indent=2, ensure_ascii=False))
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: micro-accessibility-v0-1
+          path: build/micro_accessibility_v0_1/
+          if-no-files-found: error

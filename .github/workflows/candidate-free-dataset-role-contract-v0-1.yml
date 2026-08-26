@@ -1,0 +1,34 @@
+name: Candidate-free dataset role contract v0.1
+
+on:
+  pull_request:
+    paths:
+      - 'data/candidate_free_dataset_role_registry_v0_1.csv'
+      - 'data/candidate_free_canonical_bridge_v0_1.csv'
+      - 'scripts/validate_candidate_free_dataset_roles_v0_1.py'
+      - '.github/workflows/candidate-free-dataset-role-contract-v0-1.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  dataset-role-contract:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Validate recurrence versus validation roles
+        run: |
+          python scripts/validate_candidate_free_dataset_roles_v0_1.py \
+            --registry data/candidate_free_dataset_role_registry_v0_1.csv \
+            --bridge data/candidate_free_canonical_bridge_v0_1.csv \
+            --summary build/candidate_free_dataset_role_contract_v0_1.json
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: candidate-free-dataset-role-contract-v0-1
+          path: build/candidate_free_dataset_role_contract_v0_1.json
+          if-no-files-found: warn

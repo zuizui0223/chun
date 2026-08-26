@@ -1,0 +1,5 @@
+contrast_id,dependence_cluster,dataset_target_id,source_condition,target_condition,contrast_type,independence_role,primary_for_cluster,module_axes,notes
+CF_CJ_JOY_RED_PINK,CJAPONICA,CF_CJ_02,CJ_JK_PINK,CJ_JK_RED,two_group_within_genotype,primary,true,A;F;C;P,"Highest-isolation C. japonica pilot: red and pink regions within the same Joy Kendrick cultivar, three biological replicates per region. Target minus source defines direction toward red."
+CF_CR_RED_WHITE,CRETICULATA,CF_CR_01,CR_MN_FULL_WHITE,CR_MN_FULL_RED,two_group_within_genotype,primary,true,A;F;C;P,"Primary within-genotype red-vs-white petal-region contrast. Target minus source defines positive direction toward the red region."
+CF_CP_YELLOW_ONSET,CPERPETUA,CF_CP_01,CP_S1,CP_S3,two_group_developmental,primary,true,A;F;C;P,"Primary early-to-yellowing contrast fixed before expression inspection. S3 is yellowing onset, not whichever stage maximizes module separation."
+CF_CP_YELLOW_ENDPOINT,CPERPETUA,CF_CP_01,CP_S1,CP_S5,two_group_developmental,secondary_correlated,false,A;F;C;P,"Endpoint sensitivity only; same developmental series as primary S1-vs-S3 and never counted as an independent transition."

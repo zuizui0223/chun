@@ -1,0 +1,50 @@
+name: Paper 1 Fig3 Fig4 audits v0.2
+
+on:
+  pull_request:
+    paths:
+      - 'data/paper1_figure_numeric_inputs_v0_1.csv'
+      - 'scripts/build_paper1_fig3_fig4_audits_v0_2.py'
+      - '.github/workflows/paper1-fig3-fig4-audits-v0-2.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  build-audits:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    env:
+      MPLBACKEND: Agg
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install plotting dependency
+        run: python -m pip install --disable-pip-version-check matplotlib
+      - name: Build audit figures from frozen numeric registry
+        run: |
+          python scripts/build_paper1_fig3_fig4_audits_v0_2.py \
+            --numeric-inputs data/paper1_figure_numeric_inputs_v0_1.csv \
+            --out-dir build/paper1_fig3_fig4_v0_2
+      - name: Guard outputs
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          root=Path('build/paper1_fig3_fig4_v0_2')
+          s=json.load(open(root/'summary.json'))
+          assert s['status']=='paper1_fig3_fig4_audits_built'
+          for name in [
+            'paper1_fig3_evidence_attrition_v0_2.svg','paper1_fig3_evidence_attrition_v0_2.png',
+            'paper1_fig4_topology_concordance_v0_2.svg','paper1_fig4_topology_concordance_v0_2.png']:
+              assert (root/name).stat().st_size > 1000
+          print(json.dumps(s,indent=2))
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: paper1-fig3-fig4-audits-v0-2
+          path: build/paper1_fig3_fig4_v0_2/
+          if-no-files-found: error

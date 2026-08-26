@@ -1,0 +1,55 @@
+name: Paper 1 Fig1 framework v0.2
+
+on:
+  pull_request:
+    paths:
+      - 'data/paper1_fig1_framework_v0_2.csv'
+      - 'data/paper1_fig1_observation_contract_v0_2.csv'
+      - 'scripts/build_paper1_fig1_framework_v0_2.py'
+      - '.github/workflows/paper1-fig1-framework-v0-2.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: paper1-fig1-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build-fig1:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    env:
+      MPLBACKEND: Agg
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install plotting dependency
+        run: python -m pip install --disable-pip-version-check matplotlib
+      - name: Build Fig. 1 from frozen hierarchy tables
+        run: |
+          python scripts/build_paper1_fig1_framework_v0_2.py \
+            --framework data/paper1_fig1_framework_v0_2.csv \
+            --observation data/paper1_fig1_observation_contract_v0_2.csv \
+            --out-dir build/paper1_fig1_v0_2
+      - name: Guard outputs
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          root=Path('build/paper1_fig1_v0_2')
+          s=json.load(open(root/'summary.json'))
+          assert s['status']=='paper1_fig1_framework_built'
+          assert s['framework_rows']==6 and s['observation_rows']==8
+          assert (root/'paper1_fig1_framework_v0_2.svg').stat().st_size > 1000
+          assert (root/'paper1_fig1_framework_v0_2.png').stat().st_size > 1000
+          print(json.dumps(s,indent=2))
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: paper1-fig1-framework-v0-2
+          path: build/paper1_fig1_v0_2/
+          if-no-files-found: error

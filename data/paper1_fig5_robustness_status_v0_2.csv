@@ -1,0 +1,9 @@
+claim_id,claim,topology,coding,status,p_value,p_label,result_id,interpretation
+GLOBAL_MPD,Global same-colour MPD,FastTree/ASTRAL,strict,sensitivity_positive,0.00803,0.00803,P04_GLOBAL_MPD_TOPOLOGY_SENSITIVE,Positive on FastTree only; not topology-robust
+GLOBAL_MPD,Global same-colour MPD,FastTree/ASTRAL,dominant,sensitivity_positive,0.00770,0.00770,P04_GLOBAL_MPD_TOPOLOGY_SENSITIVE,Positive on FastTree only; not topology-robust
+GLOBAL_MPD,Global same-colour MPD,IQ-TREE/UFBoot-ASTRAL,strict,demoted,0.1724,0.1724,P04_GLOBAL_MPD_TOPOLOGY_SENSITIVE,Not retained on stronger topology
+GLOBAL_MPD,Global same-colour MPD,IQ-TREE/UFBoot-ASTRAL,dominant,demoted,0.1327,0.1327,P04_GLOBAL_MPD_TOPOLOGY_SENSITIVE,Not retained on stronger topology
+A_SPECIFIC,A-specific clustering,FastTree/ASTRAL,strict,not_estimable,,,P05_A_SPECIFIC_PERMISSIVITY_NOT_STRICT,Strict A is a singleton
+A_SPECIFIC,A-specific clustering,FastTree/ASTRAL,dominant,sensitivity_positive,0.000210,0.000210,P05_A_SPECIFIC_PERMISSIVITY_NOT_STRICT,Dominant-colour sensitivity only
+A_SPECIFIC,A-specific clustering,IQ-TREE/UFBoot-ASTRAL,strict,not_estimable,,,P05_A_SPECIFIC_PERMISSIVITY_NOT_STRICT,Strict A is a singleton
+A_SPECIFIC,A-specific clustering,IQ-TREE/UFBoot-ASTRAL,dominant,sensitivity_positive,0.00110,0.00110,P05_A_SPECIFIC_PERMISSIVITY_NOT_STRICT,Dominant-colour sensitivity only

@@ -1,0 +1,2 @@
+contrast_id,dependence_cluster,dataset_target_id,source_condition,target_condition,contrast_type,independence_role,primary_for_cluster,module_axes,notes
+CF_CR_MN_FB_WHITE_RED,CRETICULATA,CF_CR_01,CR_MN_FULL_BLOOM_WHITE_REGION,CR_MN_FULL_BLOOM_RED_REGION,two_group_within_genotype_same_stage,primary,true,A;F;C;P,"Primary Damanao/MN full-bloom within-flower white-region to red-region contrast, frozen before archive run mapping or expression inspection. Target minus source defines direction toward red."

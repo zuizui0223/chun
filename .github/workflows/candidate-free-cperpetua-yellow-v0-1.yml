@@ -1,0 +1,359 @@
+name: Candidate-free C. perpetua yellow-development pilot v0.1
+
+on:
+  pull_request:
+    paths:
+      - 'data/candidate_free_cperpetua_run_manifest_v0_1.csv'
+      - 'data/candidate_free_cperpetua_contrast_registry_v0_1.csv'
+      - 'data/candidate_free_cperpetua_primary_contrast_v0_1.csv'
+      - 'data/candidate_free_pigment_module_schema_v0_1.csv'
+      - 'data/micro_accessibility_edge_registry_v0_1.csv'
+      - 'data/micro_transition_canonical_orientation_v0_1.csv'
+      - 'scripts/build_candidate_free_family_map_from_gff_v0_1.py'
+      - 'scripts/prepare_candidate_free_reference_v0_1.sh'
+      - 'scripts/download_ena_fastq_prefix_v0_1.py'
+      - 'scripts/aggregate_salmon_family_expression_v0_1.py'
+      - 'scripts/score_candidate_free_modules_v0_1.py'
+      - 'scripts/summarize_candidate_free_ordered_trajectory_v0_1.py'
+      - 'scripts/analyze_observation_corrected_recurrence_v0_1.py'
+      - '.github/workflows/candidate-free-cperpetua-yellow-v0-1.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  actions: read
+
+concurrency:
+  group: candidate-free-cperpetua-yellow-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  pilot:
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    env:
+      REF_ACCESSION: GCF_004153795.1
+      MAX_SPOTS_PER_RUN: '500000'
+      ROOT: build/cperpetua_yellow_pilot_v0_1
+      CN_RUN_ID: '32803242174'
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Guard frozen 5x3 manifest and primary yellow-onset contrast
+        run: |
+          python - <<'PY'
+          import csv,json
+          m=list(csv.DictReader(open('data/candidate_free_cperpetua_run_manifest_v0_1.csv',newline='',encoding='utf-8')))
+          c=list(csv.DictReader(open('data/candidate_free_cperpetua_contrast_registry_v0_1.csv',newline='',encoding='utf-8')))
+          p=list(csv.DictReader(open('data/candidate_free_cperpetua_primary_contrast_v0_1.csv',newline='',encoding='utf-8')))
+          assert len(m)==15 and len(c)==2 and len(p)==1
+          assert all(r['dependence_cluster']=='CPERPETUA' and r['mapping_status']=='resolved' for r in m)
+          got={(r['condition_id'],r['replicate']) for r in m}
+          expected={(f'CP_S{s}',str(rep)) for s in range(1,6) for rep in range(1,4)}
+          assert got==expected
+          primary=next(r for r in c if r['primary_for_cluster'].lower()=='true')
+          assert primary['contrast_id']=='CF_CP_YELLOW_ONSET'
+          assert primary['source_condition']=='CP_S1' and primary['target_condition']=='CP_S3'
+          assert primary['independence_role']=='primary'
+          assert next(r for r in c if r['contrast_id']=='CF_CP_YELLOW_ENDPOINT')['independence_role']=='secondary_correlated'
+          q=p[0]
+          assert q['contrast_id']=='CF_CP_YELLOW_ONSET' and q['mapping_audit_run_id']=='32826721885'
+          assert q['transition_class']=='yellow_development' and q['canonical_target']=='later_or_more_yellow'
+          print(json.dumps({
+              'status':'frozen_before_expression','n_runs':15,'primary_within_system':primary,
+              'cross_cluster_estimator':'OLS slope across all five prespecified stage means',
+              'mapping_audit_run':32826721885},indent=2))
+          PY
+
+      - name: Install RNA-seq and reference tools
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends salmon sra-toolkit unzip ca-certificates
+          salmon --version
+          prefetch --version
+          fastq-dump --version
+          vdb-validate --version || true
+
+      - name: Prepare fixed annotation-informative reference
+        run: |
+          bash scripts/prepare_candidate_free_reference_v0_1.sh "$ROOT"
+          cat "$ROOT/reference_route_diagnostic.txt"
+
+      - name: Build outcome-independent transcript family map and Salmon index
+        run: |
+          python scripts/build_candidate_free_family_map_from_gff_v0_1.py \
+            --gff "$GFF" --rna-fasta "$RNA_FASTA" \
+            --out-dir "$ROOT/family_map"
+          python - <<'PY'
+          import json,os
+          s=json.load(open(os.environ['ROOT']+'/family_map/family_mapping_summary.json'))
+          if s['n_mapped_transcripts']==0: raise SystemExit('fixed reference resolves no preregistered pigment family')
+          print(json.dumps(s,indent=2,ensure_ascii=False))
+          PY
+          salmon index -t "$RNA_FASTA" -i "$ROOT/salmon_index" -p 2
+
+      - name: Stream and quantify all fifteen frozen S1-S5 runs
+        run: |
+          mkdir -p "$ROOT/quant" "$ROOT/reads" "$ROOT/ena" "$ROOT/sra_cache" "$ROOT/sra_fastq"
+          tail -n +2 data/candidate_free_cperpetua_run_manifest_v0_1.csv | cut -d, -f1 | while read -r RUN; do
+            echo "Quantifying $RUN from first ${MAX_SPOTS_PER_RUN} paired reads; ENA HTTPS primary with exact-accession SRA fallbacks"
+            rm -f "$ROOT/reads/${RUN}_1.fastq" "$ROOT/reads/${RUN}_2.fastq"
+            rm -rf "$ROOT/sra_cache/${RUN}" "$ROOT/sra_fastq/${RUN}"
+
+            if python scripts/download_ena_fastq_prefix_v0_1.py \
+              --run "$RUN" --max-spots "$MAX_SPOTS_PER_RUN" \
+              --out-r1 "$ROOT/reads/${RUN}_1.fastq" \
+              --out-r2 "$ROOT/reads/${RUN}_2.fastq" \
+              --metadata-out "$ROOT/ena/${RUN}.tsv" \
+              --summary-out "$ROOT/ena/${RUN}.json"; then
+              echo "$RUN retrieved through ENA HTTPS"
+            else
+              echo "$RUN ENA transport failed; using exact-accession SRA fallback"
+              rm -f "$ROOT/reads/${RUN}_1.fastq" "$ROOT/reads/${RUN}_2.fastq"
+              mkdir -p "$ROOT/sra_fastq/${RUN}" "$ROOT/sra_cache/${RUN}"
+              SRA_PATH="$ROOT/sra_cache/${RUN}/${RUN}.sra"
+              FALLBACK_ROUTE="NCBI_SRA_prefetch_exact_accession"
+              if prefetch "$RUN" --max-size u --output-directory "$ROOT/sra_cache" && test -s "$SRA_PATH"; then
+                echo "$RUN retrieved through NCBI prefetch"
+              else
+                FALLBACK_ROUTE="NCBI_AWS_normalized_SRA_exact_accession"
+                echo "$RUN prefetch failed; using audited public AWS normalized SRA object"
+                rm -f "$SRA_PATH"
+                curl --fail --location --retry 5 --retry-all-errors --connect-timeout 30 \
+                  "https://sra-pub-run-odp.s3.amazonaws.com/sra/${RUN}/${RUN}" \
+                  -o "$SRA_PATH"
+                test -s "$SRA_PATH"
+                test "$(stat -c %s "$SRA_PATH")" -gt 1000000
+                vdb-validate "$SRA_PATH"
+              fi
+              fastq-dump "$SRA_PATH" \
+                --split-files --skip-technical -N 1 -X "$MAX_SPOTS_PER_RUN" \
+                --outdir "$ROOT/sra_fastq/${RUN}"
+              R1_SRC="$(find "$ROOT/sra_fastq/${RUN}" -maxdepth 1 -type f -name '*_1.fastq' -print -quit)"
+              R2_SRC="$(find "$ROOT/sra_fastq/${RUN}" -maxdepth 1 -type f -name '*_2.fastq' -print -quit)"
+              test -n "$R1_SRC" && test -s "$R1_SRC"
+              test -n "$R2_SRC" && test -s "$R2_SRC"
+              mv "$R1_SRC" "$ROOT/reads/${RUN}_1.fastq"
+              mv "$R2_SRC" "$ROOT/reads/${RUN}_2.fastq"
+              python - "$RUN" "$ROOT/reads/${RUN}_1.fastq" "$ROOT/reads/${RUN}_2.fastq" "$MAX_SPOTS_PER_RUN" "$ROOT/ena/${RUN}.json" "$FALLBACK_ROUTE" <<'PY'
+          import json,sys
+          from pathlib import Path
+          from scripts.download_ena_fastq_prefix_v0_1 import validate_pairs
+          run,r1,r2,requested,summary,route=sys.argv[1:]
+          requested=int(requested)
+          n=validate_pairs(Path(r1),Path(r2))
+          if n != requested:
+              raise SystemExit(f'{run}: SRA fallback yielded {n} validated pairs, expected frozen prefix {requested}')
+          payload={
+              'status':'ready','run':run,'route':route,'library_layout':'PAIRED',
+              'requested_max_pairs':requested,'actual_pairs':n,'source_accession':run,
+              'transport_note':'ENA route failed; exact SRA accession was converted locally. Biological contrast, read depth, reference and module contract were unchanged.',
+              'integrity_note':'Paired FASTQ structure, equal pair count and normalized pair IDs were validated after fallback retrieval.'
+          }
+          Path(summary).write_text(json.dumps(payload,indent=2,ensure_ascii=False)+'\n',encoding='utf-8')
+          print(json.dumps(payload,indent=2,ensure_ascii=False))
+          PY
+            fi
+
+            test -s "$ROOT/reads/${RUN}_1.fastq"
+            test -s "$ROOT/reads/${RUN}_2.fastq"
+            salmon quant -i "$ROOT/salmon_index" -l A \
+              -1 "$ROOT/reads/${RUN}_1.fastq" -2 "$ROOT/reads/${RUN}_2.fastq" \
+              --validateMappings -p 2 -o "$ROOT/quant/${RUN}"
+            rm -f "$ROOT/reads/${RUN}_1.fastq" "$ROOT/reads/${RUN}_2.fastq"
+            rm -rf "$ROOT/sra_cache/${RUN}" "$ROOT/sra_fastq/${RUN}"
+          done
+
+      - name: Aggregate family expression and score frozen within-system contrasts
+        run: |
+          python scripts/aggregate_salmon_family_expression_v0_1.py \
+            --quant-root "$ROOT/quant" \
+            --manifest data/candidate_free_cperpetua_run_manifest_v0_1.csv \
+            --family-map "$ROOT/family_map/transcript_family_map.csv" \
+            --dataset-id CF_CP_01 --min-percent-mapped 15 \
+            --out "$ROOT/family_expression.csv"
+          python scripts/score_candidate_free_modules_v0_1.py \
+            --expression "$ROOT/family_expression.csv" \
+            --modules data/candidate_free_pigment_module_schema_v0_1.csv \
+            --contrasts data/candidate_free_cperpetua_contrast_registry_v0_1.csv \
+            --out-dir "$ROOT/scored"
+
+      - name: Compute matched five-stage ordered trajectory for cross-cluster recurrence
+        run: |
+          python scripts/summarize_candidate_free_ordered_trajectory_v0_1.py \
+            --scores "$ROOT/scored/sample_module_scores.csv" \
+            --dependence-cluster CPERPETUA \
+            --out-dir "$ROOT/trajectory"
+          python - <<'PY'
+          import json,os
+          s=json.load(open(os.environ['ROOT']+'/trajectory/trajectory_summary.json'))
+          assert s['dependence_cluster']=='CPERPETUA'
+          assert s['prespecified_stages']==['S1','S2','S3','S4','S5']
+          assert set(s['axes'])=={'A','F','C','P'}
+          assert '5!' in s['uncertainty_test']
+          assert 'largest' in s['forbidden_rule']
+          print(json.dumps(s,indent=2,ensure_ascii=False))
+          PY
+
+      - name: Freeze primary S1-to-S3 result without expected-direction assertions
+        run: |
+          python - <<'PY'
+          import csv,json,os
+          from pathlib import Path
+          root=Path(os.environ['ROOT'])
+          effects=list(csv.DictReader(open(root/'scored/contrast_effects.csv',newline='',encoding='utf-8')))
+          primary=[e for e in effects if e['contrast_id']=='CF_CP_YELLOW_ONSET']
+          secondary=[e for e in effects if e['contrast_id']=='CF_CP_YELLOW_ENDPOINT']
+          if len(primary)!=4 or {e['axis'] for e in primary}!={'A','F','C','P'}: raise SystemExit(primary)
+          if len(secondary)!=4: raise SystemExit(secondary)
+          def pack(rows):
+              return {e['axis']:{'effect_status':e['effect_status'],'hedges_g':None if not e['hedges_g'] else float(e['hedges_g']),
+                'direction':e['direction_target_minus_source'],'n_source':int(e['n_source']),'n_target':int(e['n_target'])} for e in rows}
+          result={
+            'status':'computed_no_direction_forced',
+            'contrast':'CF_CP_YELLOW_ONSET','dependence_cluster':'CPERPETUA','transition_class':'yellow_development',
+            'source':'S1 young bud','target':'S3 yellowing onset','run_count':15,'max_spots_per_run':int(os.environ['MAX_SPOTS_PER_RUN']),
+            'mapping_audit_run_id':'32826721885','mapping_rule':'ENA archive labels explicitly encode S1-1 through S5-3; SRR order not used',
+            'reference':os.environ['REF_ACCESSION'],'reference_route':os.environ.get('REFERENCE_ROUTE','unknown'),
+            'effects':pack(primary),'endpoint_sensitivity_S1_to_S5':pack(secondary),
+            'interpretation_rule':'within-system primary direction comes only from preregistered S1-to-S3 target-minus-source effects; no expected direction or significance threshold is a pass condition',
+            'cross_cluster_rule':'yellow recurrence uses the separately frozen all-five-stage ordered trajectory so the estimator matches CNITIDISSIMA'
+          }
+          (root/'pilot_result.json').write_text(json.dumps(result,indent=2,ensure_ascii=False)+'\n',encoding='utf-8')
+          fields=['measurement_id','dependence_cluster','transition_class','axis','direction','status','source','literature_anchor_edge','canonical_target','direction_frame','estimator','effect_value','uncertainty_metric','uncertainty_value','consistency_metric','consistency_value','resolution_rule']
+          rows=[]
+          for axis in ('A','F','C','P'):
+              e=result['effects'][axis]; d=e['direction']; ok=e['effect_status']=='ok' and d in {'up','down','same'}
+              rows.append({
+                'measurement_id':f'CF_CP_YELLOW_ONSET:{axis}','dependence_cluster':'CPERPETUA','transition_class':'yellow_development',
+                'axis':axis,'direction':d if ok else 'unresolved','status':'resolved' if ok else 'unresolved','source':'C_perpetua_candidate_free',
+                'literature_anchor_edge':'MICRO_CP_DEV_2024_01','canonical_target':'later_or_more_yellow','direction_frame':'target_minus_source',
+                'estimator':'S3_yellowing_minus_S1_young_bud_Hedges_g','effect_value':e['hedges_g'] if e['hedges_g'] is not None else '',
+                'uncertainty_metric':'not_thresholded','uncertainty_value':'','consistency_metric':'prespecified_3v3_yellow_onset',
+                'consistency_value':'1' if ok else '','resolution_rule':'effect_status_ok_and_direction_resolved; significance not required'})
+          with (root/'candidate_free_onset_measurements.csv').open('w',newline='',encoding='utf-8') as f:
+              w=csv.DictWriter(f,fieldnames=fields); w.writeheader(); w.writerows(rows)
+          print(json.dumps(result,indent=2,ensure_ascii=False))
+          PY
+
+      - name: Export canonical ordered C. perpetua measurement registry
+        run: |
+          python - <<'PY'
+          import csv,json,math,os
+          from pathlib import Path
+          root=Path(os.environ['ROOT'])
+          s=json.load(open(root/'trajectory/trajectory_summary.json'))
+          fields=['measurement_id','dependence_cluster','transition_class','axis','direction','status','source','literature_anchor_edge','canonical_target','direction_frame','estimator','effect_value','uncertainty_metric','uncertainty_value','consistency_metric','consistency_value','resolution_rule']
+          rows=[]
+          for axis in ('A','F','C','P'):
+              e=s['axes'][axis]
+              d=e.get('trend_direction','unresolved')
+              if d=='flat': d='same'
+              slope=e.get('slope')
+              ok=(e.get('status')=='computed_all_five_prespecified_stages' and e.get('n_stages_resolved')==5 and isinstance(slope,(int,float)) and math.isfinite(float(slope)) and d in {'up','down','same'})
+              rows.append({
+                  'measurement_id':f'CF_CP_ORDERED_S1_S5:{axis}','dependence_cluster':'CPERPETUA','transition_class':'yellow_development',
+                  'axis':axis,'direction':d if ok else 'unresolved','status':'resolved' if ok else 'unresolved','source':'C_perpetua_candidate_free',
+                  'literature_anchor_edge':'MICRO_CP_DEV_2024_01','canonical_target':'later_or_more_yellow','direction_frame':'ordered_slope_source_to_target',
+                  'estimator':'OLS_slope_all_five_prespecified_stage_means','effect_value':slope if slope is not None else '',
+                  'uncertainty_metric':'exact_5factorial_stage_order_permutation_p','uncertainty_value':e.get('exact_order_p_two_sided',''),
+                  'consistency_metric':'adjacent_direction_consistency','consistency_value':e.get('adjacent_direction_consistency',''),
+                  'resolution_rule':'all 5 stages scorable and finite slope; P-value retained as uncertainty, not a direction filter'})
+          with (root/'candidate_free_measurements.csv').open('w',newline='',encoding='utf-8') as f:
+              w=csv.DictWriter(f,fieldnames=fields); w.writeheader(); w.writerows(rows)
+          summary={'status':'canonical_ordered_measurement_registry','dependence_cluster':'CPERPETUA','n_rows':4,'n_resolved':sum(r['status']=='resolved' for r in rows),'direction_policy':'five-stage ordered slope; significance never selects direction'}
+          (root/'candidate_free_measurements.summary.json').write_text(json.dumps(summary,indent=2)+'\n')
+          print(json.dumps(summary,indent=2))
+          PY
+
+      - name: Compute frozen two-cluster yellow recurrence against C. nitidissima
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          mkdir -p "$ROOT/cn_frozen" "$ROOT/yellow_two_cluster"
+          gh run download "$CN_RUN_ID" --repo "$GITHUB_REPOSITORY" \
+            --name candidate-free-cn-trajectory-v0-1 \
+            --dir "$ROOT/cn_frozen"
+          python - <<'PY'
+          import csv,json,os
+          from pathlib import Path
+          root=Path(os.environ['ROOT'])
+          hits=list((root/'cn_frozen').rglob('candidate_free_measurements.csv'))
+          if len(hits)!=1: raise SystemExit(f'expected one frozen CN measurement registry, got {hits}')
+          with hits[0].open(newline='',encoding='utf-8') as f: cn=list(csv.DictReader(f))
+          with (root/'candidate_free_measurements.csv').open(newline='',encoding='utf-8') as f: cp=list(csv.DictReader(f))
+          if len(cn)!=4 or len(cp)!=4: raise SystemExit((len(cn),len(cp)))
+          rows=cn+cp; fields=list(rows[0])
+          if any(list(r.keys())!=fields for r in rows): raise SystemExit('CN and CP canonical measurement schemas differ')
+          out=root/'yellow_two_cluster/candidate_free_measurements.csv'
+          with out.open('w',newline='',encoding='utf-8') as f:
+              w=csv.DictWriter(f,fieldnames=fields); w.writeheader(); w.writerows(rows)
+          prov={'status':'two_independent_yellow_clusters','cn_run_id':os.environ['CN_RUN_ID'],'cp_run_id':os.environ['GITHUB_RUN_ID'],'n_measurements':len(rows),'clusters':['CNITIDISSIMA','CPERPETUA'],'matched_estimator':'OLS slope across all five prespecified stage means'}
+          (root/'yellow_two_cluster/provenance.json').write_text(json.dumps(prov,indent=2)+'\n')
+          print(json.dumps(prov,indent=2))
+          PY
+          python scripts/analyze_observation_corrected_recurrence_v0_1.py \
+            --registry data/micro_accessibility_edge_registry_v0_1.csv \
+            --orientation data/micro_transition_canonical_orientation_v0_1.csv \
+            --candidate-free "$ROOT/yellow_two_cluster/candidate_free_measurements.csv" \
+            --out-dir "$ROOT/yellow_two_cluster/recurrence"
+          python - <<'PY'
+          import csv,json,os
+          from pathlib import Path
+          root=Path(os.environ['ROOT'])
+          s=json.load(open(root/'yellow_two_cluster/recurrence/summary.json'))
+          y=s['identified_set_contraction_on_common_clusters']['yellow_development']
+          assert y['status']=='comparable_common_cluster_set'
+          assert y['common_clusters']==['CNITIDISSIMA','CPERPETUA']
+          cf=y['candidate_free_common_cluster_bounds']
+          lit=y['literature_common_cluster_bounds']
+          rows=list(csv.DictReader(open(root/'yellow_two_cluster/candidate_free_measurements.csv',newline='',encoding='utf-8')))
+          sig={}
+          for r in rows:
+              sig.setdefault(r['dependence_cluster'],{})[r['axis']]=r['direction'] if r['status']=='resolved' else 'unresolved'
+          matches=sum(sig['CNITIDISSIMA'].get(a)==sig['CPERPETUA'].get(a) and sig['CPERPETUA'].get(a) in {'up','down','same'} for a in ('A','F','C','P'))
+          cp_resolved=sum(sig['CPERPETUA'].get(a) in {'up','down','same'} for a in ('A','F','C','P'))
+          result={
+              'status':'yellow_two_cluster_computed','clusters':['CNITIDISSIMA','CPERPETUA'],
+              'candidate_free_signatures':sig,'cp_axes_resolved':cp_resolved,'matching_resolved_axes':matches,
+              'literature_bounds':lit,'candidate_free_bounds':cf,
+              'literature_width':y['literature_width'],'candidate_free_width':y['candidate_free_width'],'width_reduction':y['width_reduction'],
+              'literature_vs_candidate_free_overlap':s['literature_vs_candidate_free_overlap']['yellow_development'],
+              'interpretation_rule':'full-signature recurrence requires 4/4 directional match; otherwise report axis concordance and exact/partial bounds without outcome-based recoding'}
+          if cp_resolved==4:
+              assert abs(y['candidate_free_width']) < 1e-12
+              assert abs(y['literature_width']-0.75) < 1e-12
+          (root/'yellow_two_cluster/result.json').write_text(json.dumps(result,indent=2,ensure_ascii=False)+'\n',encoding='utf-8')
+          print(json.dumps(result,indent=2,ensure_ascii=False))
+          PY
+
+      - name: Preserve diagnostics
+        if: always()
+        run: |
+          mkdir -p "$ROOT/diagnostics"
+          cp "$ROOT/reference_contract.txt" "$ROOT/diagnostics/" 2>/dev/null || true
+          cp "$ROOT/reference_route_diagnostic.txt" "$ROOT/diagnostics/" 2>/dev/null || true
+          printf 'reference=%s\nmax_spots_per_run=%s\nruns=15\nwithin_system_primary=S1_to_S3_yellow_onset\ncross_cluster_primary=ordered_S1_to_S5_trajectory\nmapping_audit_run=32826721885\ncn_frozen_run=%s\n' "$REF_ACCESSION" "$MAX_SPOTS_PER_RUN" "$CN_RUN_ID" > "$ROOT/diagnostics/run_contract.txt"
+          find "$ROOT" -maxdepth 4 -type f -printf '%p\t%s bytes\n' 2>/dev/null | sort > "$ROOT/diagnostics/files.txt" || true
+
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: candidate-free-cperpetua-yellow-v0-1
+          path: |
+            build/cperpetua_yellow_pilot_v0_1/family_map/
+            build/cperpetua_yellow_pilot_v0_1/ena/
+            build/cperpetua_yellow_pilot_v0_1/family_expression.csv
+            build/cperpetua_yellow_pilot_v0_1/family_expression.summary.json
+            build/cperpetua_yellow_pilot_v0_1/scored/
+            build/cperpetua_yellow_pilot_v0_1/trajectory/
+            build/cperpetua_yellow_pilot_v0_1/pilot_result.json
+            build/cperpetua_yellow_pilot_v0_1/candidate_free_onset_measurements.csv
+            build/cperpetua_yellow_pilot_v0_1/candidate_free_measurements.csv
+            build/cperpetua_yellow_pilot_v0_1/candidate_free_measurements.summary.json
+            build/cperpetua_yellow_pilot_v0_1/yellow_two_cluster/
+            build/cperpetua_yellow_pilot_v0_1/diagnostics/
+          if-no-files-found: warn

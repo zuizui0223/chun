@@ -1,0 +1,51 @@
+name: Accessibility realization gap v0.1
+
+on:
+  pull_request:
+    paths:
+      - 'data/micro_accessibility_edge_registry_v0_1.csv'
+      - 'data/fan2026_full_section_concentration_v0_1.csv'
+      - 'scripts/analyze_accessibility_realization_gap_v0_1.py'
+      - '.github/workflows/accessibility-realization-gap-v0-1.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  analyze:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Run accessibility-realization gap analysis
+        run: |
+          mkdir -p build/accessibility_realization_gap_v0_1
+          python scripts/analyze_accessibility_realization_gap_v0_1.py \
+            --micro data/micro_accessibility_edge_registry_v0_1.csv \
+            --macro data/fan2026_full_section_concentration_v0_1.csv \
+            --out-dir build/accessibility_realization_gap_v0_1
+      - name: Guard cross-scale claim boundary
+        run: |
+          python - <<'PY'
+          import json
+          s=json.load(open('build/accessibility_realization_gap_v0_1/summary.json'))
+          a=s['states']['A']; w=s['states']['W']; y=s['states']['Y']
+          assert all(s['states'][k]['micro_accessibility_present'] for k in ('A','W','Y'))
+          assert 0.57 < a['breadth_realization_gap'] < 0.60
+          assert 0.49 < y['breadth_realization_gap'] < 0.52
+          assert 0.02 < w['breadth_realization_gap'] < 0.05
+          assert a['breadth_lower_tail_p'] < 0.001
+          assert y['breadth_lower_tail_p'] < 0.01
+          assert w['breadth_lower_tail_p'] > 0.1
+          assert s['conclusion']['status'] == 'supported_as_cross_scale_mismatch_not_branch_causality'
+          print(json.dumps(s, indent=2, ensure_ascii=False))
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: accessibility-realization-gap-v0-1
+          path: build/accessibility_realization_gap_v0_1/
+          if-no-files-found: error

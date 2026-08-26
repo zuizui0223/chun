@@ -1,0 +1,56 @@
+name: Paper 1 Fig2 molecular v0.2
+
+on:
+  pull_request:
+    paths:
+      - 'data/paper1_fig2_candidate_free_signature_v0_2.csv'
+      - 'data/paper1_fig2_recurrence_intervals_v0_2.csv'
+      - 'data/paper1_fig2_direct_overlap_v0_2.csv'
+      - 'scripts/build_paper1_fig2_molecular_v0_2.py'
+      - '.github/workflows/paper1-fig2-molecular-v0-2.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  build-fig2:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    env:
+      MPLBACKEND: Agg
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install plotting dependency
+        run: python -m pip install --disable-pip-version-check matplotlib
+      - name: Build Fig. 2 from frozen source tables
+        run: |
+          python scripts/build_paper1_fig2_molecular_v0_2.py \
+            --signatures data/paper1_fig2_candidate_free_signature_v0_2.csv \
+            --intervals data/paper1_fig2_recurrence_intervals_v0_2.csv \
+            --overlap data/paper1_fig2_direct_overlap_v0_2.csv \
+            --out-dir build/paper1_fig2_v0_2
+      - name: Guard source contract
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          root=Path('build/paper1_fig2_v0_2')
+          s=json.load(open(root/'summary.json'))
+          assert s['status']=='paper1_fig2_molecular_built'
+          assert s['signature_rows']==20
+          assert s['interval_rows']==8
+          assert s['overlap_rows']==2
+          assert s['source_run']=='32929846096'
+          assert (root/'paper1_fig2_molecular_v0_2.svg').stat().st_size > 1000
+          assert (root/'paper1_fig2_molecular_v0_2.png').stat().st_size > 1000
+          print(json.dumps(s,indent=2))
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: paper1-fig2-molecular-v0-2
+          path: build/paper1_fig2_v0_2/
+          if-no-files-found: error

@@ -1,0 +1,109 @@
+name: Candidate-free module contract v0.1
+
+on:
+  pull_request:
+    paths:
+      - 'data/candidate_free_pigment_module_schema_v0_1.csv'
+      - 'data/candidate_free_contrast_registry_v0_1.csv'
+      - 'scripts/score_candidate_free_modules_v0_1.py'
+      - '.github/workflows/candidate-free-module-contract-v0-1.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  contract:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Build synthetic family-level fixture
+        run: |
+          mkdir -p build/candidate_free_module_contract_v0_1
+          python - <<'PY'
+          import csv
+          from pathlib import Path
+
+          out=Path('build/candidate_free_module_contract_v0_1/expression.csv')
+          fields=['dataset_id','dependence_cluster','sample_id','condition_id','gene_family','expression']
+          rows=[]
+          source=[('W1',0.8),('W2',1.0),('W3',1.2)]
+          target=[('R1',7.8),('R2',8.0),('R3',8.2)]
+          # A branch commitment: exactly 2/3 predefined families -> admitted (>50%).
+          # UFGT/3GT is deliberately absent to exercise the missing-family gate.
+          for sample,base in source:
+              for fam,offset in [('DFR',0.2),('ANS/LDOX',0.4)]:
+                  rows.append(['fixture','CRETICULATA',sample,'CR_MN_FULL_WHITE',fam,base+offset])
+          for sample,base in target:
+              for fam,offset in [('DFR',0.2),('ANS/LDOX',0.4)]:
+                  rows.append(['fixture','CRETICULATA',sample,'CR_MN_FULL_RED',fam,base+offset])
+          # Shared flavonoid backbone is present but must not enter the primary A score.
+          for condition,group in [('CR_MN_FULL_WHITE',source),('CR_MN_FULL_RED',target)]:
+              for sample,base in group:
+                  for fam in ['CHS','CHI','F3H']:
+                      rows.append(['fixture','CRETICULATA',sample,condition,fam,20.0-base])
+          # F: complete single-family module, deliberately lower in target.
+          for sample,base in source:
+              rows.append(['fixture','CRETICULATA',sample,'CR_MN_FULL_WHITE','FLS',6.0+base/10])
+          for sample,base in target:
+              rows.append(['fixture','CRETICULATA',sample,'CR_MN_FULL_RED','FLS',1.0+base/100])
+          # P: complete 2/2 module, deliberately lower in target.
+          for sample,base in source:
+              for fam in ['ANR','LAR']:
+                  rows.append(['fixture','CRETICULATA',sample,'CR_MN_FULL_WHITE',fam,5.0+base/10])
+          for sample,base in target:
+              for fam in ['ANR','LAR']:
+                  rows.append(['fixture','CRETICULATA',sample,'CR_MN_FULL_RED',fam,1.0+base/100])
+          # C: only 3/8 families -> must be rejected by completeness guard.
+          for condition,group in [('CR_MN_FULL_WHITE',source),('CR_MN_FULL_RED',target)]:
+              for sample,base in group:
+                  for fam in ['PSY','PDS','ZDS']:
+                      rows.append(['fixture','CRETICULATA',sample,condition,fam,2.0+base/10])
+          with out.open('w',newline='',encoding='utf-8') as fh:
+              w=csv.writer(fh); w.writerow(fields); w.writerows(rows)
+          PY
+      - name: Run candidate-free scoring contract
+        run: |
+          python scripts/score_candidate_free_modules_v0_1.py \
+            --expression build/candidate_free_module_contract_v0_1/expression.csv \
+            --modules data/candidate_free_pigment_module_schema_v0_1.csv \
+            --contrasts data/candidate_free_contrast_registry_v0_1.csv \
+            --out-dir build/candidate_free_module_contract_v0_1/out
+      - name: Guard module and effect behavior
+        run: |
+          python - <<'PY'
+          import csv, json
+          out='build/candidate_free_module_contract_v0_1/out'
+          scores=list(csv.DictReader(open(f'{out}/sample_module_scores.csv')))
+          effects=list(csv.DictReader(open(f'{out}/contrast_effects.csv')))
+          summary=json.load(open(f'{out}/summary.json'))
+          assert summary['status']=='candidate_free_module_contract_executable'
+          assert summary['module_completeness_threshold']==0.5
+          assert summary['primary_modules']['A_BRANCH']['families']==['DFR','ANS/LDOX','UFGT/3GT']
+          assert 'SHARED_FLAV' not in summary['primary_modules']
+          cr=[e for e in effects if e['contrast_id']=='CF_CR_RED_WHITE']
+          by_axis={e['axis']:e for e in cr}
+          assert by_axis['A']['effect_status']=='ok' and float(by_axis['A']['hedges_g'])>0
+          assert by_axis['A']['direction_target_minus_source']=='up'
+          assert by_axis['F']['effect_status']=='ok' and float(by_axis['F']['hedges_g'])<0
+          assert by_axis['P']['effect_status']=='ok' and float(by_axis['P']['hedges_g'])<0
+          assert by_axis['C']['effect_status']=='insufficient_replication'
+          c_scores=[r for r in scores if r['axis']=='C']
+          assert c_scores and all(r['score_status']=='below_50pct_completeness' for r in c_scores)
+          a_scores=[r for r in scores if r['axis']=='A']
+          assert a_scores and all(abs(float(r['completeness'])-(2/3))<1e-12 for r in a_scores)
+          # Shared-backbone rows exist in input but cannot become primary module scores.
+          assert not any(r['axis']=='S' for r in scores)
+          # Contract input has no visible-colour field: state is never imputed from hue.
+          assert 'visible_colour' not in open('build/candidate_free_module_contract_v0_1/expression.csv').readline()
+          print(json.dumps({'A_g':by_axis['A']['hedges_g'],'F_g':by_axis['F']['hedges_g'],'P_g':by_axis['P']['hedges_g']},indent=2))
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: candidate-free-module-contract-v0-1
+          path: build/candidate_free_module_contract_v0_1/
+          if-no-files-found: error
