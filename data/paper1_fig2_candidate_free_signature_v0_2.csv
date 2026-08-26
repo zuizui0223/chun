@@ -1,0 +1,21 @@
+transition_class,dependence_cluster,label,axis,direction,status,effect_metric,effect_value,uncertainty_metric,uncertainty_value,source_run
+anthocyanin_gain,CJAPONICA,C. japonica Joy Kendrick,A,down,resolved,Hedges_g,-0.0168,not_thresholded,,32803242153
+anthocyanin_gain,CJAPONICA,C. japonica Joy Kendrick,F,up,resolved,Hedges_g,0.4287,not_thresholded,,32803242153
+anthocyanin_gain,CJAPONICA,C. japonica Joy Kendrick,C,down,resolved,Hedges_g,-0.9379,not_thresholded,,32803242153
+anthocyanin_gain,CJAPONICA,C. japonica Joy Kendrick,P,up,resolved,Hedges_g,1.9002,not_thresholded,,32803242153
+anthocyanin_gain,CRETICULATA,C. reticulata Manao,A,up,resolved,Hedges_g,0.1175,not_thresholded,,32823901705
+anthocyanin_gain,CRETICULATA,C. reticulata Manao,F,up,resolved,Hedges_g,0.3233,not_thresholded,,32823901705
+anthocyanin_gain,CRETICULATA,C. reticulata Manao,C,down,resolved,Hedges_g,-3.4590,not_thresholded,,32823901705
+anthocyanin_gain,CRETICULATA,C. reticulata Manao,P,up,resolved,Hedges_g,0.3990,not_thresholded,,32823901705
+anthocyanin_gain,CSIN_WHITE_PINK,C. sinensis white->pink,A,down,resolved,mean_stagewise_Hedges_g,-2.8595,stage_sign_consistency,1.0,32817229591
+anthocyanin_gain,CSIN_WHITE_PINK,C. sinensis white->pink,F,down,resolved,mean_stagewise_Hedges_g,-0.3679,stage_sign_consistency,0.8,32817229591
+anthocyanin_gain,CSIN_WHITE_PINK,C. sinensis white->pink,C,up,resolved,mean_stagewise_Hedges_g,0.8820,stage_sign_consistency,0.8,32817229591
+anthocyanin_gain,CSIN_WHITE_PINK,C. sinensis white->pink,P,unresolved,unresolved,mean_stagewise_Hedges_g,-0.7558,stage_sign_consistency,0.6,32817229591
+yellow_development,CNITIDISSIMA,C. nitidissima S1-S5,A,down,resolved,OLS_stage_slope,-0.2406,exact_5factorial_order_p,0.0833,32803242174
+yellow_development,CNITIDISSIMA,C. nitidissima S1-S5,F,up,resolved,OLS_stage_slope,0.1240,exact_5factorial_order_p,0.6667,32803242174
+yellow_development,CNITIDISSIMA,C. nitidissima S1-S5,C,up,resolved,OLS_stage_slope,0.1567,exact_5factorial_order_p,0.1667,32803242174
+yellow_development,CNITIDISSIMA,C. nitidissima S1-S5,P,down,resolved,OLS_stage_slope,-0.4503,exact_5factorial_order_p,0.0333,32803242174
+yellow_development,CPERPETUA,C. perpetua S1-S5,A,down,resolved,OLS_stage_slope,-0.5817,exact_5factorial_order_p,0.0167,32834693855
+yellow_development,CPERPETUA,C. perpetua S1-S5,F,down,resolved,OLS_stage_slope,-0.1691,exact_5factorial_order_p,0.3167,32834693855
+yellow_development,CPERPETUA,C. perpetua S1-S5,C,up,resolved,OLS_stage_slope,0.1792,exact_5factorial_order_p,0.0667,32834693855
+yellow_development,CPERPETUA,C. perpetua S1-S5,P,down,resolved,OLS_stage_slope,-0.6156,exact_5factorial_order_p,0.0167,32834693855
