@@ -1,0 +1,152 @@
+name: Paper 1 AJB upload bundle v0.6 current v0.2
+
+on:
+  pull_request:
+    paths:
+      - 'manuscript/PAPER1_AJB_MANUSCRIPT_V0_2.md'
+      - 'data/paper1_authoritative_results_v0_2.csv'
+      - 'data/paper1_main_figure_manifest_v0_2.csv'
+      - 'data/paper1_reference_registry_v0_2.csv'
+      - 'data/paper1_ajb_appendix_mapping_v0_3.csv'
+      - 'data/paper1_fig1_framework_v0_2.csv'
+      - 'data/paper1_fig1_observation_contract_v0_2.csv'
+      - 'data/paper1_fig2_candidate_free_signature_v0_2.csv'
+      - 'data/paper1_fig2_recurrence_intervals_v0_2.csv'
+      - 'data/paper1_fig2_direct_overlap_v0_2.csv'
+      - 'data/paper1_figure_numeric_inputs_v0_1.csv'
+      - 'data/paper1_fig5_nearest_same_v0_2.csv'
+      - 'data/paper1_fig5_robustness_status_v0_2.csv'
+      - 'data/paper1_fig6_event_gate_v0_2.csv'
+      - 'data/paper1_fig6_synthesis_v0_2.csv'
+      - 'data/wfo55_accepted_species_wild_colour_registry_v0_1.csv'
+      - 'data/ecological_driver_effect_size_registry_v0_2.csv'
+      - 'scripts/validate_paper1_result_registry.py'
+      - 'scripts/build_paper1_submission_v0_6.py'
+      - 'scripts/build_paper1_supp_figures_v0_2.py'
+      - 'scripts/audit_paper1_ajb_bundle_v0_6.py'
+      - 'scripts/build_paper1_fig1_framework_v0_2.py'
+      - 'scripts/build_paper1_fig2_molecular_v0_2.py'
+      - 'scripts/build_paper1_fig3_fig4_audits_v0_2.py'
+      - 'scripts/build_paper1_fig5_macro_v0_2.py'
+      - 'scripts/build_paper1_fig6_identifiability_v0_2.py'
+      - 'docs/PAPER1_AJB_UPLOAD_BUNDLE_V0_6_README.md'
+      - '.github/workflows/paper1-ajb-upload-bundle-v0-6.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  build_upload_bundle:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      MPLBACKEND: Agg
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install plotting dependency
+        run: python -m pip install --disable-pip-version-check matplotlib
+
+      - name: Prepare bundle directories
+        run: |
+          mkdir -p build/ajb_upload_bundle_v0_6/{manuscript,main_figures,appendices,provenance}
+          mkdir -p build/paper1_registry_v0_2 build/paper1_fig1_v0_2 build/paper1_fig2_v0_2
+          mkdir -p build/paper1_fig3_fig4_v0_2 build/paper1_fig5_v0_2 build/paper1_fig6_v0_2
+          mkdir -p build/paper1_supp_v0_2
+
+      - name: Validate current authoritative result contract
+        run: |
+          python scripts/validate_paper1_result_registry.py \
+            --registry data/paper1_authoritative_results_v0_2.csv \
+            --figures data/paper1_main_figure_manifest_v0_2.csv \
+            --out-dir build/paper1_registry_v0_2
+          cp build/paper1_registry_v0_2/summary.json \
+            build/ajb_upload_bundle_v0_6/provenance/registry_gate_summary.json
+
+      - name: Build submission-clean manuscript directly from current v0.2
+        run: |
+          python scripts/build_paper1_submission_v0_6.py \
+            --source manuscript/PAPER1_AJB_MANUSCRIPT_V0_2.md \
+            --appendix-map data/paper1_ajb_appendix_mapping_v0_3.csv \
+            --figure-manifest data/paper1_main_figure_manifest_v0_2.csv \
+            --out build/ajb_upload_bundle_v0_6/manuscript/PAPER1_AJB_UPLOAD_V0_6.md \
+            --summary build/ajb_upload_bundle_v0_6/provenance/submission_v0_6_build_summary.json
+
+      - name: Rebuild current Main Figures 1-6
+        run: |
+          python scripts/build_paper1_fig1_framework_v0_2.py \
+            --framework data/paper1_fig1_framework_v0_2.csv \
+            --observation data/paper1_fig1_observation_contract_v0_2.csv \
+            --out-dir build/paper1_fig1_v0_2
+          python scripts/build_paper1_fig2_molecular_v0_2.py \
+            --signatures data/paper1_fig2_candidate_free_signature_v0_2.csv \
+            --intervals data/paper1_fig2_recurrence_intervals_v0_2.csv \
+            --overlap data/paper1_fig2_direct_overlap_v0_2.csv \
+            --out-dir build/paper1_fig2_v0_2
+          python scripts/build_paper1_fig3_fig4_audits_v0_2.py \
+            --numeric-inputs data/paper1_figure_numeric_inputs_v0_1.csv \
+            --out-dir build/paper1_fig3_fig4_v0_2
+          python scripts/build_paper1_fig5_macro_v0_2.py \
+            --nearest data/paper1_fig5_nearest_same_v0_2.csv \
+            --robustness data/paper1_fig5_robustness_status_v0_2.csv \
+            --out-dir build/paper1_fig5_v0_2
+          python scripts/build_paper1_fig6_identifiability_v0_2.py \
+            --events data/paper1_fig6_event_gate_v0_2.csv \
+            --synthesis data/paper1_fig6_synthesis_v0_2.csv \
+            --out-dir build/paper1_fig6_v0_2
+          cp build/paper1_fig1_v0_2/paper1_fig1_framework_v0_2.png build/ajb_upload_bundle_v0_6/main_figures/Figure_1.png
+          cp build/paper1_fig1_v0_2/paper1_fig1_framework_v0_2.svg build/ajb_upload_bundle_v0_6/main_figures/Figure_1.svg
+          cp build/paper1_fig2_v0_2/paper1_fig2_molecular_v0_2.png build/ajb_upload_bundle_v0_6/main_figures/Figure_2.png
+          cp build/paper1_fig2_v0_2/paper1_fig2_molecular_v0_2.svg build/ajb_upload_bundle_v0_6/main_figures/Figure_2.svg
+          cp build/paper1_fig3_fig4_v0_2/paper1_fig3_evidence_attrition_v0_2.png build/ajb_upload_bundle_v0_6/main_figures/Figure_3.png
+          cp build/paper1_fig3_fig4_v0_2/paper1_fig3_evidence_attrition_v0_2.svg build/ajb_upload_bundle_v0_6/main_figures/Figure_3.svg
+          cp build/paper1_fig3_fig4_v0_2/paper1_fig4_topology_concordance_v0_2.png build/ajb_upload_bundle_v0_6/main_figures/Figure_4.png
+          cp build/paper1_fig3_fig4_v0_2/paper1_fig4_topology_concordance_v0_2.svg build/ajb_upload_bundle_v0_6/main_figures/Figure_4.svg
+          cp build/paper1_fig5_v0_2/paper1_fig5_macro_v0_2.png build/ajb_upload_bundle_v0_6/main_figures/Figure_5.png
+          cp build/paper1_fig5_v0_2/paper1_fig5_macro_v0_2.svg build/ajb_upload_bundle_v0_6/main_figures/Figure_5.svg
+          cp build/paper1_fig6_v0_2/paper1_fig6_identifiability_synthesis_v0_2.png build/ajb_upload_bundle_v0_6/main_figures/Figure_6.png
+          cp build/paper1_fig6_v0_2/paper1_fig6_identifiability_synthesis_v0_2.svg build/ajb_upload_bundle_v0_6/main_figures/Figure_6.svg
+
+      - name: Build current Supplementary Figures S1-S2
+        run: |
+          python scripts/build_paper1_supp_figures_v0_2.py \
+            --registry data/paper1_authoritative_results_v0_2.csv \
+            --out-dir build/paper1_supp_v0_2
+          cp build/paper1_supp_v0_2/summary.json \
+            build/ajb_upload_bundle_v0_6/provenance/supplementary_figure_summary.json
+
+      - name: Materialize current Supporting Information
+        run: |
+          cp data/paper1_authoritative_results_v0_2.csv build/ajb_upload_bundle_v0_6/appendices/Appendix_S1.csv
+          cp data/paper1_fig2_candidate_free_signature_v0_2.csv build/ajb_upload_bundle_v0_6/appendices/Appendix_S2.csv
+          cp data/paper1_fig2_recurrence_intervals_v0_2.csv build/ajb_upload_bundle_v0_6/appendices/Appendix_S3.csv
+          cp data/paper1_fig2_direct_overlap_v0_2.csv build/ajb_upload_bundle_v0_6/appendices/Appendix_S4.csv
+          cp data/wfo55_accepted_species_wild_colour_registry_v0_1.csv build/ajb_upload_bundle_v0_6/appendices/Appendix_S5.csv
+          cp data/ecological_driver_effect_size_registry_v0_2.csv build/ajb_upload_bundle_v0_6/appendices/Appendix_S6.csv
+          cp build/paper1_supp_v0_2/FigS1_molecular_support_v0_2.png build/ajb_upload_bundle_v0_6/appendices/Appendix_S7.png
+          cp build/paper1_supp_v0_2/FigS2_ecology_boundary_v0_2.png build/ajb_upload_bundle_v0_6/appendices/Appendix_S8.png
+
+      - name: Copy frozen provenance and bundle contract
+        run: |
+          cp data/paper1_authoritative_results_v0_2.csv build/ajb_upload_bundle_v0_6/provenance/
+          cp data/paper1_main_figure_manifest_v0_2.csv build/ajb_upload_bundle_v0_6/provenance/
+          cp data/paper1_reference_registry_v0_2.csv build/ajb_upload_bundle_v0_6/provenance/
+          cp data/paper1_ajb_appendix_mapping_v0_3.csv build/ajb_upload_bundle_v0_6/provenance/
+          cp docs/EVIDENCE_AUDIT_2026-08-26.md build/ajb_upload_bundle_v0_6/provenance/
+          cp docs/PAPER1_AJB_UPLOAD_BUNDLE_V0_6_README.md build/ajb_upload_bundle_v0_6/README.md
+
+      - name: Audit final v0.6 AJB upload bundle
+        run: |
+          python scripts/audit_paper1_ajb_bundle_v0_6.py \
+            --bundle build/ajb_upload_bundle_v0_6 \
+            --out build/ajb_upload_bundle_v0_6/BUNDLE_MANIFEST.json
+          cat build/ajb_upload_bundle_v0_6/BUNDLE_MANIFEST.json >> "$GITHUB_STEP_SUMMARY"
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: paper1-ajb-upload-bundle-v0-6
+          path: build/ajb_upload_bundle_v0_6/
+          if-no-files-found: error
