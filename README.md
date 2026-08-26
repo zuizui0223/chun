@@ -1,6 +1,10 @@
 # chun
 
-Comparative project on **floral pigment-state recurrence, observation regimes, and macroevolutionary realization** in *Camellia*, with related comparative work in East Asian plants.
+Comparative project on **floral pigment-state recurrence, observation regimes, and macroevolutionary realization** in *Camellia*.
+
+## Scope
+
+`chun` is now *Camellia*-only. East Asian *Cirsium* phylogenomics, colour history and molecular mechanism are maintained in [EAzami](https://github.com/zuizui0223/EAzami). The initial cross-family scaffold remains recoverable in Git history but is not an active analysis input here. See [repository scope and handoff](docs/REPOSITORY_SCOPE.md).
 
 ## Current Paper 1 mainline
 
@@ -65,7 +69,7 @@ The molecular recurrence discovery gate is closed. The active work is now:
 
 1. final manuscript and figure consistency checks;
 2. AJB submission-package polishing and reference/QC cleanup;
-3. repository consolidation around the v0.2 authoritative result hierarchy;
+3. repository consolidation around the v0.2 authoritative result hierarchy and Camellia-only scope;
 4. later mechanistic-phylogeny extension only when direct taxon-level A/F/C/P coverage is adequate.
 
 PR #95 was squash-merged into `main`; Issue #94 records the completed hypothesis test and final claim boundary.
