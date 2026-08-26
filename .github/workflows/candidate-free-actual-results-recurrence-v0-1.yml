@@ -1,6 +1,6 @@
 name: Candidate-free actual-results recurrence v0.1
 
-# Third anthocyanin-gain cluster (CRETICULATA) is frozen from successful raw run 32823901705.
+# Frozen successful public-RNA-seq results are combined without outcome-based axis selection.
 on:
   pull_request:
     paths:
@@ -23,6 +23,7 @@ env:
   CS_RUN_ID: '32817229591'
   CN_RUN_ID: '32803242174'
   CR_RUN_ID: '32823901705'
+  CP_RUN_ID: '32834693855'
 
 jobs:
   actual-results:
@@ -37,7 +38,12 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          mkdir -p build/candidate_free_actual_results_v0_1/joy build/candidate_free_actual_results_v0_1/cs build/candidate_free_actual_results_v0_1/cn build/candidate_free_actual_results_v0_1/cr
+          mkdir -p \
+            build/candidate_free_actual_results_v0_1/joy \
+            build/candidate_free_actual_results_v0_1/cs \
+            build/candidate_free_actual_results_v0_1/cn \
+            build/candidate_free_actual_results_v0_1/cr \
+            build/candidate_free_actual_results_v0_1/cp
           gh run download "$JOY_RUN_ID" --repo "$GITHUB_REPOSITORY" \
             --name candidate-free-cj-joy-pilot-v0-1 \
             --dir build/candidate_free_actual_results_v0_1/joy
@@ -50,6 +56,9 @@ jobs:
           gh run download "$CR_RUN_ID" --repo "$GITHUB_REPOSITORY" \
             --name candidate-free-creticulata-mn-sectors-v0-1 \
             --dir build/candidate_free_actual_results_v0_1/cr
+          gh run download "$CP_RUN_ID" --repo "$GITHUB_REPOSITORY" \
+            --name candidate-free-cperpetua-yellow-v0-1 \
+            --dir build/candidate_free_actual_results_v0_1/cp
       - name: Combine only canonical measurement registries
         run: |
           python - <<'PY'
@@ -64,9 +73,10 @@ jobs:
           sr,sp=one(root/'cs')
           nr,np=one(root/'cn')
           rr,rp=one(root/'cr')
-          rows=jr+sr+nr+rr
-          if any(len(x)!=4 for x in (jr,sr,nr,rr)) or len(rows)!=16:
-              raise SystemExit((len(jr),len(sr),len(nr),len(rr),len(rows)))
+          pr,pp=one(root/'cp')
+          rows=jr+sr+nr+rr+pr
+          if any(len(x)!=4 for x in (jr,sr,nr,rr,pr)) or len(rows)!=20:
+              raise SystemExit((len(jr),len(sr),len(nr),len(rr),len(pr),len(rows)))
           fields=list(rows[0])
           if any(list(r.keys())!=fields for r in rows):
               raise SystemExit('candidate-free measurement schemas drifted across frozen artifacts')
@@ -79,10 +89,12 @@ jobs:
               'cs_run_id':os.environ['CS_RUN_ID'],
               'cn_run_id':os.environ['CN_RUN_ID'],
               'cr_run_id':os.environ['CR_RUN_ID'],
+              'cp_run_id':os.environ['CP_RUN_ID'],
               'joy_measurement_file':str(jp),
               'cs_measurement_file':str(sp),
               'cn_measurement_file':str(np),
               'cr_measurement_file':str(rp),
+              'cp_measurement_file':str(pp),
               'n_measurements':len(rows),
           }
           (root/'provenance.json').write_text(json.dumps(prov,indent=2)+'\n')
@@ -96,28 +108,41 @@ jobs:
             --orientation data/micro_transition_canonical_orientation_v0_1.csv \
             --candidate-free "$ROOT/candidate_free_measurements_actual.csv" \
             --out-dir "$ROOT/recurrence"
-      - name: Guard actual common-cluster contraction without forcing biological direction
+      - name: Guard both completed class-level recurrence tests without forcing direction
         run: |
           python - <<'PY'
-          import csv,json
+          import csv,json,math
           root='build/candidate_free_actual_results_v0_1'
           rows=list(csv.DictReader(open(f'{root}/candidate_free_measurements_actual.csv')))
-          assert len(rows)==16
+          assert len(rows)==20
           assert {(r['transition_class'],r['dependence_cluster']) for r in rows}=={
               ('anthocyanin_gain','CJAPONICA'),
               ('anthocyanin_gain','CSIN_WHITE_PINK'),
               ('anthocyanin_gain','CRETICULATA'),
-              ('yellow_development','CNITIDISSIMA')}
+              ('yellow_development','CNITIDISSIMA'),
+              ('yellow_development','CPERPETUA')}
           s=json.load(open(f'{root}/recurrence/summary.json'))
           anth=s['identified_set_contraction_on_common_clusters']['anthocyanin_gain']
           assert anth['status']=='comparable_common_cluster_set'
           assert anth['common_clusters']==['CJAPONICA','CRETICULATA','CSIN_WHITE_PINK']
           yellow=s['identified_set_contraction_on_common_clusters']['yellow_development']
-          assert yellow['status']=='not_testable_fewer_than_two_common_clusters'
-          assert yellow['common_clusters']==['CNITIDISSIMA']
-          overlap=s['literature_vs_candidate_free_overlap']['anthocyanin_gain']
-          assert overlap['common_clusters']==['CJAPONICA','CRETICULATA','CSIN_WHITE_PINK']
-          print(json.dumps({'anthocyanin':anth,'yellow':yellow,'overlap':overlap},indent=2))
+          assert yellow['status']=='comparable_common_cluster_set'
+          assert yellow['common_clusters']==['CNITIDISSIMA','CPERPETUA']
+          ycf=yellow['candidate_free_common_cluster_bounds']
+          assert ycf['n_unresolved_cluster_axes']==0
+          assert math.isclose(ycf['exact_signature_recurrence']['minimum'],0.5)
+          assert math.isclose(ycf['exact_signature_recurrence']['maximum'],0.5)
+          assert math.isclose(ycf['pairwise_axis_concordance']['minimum'],0.75)
+          assert math.isclose(ycf['pairwise_axis_concordance']['maximum'],0.75)
+          assert math.isclose(yellow['candidate_free_width'],0.0)
+          assert math.isclose(yellow['width_reduction'],0.75)
+          ao=s['literature_vs_candidate_free_overlap']['anthocyanin_gain']
+          yo=s['literature_vs_candidate_free_overlap']['yellow_development']
+          assert ao['common_clusters']==['CJAPONICA','CRETICULATA','CSIN_WHITE_PINK']
+          assert yo['common_clusters']==['CNITIDISSIMA','CPERPETUA']
+          # These are descriptive frozen outcomes, not pass/fail directions for raw-data workflows.
+          assert yo['n_comparable_resolved_cells']==5 and yo['n_agree']==4
+          print(json.dumps({'anthocyanin':anth,'yellow':yellow,'anthocyanin_overlap':ao,'yellow_overlap':yo},indent=2))
           PY
       - uses: actions/upload-artifact@v4
         with:
