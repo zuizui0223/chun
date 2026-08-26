@@ -1,13 +1,7 @@
-name: Paper 1 authoritative result registry
+name: Paper 1 v0.2 authoritative result registry
 
 on:
   pull_request:
-    paths:
-      - 'data/paper1_authoritative_results_v0_1.csv'
-      - 'data/paper1_main_figure_manifest_v0_1.csv'
-      - 'scripts/validate_paper1_result_registry.py'
-      - 'docs/PAPER1_AUTHORITATIVE_RESULT_REGISTRY.md'
-      - '.github/workflows/paper1-authoritative-registry.yml'
   workflow_dispatch:
 
 permissions:
@@ -22,19 +16,19 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
-      - name: Validate result and figure dependency registry
+      - name: Validate v0.2 result and figure dependency registry
         run: |
-          mkdir -p build/paper1_registry
+          mkdir -p build/paper1_registry_v0_2
           python scripts/validate_paper1_result_registry.py \
-            --registry data/paper1_authoritative_results_v0_1.csv \
-            --figures data/paper1_main_figure_manifest_v0_1.csv \
-            --out-dir build/paper1_registry
+            --registry data/paper1_authoritative_results_v0_2.csv \
+            --figures data/paper1_main_figure_manifest_v0_2.csv \
+            --out-dir build/paper1_registry_v0_2
       - name: Report authoritative contract
         run: |
-          echo '### Paper 1 authoritative result registry' >> "$GITHUB_STEP_SUMMARY"
-          cat build/paper1_registry/summary.json >> "$GITHUB_STEP_SUMMARY"
+          echo '### Paper 1 v0.2 authoritative result registry' >> "$GITHUB_STEP_SUMMARY"
+          cat build/paper1_registry_v0_2/summary.json >> "$GITHUB_STEP_SUMMARY"
       - uses: actions/upload-artifact@v4
         with:
-          name: paper1-authoritative-result-registry
-          path: build/paper1_registry/
+          name: paper1-authoritative-result-registry-v0-2
+          path: build/paper1_registry_v0_2/
           if-no-files-found: error
