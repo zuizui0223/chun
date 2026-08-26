@@ -133,7 +133,7 @@ def main() -> int:
 
     required = [
         "Candidate-free remeasurement fixed exact-signature recurrence at 0.333",
-        "pairwise concordance at 0.75",
+        "pairwise concordance at **0.75**",
         "strict×dominant shared robust event count was therefore zero",
         "# DATA AVAILABILITY STATEMENT",
         "# SUPPORTING INFORMATION",
