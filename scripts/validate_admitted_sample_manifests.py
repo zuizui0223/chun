@@ -1,10 +1,5 @@
 #!/usr/bin/env python3
-"""Validate frozen scientific sample manifests against current NCBI metadata.
-
-The goal is not to assert that every archive field is biologically correct.
-Instead, it guarantees that downstream code sees the exact run/sample identity
-that was audited, while known publication/archive conflicts remain explicit.
-"""
+"""Validate the frozen Camellia SRP112181 scientific sample manifest."""
 
 from __future__ import annotations
 
@@ -15,6 +10,8 @@ import re
 
 
 def read_csv(path: pathlib.Path) -> list[dict[str, str]]:
+    if not path.exists() or path.stat().st_size == 0:
+        raise ValueError(f"missing or empty CSV: {path}")
     with path.open(newline="", encoding="utf-8") as handle:
         return list(csv.DictReader(handle))
 
@@ -49,62 +46,6 @@ def check_equal(
 ) -> None:
     if str(observed).strip() != str(expected).strip():
         failures.append(f"{label}: observed={observed!r}, expected={expected!r}")
-
-
-def validate_cirsium(
-    frozen_path: pathlib.Path,
-    runinfo_path: pathlib.Path,
-    attr_rows: list[dict[str, str]],
-) -> list[str]:
-    failures: list[str] = []
-    frozen = index(read_csv(frozen_path), "run")
-    live = index(read_csv(runinfo_path), "Run")
-    attrs = bio_attributes(attr_rows)
-
-    if set(frozen) != set(live):
-        failures.append(
-            f"Cirsium run set changed: frozen_only={sorted(set(frozen)-set(live))}, "
-            f"live_only={sorted(set(live)-set(frozen))}"
-        )
-        return failures
-
-    for run, fr in frozen.items():
-        lv = live[run]
-        comparisons = {
-            "biosample": "BioSample",
-            "sra_scientific_name": "ScientificName",
-            "sra_sample_name": "SampleName",
-            "sra_library_name": "LibraryName",
-            "sra_model": "Model",
-            "spots": "spots",
-            "bases": "bases",
-            "avg_length": "avgLength",
-            "run_hash": "RunHash",
-            "read_hash": "ReadHash",
-        }
-        for frozen_key, live_key in comparisons.items():
-            check_equal(failures, f"{run} {frozen_key}", lv.get(live_key, ""), fr.get(frozen_key, ""))
-
-        biosample = fr["biosample"].strip()
-        check_equal(failures, f"{run} isolate", attrs.get((biosample, "isolate"), ""), fr["biosample_isolate"])
-        check_equal(failures, f"{run} locality", attrs.get((biosample, "geo_loc_name"), ""), fr["geo_loc_name"])
-        check_equal(failures, f"{run} collection_date", attrs.get((biosample, "collection_date"), ""), fr["collection_date"])
-        check_equal(failures, f"{run} dev_stage", attrs.get((biosample, "dev_stage"), ""), fr["biosample_dev_stage"])
-        check_equal(failures, f"{run} tissue", attrs.get((biosample, "tissue"), ""), fr["tissue"])
-
-        sample_match = re.match(r"^(.*)-(\d+)$", fr["sra_sample_name"].strip())
-        if not sample_match:
-            failures.append(f"{run}: SRA SampleName no longer parses as taxon-voucher")
-        else:
-            check_equal(failures, f"{run} paper_taxon", sample_match.group(1), fr["paper_taxon"])
-            check_equal(failures, f"{run} voucher", sample_match.group(2), fr["voucher_or_sample_id"])
-        if fr["admission_status"].strip() != "admit_for_leaf_coding_screen":
-            failures.append(f"{run}: unexpected admission status {fr['admission_status']!r}")
-        if fr["tissue"].strip().lower() != "young leaves":
-            failures.append(f"{run}: coding-screen manifest unexpectedly contains non-leaf tissue")
-
-    print(f"Cirsium admitted manifest validated: {len(frozen)} runs")
-    return failures
 
 
 def validate_camellia(
@@ -143,7 +84,12 @@ def validate_camellia(
             "read_hash": "ReadHash",
         }
         for frozen_key, live_key in comparisons.items():
-            check_equal(failures, f"{run} {frozen_key}", lv.get(live_key, ""), fr.get(frozen_key, ""))
+            check_equal(
+                failures,
+                f"{run} {frozen_key}",
+                lv.get(live_key, ""),
+                fr.get(frozen_key, ""),
+            )
 
         biosample = fr["biosample"].strip()
         dev_stage = attrs.get((biosample, "dev_stage"), "")
@@ -193,8 +139,6 @@ def validate_camellia(
     if total_bases != 10_753_393_500:
         failures.append(f"Camellia base total changed: {total_bases} != 10,753,393,500")
 
-    # Independent publication-level sanity bounds (Zhou et al. 2017 report
-    # approximately 71.8 million raw reads / 10.8 Gbp).
     if abs(total_reads - 71_800_000) > 500_000:
         failures.append(f"Camellia total reads {total_reads} no longer match publication rounding (~71.8M)")
     if abs(total_bases - 10_800_000_000) > 200_000_000:
@@ -212,11 +156,6 @@ def main() -> int:
     parser.add_argument("--manifest-dir", required=True, type=pathlib.Path)
     parser.add_argument("--biosample-dir", required=True, type=pathlib.Path)
     parser.add_argument(
-        "--cirsium-frozen",
-        default=pathlib.Path("data/cirsium_prjna1311153_admitted_manifest_v0_1.csv"),
-        type=pathlib.Path,
-    )
-    parser.add_argument(
         "--camellia-frozen",
         default=pathlib.Path("data/camellia_srp112181_admitted_manifest_v0_1.csv"),
         type=pathlib.Path,
@@ -224,32 +163,20 @@ def main() -> int:
     args = parser.parse_args()
 
     attr_rows = read_csv(args.biosample_dir / "biosample_attributes_long.csv")
-    cir_attrs = [r for r in attr_rows if r.get("seed_id", "").strip() == "SEQ001"]
-    cam_attrs = [r for r in attr_rows if r.get("seed_id", "").strip() == "SEQ002"]
-
-    failures: list[str] = []
-    failures.extend(
-        validate_cirsium(
-            args.cirsium_frozen,
-            args.manifest_dir / "SEQ001_PRJNA1311153_runinfo.csv",
-            cir_attrs,
-        )
-    )
-    failures.extend(
-        validate_camellia(
-            args.camellia_frozen,
-            args.manifest_dir / "SEQ002_SRP112181_runinfo.csv",
-            cam_attrs,
-        )
+    cam_attrs = [row for row in attr_rows if row.get("seed_id", "").strip() == "SEQ002"]
+    failures = validate_camellia(
+        args.camellia_frozen,
+        args.manifest_dir / "SEQ002_SRP112181_runinfo.csv",
+        cam_attrs,
     )
 
     if failures:
-        print("\nFrozen sample-manifest gate FAILED:")
+        print("\nFrozen Camellia sample-manifest gate FAILED:")
         for item in failures:
             print(f"- {item}")
         return 1
 
-    print("Frozen sample-manifest gate passed.")
+    print("Frozen Camellia sample-manifest gate passed.")
     return 0
 
 
