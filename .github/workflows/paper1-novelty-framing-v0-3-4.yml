@@ -1,0 +1,59 @@
+name: Paper 1 event-boundary framing v0.3.4
+
+on:
+  pull_request:
+    paths:
+      - 'scripts/build_paper1_novelty_framing_v0_3_4.py'
+      - 'scripts/build_paper1_novelty_framing_v0_3_3.py'
+      - 'scripts/build_paper1_temporal_framing_v0_3_2.py'
+      - 'scripts/build_paper1_science_v0_2_2.py'
+      - 'docs/PAPER1_EVOLUTIONARY_EVENT_BOUNDARY_AMENDMENT_V0_1.md'
+      - 'data/paper1_reference_registry_v0_5.csv'
+      - 'scripts/validate_paper1_reference_registry_v0_5.py'
+      - '.github/workflows/paper1-novelty-framing-v0-3-4.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  frame:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Regenerate frozen science v0.2.2
+        run: |
+          mkdir -p build/paper1-v0-3-4
+          python scripts/build_paper1_science_v0_2_2.py \
+            --source manuscript/PAPER1_AJB_MANUSCRIPT_V0_2.md \
+            --out build/paper1-v0-3-4/PAPER1_SCIENCE_V0_2_2.md \
+            --summary build/paper1-v0-3-4/science_summary.json
+      - name: Build event-boundary-safe framing v0.3.4
+        run: |
+          python scripts/build_paper1_novelty_framing_v0_3_4.py \
+            --source build/paper1-v0-3-4/PAPER1_SCIENCE_V0_2_2.md \
+            --out build/paper1-v0-3-4/PAPER1_NOVELTY_FRAMING_V0_3_4.md \
+            --summary build/paper1-v0-3-4/framing_summary.json
+      - name: Validate 25-reference contract
+        run: |
+          python scripts/validate_paper1_reference_registry_v0_5.py \
+            --registry data/paper1_reference_registry_v0_5.csv \
+            --manuscript build/paper1-v0-3-4/PAPER1_NOVELTY_FRAMING_V0_3_4.md \
+            --out build/paper1-v0-3-4/reference_summary.json
+      - name: Validate event-boundary clauses
+        run: |
+          grep -Fq 'annotation-driven, outcome-independent quantification within the four prespecified pigment modules' build/paper1-v0-3-4/PAPER1_NOVELTY_FRAMING_V0_3_4.md
+          grep -Fq 'not treated as direct observations of macroevolutionary branch events' build/paper1-v0-3-4/PAPER1_NOVELTY_FRAMING_V0_3_4.md
+          grep -Fq 'not an event-for-event matching of RNA-seq contrasts to reconstructed branches' build/paper1-v0-3-4/PAPER1_NOVELTY_FRAMING_V0_3_4.md
+          grep -Fq 'not a direct observation of independent evolutionary origins' build/paper1-v0-3-4/PAPER1_NOVELTY_FRAMING_V0_3_4.md
+      - name: Report framing summary
+        run: cat build/paper1-v0-3-4/framing_summary.json >> "$GITHUB_STEP_SUMMARY"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: paper1-event-boundary-framing-v0-3-4
+          path: build/paper1-v0-3-4/
+          if-no-files-found: error
