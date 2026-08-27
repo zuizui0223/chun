@@ -1,0 +1,35 @@
+name: Paper 1 Chinese and grey-literature screen v0.1
+
+on:
+  pull_request:
+    paths:
+      - 'data/paper1_chinese_grey_literature_screen_v0_1.csv'
+      - 'docs/PAPER1_CHINESE_GREY_LITERATURE_SCREEN_2026-08-27.md'
+      - 'docs/PAPER1_LITERATURE_COVERAGE_AUDIT_2026-08-27.md'
+      - 'scripts/validate_paper1_chinese_grey_screen_v0_1.py'
+      - '.github/workflows/paper1-chinese-grey-literature-screen-v0-1.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Validate Chinese and grey-literature screen
+        run: |
+          python scripts/validate_paper1_chinese_grey_screen_v0_1.py \
+            --screen data/paper1_chinese_grey_literature_screen_v0_1.csv \
+            --out build/paper1_chinese_grey_screen_v0_1_summary.json
+          cat build/paper1_chinese_grey_screen_v0_1_summary.json >> "$GITHUB_STEP_SUMMARY"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: paper1-chinese-grey-literature-screen-v0-1
+          path: build/paper1_chinese_grey_screen_v0_1_summary.json
+          if-no-files-found: error
