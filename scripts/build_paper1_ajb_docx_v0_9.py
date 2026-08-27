@@ -8,6 +8,26 @@ import sys
 import tempfile
 from pathlib import Path
 
+from docx import Document
+from docx.oxml.ns import qn
+
+
+def remove_title_border(path: Path) -> None:
+    """Remove Word's decorative built-in Title bottom border from the upload DOCX."""
+    doc = Document(path)
+    title = doc.styles["Title"]
+    ppr = title.element.get_or_add_pPr()
+    pbdr = ppr.find(qn("w:pBdr"))
+    if pbdr is not None:
+        ppr.remove(pbdr)
+    doc.save(path)
+
+    # Re-open and fail closed if the border survived serialization.
+    check = Document(path)
+    check_ppr = check.styles["Title"].element.get_or_add_pPr()
+    if check_ppr.find(qn("w:pBdr")) is not None:
+        raise SystemExit("Title style border removal failed")
+
 
 def main() -> int:
     ap = argparse.ArgumentParser()
@@ -30,6 +50,8 @@ def main() -> int:
         )
         inherited = json.loads(base_summary.read_text(encoding="utf-8"))
 
+    remove_title_border(a.out)
+
     summary = {
         **inherited,
         "submission_version": "v0.9",
@@ -37,6 +59,7 @@ def main() -> int:
         "output_docx": str(a.out),
         "source_science_version": "Paper 1 v0.2.2",
         "source_framing_version": "Paper 1 v0.3.2 temporal framing",
+        "title_style_bottom_border_removed": True,
         "scientific_results_changed": False,
         "status": "AJB v0.9 DOCX built and structurally audited",
     }
