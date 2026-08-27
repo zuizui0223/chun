@@ -74,8 +74,48 @@ def main() -> int:
     if absent_claims:
         raise SystemExit(f"submission manuscript lost frozen v0.2 claims: {absent_claims}")
 
-    if manuscript.count("[ARCHIVE DOI TO ADD AT SUBMISSION]") != 1:
-        raise SystemExit("submission manuscript must contain exactly one archive DOI placeholder")
+    required_ajb = [
+        "Manuscript received _______; revision accepted _______.",
+        "# ACKNOWLEDGMENTS",
+        "# AUTHOR CONTRIBUTIONS",
+        "# DATA AVAILABILITY STATEMENT",
+        "# LITERATURE CITED",
+        "# SUPPORTING INFORMATION",
+        "# FIGURE LEGENDS",
+        "Additional supporting information may be found online in the Supporting Information section at the end of the article.",
+    ]
+    missing_ajb = [token for token in required_ajb if token not in manuscript]
+    if missing_ajb:
+        raise SystemExit(f"submission manuscript missing AJB-facing structure: {missing_ajb}")
+
+    placeholders = {
+        "[AUTHOR LIST TO ADD AT SUBMISSION]": 1,
+        "[AFFILIATIONS TO ADD AT SUBMISSION]": 1,
+        "[CORRESPONDING AUTHOR DETAILS TO ADD AT SUBMISSION]": 1,
+        "[ACKNOWLEDGMENTS AND FUNDING TO ADD AT SUBMISSION]": 1,
+        "[CRediT AUTHOR CONTRIBUTIONS TO ADD AT SUBMISSION]": 1,
+        "[ARCHIVE DOI TO ADD AT SUBMISSION]": 1,
+    }
+    bad_placeholders = {
+        token: manuscript.count(token)
+        for token, expected_count in placeholders.items()
+        if manuscript.count(token) != expected_count
+    }
+    if bad_placeholders:
+        raise SystemExit(f"submission placeholder count drift: {bad_placeholders}")
+
+    headings = [
+        "# ACKNOWLEDGMENTS",
+        "# AUTHOR CONTRIBUTIONS",
+        "# DATA AVAILABILITY STATEMENT",
+        "# LITERATURE CITED",
+        "# SUPPORTING INFORMATION",
+        "# FIGURE LEGENDS",
+    ]
+    positions = [manuscript.index(h) for h in headings]
+    if positions != sorted(positions):
+        raise SystemExit(f"AJB section order drift: {list(zip(headings, positions))}")
+
     for i in range(1, 9):
         if f"Appendix S{i}" not in manuscript:
             raise SystemExit(f"manuscript missing Appendix S{i} legend/reference")
@@ -98,6 +138,7 @@ def main() -> int:
         "obsolete_ecological_fig6_absent": True,
         "legacy_v0_1_registry_absent_from_submission_contract": True,
         "archive_doi_placeholders": 1,
+        "ajb_section_order_checked": True,
         "status": "bundle audit passed",
         "files": entries,
     }
