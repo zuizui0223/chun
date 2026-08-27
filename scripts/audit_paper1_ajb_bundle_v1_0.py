@@ -53,12 +53,12 @@ def main() -> int:
         "appendices/Appendix_S7.png",
         "appendices/Appendix_S8.png",
         "provenance/PAPER1_SCIENCE_V0_2_2.md",
-        "provenance/PAPER1_NOVELTY_FRAMING_V0_3_3.md",
+        "provenance/PAPER1_NOVELTY_FRAMING_V0_3_4.md",
         "provenance/paper1_authoritative_results_v0_2_2.csv",
         "provenance/paper1_main_figure_manifest_v0_2_2.csv",
         "provenance/paper1_reference_registry_v0_5.csv",
         "provenance/science_v0_2_2_build_summary.json",
-        "provenance/novelty_framing_v0_3_3_summary.json",
+        "provenance/novelty_framing_v0_3_4_summary.json",
         "provenance/submission_v1_0_build_summary.json",
         "provenance/submission_reference_registry_v1_0_summary.json",
         "provenance/docx_v1_0_summary.json",
@@ -74,17 +74,22 @@ def main() -> int:
     stale_submission_files = [
         "manuscript/PAPER1_AJB_UPLOAD_V0_9.md",
         "manuscript/PAPER1_AJB_UPLOAD_V0_9.docx",
+        "provenance/PAPER1_NOVELTY_FRAMING_V0_3_3.md",
+        "provenance/novelty_framing_v0_3_3_summary.json",
     ]
     stale_present = [x for x in stale_submission_files if (root / x).exists()]
     if stale_present:
-        raise SystemExit(f"v1.0 bundle retained stale submission files: {stale_present}")
+        raise SystemExit(f"v1.0 bundle retained stale submission/framing files: {stale_present}")
 
     manuscript = (root / "manuscript/PAPER1_AJB_UPLOAD_V1_0.md").read_text(encoding="utf-8")
     required_claims = [
-        "Standardized remeasurement reveals partial mechanistic replay during repeated flower-colour evolution",
-        "matched observation intervention",
+        "Hierarchical molecular repeatability coexists with local flower-colour conservatism",
+        "annotation-driven, outcome-independent quantification within these prespecified modules",
+        "not direct macroevolutionary branch events",
+        "hierarchical rather than all-or-none",
         "matched inferential audit across scales",
-        "The distinctive result is not mechanistic heterogeneity itself",
+        "not an event-for-event matching of RNA-seq contrasts to reconstructed branches",
+        "not a direct observation of independent evolutionary origins",
         "0.333–1.0",
         "0.333–0.5",
         "0.25–1.0",
@@ -94,14 +99,15 @@ def main() -> int:
     ]
     absent = [x for x in required_claims if x not in manuscript]
     if absent:
-        raise SystemExit(f"v1.0 manuscript lost novelty/science claims: {absent}")
+        raise SystemExit(f"v1.0 manuscript lost v0.3.4 boundary/science claims: {absent}")
 
     forbidden = [
-        "Draft v0.2", "Draft v0.3", "Draft v0.3.2", "Draft v0.3.3",
+        "Draft v0.2", "Draft v0.3", "Draft v0.3.2", "Draft v0.3.3", "Draft v0.3.4",
         "`data/", "`docs/", "`scripts/", "GitHub Actions",
         "first demonstration that repeated flower colour", "first pathway-level", "first micro-to-macro",
         "anthocyanin-axis ascertainment remained enriched after dependence collapse",
         "ecological Fig. 6",
+        "# Standardized remeasurement reveals partial mechanistic replay during repeated flower-colour evolution",
     ]
     retained = [x for x in forbidden if x in manuscript]
     if retained:
@@ -141,17 +147,25 @@ def main() -> int:
     science_summary = json.loads((root / "provenance/science_v0_2_2_build_summary.json").read_text(encoding="utf-8"))
     if science_summary.get("candidate_free_recurrence_changed") is not False or science_summary.get("yellow_changed") is not False or science_summary.get("macro_results_changed") is not False:
         raise SystemExit("v0.2.2 change-scope boundary drift")
-    framing_summary = json.loads((root / "provenance/novelty_framing_v0_3_3_summary.json").read_text(encoding="utf-8"))
-    if framing_summary.get("scientific_results_changed_by_framing") is not False or framing_summary.get("methods_results_byte_identical") is not True:
-        raise SystemExit("v0.3.3 framing altered science body")
+    framing_summary = json.loads((root / "provenance/novelty_framing_v0_3_4_summary.json").read_text(encoding="utf-8"))
+    if framing_summary.get("scientific_estimates_changed") is not False:
+        raise SystemExit("v0.3.4 framing altered frozen scientific estimates")
+    if framing_summary.get("event_boundary_clarified") is not True or framing_summary.get("candidate_free_definition_clarified") is not True or framing_summary.get("hierarchical_repeatability_headline") is not True:
+        raise SystemExit("v0.3.4 framing boundary flags are incomplete")
+
+    submission_summary = json.loads((root / "provenance/submission_v1_0_build_summary.json").read_text(encoding="utf-8"))
+    if submission_summary.get("event_boundary_clarified") is not True or submission_summary.get("candidate_free_definition_clarified") is not True:
+        raise SystemExit("submission v1.0 did not preserve v0.3.4 boundary flags")
 
     files = sorted(p for p in root.rglob("*") if p.is_file() and p != a.out)
     entries = [{"path": str(p.relative_to(root)), "bytes": p.stat().st_size, "sha256": sha256(p)} for p in files]
     manifest = {
-        "bundle_version": "v1.0-ajb-upload-paper1-v0.2.2-novelty-v0.3.3",
+        "bundle_version": "v1.0-ajb-upload-paper1-v0.2.2-framing-v0.3.4",
         "source_science_version": "Paper 1 v0.2.2",
-        "source_framing_version": "Paper 1 v0.3.3 novelty-forward framing",
-        "novelty_headline": "same-system standardized remeasurement quantifies how much mechanistic replay survives",
+        "source_framing_version": "Paper 1 v0.3.4 event-boundary-safe novelty framing",
+        "novelty_headline": "hierarchical transition-class-dependent molecular repeatability plus separate macro pattern/event identity",
+        "event_boundary_clarified": True,
+        "candidate_free_definition_clarified": True,
         "literature_systems": 12,
         "dependence_clusters": 6,
         "cluster_A_enrichment_p": 0.078125,
