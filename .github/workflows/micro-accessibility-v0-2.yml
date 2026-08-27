@@ -1,0 +1,40 @@
+name: Micro accessibility v0.2 formal-db update
+
+on:
+  pull_request:
+    paths:
+      - 'data/micro_accessibility_edge_registry_v0_2.csv'
+      - 'scripts/analyze_micro_accessibility_v0_1.py'
+      - 'scripts/validate_micro_accessibility_v0_2.py'
+      - '.github/workflows/micro-accessibility-v0-2.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  analyze:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Run updated dependence-aware literature analysis
+        run: |
+          mkdir -p build/micro_accessibility_v0_2
+          python scripts/analyze_micro_accessibility_v0_1.py \
+            --registry data/micro_accessibility_edge_registry_v0_2.csv \
+            --out-dir build/micro_accessibility_v0_2 \
+            --permutations 10000 \
+            --seed 230223
+      - name: Validate CSEMISERRATA ascertainment update
+        run: |
+          python scripts/validate_micro_accessibility_v0_2.py \
+            --summary build/micro_accessibility_v0_2/summary.json
+      - uses: actions/upload-artifact@v4
+        with:
+          name: micro-accessibility-v0-2
+          path: build/micro_accessibility_v0_2/
+          if-no-files-found: error
