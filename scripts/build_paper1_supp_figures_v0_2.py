@@ -19,7 +19,7 @@ def index(rows: list[dict[str, str]]) -> dict[str, dict[str, str]]:
     return {row["result_id"].strip(): row for row in rows}
 
 
-def wrap(text: str, width: int = 68) -> str:
+def wrap(text: str, width: int = 60) -> str:
     return "\n".join(textwrap.wrap(text, width=width, break_long_words=False))
 
 
@@ -35,8 +35,8 @@ def draw_cards(path_base: Path, title: str, cards: list[tuple[str, str, str]]) -
     for i, (label, claim, boundary) in enumerate(cards):
         y = usable_top - i * step
         ax.text(0.03, y, label, fontsize=12, fontweight="bold", va="top")
-        ax.text(0.22, y, wrap(claim), fontsize=10.5, va="top")
-        ax.text(0.22, y - step * 0.49, wrap("Boundary: " + boundary), fontsize=9, va="top")
+        ax.text(0.30, y, wrap(claim), fontsize=10.5, va="top")
+        ax.text(0.30, y - step * 0.49, wrap("Boundary: " + boundary), fontsize=9, va="top")
         if i < len(cards) - 1:
             ax.plot([0.02, 0.98], [y - step * 0.78, y - step * 0.78], linewidth=0.8)
     fig.tight_layout()
