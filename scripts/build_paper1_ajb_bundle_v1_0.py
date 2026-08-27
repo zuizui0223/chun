@@ -42,7 +42,7 @@ def main() -> int:
 
     submission = bundle / "manuscript/PAPER1_AJB_UPLOAD_V1_0.md"
     run(
-        "scripts/build_paper1_submission_v1_0.py",
+        "scripts/run_paper1_submission_v1_0.py",
         "--source", str(framed),
         "--appendix-map", "data/paper1_ajb_appendix_mapping_v0_5.csv",
         "--figure-manifest", "data/paper1_main_figure_manifest_v0_2_2.csv",
