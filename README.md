@@ -53,6 +53,7 @@ At the macro scale, accepted-species nuclear analyses retain non-random visible-
 - [`data/paper1_reference_registry_v0_3.csv`](data/paper1_reference_registry_v0_3.csv) — current 21-reference journal-facing contract after the novelty audit.
 - [`docs/PAPER1_NOVELTY_LITERATURE_AUDIT_2026-08-27.md`](docs/PAPER1_NOVELTY_LITERATURE_AUDIT_2026-08-27.md) — high-recall prior-art audit and claim boundary.
 - [`docs/PAPER1_NOVELTY_CORE_ATTACK_ADDENDUM_2026-08-27.md`](docs/PAPER1_NOVELTY_CORE_ATTACK_ADDENDUM_2026-08-27.md) — final attack on generic theoretical priority claims.
+- [`docs/PAPER1_LITERATURE_SATURATION_TEST_2026-08-27.md`](docs/PAPER1_LITERATURE_SATURATION_TEST_2026-08-27.md) — orthogonal species/pigment/ecology/Chinese-query saturation pass; 13 added query families yielded zero new eligible independent A/F/C/P recurrence clusters.
 - [`docs/CANDIDATE_FREE_ACTUAL_RECURRENCE_RESULT_V0_1.md`](docs/CANDIDATE_FREE_ACTUAL_RECURRENCE_RESULT_V0_1.md) — authoritative molecular recurrence result.
 - [`docs/YELLOW_TWO_CLUSTER_RECURRENCE_RESULT_V0_1.md`](docs/YELLOW_TWO_CLUSTER_RECURRENCE_RESULT_V0_1.md) — dedicated yellow-development result.
 
@@ -90,7 +91,7 @@ Do **not** claim priority for:
 
 The retained contribution is empirical and application-specific: **the same public *Camellia* systems are compared under literature-selected versus one frozen pathway-wide observation regime, incomplete A/F/C/P states are bounded explicitly, transition-class-specific recurrence is quantified, and that molecular result is separated from a topology/coding-robust macro pattern and a stricter event-identity stop rule.**
 
-The literature basis for this boundary is a **high-recall evidence audit**, not a claim of PRISMA-complete systematic-review coverage.
+The literature basis for this boundary is a **high-recall evidence audit**, not a claim of PRISMA-complete systematic-review coverage. A second orthogonal saturation pass added 13 species-, pigment-, ecology-, and Chinese-language open-web query families and recovered **zero new eligible independent A/F/C/P recurrence clusters**; this raises confidence in the frozen recurrence architecture but does not replace formal database screening.
 
 ## Frozen boundaries
 
@@ -102,7 +103,7 @@ The literature basis for this boundary is a **high-recall evidence audit**, not 
 
 ## Current execution goal
 
-The molecular discovery, novelty-audit, and machine-generated AJB bundle gates are closed. The remaining submission work is now:
+The molecular discovery, novelty-audit, literature-saturation, and machine-generated AJB bundle gates are closed. The remaining submission work is now:
 
 1. supply final author list/order, affiliations, and corresponding-author/ORCID information;
 2. supply acknowledgments/funding and CRediT author contributions;
