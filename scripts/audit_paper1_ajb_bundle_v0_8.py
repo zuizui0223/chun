@@ -114,8 +114,8 @@ def main() -> int:
         raise SystemExit(f"v0.8 manuscript lost science/framing claims: {absent}")
 
     words = abstract_words(manuscript)
-    if words != 245:
-        raise SystemExit(f"AJB v0.8 abstract word-count drift: expected 245, found {words}")
+    if words != 237:
+        raise SystemExit(f"AJB v0.8 abstract word-count drift: expected 237, found {words}")
     for label in ["### Premise of the study", "### Methods", "### Key results", "### Conclusions"]:
         if manuscript.count(label) != 1:
             raise SystemExit(f"structured abstract heading drift: {label}")
