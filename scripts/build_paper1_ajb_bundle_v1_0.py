@@ -26,12 +26,12 @@ def main() -> int:
     run("scripts/build_paper1_ajb_bundle_v0_9.py", "--out-dir", str(bundle))
 
     science = bundle / "provenance/PAPER1_SCIENCE_V0_2_2.md"
-    framed = bundle / "provenance/PAPER1_NOVELTY_FRAMING_V0_3_3.md"
+    framed = bundle / "provenance/PAPER1_NOVELTY_FRAMING_V0_3_4.md"
     run(
-        "scripts/run_paper1_novelty_framing_v0_3_3.py",
+        "scripts/build_paper1_novelty_framing_v0_3_4.py",
         "--source", str(science),
         "--out", str(framed),
-        "--summary", str(bundle / "provenance/novelty_framing_v0_3_3_summary.json"),
+        "--summary", str(bundle / "provenance/novelty_framing_v0_3_4_summary.json"),
     )
     run(
         "scripts/validate_paper1_reference_registry_v0_5.py",
@@ -68,6 +68,8 @@ def main() -> int:
         "manuscript/PAPER1_AJB_UPLOAD_V0_9.docx",
         "provenance/submission_v0_9_build_summary.json",
         "provenance/docx_v0_9_summary.json",
+        "provenance/PAPER1_NOVELTY_FRAMING_V0_3_3.md",
+        "provenance/novelty_framing_v0_3_3_summary.json",
     ]:
         p = bundle / rel
         if p.exists():
