@@ -120,6 +120,7 @@ def main() -> int:
         "event_boundary_clarified": True,
         "candidate_free_definition_clarified": True,
         "abstract_word_count": words,
+        "biological_headline": "hierarchical transition-class-dependent molecular repeatability with separate macro pattern and event identity",
         "novelty_headline": "hierarchical transition-class-dependent molecular repeatability plus separate macro pattern/event identity",
         "status": "submission-clean Paper 1 AJB v1.0 built from event-boundary-safe framing v0.3.4",
     })
