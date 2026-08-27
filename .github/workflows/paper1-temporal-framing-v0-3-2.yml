@@ -1,0 +1,68 @@
+name: Paper 1 temporal framing v0.3.2
+
+on:
+  pull_request:
+    paths:
+      - 'data/paper1_reference_registry_v0_5.csv'
+      - 'scripts/build_paper1_temporal_framing_v0_3_2.py'
+      - 'scripts/validate_paper1_reference_registry_v0_5.py'
+      - '.github/workflows/paper1-temporal-framing-v0-3-2.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  frame:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Regenerate frozen science v0.2.2
+        run: |
+          mkdir -p build/paper1_temporal_framing_v0_3_2
+          python scripts/build_paper1_science_v0_2_2.py \
+            --source manuscript/PAPER1_AJB_MANUSCRIPT_V0_2.md \
+            --out build/paper1_temporal_framing_v0_3_2/PAPER1_SCIENCE_V0_2_2.md \
+            --summary build/paper1_temporal_framing_v0_3_2/science_summary.json
+      - name: Build temporal framing v0.3.2
+        run: |
+          python scripts/build_paper1_temporal_framing_v0_3_2.py \
+            --source build/paper1_temporal_framing_v0_3_2/PAPER1_SCIENCE_V0_2_2.md \
+            --out build/paper1_temporal_framing_v0_3_2/PAPER1_TEMPORAL_FRAMING_V0_3_2.md \
+            --summary build/paper1_temporal_framing_v0_3_2/framing_summary.json
+      - name: Validate 25-reference contract
+        run: |
+          python scripts/validate_paper1_reference_registry_v0_5.py \
+            --registry data/paper1_reference_registry_v0_5.csv \
+            --manuscript build/paper1_temporal_framing_v0_3_2/PAPER1_TEMPORAL_FRAMING_V0_3_2.md \
+            --out build/paper1_temporal_framing_v0_3_2/reference_summary.json
+      - name: Prove science body is unchanged
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import json, re
+          root=Path('build/paper1_temporal_framing_v0_3_2')
+          science=(root/'PAPER1_SCIENCE_V0_2_2.md').read_text()
+          framed=(root/'PAPER1_TEMPORAL_FRAMING_V0_3_2.md').read_text()
+          def block(t,a,b):
+              return t[t.index(a):t.index(b)]
+          assert block(science,'# MATERIALS AND METHODS','# DISCUSSION') == block(framed,'# MATERIALS AND METHODS','# DISCUSSION')
+          assert '0.333–1.0' in framed and '0.333–0.5' in framed
+          assert 'P=0.078125' in framed
+          assert 'The strict×dominant shared robust event count was therefore zero' in framed
+          assert 'Repeated generation of flower-colour states does not replay one pigment-state programme' in framed
+          assert 'repeated generation with partial mechanistic replay' in framed
+          s=json.loads((root/'framing_summary.json').read_text())
+          assert s['scientific_results_changed_by_framing'] is False
+          assert s['abstract_words'] <= 250
+          print(json.dumps({'status':'temporal_framing_science_body_unchanged','abstract_words':s['abstract_words']},indent=2))
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: paper1-temporal-framing-v0-3-2
+          path: build/paper1_temporal_framing_v0_3_2/
+          if-no-files-found: error
