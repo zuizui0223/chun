@@ -29,7 +29,7 @@ def main() -> int:
         base_summary = td / "v033_summary.json"
         subprocess.run([
             sys.executable,
-            "scripts/build_paper1_novelty_framing_v0_3_3.py",
+            "scripts/run_paper1_novelty_framing_v0_3_3.py",
             "--source", str(a.source),
             "--out", str(base),
             "--summary", str(base_summary),
@@ -140,7 +140,7 @@ def main() -> int:
         "event_boundary_clarified": True,
         "candidate_free_definition_clarified": True,
         "hierarchical_repeatability_headline": True,
-        "source_layer": "v0.3.3 novelty-forward framing",
+        "source_layer": "v0.3.3 novelty-forward framing via canonical QC runner",
     }
     a.summary.parent.mkdir(parents=True, exist_ok=True)
     a.summary.write_text(json.dumps(summary, indent=2) + "\n", encoding="utf-8")
