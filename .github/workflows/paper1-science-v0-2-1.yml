@@ -1,0 +1,72 @@
+name: Paper 1 science v0.2.1 formal-db ascertainment update
+
+on:
+  pull_request:
+    paths:
+      - 'data/micro_accessibility_edge_registry_v0_2.csv'
+      - 'data/paper1_authoritative_results_v0_2_1.csv'
+      - 'data/paper1_main_figure_manifest_v0_2_1.csv'
+      - 'data/paper1_fig1_observation_contract_v0_2_1.csv'
+      - 'data/paper1_reference_registry_v0_2_1.csv'
+      - 'docs/MICRO_ACCESSIBILITY_V0_2_RESULT.md'
+      - 'scripts/build_paper1_science_v0_2_1.py'
+      - 'scripts/build_paper1_fig1_framework_v0_2_1.py'
+      - 'scripts/validate_paper1_reference_registry_v0_2_1.py'
+      - '.github/workflows/paper1-science-v0-2-1.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  refreeze:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    env:
+      MPLBACKEND: Agg
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install plotting dependency
+        run: python -m pip install --disable-pip-version-check matplotlib
+      - name: Validate authoritative result and figure contract v0.2.1
+        run: |
+          mkdir -p build/paper1_science_v0_2_1/registry
+          python scripts/validate_paper1_result_registry.py \
+            --registry data/paper1_authoritative_results_v0_2_1.csv \
+            --figures data/paper1_main_figure_manifest_v0_2_1.csv \
+            --out-dir build/paper1_science_v0_2_1/registry
+      - name: Reproduce updated literature ascertainment
+        run: |
+          mkdir -p build/paper1_science_v0_2_1/micro
+          python scripts/analyze_micro_accessibility_v0_1.py \
+            --registry data/micro_accessibility_edge_registry_v0_2.csv \
+            --out-dir build/paper1_science_v0_2_1/micro \
+            --permutations 10000 \
+            --seed 230223
+          python scripts/validate_micro_accessibility_v0_2.py \
+            --summary build/paper1_science_v0_2_1/micro/summary.json
+      - name: Build science manuscript v0.2.1
+        run: |
+          python scripts/build_paper1_science_v0_2_1.py \
+            --source manuscript/PAPER1_AJB_MANUSCRIPT_V0_2.md \
+            --out build/paper1_science_v0_2_1/PAPER1_AJB_MANUSCRIPT_V0_2_1.md \
+            --summary build/paper1_science_v0_2_1/manuscript_summary.json
+          python scripts/validate_paper1_reference_registry_v0_2_1.py \
+            --registry data/paper1_reference_registry_v0_2_1.csv \
+            --manuscript build/paper1_science_v0_2_1/PAPER1_AJB_MANUSCRIPT_V0_2_1.md \
+            --out build/paper1_science_v0_2_1/reference_summary.json
+      - name: Build updated Fig1 only
+        run: |
+          mkdir -p build/paper1_science_v0_2_1/fig1
+          python scripts/build_paper1_fig1_framework_v0_2_1.py \
+            --framework data/paper1_fig1_framework_v0_2.csv \
+            --observation data/paper1_fig1_observation_contract_v0_2_1.csv \
+            --out-dir build/paper1_science_v0_2_1/fig1
+      - uses: actions/upload-artifact@v4
+        with:
+          name: paper1-science-v0-2-1
+          path: build/paper1_science_v0_2_1/
+          if-no-files-found: error
