@@ -1,0 +1,52 @@
+name: Paper 1 novelty-forward framing v0.3.3
+
+on:
+  pull_request:
+    paths:
+      - 'scripts/build_paper1_novelty_framing_v0_3_3.py'
+      - 'scripts/run_paper1_novelty_framing_v0_3_3.py'
+      - 'scripts/build_paper1_temporal_framing_v0_3_2.py'
+      - 'scripts/build_paper1_science_v0_2_2.py'
+      - 'data/paper1_reference_registry_v0_5.csv'
+      - 'scripts/validate_paper1_reference_registry_v0_5.py'
+      - '.github/workflows/paper1-novelty-framing-v0-3-3.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  frame:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Regenerate frozen science v0.2.2
+        run: |
+          mkdir -p build/paper1-v0-3-3
+          python scripts/build_paper1_science_v0_2_2.py \
+            --source manuscript/PAPER1_AJB_MANUSCRIPT_V0_2.md \
+            --out build/paper1-v0-3-3/PAPER1_SCIENCE_V0_2_2.md \
+            --summary build/paper1-v0-3-3/science_summary.json
+      - name: Build novelty-forward framing v0.3.3
+        run: |
+          python scripts/run_paper1_novelty_framing_v0_3_3.py \
+            --source build/paper1-v0-3-3/PAPER1_SCIENCE_V0_2_2.md \
+            --out build/paper1-v0-3-3/PAPER1_NOVELTY_FRAMING_V0_3_3.md \
+            --summary build/paper1-v0-3-3/framing_summary.json
+      - name: Validate 25-reference contract
+        run: |
+          python scripts/validate_paper1_reference_registry_v0_5.py \
+            --registry data/paper1_reference_registry_v0_5.csv \
+            --manuscript build/paper1-v0-3-3/PAPER1_NOVELTY_FRAMING_V0_3_3.md \
+            --out build/paper1-v0-3-3/reference_summary.json
+      - name: Report framing summary
+        run: cat build/paper1-v0-3-3/framing_summary.json >> "$GITHUB_STEP_SUMMARY"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: paper1-novelty-framing-v0-3-3
+          path: build/paper1-v0-3-3/
+          if-no-files-found: error
