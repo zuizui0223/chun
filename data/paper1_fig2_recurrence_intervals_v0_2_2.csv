@@ -1,0 +1,9 @@
+transition_class,regime,metric,minimum,maximum,width,n_clusters,n_unresolved_cluster_axes,n_exact_completions,source_run
+anthocyanin_gain,literature,exact_signature_recurrence,0.3333333333,1.0,0.6666666667,3,6,729,33045356947
+anthocyanin_gain,candidate_free,exact_signature_recurrence,0.3333333333,0.3333333333,0.0,3,1,3,32929846096
+anthocyanin_gain,literature,pairwise_axis_concordance,0.3333333333,1.0,0.6666666667,3,6,729,33045356947
+anthocyanin_gain,candidate_free,pairwise_axis_concordance,0.3333333333,0.5,0.1666666667,3,1,3,32929846096
+yellow_development,literature,exact_signature_recurrence,0.5,1.0,0.5,2,3,27,32929846096
+yellow_development,candidate_free,exact_signature_recurrence,0.5,0.5,0.0,2,0,1,32929846096
+yellow_development,literature,pairwise_axis_concordance,0.25,1.0,0.75,2,3,27,32929846096
+yellow_development,candidate_free,pairwise_axis_concordance,0.75,0.75,0.0,2,0,1,32929846096

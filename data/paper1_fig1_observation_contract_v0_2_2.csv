@@ -1,0 +1,17 @@
+regime,feature,value,interpretation,source_ref
+published_literature,A_axis_system_coverage,10,Anthocyanin remains the most frequently observed axis across literature systems after Luo 2016,run33045356947
+published_literature,F_axis_system_coverage,5,Luo 2016 resolves an additional flavonol-axis observation in the existing CJAPONICA background,run33045356947
+published_literature,C_axis_system_coverage,1,Carotenoid remains rarely resolved in the literature mechanism matrix,run33045356947
+published_literature,P_axis_system_coverage,3,Proanthocyanidin diversion remains incompletely observed,run33045356947
+published_literature,A_enrichment_exact_p,0.0015277862548828125,System-level exact axis-symmetric ascertainment test; systems are not treated as independent evolutionary origins,run33045356947
+published_literature,any_axis_imbalance_exact_p,0.003514796127507716,System-level maximum-minus-minimum axis imbalance test,run33045356947
+dependence_collapsed,A_axis_cluster_coverage,5,Anthocyanin coverage across six independent dependence backgrounds,run33045356947
+dependence_collapsed,F_axis_cluster_coverage,4,Flavonol coverage increases because Luo resolves CJAPONICA F,run33045356947
+dependence_collapsed,C_axis_cluster_coverage,1,Dependence-collapsed carotenoid coverage,run33045356947
+dependence_collapsed,P_axis_cluster_coverage,2,Dependence-collapsed proanthocyanidin coverage,run33045356947
+dependence_collapsed,A_enrichment_exact_p,0.078125,A-specific ascertainment enrichment is not retained below 0.05 after dependence collapse,run33045356947
+dependence_collapsed,any_axis_imbalance_exact_p,0.1736111111111111,General axis-imbalance test after dependence collapse,run33045356947
+candidate_free,canonical_systems,5,Five public systems remain the standardized common set; Luo is literature evidence in an existing cluster and adds no candidate-free dataset,run32929846096
+candidate_free,canonical_cluster_axis_cells,20,All five standardized systems retain the common four-axis schema,run32929846096
+candidate_free,resolved_cluster_axis_cells,19,One cell remains unresolved rather than imputed,run32929846096
+candidate_free,significance_filter,0,Expected direction and P value never decide axis retention,run32929846096

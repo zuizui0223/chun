@@ -1,0 +1,113 @@
+name: Paper 1 science v0.2.2 Luo citation-chase update
+
+on:
+  pull_request:
+    paths:
+      - 'data/micro_accessibility_edge_registry_v0_3.csv'
+      - 'data/micro_accessibility_recurrence_registry_v0_2.csv'
+      - 'data/micro_transition_canonical_orientation_v0_2.csv'
+      - 'data/paper1_authoritative_results_v0_2_2.csv'
+      - 'data/paper1_main_figure_manifest_v0_2_2.csv'
+      - 'data/paper1_fig1_observation_contract_v0_2_2.csv'
+      - 'data/paper1_fig2_candidate_free_signature_v0_2.csv'
+      - 'data/paper1_fig2_recurrence_intervals_v0_2_2.csv'
+      - 'data/paper1_fig2_direct_overlap_v0_2_2.csv'
+      - 'data/paper1_reference_registry_v0_2_2.csv'
+      - 'docs/PAPER1_LUO2016_LITERATURE_RECHECK_RESULT.md'
+      - 'scripts/build_paper1_science_v0_2_2.py'
+      - 'scripts/build_paper1_fig1_framework_v0_2_2.py'
+      - 'scripts/build_paper1_fig2_molecular_v0_2_2.py'
+      - 'scripts/validate_paper1_reference_registry_v0_2_2.py'
+      - '.github/workflows/paper1-science-v0-2-2.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  refreeze:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    env:
+      MPLBACKEND: Agg
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install plotting dependency
+        run: python -m pip install --disable-pip-version-check matplotlib
+      - name: Validate authoritative result and figure contract v0.2.2
+        run: |
+          mkdir -p build/paper1_science_v0_2_2/registry
+          python scripts/validate_paper1_result_registry.py \
+            --registry data/paper1_authoritative_results_v0_2_2.csv \
+            --figures data/paper1_main_figure_manifest_v0_2_2.csv \
+            --out-dir build/paper1_science_v0_2_2/registry
+      - name: Reproduce Luo literature recheck
+        run: |
+          mkdir -p build/paper1_science_v0_2_2/luo/accessibility build/paper1_science_v0_2_2/luo/recurrence
+          python scripts/analyze_micro_accessibility_v0_1.py \
+            --registry data/micro_accessibility_edge_registry_v0_3.csv \
+            --out-dir build/paper1_science_v0_2_2/luo/accessibility \
+            --permutations 10000 \
+            --seed 230223
+          python scripts/build_candidate_free_measurements_from_fig2_v0_1.py \
+            --source data/paper1_fig2_candidate_free_signature_v0_2.csv \
+            --out build/paper1_science_v0_2_2/luo/candidate_free_measurements.csv
+          python scripts/analyze_observation_corrected_recurrence_v0_1.py \
+            --registry data/micro_accessibility_recurrence_registry_v0_2.csv \
+            --orientation data/micro_transition_canonical_orientation_v0_2.csv \
+            --candidate-free build/paper1_science_v0_2_2/luo/candidate_free_measurements.csv \
+            --out-dir build/paper1_science_v0_2_2/luo/recurrence
+          python scripts/validate_paper1_luo2016_recurrence_v0_1.py \
+            --accessibility-summary build/paper1_science_v0_2_2/luo/accessibility/summary.json \
+            --recurrence-summary build/paper1_science_v0_2_2/luo/recurrence/summary.json \
+            --out build/paper1_science_v0_2_2/luo/validated_summary.json
+      - name: Build and validate science manuscript v0.2.2
+        run: |
+          python scripts/build_paper1_science_v0_2_2.py \
+            --source manuscript/PAPER1_AJB_MANUSCRIPT_V0_2.md \
+            --out build/paper1_science_v0_2_2/PAPER1_AJB_MANUSCRIPT_V0_2_2.md \
+            --summary build/paper1_science_v0_2_2/manuscript_summary.json
+          python scripts/validate_paper1_reference_registry_v0_2_2.py \
+            --registry data/paper1_reference_registry_v0_2_2.csv \
+            --manuscript build/paper1_science_v0_2_2/PAPER1_AJB_MANUSCRIPT_V0_2_2.md \
+            --out build/paper1_science_v0_2_2/reference_summary.json
+      - name: Build Fig1 v0.2.2
+        run: |
+          python scripts/build_paper1_fig1_framework_v0_2_2.py \
+            --framework data/paper1_fig1_framework_v0_2.csv \
+            --observation data/paper1_fig1_observation_contract_v0_2_2.csv \
+            --out-dir build/paper1_science_v0_2_2/fig1
+      - name: Build Fig2 v0.2.2
+        run: |
+          python scripts/build_paper1_fig2_molecular_v0_2_2.py \
+            --signatures data/paper1_fig2_candidate_free_signature_v0_2.csv \
+            --intervals data/paper1_fig2_recurrence_intervals_v0_2_2.csv \
+            --overlap data/paper1_fig2_direct_overlap_v0_2_2.csv \
+            --out-dir build/paper1_science_v0_2_2/fig2
+      - name: Freeze change boundary
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          root=Path('build/paper1_science_v0_2_2')
+          m=json.load(open(root/'manuscript_summary.json'))
+          l=json.load(open(root/'luo/validated_summary.json'))
+          f1=json.load(open(root/'fig1/summary.json'))
+          f2=json.load(open(root/'fig2/summary.json'))
+          assert m['candidate_free_recurrence_changed'] is False
+          assert m['yellow_changed'] is False
+          assert m['macro_results_changed'] is False
+          assert l['cluster_A_enrichment_p'] == 0.078125
+          assert l['anthocyanin_direct_agreement'] == '2/6'
+          assert f1['cluster_coverage'] == [5,4,1,2]
+          assert f2['anthocyanin_direct_agreement'] == '2/6'
+          print(json.dumps({'status':'paper1_science_v0_2_2_frozen','candidate_free_changed':False,'yellow_changed':False,'macro_changed':False}, indent=2))
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: paper1-science-v0-2-2
+          path: build/paper1_science_v0_2_2/
+          if-no-files-found: error
