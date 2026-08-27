@@ -1,0 +1,9 @@
+seed_id,doi,scope,role
+Xiao2025,10.1016/j.scienta.2025.114474,Camellia molecular review,current_camellia_review_anchor
+Fan2026PBJ,10.1111/pbi.70442,Camellia genus colour phylogenomics,direct_competitor_anchor
+Trunschke2021,10.3389/fpls.2021.617851,flower colour pollinator selection review,ecology_prior_art_anchor
+NgSmith2016,10.1111/nph.13576,alternate biochemical pathways in flower-colour convergence,mechanism_convergence_anchor
+Larter2018,10.1093/molbev/msy117,pathway-level flower-colour convergence,pathway_convergence_anchor
+Wheeler2023,10.1098/rspb.2023.0275,pathway-wide expression and flower-colour evolution,pathway_expression_anchor
+Rausher2008,10.1086/523358,flower-colour evolutionary transitions,broad_flower_colour_anchor
+Ren2018,10.1016/j.pld.2018.07.007,Chinese pollination ecology review,china_pollination_anchor
