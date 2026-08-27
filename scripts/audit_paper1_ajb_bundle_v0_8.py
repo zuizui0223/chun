@@ -151,8 +151,8 @@ def main() -> int:
 
     s1 = read_csv(root / "appendices/Appendix_S1.csv")
     ids = {r.get("result_id", "") for r in s1}
-    if "M07_FORMAL_DB_LITERATURE_ASCERTAINMENT" not in ids:
-        raise SystemExit("Appendix S1 lacks M07 formal database ascertainment result")
+    if "M07_LITERATURE_AXIS_ASCERTAINMENT" not in ids:
+        raise SystemExit("Appendix S1 lacks M07 literature-axis ascertainment result")
 
     docx_summary = json.loads((root / "provenance/docx_v0_8_summary.json").read_text(encoding="utf-8"))
     if not all(docx_summary.get("structural_checks", {}).values()):
