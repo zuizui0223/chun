@@ -4,6 +4,7 @@ from __future__ import annotations
 import argparse
 import hashlib
 import json
+import re
 from pathlib import Path
 
 
@@ -13,6 +14,16 @@ def sha256(path: Path) -> str:
         for chunk in iter(lambda: handle.read(1024 * 1024), b""):
             h.update(chunk)
     return h.hexdigest()
+
+
+def abstract_word_count(text: str) -> int:
+    abstract_marker = "## ABSTRACT"
+    keyword_marker = "**Key words:**"
+    if text.count(abstract_marker) != 1 or text.count(keyword_marker) != 1:
+        raise SystemExit("could not uniquely locate abstract / key-word boundaries")
+    block = text.split(abstract_marker, 1)[1].split(keyword_marker, 1)[0]
+    body = "\n".join(line for line in block.splitlines() if not line.startswith("#"))
+    return len(re.findall(r"\b[\w’'-]+\b", body))
 
 
 def main() -> int:
@@ -73,6 +84,18 @@ def main() -> int:
     absent_claims = [token for token in required_claims if token not in manuscript]
     if absent_claims:
         raise SystemExit(f"submission manuscript lost frozen v0.2 claims: {absent_claims}")
+
+    abstract_words = abstract_word_count(manuscript)
+    if abstract_words > 250:
+        raise SystemExit(f"AJB abstract exceeds 250 words: {abstract_words}")
+    structured_labels = [
+        "### Premise of the study",
+        "### Methods",
+        "### Key results",
+        "### Conclusions",
+    ]
+    if any(manuscript.count(label) != 1 for label in structured_labels):
+        raise SystemExit("AJB structured abstract headings missing or duplicated")
 
     required_ajb = [
         "Manuscript received _______; revision accepted _______.",
@@ -135,6 +158,8 @@ def main() -> int:
         "n_files": len(entries),
         "main_figures": 6,
         "appendices": 8,
+        "abstract_word_count": abstract_words,
+        "ajb_abstract_limit_checked": True,
         "obsolete_ecological_fig6_absent": True,
         "legacy_v0_1_registry_absent_from_submission_contract": True,
         "archive_doi_placeholders": 1,
