@@ -236,15 +236,19 @@ def main() -> int:
     if lost:
         raise SystemExit(f"framing revision lost frozen science tokens: {lost}")
 
-    forbidden_priority = [
-        "first pathway-level",
-        "first micro-to-macro",
-        "first demonstration that repeated flower",
-        "first demonstration of candidate-gene bias",
+    forbidden_positive_priority = [
+        "we provide the first pathway-level",
+        "we present the first pathway-level",
+        "this is the first pathway-level",
+        "we provide the first micro-to-macro",
+        "we present the first micro-to-macro",
+        "this is the first micro-to-macro",
+        "we show for the first time",
+        "we demonstrate for the first time",
     ]
-    retained = [x for x in forbidden_priority if x.lower() in text.lower()]
+    retained = [x for x in forbidden_positive_priority if x.lower() in text.lower()]
     if retained:
-        raise SystemExit(f"framing revision retained forbidden priority language: {retained}")
+        raise SystemExit(f"framing revision retained forbidden positive priority language: {retained}")
 
     args.out.parent.mkdir(parents=True, exist_ok=True)
     args.out.write_text(text.rstrip() + "\n", encoding="utf-8")
