@@ -4,7 +4,10 @@ on:
   pull_request:
     paths:
       - 'data/paper1_citation_chase_seeds_v0_1.csv'
+      - 'data/paper1_citation_chase_priority_screen_v0_1.csv'
+      - 'docs/PAPER1_CITATION_CHASE_SCREEN_2026-08-27.md'
       - 'scripts/run_paper1_citation_chase_v0_1.py'
+      - 'scripts/validate_paper1_citation_chase_screen_v0_1.py'
       - 'scripts/run_paper1_bibliographic_db_search_v0_1.py'
       - '.github/workflows/paper1-citation-chase-v0-1.yml'
   workflow_dispatch:
@@ -21,6 +24,12 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
+      - name: Validate frozen manual screen
+        run: |
+          python scripts/validate_paper1_citation_chase_screen_v0_1.py \
+            --screen data/paper1_citation_chase_priority_screen_v0_1.csv \
+            --out build/paper1_citation_chase_screen_summary.json
+          cat build/paper1_citation_chase_screen_summary.json >> "$GITHUB_STEP_SUMMARY"
       - name: Run backward and forward citation chase
         run: |
           python scripts/run_paper1_citation_chase_v0_1.py \
@@ -31,5 +40,7 @@ jobs:
       - uses: actions/upload-artifact@v4
         with:
           name: paper1-citation-chase-v0-1
-          path: build/paper1_citation_chase_v0_1/
+          path: |
+            build/paper1_citation_chase_v0_1/
+            build/paper1_citation_chase_screen_summary.json
           if-no-files-found: error
