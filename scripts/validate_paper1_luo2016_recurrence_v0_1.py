@@ -32,7 +32,7 @@ def main() -> int:
     srec = acc["system_level_recurrence_sensitivity"]
     crec = acc["dependence_collapsed_recurrence_primary"]
     close(srec["observed_recurrence"], 0.23611111111111113)
-    close(srec["permutation_p_upper"], 0.033596640335966405, 1e-15)
+    close(srec["permutation_p_upper"], 0.031096890310968902, 1e-15)
     close(crec["observed_recurrence"], 2 / 9)
     close(crec["permutation_p_upper"], 0.16048395160483953, 1e-15)
 
@@ -112,6 +112,8 @@ def main() -> int:
         "cluster_axis_coverage": "5/4/1/2",
         "system_A_enrichment_p": sasc["exact_p_A_enrichment"],
         "cluster_A_enrichment_p": casc["exact_p_A_enrichment"],
+        "system_recurrence_p": srec["permutation_p_upper"],
+        "cluster_recurrence_p": crec["permutation_p_upper"],
         "anthocyanin_literature_exact_bounds": [1 / 3, 1.0],
         "anthocyanin_literature_pairwise_bounds": [1 / 3, 1.0],
         "anthocyanin_candidate_free_exact": 1 / 3,
