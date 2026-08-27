@@ -1,0 +1,52 @@
+name: Paper 1 AJB upload bundle v0.9 temporal
+
+on:
+  pull_request:
+    paths:
+      - 'data/paper1_authoritative_results_v0_2_2.csv'
+      - 'data/paper1_main_figure_manifest_v0_2_2.csv'
+      - 'data/paper1_fig1_observation_contract_v0_2_2.csv'
+      - 'data/paper1_fig2_recurrence_intervals_v0_2_2.csv'
+      - 'data/paper1_fig2_direct_overlap_v0_2_2.csv'
+      - 'data/paper1_reference_registry_v0_2_2.csv'
+      - 'data/paper1_reference_registry_v0_5.csv'
+      - 'data/paper1_ajb_appendix_mapping_v0_5.csv'
+      - 'scripts/build_paper1_science_v0_2_2.py'
+      - 'scripts/build_paper1_temporal_framing_v0_3_2.py'
+      - 'scripts/build_paper1_submission_v0_9.py'
+      - 'scripts/build_paper1_ajb_docx_v0_9.py'
+      - 'scripts/build_paper1_ajb_bundle_v0_9.py'
+      - 'scripts/audit_paper1_ajb_bundle_v0_9.py'
+      - 'docs/PAPER1_AJB_UPLOAD_BUNDLE_V0_9_README.md'
+      - '.github/workflows/paper1-ajb-upload-bundle-v0-9.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+env:
+  MPLBACKEND: Agg
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install submission dependencies
+        run: python -m pip install --disable-pip-version-check matplotlib python-docx
+      - name: Build audited AJB v0.9 upload bundle
+        run: |
+          python scripts/build_paper1_ajb_bundle_v0_9.py \
+            --out-dir build/paper1-ajb-upload-v0-9
+      - name: Report final manifest
+        run: |
+          cat build/paper1-ajb-upload-v0-9/BUNDLE_MANIFEST.json >> "$GITHUB_STEP_SUMMARY"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: paper1-ajb-upload-bundle-v0-9
+          path: build/paper1-ajb-upload-v0-9/
+          if-no-files-found: error
