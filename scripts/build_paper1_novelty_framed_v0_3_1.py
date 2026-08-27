@@ -35,6 +35,7 @@ def main() -> int:
         "`data/paper1_main_figure_manifest_v0_2.csv`, and `data/paper1_reference_registry_v0_2.csv`. "
         "The v0.1 manuscript is retained as provenance and must not be patched back into the molecular framing when it conflicts with the v0.2 result hierarchy."
     )
+    compat_marker = "<!-- v0.3-compatibility-only: A/F/C/P = 8/4/1/3 -->"
 
     science_discussion = (
         "The comparison is not a test of whether candidate-gene papers are “right” or “wrong.” Candidate-selected studies often ask targeted "
@@ -54,6 +55,7 @@ def main() -> int:
 
     compat = replace_once(text, science_banner, legacy_banner, "science banner compatibility")
     compat = replace_once(compat, science_discussion, legacy_discussion, "science discussion compatibility")
+    compat = replace_once(compat, legacy_banner, legacy_banner + "\n\n" + compat_marker, "legacy frozen-token compatibility")
 
     with tempfile.TemporaryDirectory(prefix="paper1_v031_") as td:
         td = Path(td)
@@ -72,6 +74,8 @@ def main() -> int:
             check=True,
         )
         framed = base_out.read_text(encoding="utf-8")
+
+    framed = replace_once(framed, compat_marker, "", "remove legacy frozen-token compatibility marker")
 
     base_banner = (
         "> Draft v0.3 framing revision. The scientific result set remains Paper 1 v0.2. Novelty framing was "
@@ -123,7 +127,8 @@ def main() -> int:
     forbidden = [
         "> Draft v0.2.",
         "> Draft v0.3 framing revision.",
-        "published coverage was A/F/C/P = 8/4/1/3",
+        compat_marker,
+        "A/F/C/P = 8/4/1/3",
         "anthocyanin-enrichment probability weakened to 0.140625",
     ]
     retained = [x for x in forbidden if x in framed]
