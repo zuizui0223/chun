@@ -20,6 +20,8 @@ def main() -> int:
         '"same biological systems are held constant and the observation rule is standardized",':
             '"biological systems are held constant and the observation rule is standardized",',
         '"two agreements",': '"agreement remained only two",',
+        "Repeated phenotypic evolution is often interpreted as evidence of mechanistic repeatability, yet comparative molecular studies usually report different subsets of the underlying pathway.":
+            "Repeated phenotypic evolution can imply mechanistic repeatability, yet molecular studies often report different pathway subsets.",
     }
     for old, new in patches.items():
         if src.count(old) != 1:
