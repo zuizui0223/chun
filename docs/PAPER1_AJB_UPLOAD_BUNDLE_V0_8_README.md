@@ -44,7 +44,7 @@ The matched standardized recurrence results remain:
 
 ## Submission manuscript contract
 
-The generated manuscript uses a **245-word structured abstract**. It includes the formal-database-expanded ascertainment result while preserving the frozen candidate-free and macro conclusions.
+The generated manuscript uses a **237-word structured abstract**. It includes the formal-database-expanded ascertainment result while preserving the frozen candidate-free and macro conclusions.
 
 The DOCX is structurally audited for:
 
