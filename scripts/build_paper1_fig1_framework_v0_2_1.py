@@ -51,7 +51,7 @@ def main() -> None:
         raise ValueError("candidate-free contract drift")
 
     args.out_dir.mkdir(parents=True, exist_ok=True)
-    fig, axes = plt.subplots(1, 2, figsize=(16.5, 6.0), gridspec_kw={"width_ratios": [1.55, 1]})
+    fig, axes = plt.subplots(1, 2, figsize=(16.5, 6.0), gridspec_kw={"width_ratios": [1.55, 1.12]})
 
     ax = axes[0]
     ax.axis("off")
@@ -70,17 +70,22 @@ def main() -> None:
     ax = axes[1]
     ax.set_title("B  Formal database expansion strengthens the observation-process result")
     names = ["A", "F", "C", "P"]
-    ax.bar(range(4), system_coverage)
-    ax.set_xticks(range(4), names)
+    x = list(range(4))
+    ax.bar(x, system_coverage, width=.68)
+    ax.set_xticks(x, names)
     ax.set_ylabel("Published biological systems measuring axis")
     ax.set_ylim(0, 10)
+    # Reserve a dedicated annotation column to the right of the four bars.
+    ax.set_xlim(-.6, 7.3)
     for i, value in enumerate(system_coverage):
         ax.text(i, value + .15, str(value), ha="center", fontsize=9)
-    ax.text(.37, .98, "After dependence collapse:", transform=ax.transAxes, va="top", fontsize=9.3, weight="bold")
-    ax.text(.37, .90, "A/F/C/P = 5/3/1/2\nexact A-enrichment P = 0.046875", transform=ax.transAxes, va="top", fontsize=8.7)
-    ax.text(.37, .72, "Candidate-free common set:", transform=ax.transAxes, va="top", fontsize=9.3, weight="bold")
-    ax.text(.37, .64, "5 systems × 4 axes = 20 canonical cells\n19 resolved; 1 kept unresolved\nC. semiserrata not added without raw reads", transform=ax.transAxes, va="top", fontsize=8.5)
-    ax.text(.37, .38, "Broader literature coverage updates\nascertainment, not the matched\ncandidate-free recurrence estimator.", transform=ax.transAxes, va="top", fontsize=8.8, weight="bold")
+
+    note_x = 4.15
+    ax.text(note_x, 9.75, "After dependence collapse:", va="top", fontsize=9.2, weight="bold")
+    ax.text(note_x, 8.95, "A/F/C/P = 5/3/1/2\nexact A-enrichment P = 0.046875", va="top", fontsize=8.6)
+    ax.text(note_x, 7.35, "Candidate-free common set:", va="top", fontsize=9.2, weight="bold")
+    ax.text(note_x, 6.55, "5 systems × 4 axes = 20 canonical cells\n19 resolved; 1 kept unresolved\nC. semiserrata not added without raw reads", va="top", fontsize=8.35)
+    ax.text(note_x, 3.95, "Broader literature coverage updates\nascertainment, not the matched\ncandidate-free recurrence estimator.", va="top", fontsize=8.65, weight="bold")
 
     fig.suptitle("Mechanistic feasibility, observation, recurrence, realization and event identity are distinct quantities", fontsize=12)
     fig.tight_layout(rect=[0, .02, 1, .93])
@@ -98,6 +103,7 @@ def main() -> None:
         "cluster_A_enrichment_p": float(dep["A_enrichment_exact_p"]["value"]),
         "candidate_free_systems": int(cf["canonical_systems"]["value"]),
         "scientific_change_scope": "literature ascertainment only",
+        "layout_contract": "bar area and annotation column separated",
         "outputs": [str(svg), str(png)],
     }
     (args.out_dir / "summary.json").write_text(json.dumps(summary, indent=2) + "\n", encoding="utf-8")
