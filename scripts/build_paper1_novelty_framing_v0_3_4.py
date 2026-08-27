@@ -51,7 +51,7 @@ def main() -> int:
 
     text = replace_once(
         text,
-        "Repeated phenotypic evolution is often interpreted as evidence of mechanistic repeatability, yet comparative molecular studies usually report different subsets of the underlying pathway. We asked how much of a multivariate flower-colour transition is actually replayed when the biological systems are held constant and the observation rule is standardized.",
+        "Repeated phenotypic evolution can imply mechanistic repeatability, yet molecular studies often report different pathway subsets. We asked how much of a multivariate flower-colour transition is actually replayed when the biological systems are held constant and the observation rule is standardized.",
         "Similar flower-colour states can be generated through multiple molecular routes, yet comparative molecular studies usually report different subsets of the underlying pathway. We asked how repeatable the underlying multivariate pigment-network state change is when the same public biological systems are remeasured under one standardized observation rule, and separately whether realised wild-colour patterns and individual historical transition events show the same robustness at macroevolutionary scale.",
         "abstract premise",
     )
