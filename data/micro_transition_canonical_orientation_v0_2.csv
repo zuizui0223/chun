@@ -1,0 +1,12 @@
+edge_id,transition_class,orientation,canonical_target,reason
+MICRO_CJ_BUDSPORT_01,anthocyanin_gain,forward,more_red_or_pink,"already oriented from less-red to more-red"
+MICRO_CJ_SECTOR_01,anthocyanin_gain,forward,more_red_or_pink,"already oriented from pink to red"
+MICRO_CJ_GRADIENT_01,anthocyanin_gain,forward,more_red_or_pink,"already oriented from white to crimson"
+MICRO_CJ_LUO2016_01,anthocyanin_gain,forward,more_red_or_pink,"already oriented from white to red"
+MICRO_CR_SECTOR_01,anthocyanin_gain,forward,more_red_or_pink,"already oriented from white to red"
+MICRO_CR_FADING_01,anthocyanin_gain,reverse,more_red_or_pink,"reverse the observed pink-to-white fading so the canonical comparison is white-to-pink"
+MICRO_CR_CULTIVAR_01,anthocyanin_gain,forward,more_red_or_pink,"already oriented from white to red"
+MICRO_CS_WHITE_PINK_01,anthocyanin_gain,forward,more_red_or_pink,"already oriented from white to pink"
+MICRO_CN_DEV_2017_01,yellow_development,forward,later_or_more_yellow,"already oriented from earlier/paler to later yellow development"
+MICRO_CN_DEV_2024_01,yellow_development,forward,later_or_more_yellow,"already oriented from less-golden to golden development"
+MICRO_CP_DEV_2024_01,yellow_development,forward,later_or_more_yellow,"already oriented from earlier/less-yellow to yellow development"
