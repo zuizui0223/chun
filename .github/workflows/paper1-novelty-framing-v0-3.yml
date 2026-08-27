@@ -1,0 +1,65 @@
+name: Paper 1 novelty framing v0.3
+
+on:
+  pull_request:
+    paths:
+      - 'manuscript/PAPER1_AJB_MANUSCRIPT_V0_2.md'
+      - 'scripts/build_paper1_novelty_framed_v0_3.py'
+      - 'data/paper1_novelty_prior_art_registry_v0_1.csv'
+      - 'data/paper1_novelty_reference_additions_v0_1.csv'
+      - 'docs/PAPER1_NOVELTY_LITERATURE_AUDIT_2026-08-27.md'
+      - 'docs/NOVELTY_AND_IDENTIFIABILITY_BOUNDARY_V0_2.md'
+      - '.github/workflows/paper1-novelty-framing-v0-3.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  build_and_audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Build novelty-audited manuscript framing
+        run: |
+          mkdir -p build/paper1_novelty_v0_3
+          python scripts/build_paper1_novelty_framed_v0_3.py \
+            --source manuscript/PAPER1_AJB_MANUSCRIPT_V0_2.md \
+            --out build/paper1_novelty_v0_3/PAPER1_AJB_MANUSCRIPT_V0_3.md \
+            --summary build/paper1_novelty_v0_3/summary.json
+      - name: Audit manuscript-facing novelty boundary
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import json
+          p = Path('build/paper1_novelty_v0_3/PAPER1_AJB_MANUSCRIPT_V0_3.md')
+          text = p.read_text(encoding='utf-8')
+          required = [
+              'The molecular result should not be read as the first demonstration',
+              'observation-method dependence itself a new concept',
+              'event instability is not itself a new methodological discovery',
+              'The ecological value of the present result is an inferential boundary',
+              '10.1098/rspb.2012.2146',
+              '10.1111/nph.13576',
+              '10.1093/molbev/msy117',
+              '10.1098/rspb.2023.0275',
+              '10.1016/j.scienta.2025.114474',
+              '10.1007/s11692-025-09645-y',
+          ]
+          missing = [x for x in required if x not in text]
+          if missing:
+              raise SystemExit(f'missing novelty framing tokens: {missing}')
+          summary = json.loads(Path('build/paper1_novelty_v0_3/summary.json').read_text())
+          if summary['scientific_results_changed'] is not False:
+              raise SystemExit('science-change flag drift')
+          print(json.dumps(summary, indent=2))
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: paper1-novelty-framed-manuscript-v0-3
+          path: build/paper1_novelty_v0_3/
+          if-no-files-found: error
