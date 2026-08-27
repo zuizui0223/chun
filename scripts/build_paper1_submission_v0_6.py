@@ -90,6 +90,12 @@ def main() -> int:
     before = text.split(data_marker, 1)[0].rstrip()
     refs = text.split(lit_marker, 1)[1].lstrip()
 
+    metadata_block = (
+        "# ACKNOWLEDGMENTS\n\n"
+        "[ACKNOWLEDGMENTS AND FUNDING TO ADD AT SUBMISSION]\n\n"
+        "# AUTHOR CONTRIBUTIONS\n\n"
+        "[CRediT AUTHOR CONTRIBUTIONS TO ADD AT SUBMISSION]"
+    )
     data_block = (
         "# DATA AVAILABILITY STATEMENT\n\n"
         "All source datasets used in this study are public. Analysis code, frozen derived-data "
@@ -97,13 +103,28 @@ def main() -> int:
         "a versioned release [ARCHIVE DOI TO ADD AT SUBMISSION]. The June 2026 World Flora Online "
         "Plant List snapshot used for taxonomy normalization is independently archived at Zenodo "
         "(doi:10.5281/zenodo.20782718). Public sequence accessions and source-level provenance are "
-        "retained in the archived release and Supporting Information.\n\n"
+        "retained in the archived release and Supporting Information. Additional supporting information "
+        "may be found online in the Supporting Information section at the end of the article."
+    )
+    post_refs = (
         "# SUPPORTING INFORMATION\n\n"
         + supporting_information(appendix_rows)
         + "\n\n# FIGURE LEGENDS\n\n"
         + figure_legends(figure_rows)
     )
-    text = before + "\n\n" + data_block + "\n\n" + lit_marker + "\n\n" + refs
+    text = (
+        before
+        + "\n\n"
+        + metadata_block
+        + "\n\n"
+        + data_block
+        + "\n\n"
+        + lit_marker
+        + "\n\n"
+        + refs.rstrip()
+        + "\n\n"
+        + post_refs
+    )
 
     running = "**Running head:** Modular recurrence and flower-colour realization"
     front = (
@@ -111,6 +132,7 @@ def main() -> int:
         + "\n\n**Authors:** [AUTHOR LIST TO ADD AT SUBMISSION]"
         + "\n\n**Affiliations:** [AFFILIATIONS TO ADD AT SUBMISSION]"
         + "\n\n**Corresponding author:** [CORRESPONDING AUTHOR DETAILS TO ADD AT SUBMISSION]"
+        + "\n\nManuscript received _______; revision accepted _______."
     )
     if text.count(running) != 1:
         raise SystemExit("running-head contract changed")
@@ -135,18 +157,49 @@ def main() -> int:
         "Candidate-free remeasurement fixed exact-signature recurrence at 0.333",
         "pairwise concordance at **0.75**",
         "strict×dominant shared robust event count was therefore zero",
+        "# ACKNOWLEDGMENTS",
+        "# AUTHOR CONTRIBUTIONS",
         "# DATA AVAILABILITY STATEMENT",
+        "# LITERATURE CITED",
         "# SUPPORTING INFORMATION",
         "# FIGURE LEGENDS",
+        "Additional supporting information may be found online in the Supporting Information section at the end of the article.",
+        "Manuscript received _______; revision accepted _______.",
         "Appendix S8",
         "Figure 6",
         "[ARCHIVE DOI TO ADD AT SUBMISSION]",
     ]
     missing = [token for token in required if token not in text]
     if missing:
-        raise SystemExit(f"submission output missing frozen v0.2 tokens: {missing}")
-    if text.count("[ARCHIVE DOI TO ADD AT SUBMISSION]") != 1:
-        raise SystemExit("expected exactly one archive DOI placeholder")
+        raise SystemExit(f"submission output missing frozen/AJB tokens: {missing}")
+
+    placeholders = {
+        "[AUTHOR LIST TO ADD AT SUBMISSION]": 1,
+        "[AFFILIATIONS TO ADD AT SUBMISSION]": 1,
+        "[CORRESPONDING AUTHOR DETAILS TO ADD AT SUBMISSION]": 1,
+        "[ACKNOWLEDGMENTS AND FUNDING TO ADD AT SUBMISSION]": 1,
+        "[CRediT AUTHOR CONTRIBUTIONS TO ADD AT SUBMISSION]": 1,
+        "[ARCHIVE DOI TO ADD AT SUBMISSION]": 1,
+    }
+    bad_placeholders = {
+        token: text.count(token)
+        for token, expected_count in placeholders.items()
+        if text.count(token) != expected_count
+    }
+    if bad_placeholders:
+        raise SystemExit(f"submission placeholder count drift: {bad_placeholders}")
+
+    headings = [
+        "# ACKNOWLEDGMENTS",
+        "# AUTHOR CONTRIBUTIONS",
+        "# DATA AVAILABILITY STATEMENT",
+        "# LITERATURE CITED",
+        "# SUPPORTING INFORMATION",
+        "# FIGURE LEGENDS",
+    ]
+    positions = [text.index(h) for h in headings]
+    if positions != sorted(positions):
+        raise SystemExit(f"AJB section order drift: {list(zip(headings, positions))}")
 
     a.out.parent.mkdir(parents=True, exist_ok=True)
     a.out.write_text(text.rstrip() + "\n", encoding="utf-8")
@@ -159,11 +212,14 @@ def main() -> int:
         "scientific_results_changed": False,
         "internal_repository_tokens_absent": True,
         "obsolete_ecological_fig6_absent": True,
+        "ajb_section_order_checked": True,
         "remaining_human_inputs": [
             "author list/order",
             "affiliations",
-            "corresponding-author details",
-            "contributions/funding/acknowledgments/conflict statement as required",
+            "corresponding-author details and ORCID in submission system",
+            "acknowledgments and funding",
+            "CRediT author contributions",
+            "conflict-of-interest declaration in submission system",
             "archive DOI",
         ],
         "status": "submission-clean Paper 1 v0.6 manuscript built from current v0.2 source",
