@@ -1,0 +1,15 @@
+regime,feature,value,interpretation,source_ref
+published_literature,A_axis_system_coverage,9,Anthocyanin axis is observed most often after formal database expansion,docs/MICRO_ACCESSIBILITY_V0_2_RESULT.md
+published_literature,F_axis_system_coverage,4,Flavonol remains less often observed,docs/MICRO_ACCESSIBILITY_V0_2_RESULT.md
+published_literature,C_axis_system_coverage,1,Carotenoid remains rarely observed in the literature mechanism matrix,docs/MICRO_ACCESSIBILITY_V0_2_RESULT.md
+published_literature,P_axis_system_coverage,3,Proanthocyanidin diversion remains incompletely observed,docs/MICRO_ACCESSIBILITY_V0_2_RESULT.md
+published_literature,A_enrichment_exact_p,0.002788543701171875,System-level exact axis-symmetric ascertainment test,run33040242009
+dependence_collapsed,A_axis_cluster_coverage,5,Anthocyanin axis remains the most resolved axis across independent dependence clusters,docs/MICRO_ACCESSIBILITY_V0_2_RESULT.md
+dependence_collapsed,F_axis_cluster_coverage,3,Dependence-collapsed flavonol coverage,docs/MICRO_ACCESSIBILITY_V0_2_RESULT.md
+dependence_collapsed,C_axis_cluster_coverage,1,Dependence-collapsed carotenoid coverage,docs/MICRO_ACCESSIBILITY_V0_2_RESULT.md
+dependence_collapsed,P_axis_cluster_coverage,2,Dependence-collapsed proanthocyanidin coverage,docs/MICRO_ACCESSIBILITY_V0_2_RESULT.md
+dependence_collapsed,A_enrichment_exact_p,0.046875,Anthocyanin enrichment remains detectable after dependence collapse,run33040242009
+candidate_free,canonical_systems,5,Five public systems are remeasured with the same A/F/C/P protocol; CSEMISERRATA is not admitted without audited public raw reads,run32929846096
+candidate_free,canonical_cluster_axis_cells,20,All five standardized systems enter the common four-axis schema,run32929846096
+candidate_free,resolved_cluster_axis_cells,19,One cell remains unresolved rather than imputed,run32929846096
+candidate_free,significance_filter,0,Expected direction and P value never decide axis retention,run32929846096
