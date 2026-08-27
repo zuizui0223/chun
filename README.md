@@ -47,28 +47,50 @@ At the macro scale, accepted-species nuclear analyses retain non-random visible-
 
 ## Authoritative Paper 1 files
 
-- [`manuscript/PAPER1_AJB_MANUSCRIPT_V0_2.md`](manuscript/PAPER1_AJB_MANUSCRIPT_V0_2.md) — current scientific manuscript source; v0.1 is provenance only.
+- [`manuscript/PAPER1_AJB_MANUSCRIPT_V0_2.md`](manuscript/PAPER1_AJB_MANUSCRIPT_V0_2.md) — frozen scientific manuscript source; v0.1 is provenance only.
 - [`data/paper1_authoritative_results_v0_2.csv`](data/paper1_authoritative_results_v0_2.csv) — frozen result hierarchy.
 - [`data/paper1_main_figure_manifest_v0_2.csv`](data/paper1_main_figure_manifest_v0_2.csv) — current Main/Supp figure contract.
-- [`data/paper1_reference_registry_v0_2.csv`](data/paper1_reference_registry_v0_2.csv) — governed reference set.
+- [`data/paper1_reference_registry_v0_3.csv`](data/paper1_reference_registry_v0_3.csv) — current 21-reference journal-facing contract after the novelty audit.
+- [`docs/PAPER1_NOVELTY_LITERATURE_AUDIT_2026-08-27.md`](docs/PAPER1_NOVELTY_LITERATURE_AUDIT_2026-08-27.md) — high-recall prior-art audit and claim boundary.
+- [`docs/PAPER1_NOVELTY_CORE_ATTACK_ADDENDUM_2026-08-27.md`](docs/PAPER1_NOVELTY_CORE_ATTACK_ADDENDUM_2026-08-27.md) — final attack on generic theoretical priority claims.
 - [`docs/CANDIDATE_FREE_ACTUAL_RECURRENCE_RESULT_V0_1.md`](docs/CANDIDATE_FREE_ACTUAL_RECURRENCE_RESULT_V0_1.md) — authoritative molecular recurrence result.
 - [`docs/YELLOW_TWO_CLUSTER_RECURRENCE_RESULT_V0_1.md`](docs/YELLOW_TWO_CLUSTER_RECURRENCE_RESULT_V0_1.md) — dedicated yellow-development result.
 
-The v0.2 authoritative-registry gate checks result/figure dependencies and local source references. Main Fig. 1–6 are rebuilt from frozen v0.2 source tables.
+The v0.2 authoritative-registry gate checks result/figure dependencies and local source references. Main Fig. 1–6 remain rebuilt from frozen v0.2 source tables. The journal-facing framing is generated as Paper 1 v0.3 without changing those scientific results.
 
 ## Current journal-facing route
 
-The only current AJB upload route is **v0.6**, documented in [`docs/PAPER1_AJB_UPLOAD_BUNDLE_V0_6_README.md`](docs/PAPER1_AJB_UPLOAD_BUNDLE_V0_6_README.md) and built by `.github/workflows/paper1-ajb-upload-bundle-v0-6.yml`.
+The only current AJB upload route is **v0.7**, documented in [`docs/PAPER1_AJB_UPLOAD_BUNDLE_V0_7_README.md`](docs/PAPER1_AJB_UPLOAD_BUNDLE_V0_7_README.md) and built by `.github/workflows/paper1-ajb-upload-bundle-v0-7.yml`.
 
-v0.6:
+v0.7:
 
-1. starts directly from the current v0.2 scientific manuscript and result registry;
-2. rebuilds the current Main Fig. 1–6, including identifiability/synthesis as Fig. 6;
-3. materializes eight current Supporting Information appendices;
-4. rejects stale v0.1 registry references, the obsolete ecological Main Fig. 6, and legacy Fig. S3 from the submission contract;
-5. produces a SHA256 bundle manifest.
+1. validates the frozen Paper 1 v0.2 scientific result/figure contract;
+2. generates the novelty-audited Paper 1 framing v0.3 and requires exact agreement with the 21-reference v0.3 DOI registry;
+3. applies the AJB 239-word structured abstract and journal-facing section order without changing biological estimates;
+4. rebuilds Main Fig. 1–6 and materializes Appendix S1–S8 from frozen v0.2 scientific sources;
+5. produces both Markdown and structurally audited Word/DOCX manuscript files;
+6. checks Times New Roman 12 pt body, double spacing, one-inch margins, continuous line numbering, and page numbering in the DOCX;
+7. rejects stale/internal manuscript content and produces a final SHA256 bundle manifest.
 
-The former v0.5 ecological-integration upload bundle is **historical provenance only** and is not a current submission route.
+The v0.7 hosted build passed with **38 files before the manifest (39 uploaded files total), 21/21 reference DOIs matched, Abstract = 239 words, DOCX present, and `scientific_results_changed = false`**.
+
+v0.6 and the former v0.5 ecological-integration bundle are historical provenance only and are not current submission routes.
+
+## Novelty boundary
+
+Do **not** claim priority for:
+
+- the general idea that the same phenotype can arise through different mechanisms;
+- pathway-level or modular flower-colour convergence;
+- candidate/discovery-method effects on apparent repeatability;
+- partial identification or identified sets as a general statistical idea;
+- phylogenetic ancestral-event uncertainty or model identifiability;
+- measurement-process dependence as a general biological concept;
+- the first micro-to-macro study of *Camellia* flower colour.
+
+The retained contribution is empirical and application-specific: **the same public *Camellia* systems are compared under literature-selected versus one frozen pathway-wide observation regime, incomplete A/F/C/P states are bounded explicitly, transition-class-specific recurrence is quantified, and that molecular result is separated from a topology/coding-robust macro pattern and a stricter event-identity stop rule.**
+
+The literature basis for this boundary is a **high-recall evidence audit**, not a claim of PRISMA-complete systematic-review coverage.
 
 ## Frozen boundaries
 
@@ -80,11 +102,12 @@ The former v0.5 ecological-integration upload bundle is **historical provenance 
 
 ## Current execution goal
 
-The molecular recurrence discovery gate is closed. The active work is now:
+The molecular discovery, novelty-audit, and machine-generated AJB bundle gates are closed. The remaining submission work is now:
 
-1. validate and freeze the v0.6 AJB upload artifact;
-2. complete final manuscript/reference/figure QC without changing frozen biological estimates;
-3. supply human submission metadata and the versioned archive DOI;
-4. reopen mechanistic-phylogeny causal work only when direct taxon-level A/F/C/P coverage and robust accepted-species event identity are adequate.
+1. supply final author list/order, affiliations, and corresponding-author/ORCID information;
+2. supply acknowledgments/funding and CRediT author contributions;
+3. create and insert the versioned archive DOI;
+4. enter the conflict-of-interest declaration in the journal submission system;
+5. reopen mechanistic-phylogeny causal work only when direct taxon-level A/F/C/P coverage and robust accepted-species event identity are adequate.
 
-Issue #94 records the completed hypothesis test and final claim boundary.
+Issue #94 records the completed hypothesis test and final scientific claim boundary.
