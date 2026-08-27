@@ -25,6 +25,8 @@ LEGACY_REGISTRY = (
 )
 TEMPORAL_TITLE = "# Repeated generation of flower-colour states does not replay one pigment-state programme in *Camellia*"
 LEGACY_TITLE = "# Repeated flower-colour change does not imply repeated pigment-state packages in *Camellia*"
+TEMPORAL_RUNNING = "**Running head:** Temporal repeatability of flower colour"
+LEGACY_RUNNING = "**Running head:** Modular recurrence and flower-colour realization"
 
 AJB_ABSTRACT_V09 = """## ABSTRACT
 
@@ -70,10 +72,11 @@ def main() -> int:
     source = a.source.read_text(encoding="utf-8")
     compat = replace_once(source, V032_BANNER, V02_BANNER, "v0.3.2 banner compatibility")
     compat = replace_once(compat, SCIENCE_REGISTRY_V022, LEGACY_REGISTRY, "v0.2.2 registry compatibility")
-    # The audited v0.6 transformer validates the historical v0.2 title. Supply that
-    # title only inside the temporary compatibility input, then restore the temporal
-    # title immediately after transformation. No user-facing manuscript retains it.
+    # The audited v0.6 transformer validates the historical v0.2 title and running
+    # head. Supply them only inside the temporary compatibility input, then restore
+    # the temporal versions immediately after transformation.
     compat = replace_once(compat, TEMPORAL_TITLE, LEGACY_TITLE, "temporal title compatibility")
+    compat = replace_once(compat, TEMPORAL_RUNNING, LEGACY_RUNNING, "temporal running-head compatibility")
 
     a.out.parent.mkdir(parents=True, exist_ok=True)
     a.summary.parent.mkdir(parents=True, exist_ok=True)
@@ -98,6 +101,7 @@ def main() -> int:
 
     out = a.out.read_text(encoding="utf-8")
     out = replace_once(out, LEGACY_TITLE, TEMPORAL_TITLE, "restore temporal title")
+    out = replace_once(out, LEGACY_RUNNING, TEMPORAL_RUNNING, "restore temporal running head")
     if out.count("## ABSTRACT") != 1 or out.count("**Key words:**") != 1:
         raise SystemExit("could not uniquely locate AJB abstract boundaries")
     prefix = out.split("## ABSTRACT", 1)[0].rstrip()
@@ -110,6 +114,7 @@ def main() -> int:
 
     required = [
         "Repeated generation of flower-colour states does not replay one pigment-state programme",
+        "Temporal repeatability of flower colour",
         "repeated generation with partial mechanistic replay",
         "P=0.078125",
         "0.333–1.0",
@@ -126,6 +131,8 @@ def main() -> int:
 
     forbidden = [
         "Draft v0.2", "Draft v0.3", "Draft v0.3.2", "`data/", "`docs/", "`scripts/",
+        "Repeated flower-colour change does not imply repeated pigment-state packages",
+        "Modular recurrence and flower-colour realization",
         "A/F/C/P coverage = 9/4/1/3", "coverage was 5/3/1/2",
         "anthocyanin-axis ascertainment remained enriched after dependence collapse",
         "ecological Fig. 6",
