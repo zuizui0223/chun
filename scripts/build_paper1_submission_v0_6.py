@@ -4,13 +4,43 @@ from __future__ import annotations
 import argparse
 import csv
 import json
+import re
 from collections import defaultdict
 from pathlib import Path
+
+
+AJB_ABSTRACT = """## ABSTRACT
+
+### Premise of the study
+
+Repeated change can suggest reuse of the same mechanism, but recurrence may depend on which pathway components are measured. We asked whether flower-colour mechanistic recurrence in *Camellia* survives standardized remeasurement and how it relates to macroevolutionary pattern.
+
+### Methods
+
+We represented mechanisms on four pigment-state axes—anthocyanin (A), flavonol (F), carotenoid (C), and proanthocyanidin diversion (P)—for anthocyanin gain and yellow development. Literature mechanisms were partially observed signatures. Five RNA-seq systems were reanalyzed with one frozen annotation-driven all-paralog protocol without expected-direction or significance filtering. We audited accepted taxonomy and wild colours, tested local colour structure on two nuclear topologies, and required transition events to survive alternative colour codings.
+
+### Key results
+
+Literature observation left complete recurrence admissible in both transition classes. Candidate-free remeasurement fixed exact-signature recurrence at 0.333 and pairwise concordance at 0.333–0.5 for anthocyanin gain. For yellow development, exact-signature recurrence was 0.5 and pairwise concordance at **0.75**; both trajectories reused A, C, and P directions but differed in F. No invariant whole A/F/C/P package recurred, although modular reuse was transition-class dependent. At the macro scale, nearest-same-colour clustering survived topology and wild-colour sensitivity, but no accepted-species transition branch survived strict versus dominant coding.
+
+### Conclusions
+
+Repeated *Camellia* flower-colour change therefore does not imply repetition of one complete pigment-state package. Standardizing observation changes the mechanistic recurrence identifiable from the same systems, while robust macroevolutionary pattern need not identify historical events. Observation, recurrence, and macroevolutionary realization are distinct quantities."""
 
 
 def read_csv(path: Path) -> list[dict[str, str]]:
     with path.open(newline="", encoding="utf-8-sig") as handle:
         return list(csv.DictReader(handle))
+
+
+def abstract_word_count(text: str) -> int:
+    abstract_marker = "## ABSTRACT"
+    keyword_marker = "**Key words:**"
+    if text.count(abstract_marker) != 1 or text.count(keyword_marker) != 1:
+        raise SystemExit("could not uniquely locate abstract / key-word boundaries")
+    block = text.split(abstract_marker, 1)[1].split(keyword_marker, 1)[0]
+    body = "\n".join(line for line in block.splitlines() if not line.startswith("#"))
+    return len(re.findall(r"\b[\w’'-]+\b", body))
 
 
 def figure_legends(rows: list[dict[str, str]]) -> str:
@@ -68,6 +98,25 @@ def main() -> int:
     if len(draft_lines) != 1:
         raise SystemExit(f"expected one v0.2 governance banner, found {len(draft_lines)}")
     text = text.replace(draft_lines[0] + "\n\n", "", 1)
+
+    abstract_marker = "## ABSTRACT"
+    keyword_marker = "**Key words:**"
+    if text.count(abstract_marker) != 1 or text.count(keyword_marker) != 1:
+        raise SystemExit("could not uniquely locate source abstract / key-word boundaries")
+    abstract_prefix = text.split(abstract_marker, 1)[0].rstrip()
+    keyword_suffix = text.split(keyword_marker, 1)[1]
+    text = abstract_prefix + "\n\n" + AJB_ABSTRACT + "\n\n" + keyword_marker + keyword_suffix
+    abstract_words = abstract_word_count(text)
+    if abstract_words > 250:
+        raise SystemExit(f"AJB abstract exceeds 250 words: {abstract_words}")
+    structured_labels = [
+        "### Premise of the study",
+        "### Methods",
+        "### Key results",
+        "### Conclusions",
+    ]
+    if any(text.count(label) != 1 for label in structured_labels):
+        raise SystemExit("AJB structured abstract headings missing or duplicated")
 
     old_registry = (
         "The current result set is frozen in `data/paper1_authoritative_results_v0_2.csv`; "
@@ -209,6 +258,8 @@ def main() -> int:
         "source_science_version": "Paper 1 v0.2",
         "appendix_count": len(appendix_rows),
         "main_figure_count": 6,
+        "abstract_word_count": abstract_words,
+        "ajb_abstract_limit_checked": True,
         "scientific_results_changed": False,
         "internal_repository_tokens_absent": True,
         "obsolete_ecological_fig6_absent": True,
