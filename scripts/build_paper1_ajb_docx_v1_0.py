@@ -33,9 +33,10 @@ def main() -> int:
         "source_markdown": str(a.source),
         "output_docx": str(a.out),
         "source_science_version": "Paper 1 v0.2.2",
-        "source_framing_version": "Paper 1 v0.3.3 novelty-forward framing",
+        "source_framing_version": "Paper 1 v0.3.4 event-boundary-safe novelty framing",
         "scientific_results_changed": False,
-        "status": "AJB v1.0 DOCX built and structurally audited",
+        "event_boundary_clarified": True,
+        "status": "AJB v1.0 DOCX built from framing v0.3.4 and structurally audited",
     }
     a.summary.parent.mkdir(parents=True, exist_ok=True)
     a.summary.write_text(json.dumps(summary, indent=2) + "\n", encoding="utf-8")
