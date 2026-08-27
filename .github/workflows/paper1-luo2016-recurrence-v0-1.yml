@@ -1,0 +1,64 @@
+name: Paper 1 Luo 2016 literature recurrence recheck
+
+on:
+  pull_request:
+    paths:
+      - 'data/micro_accessibility_edge_registry_v0_3.csv'
+      - 'data/micro_accessibility_recurrence_registry_v0_2.csv'
+      - 'data/micro_transition_canonical_orientation_v0_2.csv'
+      - 'data/paper1_fig2_candidate_free_signature_v0_2.csv'
+      - 'scripts/analyze_micro_accessibility_v0_1.py'
+      - 'scripts/analyze_observation_corrected_recurrence_v0_1.py'
+      - 'scripts/build_candidate_free_measurements_from_fig2_v0_1.py'
+      - 'scripts/validate_paper1_luo2016_recurrence_v0_1.py'
+      - '.github/workflows/paper1-luo2016-recurrence-v0-1.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  recheck:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Recompute full literature accessibility layer
+        run: |
+          python scripts/analyze_micro_accessibility_v0_1.py \
+            --registry data/micro_accessibility_edge_registry_v0_3.csv \
+            --out-dir build/luo2016/accessibility \
+            --permutations 10000 \
+            --seed 230223
+
+      - name: Reconstruct frozen candidate-free common set
+        run: |
+          python scripts/build_candidate_free_measurements_from_fig2_v0_1.py \
+            --source data/paper1_fig2_candidate_free_signature_v0_2.csv \
+            --out build/luo2016/candidate_free_measurements.csv
+
+      - name: Recompute class-stratified recurrence with Luo literature cell
+        run: |
+          python scripts/analyze_observation_corrected_recurrence_v0_1.py \
+            --registry data/micro_accessibility_recurrence_registry_v0_2.csv \
+            --orientation data/micro_transition_canonical_orientation_v0_2.csv \
+            --candidate-free build/luo2016/candidate_free_measurements.csv \
+            --out-dir build/luo2016/recurrence
+
+      - name: Validate result-change boundary
+        run: |
+          python scripts/validate_paper1_luo2016_recurrence_v0_1.py \
+            --accessibility-summary build/luo2016/accessibility/summary.json \
+            --recurrence-summary build/luo2016/recurrence/summary.json \
+            --out build/luo2016/validated_summary.json
+          cat build/luo2016/validated_summary.json >> "$GITHUB_STEP_SUMMARY"
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: paper1-luo2016-recurrence-v0-1
+          path: build/luo2016/
+          if-no-files-found: error
