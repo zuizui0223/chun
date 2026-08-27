@@ -5,10 +5,13 @@ on:
     paths:
       - 'manuscript/PAPER1_AJB_MANUSCRIPT_V0_2.md'
       - 'scripts/build_paper1_novelty_framed_v0_3.py'
+      - 'scripts/validate_paper1_reference_registry_v0_3.py'
       - 'data/paper1_novelty_prior_art_registry_v0_1.csv'
       - 'data/paper1_novelty_reference_additions_v0_1.csv'
+      - 'data/paper1_reference_registry_v0_3.csv'
       - 'docs/PAPER1_NOVELTY_LITERATURE_AUDIT_2026-08-27.md'
       - 'docs/NOVELTY_AND_IDENTIFIABILITY_BOUNDARY_V0_2.md'
+      - 'docs/PAPER1_NOVELTY_CORE_ATTACK_ADDENDUM_2026-08-27.md'
       - '.github/workflows/paper1-novelty-framing-v0-3.yml'
   workflow_dispatch:
 
@@ -31,6 +34,12 @@ jobs:
             --source manuscript/PAPER1_AJB_MANUSCRIPT_V0_2.md \
             --out build/paper1_novelty_v0_3/PAPER1_AJB_MANUSCRIPT_V0_3.md \
             --summary build/paper1_novelty_v0_3/summary.json
+      - name: Validate v0.3 reference registry against generated manuscript
+        run: |
+          python scripts/validate_paper1_reference_registry_v0_3.py \
+            --registry data/paper1_reference_registry_v0_3.csv \
+            --manuscript build/paper1_novelty_v0_3/PAPER1_AJB_MANUSCRIPT_V0_3.md \
+            --out build/paper1_novelty_v0_3/reference_registry_summary.json
       - name: Audit manuscript-facing novelty boundary
         run: |
           python - <<'PY'
@@ -56,7 +65,10 @@ jobs:
           summary = json.loads(Path('build/paper1_novelty_v0_3/summary.json').read_text())
           if summary['scientific_results_changed'] is not False:
               raise SystemExit('science-change flag drift')
-          print(json.dumps(summary, indent=2))
+          ref_summary = json.loads(Path('build/paper1_novelty_v0_3/reference_registry_summary.json').read_text())
+          if ref_summary['registry_matches_generated_manuscript'] is not True:
+              raise SystemExit('v0.3 reference registry drift')
+          print(json.dumps({**summary, **ref_summary}, indent=2))
           PY
       - uses: actions/upload-artifact@v4
         with:
