@@ -4,6 +4,7 @@ on:
   pull_request:
     paths:
       - 'scripts/build_paper1_novelty_framing_v0_3_3.py'
+      - 'scripts/run_paper1_novelty_framing_v0_3_3.py'
       - 'scripts/build_paper1_temporal_framing_v0_3_2.py'
       - 'scripts/build_paper1_science_v0_2_2.py'
       - 'data/paper1_reference_registry_v0_5.csv'
@@ -32,7 +33,7 @@ jobs:
             --summary build/paper1-v0-3-3/science_summary.json
       - name: Build novelty-forward framing v0.3.3
         run: |
-          python scripts/build_paper1_novelty_framing_v0_3_3.py \
+          python scripts/run_paper1_novelty_framing_v0_3_3.py \
             --source build/paper1-v0-3-3/PAPER1_SCIENCE_V0_2_2.md \
             --out build/paper1-v0-3-3/PAPER1_NOVELTY_FRAMING_V0_3_3.md \
             --summary build/paper1-v0-3-3/framing_summary.json
