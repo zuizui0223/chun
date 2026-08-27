@@ -1,0 +1,38 @@
+name: Paper 1 bibliographic database search v0.1
+
+on:
+  pull_request:
+    paths:
+      - 'data/paper1_bibliographic_db_queries_v0_1.csv'
+      - 'scripts/run_paper1_bibliographic_db_search_v0_1.py'
+      - '.github/workflows/paper1-bibliographic-db-search-v0-1.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  search_and_freeze:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Run fixed OpenAlex Crossref PubMed searches
+        run: |
+          mkdir -p build/paper1_bibliographic_db_search_v0_1
+          python scripts/run_paper1_bibliographic_db_search_v0_1.py \
+            --queries data/paper1_bibliographic_db_queries_v0_1.csv \
+            --repo-root . \
+            --out-dir build/paper1_bibliographic_db_search_v0_1
+          cat build/paper1_bibliographic_db_search_v0_1/summary.json >> "$GITHUB_STEP_SUMMARY"
+          echo '' >> "$GITHUB_STEP_SUMMARY"
+          echo '## Query counts' >> "$GITHUB_STEP_SUMMARY"
+          cat build/paper1_bibliographic_db_search_v0_1/query_counts.csv >> "$GITHUB_STEP_SUMMARY"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: paper1-bibliographic-db-search-v0-1
+          path: build/paper1_bibliographic_db_search_v0_1/
+          if-no-files-found: error
