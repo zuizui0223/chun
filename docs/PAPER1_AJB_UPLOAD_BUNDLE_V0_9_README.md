@@ -1,6 +1,6 @@
 # Paper 1 AJB upload bundle v0.9
 
-v0.9 is the submission-facing route for the temporal Paper 1 framing.
+v0.9 is the current submission-facing route for the temporal Paper 1 framing.
 
 ## Scientific and framing sources
 
@@ -55,8 +55,13 @@ Appendix updates relative to v0.8:
 - S4 -> Luo-updated direct overlap v0.2.2;
 - S2 and S5–S8 remain on the previously frozen scientific inputs.
 
+## Submission companions
+
+- [`PAPER1_AJB_V0_9_COVER_LETTER_TEMPLATE.md`](PAPER1_AJB_V0_9_COVER_LETTER_TEMPLATE.md) — cover-letter template answering AJB's required questions about the manuscript's question, major contribution and broad interest while preserving the frozen claim ceiling.
+- [`PAPER1_AJB_V0_9_SUBMISSION_CHECKLIST.md`](PAPER1_AJB_V0_9_SUBMISSION_CHECKLIST.md) — final machine-validated versus human-only submission checklist, including Author Agreement, ORCID, CRediT, funding, COI and archive-DOI items.
+
 ## Human submission fields still required
 
-The generated manuscript deliberately retains placeholders for author list/order, affiliations, corresponding-author details, acknowledgments/funding, CRediT contributions and permanent archive DOI. Conflict of interest remains a journal-submission-system declaration.
+The generated manuscript deliberately retains placeholders for author list/order, affiliations, corresponding-author details, acknowledgments/funding, CRediT contributions and permanent archive DOI. Conflict of interest remains a journal-submission-system declaration. The corresponding author must also complete the journal's Author Agreement Form before initial submission.
 
-v0.8 and earlier upload routes are historical provenance after v0.9 is validated and merged.
+v0.8 and earlier upload routes are historical provenance only.
