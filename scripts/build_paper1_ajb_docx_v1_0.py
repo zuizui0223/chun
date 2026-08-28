@@ -32,6 +32,7 @@ def main() -> int:
         "submission_version": "v1.0",
         "source_markdown": str(a.source),
         "output_docx": str(a.out),
+        "bytes": a.out.stat().st_size,
         "source_science_version": "Paper 1 v0.2.2",
         "source_framing_version": "Paper 1 v0.3.4 event-boundary-safe novelty framing",
         "scientific_results_changed": False,
