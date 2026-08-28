@@ -22,13 +22,13 @@ Across the programme, **flower-colour variation** is the umbrella term. **Polymo
 
 ## Current Paper 1
 
-**Working title:** *Repeated generation of flower-colour states does not replay one pigment-state programme in Camellia*
+**Working title:** *Hierarchical molecular repeatability coexists with local flower-colour conservatism in Camellia*
 
 Current frozen layers:
 
 - **science:** Paper 1 **v0.2.2**;
-- **temporal framing:** **v0.3.2**;
-- **AJB submission route:** **v0.9**;
+- **event-boundary-safe framing:** **v0.3.4**;
+- **AJB submission route:** **v1.0**;
 - **science reference contract:** 17 DOI rows (`paper1_reference_registry_v0_2_2.csv`);
 - **journal-facing reference contract:** 25 DOI rows (`paper1_reference_registry_v0_5.csv`).
 
@@ -123,25 +123,30 @@ Current contracts include:
 - [`docs/PAPER1_CITATION_CHASE_SCREEN_2026-08-27.md`](docs/PAPER1_CITATION_CHASE_SCREEN_2026-08-27.md) — backward/forward citation-chasing screen;
 - [`docs/PAPER1_CHINESE_GREY_LITERATURE_SCREEN_2026-08-27.md`](docs/PAPER1_CHINESE_GREY_LITERATURE_SCREEN_2026-08-27.md) — Chinese/thesis/grey-literature decision layer;
 - [`docs/PAPER1_NOVELTY_LITERATURE_AUDIT_2026-08-27.md`](docs/PAPER1_NOVELTY_LITERATURE_AUDIT_2026-08-27.md) — prior-art boundary;
-- [`scripts/build_paper1_temporal_framing_v0_3_2.py`](scripts/build_paper1_temporal_framing_v0_3_2.py) — temporal framing builder.
+- [`docs/PAPER1_EVOLUTIONARY_EVENT_BOUNDARY_AMENDMENT_V0_1.md`](docs/PAPER1_EVOLUTIONARY_EVENT_BOUNDARY_AMENDMENT_V0_1.md) — molecular-generation versus macro-event contract;
+- [`docs/PAPER1_STATE_IDENTITY_FRAMING_GATE_V0_1.md`](docs/PAPER1_STATE_IDENTITY_FRAMING_GATE_V0_1.md) — Issue #131 test and AJB-lock decision;
+- [`docs/PAPER1_AJB_V1_0_COVER_LETTER_TEMPLATE.md`](docs/PAPER1_AJB_V1_0_COVER_LETTER_TEMPLATE.md) — current submission-facing cover letter;
+- [`docs/PAPER1_AJB_V1_0_SUBMISSION_CHECKLIST.md`](docs/PAPER1_AJB_V1_0_SUBMISSION_CHECKLIST.md) — current machine/human gate checklist;
+- [`scripts/build_paper1_novelty_framing_v0_3_4.py`](scripts/build_paper1_novelty_framing_v0_3_4.py) — current framing builder.
 
-## Current AJB submission route — v0.9
+## Current AJB submission route — v1.0
 
-AJB **v0.9** is the current and only active submission bundle route. It is documented in [`docs/PAPER1_AJB_UPLOAD_BUNDLE_V0_9_README.md`](docs/PAPER1_AJB_UPLOAD_BUNDLE_V0_9_README.md) and built by [`.github/workflows/paper1-ajb-upload-bundle-v0-9.yml`](.github/workflows/paper1-ajb-upload-bundle-v0-9.yml).
+AJB **v1.0** is the current and only active submission bundle route. It is documented in [`docs/PAPER1_AJB_UPLOAD_BUNDLE_V1_0_README.md`](docs/PAPER1_AJB_UPLOAD_BUNDLE_V1_0_README.md) and built by [`.github/workflows/paper1-ajb-upload-bundle-v1-0.yml`](.github/workflows/paper1-ajb-upload-bundle-v1-0.yml).
 
-Hosted run **33067022836** passed all steps. Independent final-artifact QA confirmed:
+The route promoted to `main` passed hosted run **33072640192**. Rebuilding the route confirms:
 
-- **51/51** manifest-listed files matched size and SHA256, with no missing or unregistered files;
+- final manifest = **59 packaged files**, each recorded by size and SHA256;
 - **25/25 reference DOIs** matched the journal-facing registry;
-- AJB structured Abstract = **221 words**;
+- AJB structured Abstract = **242 words**;
 - Fig. 1 uses **10/5/1/3**, **5/4/1/2**, and **P=0.078125** without annotation collision;
 - Fig. 2 uses the Luo-updated anthocyanin literature interval and **2/6** direct overlap;
 - Appendix S1 tracks science v0.2.2; S3/S4 track Luo-updated recurrence/overlap; S2 and S5–S8 retain their frozen inputs;
 - candidate-free, yellow and macro change flags are all false;
-- Word/DOCX structural checks passed: continuous line numbering, sequential page numbers, double spacing, one-inch margins, Times New Roman 12 pt body and page-number field;
-- the final hosted DOCX rendered to **26 pages** and passed visual QA; a decorative Word Title-style border found in an earlier v0.9 artifact was removed and the final page 1 was reverified, while pages 2–26 remained pixel-identical to the previously inspected clean render.
+- Word/DOCX structural checks passed: continuous line numbering, sequential page numbers, double spacing, one-inch margins, Times New Roman 12 pt body and page-number field.
 
-v0.8 and earlier upload routes are **historical provenance only** and are not current submission routes.
+Issue #131 tested a stronger state-identity framing. It produced a useful submission-facing question but **no new quantified joint state-resolution result**: the molecular and macro arms change different observations and estimands, and 0/53 accepted nuclear-tree tips have complete defensible A/F/C/P states. The current hierarchical-repeatability title and v0.3.4 manuscript are therefore retained, and AJB is locked.
+
+v0.9 and earlier upload routes are **historical provenance only** and are not current submission routes.
 
 ## Literature-audit status
 
@@ -181,7 +186,7 @@ The retained contribution is empirical: **the same auditable public *Camellia* s
 
 ## Remaining submission inputs
 
-The reproducible science/framing/bundle route is closed. Remaining AJB submission blockers are human metadata or final archive state:
+The reproducible science/framing/bundle route is closed. Issue #85 is the active gate. Remaining AJB submission blockers are human metadata or final archive state:
 
 - author list and order;
 - affiliations;

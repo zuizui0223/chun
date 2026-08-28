@@ -48,12 +48,16 @@ def main() -> int:
         "README.md",
         "manuscript/PAPER1_AJB_UPLOAD_V1_0.md",
         "manuscript/PAPER1_AJB_UPLOAD_V1_0.docx",
+        "submission/PAPER1_AJB_V1_0_COVER_LETTER_TEMPLATE.md",
+        "submission/PAPER1_AJB_V1_0_SUBMISSION_CHECKLIST.md",
         *[f"main_figures/Figure_{i}.{ext}" for i in range(1, 7) for ext in ("png", "svg")],
         *[f"appendices/Appendix_S{i}.csv" for i in range(1, 7)],
         "appendices/Appendix_S7.png",
         "appendices/Appendix_S8.png",
         "provenance/PAPER1_SCIENCE_V0_2_2.md",
         "provenance/PAPER1_NOVELTY_FRAMING_V0_3_4.md",
+        "provenance/PAPER1_STATE_IDENTITY_FRAMING_GATE_V0_1.md",
+        "provenance/PAPER1_JOURNAL_STRATEGY.md",
         "provenance/paper1_authoritative_results_v0_2_2.csv",
         "provenance/paper1_main_figure_manifest_v0_2_2.csv",
         "provenance/paper1_reference_registry_v0_5.csv",
@@ -76,6 +80,8 @@ def main() -> int:
         "manuscript/PAPER1_AJB_UPLOAD_V0_9.docx",
         "provenance/PAPER1_NOVELTY_FRAMING_V0_3_3.md",
         "provenance/novelty_framing_v0_3_3_summary.json",
+        "submission/PAPER1_AJB_V0_9_COVER_LETTER_TEMPLATE.md",
+        "submission/PAPER1_AJB_V0_9_SUBMISSION_CHECKLIST.md",
     ]
     stale_present = [x for x in stale_submission_files if (root / x).exists()]
     if stale_present:
@@ -113,6 +119,57 @@ def main() -> int:
     if retained:
         raise SystemExit(f"v1.0 manuscript retains stale/internal/overclaim tokens: {retained}")
 
+    gate = (root / "provenance/PAPER1_STATE_IDENTITY_FRAMING_GATE_V0_1.md").read_text(encoding="utf-8")
+    strategy = (root / "provenance/PAPER1_JOURNAL_STRATEGY.md").read_text(encoding="utf-8")
+    cover = (root / "submission/PAPER1_AJB_V1_0_COVER_LETTER_TEMPLATE.md").read_text(encoding="utf-8")
+    checklist = (root / "submission/PAPER1_AJB_V1_0_SUBMISSION_CHECKLIST.md").read_text(encoding="utf-8")
+    companion_contract = {
+        "state-identity gate": (
+            gate,
+            [
+                "Decision: wording-only pass",
+                "zero have complete defensible A/F/C/P states",
+                "does not yield a genuinely new quantified state-resolution result",
+                "American Journal of Botany v1.0 route",
+            ],
+        ),
+        "journal strategy": (
+            strategy,
+            [
+                "Primary submission: American Journal of Botany (AJB), v1.0 route",
+                "Do not reopen the first-submission decision for *Evolution*",
+                "0/53 have complete defensible A/F/C/P states",
+                "Resume Issue #85",
+            ],
+        ),
+        "cover letter": (
+            cover,
+            [
+                "Hierarchical molecular repeatability coexists with local flower-colour conservatism",
+                "what remains equivalent as molecular observation and historical identification become stricter",
+                "not treated as independent macroevolutionary origins",
+                "[ARCHIVE DOI TO ADD AT SUBMISSION]",
+            ],
+        ),
+        "submission checklist": (
+            checklist,
+            [
+                "science v0.2.2 + framing v0.3.4 + AJB bundle v1.0",
+                "State-identity gate: wording-only; no new quantified result; AJB locked",
+                "shared strict-by-dominant robust events = 0",
+                "repository runner had no LibreOffice/Word renderer",
+                "final visual approval of the metadata-complete Word/submission PDF",
+            ],
+        ),
+    }
+    companion_missing = {
+        label: [token for token in tokens if token not in text]
+        for label, (text, tokens) in companion_contract.items()
+        if any(token not in text for token in tokens)
+    }
+    if companion_missing:
+        raise SystemExit(f"v1.0 submission companion contract drift: {companion_missing}")
+
     words = abstract_words(manuscript)
     if words > 250:
         raise SystemExit(f"AJB v1.0 abstract exceeds 250 words: {words}")
@@ -141,6 +198,21 @@ def main() -> int:
     docx_summary = json.loads((root / "provenance/docx_v1_0_summary.json").read_text(encoding="utf-8"))
     if not all(docx_summary.get("structural_checks", {}).values()):
         raise SystemExit("DOCX v1.0 structural checks are not all true")
+    expected_docx_format = {
+        "font": "Times New Roman 12 pt body",
+        "line_spacing": "double",
+        "alignment": "left",
+        "margins_inches": 1.0,
+        "continuous_line_numbering": True,
+        "sequential_page_numbering": True,
+    }
+    docx_drift = {
+        key: {"expected": expected, "actual": docx_summary.get(key)}
+        for key, expected in expected_docx_format.items()
+        if docx_summary.get(key) != expected
+    }
+    if docx_drift:
+        raise SystemExit(f"DOCX v1.0 formatting contract drift: {docx_drift}")
     if (root / "manuscript/PAPER1_AJB_UPLOAD_V1_0.docx").stat().st_size < 20000:
         raise SystemExit("DOCX v1.0 unexpectedly small")
 
@@ -164,6 +236,8 @@ def main() -> int:
         "source_science_version": "Paper 1 v0.2.2",
         "source_framing_version": "Paper 1 v0.3.4 event-boundary-safe novelty framing",
         "novelty_headline": "hierarchical transition-class-dependent molecular repeatability plus separate macro pattern/event identity",
+        "state_identity_gate_decision": "wording-only; no new quantified joint state-resolution result",
+        "journal_lock": "American Journal of Botany",
         "event_boundary_clarified": True,
         "candidate_free_definition_clarified": True,
         "literature_systems": 12,

@@ -76,6 +76,23 @@ def main() -> int:
             p.unlink()
 
     shutil.copy2("docs/PAPER1_AJB_UPLOAD_BUNDLE_V1_0_README.md", bundle / "README.md")
+    (bundle / "submission").mkdir(parents=True, exist_ok=True)
+    shutil.copy2(
+        "docs/PAPER1_AJB_V1_0_COVER_LETTER_TEMPLATE.md",
+        bundle / "submission/PAPER1_AJB_V1_0_COVER_LETTER_TEMPLATE.md",
+    )
+    shutil.copy2(
+        "docs/PAPER1_AJB_V1_0_SUBMISSION_CHECKLIST.md",
+        bundle / "submission/PAPER1_AJB_V1_0_SUBMISSION_CHECKLIST.md",
+    )
+    shutil.copy2(
+        "docs/PAPER1_STATE_IDENTITY_FRAMING_GATE_V0_1.md",
+        bundle / "provenance/PAPER1_STATE_IDENTITY_FRAMING_GATE_V0_1.md",
+    )
+    shutil.copy2(
+        "docs/PAPER1_JOURNAL_STRATEGY.md",
+        bundle / "provenance/PAPER1_JOURNAL_STRATEGY.md",
+    )
 
     run(
         "scripts/audit_paper1_ajb_bundle_v1_0.py",
