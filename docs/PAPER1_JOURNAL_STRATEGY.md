@@ -1,121 +1,82 @@
 # Paper 1 journal strategy
 
-Checked: 2026-08-22 after result, figure, analysis-disposition and source-provenance freeze.
+Checked: 2026-08-28 after science v0.2.2, framing v0.3.4, novelty audit, event-boundary amendment, and Issue #131 state-identity gate.
+
+## Final decision
+
+**Primary submission: American Journal of Botany (AJB), v1.0 route.**
+
+**Do not reopen the first-submission decision for *Evolution*.** Issue #131 produced a useful submission-facing question but not a new quantified state-resolution result. The active title and manuscript remain:
+
+> **Hierarchical molecular repeatability coexists with local flower-colour conservatism in *Camellia*.**
+
+The sentence adopted for the cover letter and editorial positioning is:
+
+> **When similar visible flower colours are compared, what remains equivalent as molecular observation and historical identification become stricter?**
+
+This is an organizing question, not an additional result or a claim that state identity, many-to-one mapping, or measurement dependence is novel.
 
 ## Manuscript identity
 
-Paper 1 is not positioned as:
+Paper 1 is an integrative plant-evolution study with two separate but complementary inferential audits:
 
-- a new Camellia phylogeny;
-- a definitive ancestral-colour reconstruction;
-- a genus-level causal pollinator or climate-adaptation study;
-- a molecular-genomics discovery paper centred on a new locus.
+1. the same admitted public molecular systems are represented under incomplete literature observation and annotation-driven, outcome-independent A/F/C/P remeasurement; and
+2. accepted-species wild-colour data are tested first for topology/coding-robust local structure and then for the stricter identity of individual historical branches.
 
-The paper is an **integrative plant-evolution / macroevolution study** whose central result is a cross-scale mismatch:
+The strongest defensible synthesis is:
 
-> recurrent pigment modules permit flexible molecular implementation, yet accepted wild flower colour retains topology-robust local phylogenetic conservatism; current public species-level hard-state data identify the macro pattern but not robust branch-specific ecological or molecular causes.
+> molecular repeatability is modular and transition-class dependent; realised visible colours remain locally phylogenetically structured; individual transition-event identity is not robustly identifiable.
 
-This framing determines journal fit.
+The RNA-seq comparisons quantify developmental or petal-sector colour-state-generating transcript changes. They are not treated as direct observations of independent macroevolutionary origins, and they are not aligned event-for-event with reconstructed branches.
 
-## 1. Primary target — American Journal of Botany
+## Why AJB is the best current fit
 
-### Why it is the best current fit
+AJB's official scope spans ecology, evolution, biodiversity, systematics, genetics, and development from ecosystem to molecular scales. Paper 1 genuinely connects those levels in a botanical system while retaining their evidential boundaries. The paper's narrow empirical novelty—the same-system multivariate recurrence audit plus a separate pattern/event robustness gate—is legible to its plant-evolution readership without claiming a universal evolutionary law.
 
-AJB explicitly publishes across ecology, evolution, biodiversity, systematics, genetics and development, and across organizational scales from ecosystem to molecular. Paper 1 genuinely spans those levels rather than presenting a purely genomic or purely ecological result.
+Submission must lead with the general flower-colour question and then state the exact hierarchy:
 
-The journal also has unusually strong current thematic alignment: Volume 113 Issue 1 (January 2026) is the Special Issue **Paradigm Shifts in Flower Color**, containing work on flower-colour climate effects, color-transition selective pressures, pigment-derived colour spaces and macroevolutionary colour diversification.
+1. standardized observation narrows anthocyanin-gain recurrence but does not erase all molecular reuse;
+2. yellow development retains stronger A/C/P modular recurrence while F differs;
+3. local same-colour structure is robust across topology and trait coding;
+4. no accepted-species branch is shared as robust between strict and dominant coding;
+5. generation, realised pattern, and event identity are distinct quantities.
 
-This means the paper can be pitched to an audience already primed for the exact unresolved problem Paper 1 addresses: how genetic/pigment accessibility, ecology and phylogenetic history relate to flower-colour diversification.
+The main editorial risk is that the study is data-integrative and partly re-analytical. The response is the frozen falsification sequence and exact bounds, not generic novelty language or a catalogue of public datasets.
 
-### Submission framing
+## Why *Evolution* is not the first target
 
-Lead with a general flower-colour/evolution problem, not Camellia natural history:
+The predeclared reconsideration rule required a genuinely new quantified state-resolution result from already admissible evidence. The gate did not produce one:
 
-1. molecular/developmental accessibility does not necessarily imply evolutionary lability;
-2. species-level trait data can create false event histories when taxonomy and polymorphism are compressed;
-3. after accepted-taxonomy, wild-trait and topology sensitivity, local colour conservatism remains but specific causal transition events are not identifiable;
-4. the resulting identifiability boundary defines the empirical measurements needed next.
+- molecular resolution changes the observation rule within five public systems;
+- historical resolution changes the robustness target from an unrooted local pattern to rooted accepted-species branch identity;
+- the two arms have different units, data, and estimands;
+- only 5/53 accepted nuclear-tree tips overlap direct taxon-level mechanistic evidence, 3/53 have immediately standardized raw-data coverage, and 0/53 have complete defensible A/F/C/P states.
 
-### Main risk
+Consequently, a headline that Paper 1 quantitatively resolves “the same evolutionary state” would outrun the data. *Evolution* asks for important original evolutionary investigations and warns that demonstrations of established phenomena in another taxon or context may not be sufficient. The current contribution is real but safer and clearer as a bounded *Camellia* empirical synthesis for AJB.
 
-The study is data-integrative and partly re-analytical rather than one new experiment. The manuscript therefore has to emphasize the new falsification sequence and cross-scale inference, not simply catalogue public datasets.
+Do not retarget merely by strengthening prose. Reconsider a general-evolution journal only in a future paper if taxon-resolved molecular states and robust event histories support a joint, predeclared macroevolutionary test.
 
-## 2. Strong fallback — Annals of Botany
+## Fallback order
 
-Annals of Botany explicitly welcomes novel and rigorous work across all plant science, including molecular, analytical, mathematical/statistical, ecological and evolutionary questions from cell to ecosystem.
+If AJB declines the manuscript without a correctable package issue:
 
-This is a strong fit for the paper's source-aware molecular synthesis + phylogenetic comparative + trait-audit architecture.
+1. **Annals of Botany** — broad plant-science fit for the molecular, phylogenetic, and inferential architecture.
+2. **Evolutionary Journal of the Linnean Society** — use only with a deliberate rewrite toward accessibility, trait-state aliasing, and macroevolutionary identifiability.
 
-### Relative advantage over AJB
+The fallbacks do not authorize expanded claims or new post-hoc analyses.
 
-- very broad methodological scope;
-- comfortable with substantial plant-evolution and phylogenomics/trait-evolution papers;
-- the accepted-species taxonomy and topology-sensitivity component is naturally in scope.
+## Submission consequences
 
-### Relative disadvantage
-
-The 2026 AJB flower-colour context provides a sharper thematic audience and a more obvious editorial narrative for the generation-versus-persistence question.
-
-## 3. Evolution-focused alternative — Evolutionary Journal of the Linnean Society
-
-EJLS explicitly welcomes integrative evolutionary studies using genomics, advanced statistical analysis and macroevolutionary data, including work linking genomic diversity to ecological/evolutionary phenomena across scales.
-
-It is a good fit if the manuscript is rewritten to foreground a general evolutionary principle:
-
-> developmental/molecular accessibility and macroevolutionary trait lability need not coincide.
-
-### Use case
-
-Prefer EJLS if the paper evolves away from a botanical audience and toward an explicit conceptual contribution about constraint, accessibility, trait-state aliasing and macroevolutionary identifiability.
-
-### Trade-off
-
-It is fully open access and broader across organisms. AJB/Annals provide a more immediately plant-flower-colour-specific readership.
-
-## 4. Stretch option, not the default first submission
-
-A higher-selectivity general plant journal would require the manuscript to demonstrate that the central principle extends beyond Camellia and beyond the particular public-data limitations of this system.
-
-With current evidence, the safest strong claim is a Camellia-based demonstration of a general problem, not a universal plant-evolution law. We should therefore not inflate the manuscript merely to target prestige.
-
-## Decision
-
-**Primary submission: American Journal of Botany.**
-
-**Fallback: Annals of Botany.**
-
-**Evolution-focused alternative: Evolutionary Journal of the Linnean Society.**
-
-The title and abstract should be written first for AJB's broad botanical/evolutionary readership, with a conceptual opening and explicit claim boundaries.
-
-## Writing consequences
-
-### Introduction
-
-Start from the general distinction between:
-
-- *generation/accessibility* of phenotypic states, and
-- *persistence/lability* of those states over macroevolutionary time.
-
-Flower colour is the empirical system; Camellia is the test case.
-
-### Results order
-
-1. multiple molecular implementations are accessible;
-2. taxonomy/wild-trait audit sharply reduces confident species states;
-3. accepted-species nuclear topologies are highly concordant;
-4. local same-colour conservatism survives topology and trait sensitivity;
-5. event-level transition history does not survive wild-trait assumptions;
-6. climate/pollination screens therefore remain pattern/context evidence rather than branch-level causes.
-
-### Discussion
-
-The endpoint is not 'we failed to find the cause'. It is:
-
-> the distinction between an identifiable evolutionary pattern and an unidentifiable event history is itself biologically informative, because it shows exactly which population-resolved sensory, reproductive and molecular data are required to distinguish competing persistence mechanisms.
+- Retain the v0.3.4 title, 242-word structured abstract, Figure 1 contract, Methods, Results, and Discussion.
+- Use the state-identity question only in the cover letter or opening editorial pitch.
+- Keep candidate-free defined as annotation-driven, outcome-independent quantification within four prespecified modules; it is not genome-wide hypothesis-free discovery.
+- Keep exact incomplete-state bounds and dependence-cluster results visible.
+- Do not infer taxon-level A/F/C/P states from visible hue.
+- Do not claim a definitive white ancestor or branch-specific ecological causes.
+- Do not delay Paper 1 for Issues #6 or #8.
+- Resume Issue #85 for author metadata, declarations, approvals, and the archive DOI.
 
 ## Official scope sources checked
 
-- American Journal of Botany — Wiley/Botanical Society of America Aims & Scope and 2026 Special Issue `Paradigm Shifts in Flower Color`.
-- Annals of Botany — Oxford Academic About / Author Guidelines.
-- Evolutionary Journal of the Linnean Society — Oxford Academic Aims & Scope / Author Guidelines.
+- [American Journal of Botany — journal information and author resources](https://bsapubs.onlinelibrary.wiley.com/hub/journal/15372197/homepage/productinformation)
+- [Evolution — author guidelines](https://academic.oup.com/evolut/pages/author-guidelines)
