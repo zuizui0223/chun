@@ -1,12 +1,12 @@
 # Paper 1 journal strategy
 
-Checked: 2026-08-28 after science v0.2.2, framing v0.3.4, novelty audit, event-boundary amendment, and Issue #131 state-identity gate.
+Checked: 2026-08-28 after science v0.2.2, framing v0.3.4, Issue #131, and the final three-journal escalation gate.
 
 ## Final decision
 
 **Primary submission: American Journal of Botany (AJB), v1.0 route.**
 
-**Do not reopen the first-submission decision for *Evolution*.** Issue #131 produced a useful submission-facing question but not a new quantified state-resolution result. The active title and manuscript remain:
+The final escalation gate tested the importance of the existing empirical results against current official criteria, 2023–2026 prior art, and three submission-only alternatives. It independently retained AJB. The active title and manuscript remain:
 
 > **Hierarchical molecular repeatability coexists with local flower-colour conservatism in *Camellia*.**
 
@@ -14,7 +14,7 @@ The sentence adopted for the cover letter and editorial positioning is:
 
 > **When similar visible flower colours are compared, what remains equivalent as molecular observation and historical identification become stricter?**
 
-This is an organizing question, not an additional result or a claim that state identity, many-to-one mapping, or measurement dependence is novel.
+This is an organizing question, not an additional result or a claim that state identity, many-to-one mapping, or measurement dependence is novel. The full gate and scorecard are in `docs/PAPER1_JOURNAL_ESCALATION_GATE_V0_1.md`; the current source-linked web audit is in `docs/PAPER1_JOURNAL_ESCALATION_WEB_AND_PRIOR_ART_AUDIT_2026-08-28.md`.
 
 ## Manuscript identity
 
@@ -43,18 +43,18 @@ Submission must lead with the general flower-colour question and then state the 
 
 The main editorial risk is that the study is data-integrative and partly re-analytical. The response is the frozen falsification sequence and exact bounds, not generic novelty language or a catalogue of public datasets.
 
-## Why *Evolution* is not the first target
+## Why *Evolution Letters* and *Evolution* are not first targets
 
-The predeclared reconsideration rule required a genuinely new quantified state-resolution result from already admissible evidence. The gate did not produce one:
+The journal-escalation gate re-tested the existing empirical contribution rather than requiring a new state-resolution result. The current contribution still does not meet the general-journal threshold:
 
 - molecular resolution changes the observation rule within five public systems;
 - historical resolution changes the robustness target from an unrooted local pattern to rooted accepted-species branch identity;
 - the two arms have different units, data, and estimands;
 - only 5/53 accepted nuclear-tree tips overlap direct taxon-level mechanistic evidence, 3/53 have immediately standardized raw-data coverage, and 0/53 have complete defensible A/F/C/P states.
 
-Consequently, a headline that Paper 1 quantitatively resolves “the same evolutionary state” would outrun the data. *Evolution* asks for important original evolutionary investigations and warns that demonstrations of established phenomena in another taxon or context may not be sufficient. The current contribution is real but safer and clearer as a bounded *Camellia* empirical synthesis for AJB.
+Recent prior art already establishes resolution-dependent expression repeatability, hierarchical molecular convergence, alternate flower-colour pathways, candidate/discovery ascertainment, and sensitivity of historical character inference. The narrow survivor is the same-system A/F/C/P identified-set contraction plus a separate pattern/event robustness gate. *Evolution Letters* requires a field-moving broad advance, and *Evolution* warns that established phenomena in another taxon or context may be insufficient. The current combination is real but remains application-specific and clearer as a bounded *Camellia* empirical synthesis for AJB.
 
-Do not retarget merely by strengthening prose. Reconsider a general-evolution journal only in a future paper if taxon-resolved molecular states and robust event histories support a joint, predeclared macroevolutionary test.
+The current text is already within the nominal *Evolution Letters* word class, so format is not the blocker. Do not retarget merely by strengthening prose. Reconsider a general-evolution journal only after a material scientific addition such as broader same-system replication, a validated cross-trait estimator, or taxon-resolved molecular states and robust event histories supporting a joint predeclared macroevolutionary test.
 
 ## Fallback order
 
@@ -79,4 +79,5 @@ The fallbacks do not authorize expanded claims or new post-hoc analyses.
 ## Official scope sources checked
 
 - [American Journal of Botany — journal information and author resources](https://bsapubs.onlinelibrary.wiley.com/hub/journal/15372197/homepage/productinformation)
+- [Evolution Letters — author guidelines](https://academic.oup.com/evlett/pages/author-guidelines)
 - [Evolution — author guidelines](https://academic.oup.com/evolut/pages/author-guidelines)

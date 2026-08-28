@@ -93,6 +93,14 @@ def main() -> int:
         "docs/PAPER1_JOURNAL_STRATEGY.md",
         bundle / "provenance/PAPER1_JOURNAL_STRATEGY.md",
     )
+    shutil.copy2(
+        "docs/PAPER1_JOURNAL_ESCALATION_GATE_V0_1.md",
+        bundle / "provenance/PAPER1_JOURNAL_ESCALATION_GATE_V0_1.md",
+    )
+    shutil.copy2(
+        "docs/PAPER1_JOURNAL_ESCALATION_WEB_AND_PRIOR_ART_AUDIT_2026-08-28.md",
+        bundle / "provenance/PAPER1_JOURNAL_ESCALATION_WEB_AND_PRIOR_ART_AUDIT_2026-08-28.md",
+    )
 
     run(
         "scripts/audit_paper1_ajb_bundle_v1_0.py",

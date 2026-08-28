@@ -29,6 +29,7 @@ Current frozen layers:
 - **science:** Paper 1 **v0.2.2**;
 - **event-boundary-safe framing:** **v0.3.4**;
 - **AJB submission route:** **v1.0**;
+- **final journal-escalation verdict:** AJB first; *Evolution Letters* and *Evolution* inactive alternatives only;
 - **science reference contract:** 17 DOI rows (`paper1_reference_registry_v0_2_2.csv`);
 - **journal-facing reference contract:** 25 DOI rows (`paper1_reference_registry_v0_5.csv`).
 
@@ -125,13 +126,15 @@ Current contracts include:
 - [`docs/PAPER1_NOVELTY_LITERATURE_AUDIT_2026-08-27.md`](docs/PAPER1_NOVELTY_LITERATURE_AUDIT_2026-08-27.md) — prior-art boundary;
 - [`docs/PAPER1_EVOLUTIONARY_EVENT_BOUNDARY_AMENDMENT_V0_1.md`](docs/PAPER1_EVOLUTIONARY_EVENT_BOUNDARY_AMENDMENT_V0_1.md) — molecular-generation versus macro-event contract;
 - [`docs/PAPER1_STATE_IDENTITY_FRAMING_GATE_V0_1.md`](docs/PAPER1_STATE_IDENTITY_FRAMING_GATE_V0_1.md) — Issue #131 test and AJB-lock decision;
+- [`docs/PAPER1_JOURNAL_ESCALATION_GATE_V0_1.md`](docs/PAPER1_JOURNAL_ESCALATION_GATE_V0_1.md) — final three-journal scorecard and first-submission decision;
+- [`docs/PAPER1_JOURNAL_ESCALATION_WEB_AND_PRIOR_ART_AUDIT_2026-08-28.md`](docs/PAPER1_JOURNAL_ESCALATION_WEB_AND_PRIOR_ART_AUDIT_2026-08-28.md) — current official criteria and hostile prior-art audit;
 - [`docs/PAPER1_AJB_V1_0_COVER_LETTER_TEMPLATE.md`](docs/PAPER1_AJB_V1_0_COVER_LETTER_TEMPLATE.md) — current submission-facing cover letter;
 - [`docs/PAPER1_AJB_V1_0_SUBMISSION_CHECKLIST.md`](docs/PAPER1_AJB_V1_0_SUBMISSION_CHECKLIST.md) — current machine/human gate checklist;
 - [`scripts/build_paper1_novelty_framing_v0_3_4.py`](scripts/build_paper1_novelty_framing_v0_3_4.py) — current framing builder.
 
 ## Current AJB submission route — v1.0
 
-AJB **v1.0** is the current and only active submission bundle route. It is documented in [`docs/PAPER1_AJB_UPLOAD_BUNDLE_V1_0_README.md`](docs/PAPER1_AJB_UPLOAD_BUNDLE_V1_0_README.md) and built by [`.github/workflows/paper1-ajb-upload-bundle-v1-0.yml`](.github/workflows/paper1-ajb-upload-bundle-v1-0.yml).
+AJB **v1.0** is the current and only active submission bundle route. The final escalation gate compared actual *Evolution Letters*, *Evolution*, and AJB submission framings and retained AJB without changing the science. The inactive general-evolution alternatives are audit artifacts, not bundle inputs. The active route is documented in [`docs/PAPER1_AJB_UPLOAD_BUNDLE_V1_0_README.md`](docs/PAPER1_AJB_UPLOAD_BUNDLE_V1_0_README.md) and built by [`.github/workflows/paper1-ajb-upload-bundle-v1-0.yml`](.github/workflows/paper1-ajb-upload-bundle-v1-0.yml).
 
 The route promoted to `main` passed hosted run **33072640192**. Rebuilding the route confirms:
 
