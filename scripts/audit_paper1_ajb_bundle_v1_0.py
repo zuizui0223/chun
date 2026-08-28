@@ -58,6 +58,8 @@ def main() -> int:
         "provenance/PAPER1_NOVELTY_FRAMING_V0_3_4.md",
         "provenance/PAPER1_STATE_IDENTITY_FRAMING_GATE_V0_1.md",
         "provenance/PAPER1_JOURNAL_STRATEGY.md",
+        "provenance/PAPER1_JOURNAL_ESCALATION_GATE_V0_1.md",
+        "provenance/PAPER1_JOURNAL_ESCALATION_WEB_AND_PRIOR_ART_AUDIT_2026-08-28.md",
         "provenance/paper1_authoritative_results_v0_2_2.csv",
         "provenance/paper1_main_figure_manifest_v0_2_2.csv",
         "provenance/paper1_reference_registry_v0_5.csv",
@@ -121,6 +123,8 @@ def main() -> int:
 
     gate = (root / "provenance/PAPER1_STATE_IDENTITY_FRAMING_GATE_V0_1.md").read_text(encoding="utf-8")
     strategy = (root / "provenance/PAPER1_JOURNAL_STRATEGY.md").read_text(encoding="utf-8")
+    escalation_gate = (root / "provenance/PAPER1_JOURNAL_ESCALATION_GATE_V0_1.md").read_text(encoding="utf-8")
+    web_audit = (root / "provenance/PAPER1_JOURNAL_ESCALATION_WEB_AND_PRIOR_ART_AUDIT_2026-08-28.md").read_text(encoding="utf-8")
     cover = (root / "submission/PAPER1_AJB_V1_0_COVER_LETTER_TEMPLATE.md").read_text(encoding="utf-8")
     checklist = (root / "submission/PAPER1_AJB_V1_0_SUBMISSION_CHECKLIST.md").read_text(encoding="utf-8")
     companion_contract = {
@@ -137,9 +141,29 @@ def main() -> int:
             strategy,
             [
                 "Primary submission: American Journal of Botany (AJB), v1.0 route",
-                "Do not reopen the first-submission decision for *Evolution*",
+                "The final escalation gate tested the importance of the existing empirical results",
+                "The current contribution still does not meet the general-journal threshold",
                 "0/53 have complete defensible A/F/C/P states",
                 "Resume Issue #85",
+            ],
+        ),
+        "journal escalation gate": (
+            escalation_gate,
+            [
+                "First submission remains American Journal of Botany",
+                "*Evolution Letters*: **fail**",
+                "*Evolution*: **fail as first target**",
+                "0/53 complete defensible A/F/C/P states",
+                "The two general-evolution alternatives remain audit artifacts only",
+            ],
+        ),
+        "web and prior-art audit": (
+            web_audit,
+            [
+                "Do not escalate the current frozen Paper 1 above the *American Journal of Botany*",
+                "matched empirical audit in five public *Camellia* systems",
+                "0/53 accepted nuclear-tree tips have complete defensible A/F/C/P states",
+                "AJB first, Annals of Botany fallback, no journal escalation",
             ],
         ),
         "cover letter": (
@@ -238,6 +262,8 @@ def main() -> int:
         "novelty_headline": "hierarchical transition-class-dependent molecular repeatability plus separate macro pattern/event identity",
         "state_identity_gate_decision": "wording-only; no new quantified joint state-resolution result",
         "journal_lock": "American Journal of Botany",
+        "journal_escalation_gate_decision": "AJB first; Evolution Letters and Evolution alternatives inactive",
+        "current_web_prior_art_audit_included": True,
         "event_boundary_clarified": True,
         "candidate_free_definition_clarified": True,
         "literature_systems": 12,

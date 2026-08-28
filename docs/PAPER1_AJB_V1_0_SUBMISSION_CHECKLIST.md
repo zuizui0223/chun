@@ -27,7 +27,7 @@ This checklist is tied to **science v0.2.2 + framing v0.3.4 + AJB bundle v1.0**.
 - [x] Separate Figure 1–6 PNG and SVG files generated.
 - [x] Supporting Information S1–S8 generated.
 - [x] v1.0 cover-letter template prepared and included in the bundle.
-- [x] State-identity framing decision and journal strategy included as provenance.
+- [x] State-identity framing decision, final journal-escalation gate, current web/prior-art audit, and journal strategy included as provenance.
 - [ ] **Corresponding author downloads, completes, signs, and uploads the current AJB Author Agreement Form.**
 - [ ] Replace all cover-letter placeholders and export/upload the final cover letter.
 
