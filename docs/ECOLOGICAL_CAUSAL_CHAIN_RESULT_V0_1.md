@@ -74,6 +74,28 @@ The audit deliberately distinguishes a complete historical causal chain from par
 
 No admitted taxon currently closes all three links with a direct sensory manipulation, pollinator response and reproductive-fitness outcome, and none of these tests is tied to a colour-transition branch that survives the strict x dominant event-identity gate.
 
+## Same-study bridge screen — H10 is stronger than previously stated
+
+The targeted gap search identified a particularly informative peer-reviewed same-study bridge in *C. perpetua* (Jiang et al. 2025; `10.1016/j.flora.2025.152727`). The species flowers through contrasting seasons, allowing the same two populations to be compared in winter and summer.
+
+- nectar volume: **453.66 vs 129.14 uL** in winter vs summer, ratio approximately **3.51**;
+- sucrose/(fructose + glucose): **49.69 vs 6.99**, ratio approximately **7.11**;
+- bird visitation frequency was significantly higher in winter;
+- fruit set and seed set were significantly higher in winter in both populations.
+
+This is the strongest current within-study support for:
+
+`season / flowering-window environment -> reward state -> pollinator weighting -> reproductive success`.
+
+It upgrades H10 from a collection of environment-pollination observations to a **same-study observational mediation bridge**. It still does not isolate season from all co-varying environmental factors, and it contains no flower-colour or spectral-state contrast, so it cannot by itself identify selection on colour.
+
+The same-system screen also records two recent *C. oleifera* preprints only as sensitivity evidence, not primary support:
+
+- `10.21203/rs.3.rs-7998239/v1`: cultivar/wild fluorescence differences plus a field fluorescence-enhancement treatment that reportedly increased pollinator visitation, but no fruit/seed endpoint;
+- `10.21203/rs.3.rs-7998098/v1`: breeding-mediated anthesis/flower-size differences linked to pollinator attraction/transfer efficiency and fruit set, but morphology/phenology rather than a colour/spectral-state test.
+
+As of the 2026-09-03 search, these remain preprints and therefore do not close the peer-reviewed sensory-state-to-fitness gap.
+
 ## Result
 
 The strongest ecological interpretation can now be made more specific than `ecology may filter accessible states`:
@@ -97,8 +119,8 @@ The best current causal architecture is therefore:
 ## Hypothesis update
 
 - **H6 pollinator-reliability filtering:** strengthened from plausibility to mechanistic/service-level support; macrohistorical causation remains unidentified.
-- **H8 latent sensory-state filtering:** strengthened by a second independent Camellia behavioural study recovered outside title-based Camellia literature; the exact causal spectral component is not isolated across both studies.
-- **H10 flowering-window selection:** supported as an upstream pollination mediator, not as a direct visible-colour cause.
+- **H8 latent sensory-state filtering:** strengthened by a second independent Camellia behavioural study recovered outside title-based Camellia literature; the exact causal spectral component is not isolated across both studies, and peer-reviewed reproductive fitness remains missing.
+- **H10 flowering-window selection:** strengthened further by the *C. perpetua* same-study `season -> nectar -> bird visitation -> fruit/seed` bridge; this remains observational mediation rather than a direct colour-selection experiment.
 - **H7 ecological preadaptation vs genetic lineage permissivity:** still unresolved; both can generate lineage concentration.
 - **Direct annual cold -> anthocyanin-like visible colour:** remains unsupported as a general explanation after historical blocking.
 
@@ -110,8 +132,12 @@ A future promotion into Paper 1 would be justified only as a Discussion/Supporti
 
 ## Next decisive empirical gap
 
-The cleanest missing experiment/data configuration is:
+The gap search did **not** locate a peer-reviewed study that closes:
+
+`within one Camellia system: sensory / spectral state -> pollinator choice or effectiveness -> fruit / seed fitness`.
+
+The cleanest missing experiment/data configuration is therefore still:
 
 `within one wild Camellia system: sensory-state contrast/manipulation -> pollinator choice/effectiveness -> fruit/seed fitness`
 
-with the same floral state measured spectrally and biochemically. That would close the ecological filter at the extant mechanism level without requiring unstable ancestral branch reconstruction.
+with the same floral state measured spectrally and biochemically. That would close the ecological filter at the extant mechanism level without requiring unstable ancestral branch reconstruction. Historical branch causation would remain a separate, stricter gate.
