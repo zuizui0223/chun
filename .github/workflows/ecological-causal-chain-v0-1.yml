@@ -1,0 +1,179 @@
+name: Ecological causal-chain audit v0.1
+
+on:
+  pull_request:
+    paths:
+      - 'data/ecological_causal_chain_registry_v0_1.csv'
+      - 'data/ecological_same_system_bridge_screen_v0_1.csv'
+      - 'data/ecological_competing_model_contract_v0_1.csv'
+      - 'data/pollinator_filter_direction_contract_v0_1.csv'
+      - 'data/ecological_driver_study_registry_v0_2.csv'
+      - 'data/ecological_driver_effect_size_registry_v0_2.csv'
+      - 'data/camellia_visible_state_compression_models_v0_2_provenance_clean.csv'
+      - 'data/camellia_pollination_function_meta_summary_v0_2.csv'
+      - 'data/ultimate_cause_prebranch_hypothesis_results_v0_1.csv'
+      - 'data/fan2026_chelsa_species_compact_v0_1.csv'
+      - 'data/camellia_coldtail_provenance_sensitivity_v0_1.csv'
+      - 'scripts/analyze_ecological_causal_chain_v0_1.py'
+      - 'scripts/analyze_ecological_competing_models_v0_1.py'
+      - 'scripts/analyze_history_conditioned_climate_v0_1.py'
+      - 'scripts/validate_visible_colour_out_of_sample_v0_1.py'
+      - 'scripts/validate_visible_colour_provenance_cv_sensitivity_v0_1.py'
+      - 'scripts/validate_visible_colour_balance_sensitivity_v0_1.py'
+      - 'scripts/test_pollinator_filter_direction_consistency_v0_1.py'
+      - 'docs/ECOLOGICAL_CAUSAL_CHAIN_RESULT_V0_1.md'
+      - 'docs/ECOLOGICAL_COMPETING_MODEL_SELF_TEST_V0_1.md'
+      - 'docs/VISIBLE_COLOUR_OUT_OF_SAMPLE_VALIDATION_V0_1.md'
+      - 'docs/VISIBLE_COLOUR_PROVENANCE_CV_SENSITIVITY_V0_1.md'
+      - 'docs/VISIBLE_COLOUR_BALANCE_SENSITIVITY_V0_1.md'
+      - 'docs/POLLINATOR_FILTER_DIRECTION_CONSISTENCY_V0_1.md'
+      - '.github/workflows/ecological-causal-chain-v0-1.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Run branch-safe ecological causal-chain audit
+        run: |
+          mkdir -p build/ecological_causal_chain_v0_1
+          python scripts/analyze_ecological_causal_chain_v0_1.py \
+            --chain data/ecological_causal_chain_registry_v0_1.csv \
+            --bridges data/ecological_same_system_bridge_screen_v0_1.csv \
+            --studies data/ecological_driver_study_registry_v0_2.csv \
+            --effects data/ecological_driver_effect_size_registry_v0_2.csv \
+            --out-dir build/ecological_causal_chain_v0_1
+      - name: Run competing-model self-test
+        run: |
+          mkdir -p build/ecological_competing_model_v0_1
+          python scripts/analyze_ecological_competing_models_v0_1.py \
+            --contract data/ecological_competing_model_contract_v0_1.csv \
+            --climate-models data/camellia_visible_state_compression_models_v0_2_provenance_clean.csv \
+            --ultimate data/ultimate_cause_prebranch_hypothesis_results_v0_1.csv \
+            --pollination-summary data/camellia_pollination_function_meta_summary_v0_2.csv \
+            --chain data/ecological_causal_chain_registry_v0_1.csv \
+            --out-dir build/ecological_competing_model_v0_1
+      - name: Run history-conditioned climate check
+        run: |
+          mkdir -p build/history_conditioned_climate_v0_1
+          python scripts/analyze_history_conditioned_climate_v0_1.py \
+            --models data/camellia_visible_state_compression_models_v0_2_provenance_clean.csv \
+            --out-dir build/history_conditioned_climate_v0_1
+      - name: Run out-of-sample visible-colour climate validation
+        run: |
+          mkdir -p build/visible_colour_out_of_sample_v0_1
+          python scripts/validate_visible_colour_out_of_sample_v0_1.py \
+            --species data/fan2026_chelsa_species_compact_v0_1.csv \
+            --provenance data/camellia_coldtail_provenance_sensitivity_v0_1.csv \
+            --out-dir build/visible_colour_out_of_sample_v0_1
+      - name: Run provenance sensitivity of out-of-sample validation
+        run: |
+          mkdir -p build/visible_colour_provenance_cv_sensitivity_v0_1
+          python scripts/validate_visible_colour_provenance_cv_sensitivity_v0_1.py \
+            --species data/fan2026_chelsa_species_compact_v0_1.csv \
+            --provenance data/camellia_coldtail_provenance_sensitivity_v0_1.csv \
+            --out-dir build/visible_colour_provenance_cv_sensitivity_v0_1
+      - name: Run balanced A/W prediction sensitivity
+        run: |
+          mkdir -p build/visible_colour_balance_sensitivity_v0_1
+          python scripts/validate_visible_colour_balance_sensitivity_v0_1.py \
+            --species data/fan2026_chelsa_species_compact_v0_1.csv \
+            --provenance data/camellia_coldtail_provenance_sensitivity_v0_1.csv \
+            --out-dir build/visible_colour_balance_sensitivity_v0_1 \
+            --reps 10000 \
+            --seed 20260903
+      - name: Run study-level pollinator direction consistency
+        run: |
+          mkdir -p build/pollinator_filter_direction_consistency_v0_1
+          python scripts/test_pollinator_filter_direction_consistency_v0_1.py \
+            --contract data/pollinator_filter_direction_contract_v0_1.csv \
+            --effects data/ecological_driver_effect_size_registry_v0_2.csv \
+            --out-dir build/pollinator_filter_direction_consistency_v0_1
+      - name: Report
+        if: always()
+        run: |
+          echo '### Ecological causal-chain audit v0.1' >> "$GITHUB_STEP_SUMMARY"
+          for f in summary.json link_summary.csv; do
+            if [ -f "build/ecological_causal_chain_v0_1/$f" ]; then
+              echo "#### causal-chain/$f" >> "$GITHUB_STEP_SUMMARY"
+              echo '```' >> "$GITHUB_STEP_SUMMARY"
+              cat "build/ecological_causal_chain_v0_1/$f" >> "$GITHUB_STEP_SUMMARY"
+              echo '```' >> "$GITHUB_STEP_SUMMARY"
+            fi
+          done
+          echo '### Ecological competing-model self-test v0.1' >> "$GITHUB_STEP_SUMMARY"
+          for f in summary.json model_summary.csv constraint_decisions.csv leave_one_out.csv climate_negative_control.csv; do
+            if [ -f "build/ecological_competing_model_v0_1/$f" ]; then
+              echo "#### competing-model/$f" >> "$GITHUB_STEP_SUMMARY"
+              echo '```' >> "$GITHUB_STEP_SUMMARY"
+              cat "build/ecological_competing_model_v0_1/$f" >> "$GITHUB_STEP_SUMMARY"
+              echo '```' >> "$GITHUB_STEP_SUMMARY"
+            fi
+          done
+          echo '### History-conditioned climate self-check v0.1' >> "$GITHUB_STEP_SUMMARY"
+          for f in summary.json history_conditioned_aic.csv; do
+            if [ -f "build/history_conditioned_climate_v0_1/$f" ]; then
+              echo "#### history-conditioned/$f" >> "$GITHUB_STEP_SUMMARY"
+              echo '```' >> "$GITHUB_STEP_SUMMARY"
+              cat "build/history_conditioned_climate_v0_1/$f" >> "$GITHUB_STEP_SUMMARY"
+              echo '```' >> "$GITHUB_STEP_SUMMARY"
+            fi
+          done
+          echo '### Visible-colour out-of-sample validation v0.1' >> "$GITHUB_STEP_SUMMARY"
+          for f in summary.json cv_metric_summary.csv; do
+            if [ -f "build/visible_colour_out_of_sample_v0_1/$f" ]; then
+              echo "#### out-of-sample/$f" >> "$GITHUB_STEP_SUMMARY"
+              echo '```' >> "$GITHUB_STEP_SUMMARY"
+              cat "build/visible_colour_out_of_sample_v0_1/$f" >> "$GITHUB_STEP_SUMMARY"
+              echo '```' >> "$GITHUB_STEP_SUMMARY"
+            fi
+          done
+          echo '### Visible-colour provenance CV sensitivity v0.1' >> "$GITHUB_STEP_SUMMARY"
+          for f in summary.json scenario_mode_summary.csv; do
+            if [ -f "build/visible_colour_provenance_cv_sensitivity_v0_1/$f" ]; then
+              echo "#### provenance-cv/$f" >> "$GITHUB_STEP_SUMMARY"
+              echo '```' >> "$GITHUB_STEP_SUMMARY"
+              cat "build/visible_colour_provenance_cv_sensitivity_v0_1/$f" >> "$GITHUB_STEP_SUMMARY"
+              echo '```' >> "$GITHUB_STEP_SUMMARY"
+            fi
+          done
+          echo '### Visible-colour balance sensitivity v0.1' >> "$GITHUB_STEP_SUMMARY"
+          for f in summary.json metric_summary.csv; do
+            if [ -f "build/visible_colour_balance_sensitivity_v0_1/$f" ]; then
+              echo "#### balance/$f" >> "$GITHUB_STEP_SUMMARY"
+              echo '```' >> "$GITHUB_STEP_SUMMARY"
+              cat "build/visible_colour_balance_sensitivity_v0_1/$f" >> "$GITHUB_STEP_SUMMARY"
+              echo '```' >> "$GITHUB_STEP_SUMMARY"
+            fi
+          done
+          echo '### Pollinator-filter direction consistency v0.1' >> "$GITHUB_STEP_SUMMARY"
+          for f in summary.json study_cluster_votes.csv leave_one_study_out.csv; do
+            if [ -f "build/pollinator_filter_direction_consistency_v0_1/$f" ]; then
+              echo "#### direction-consistency/$f" >> "$GITHUB_STEP_SUMMARY"
+              echo '```' >> "$GITHUB_STEP_SUMMARY"
+              cat "build/pollinator_filter_direction_consistency_v0_1/$f" >> "$GITHUB_STEP_SUMMARY"
+              echo '```' >> "$GITHUB_STEP_SUMMARY"
+            fi
+          done
+      - name: Upload audit outputs
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: ecological-causal-chain-v0-1
+          path: |
+            build/ecological_causal_chain_v0_1
+            build/ecological_competing_model_v0_1
+            build/history_conditioned_climate_v0_1
+            build/visible_colour_out_of_sample_v0_1
+            build/visible_colour_provenance_cv_sensitivity_v0_1
+            build/visible_colour_balance_sensitivity_v0_1
+            build/pollinator_filter_direction_consistency_v0_1
+          if-no-files-found: error
