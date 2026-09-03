@@ -17,9 +17,11 @@ on:
       - 'scripts/analyze_ecological_competing_models_v0_1.py'
       - 'scripts/analyze_history_conditioned_climate_v0_1.py'
       - 'scripts/validate_visible_colour_out_of_sample_v0_1.py'
+      - 'scripts/validate_visible_colour_provenance_cv_sensitivity_v0_1.py'
       - 'docs/ECOLOGICAL_CAUSAL_CHAIN_RESULT_V0_1.md'
       - 'docs/ECOLOGICAL_COMPETING_MODEL_SELF_TEST_V0_1.md'
       - 'docs/VISIBLE_COLOUR_OUT_OF_SAMPLE_VALIDATION_V0_1.md'
+      - 'docs/VISIBLE_COLOUR_PROVENANCE_CV_SENSITIVITY_V0_1.md'
       - '.github/workflows/ecological-causal-chain-v0-1.yml'
   workflow_dispatch:
 
@@ -67,6 +69,13 @@ jobs:
             --species data/fan2026_chelsa_species_compact_v0_1.csv \
             --provenance data/camellia_coldtail_provenance_sensitivity_v0_1.csv \
             --out-dir build/visible_colour_out_of_sample_v0_1
+      - name: Run provenance sensitivity of out-of-sample validation
+        run: |
+          mkdir -p build/visible_colour_provenance_cv_sensitivity_v0_1
+          python scripts/validate_visible_colour_provenance_cv_sensitivity_v0_1.py \
+            --species data/fan2026_chelsa_species_compact_v0_1.csv \
+            --provenance data/camellia_coldtail_provenance_sensitivity_v0_1.csv \
+            --out-dir build/visible_colour_provenance_cv_sensitivity_v0_1
       - name: Report
         if: always()
         run: |
@@ -106,6 +115,15 @@ jobs:
               echo '```' >> "$GITHUB_STEP_SUMMARY"
             fi
           done
+          echo '### Visible-colour provenance CV sensitivity v0.1' >> "$GITHUB_STEP_SUMMARY"
+          for f in summary.json scenario_mode_summary.csv; do
+            if [ -f "build/visible_colour_provenance_cv_sensitivity_v0_1/$f" ]; then
+              echo "#### provenance-cv/$f" >> "$GITHUB_STEP_SUMMARY"
+              echo '```' >> "$GITHUB_STEP_SUMMARY"
+              cat "build/visible_colour_provenance_cv_sensitivity_v0_1/$f" >> "$GITHUB_STEP_SUMMARY"
+              echo '```' >> "$GITHUB_STEP_SUMMARY"
+            fi
+          done
       - name: Upload audit outputs
         if: always()
         uses: actions/upload-artifact@v4
@@ -116,4 +134,5 @@ jobs:
             build/ecological_competing_model_v0_1
             build/history_conditioned_climate_v0_1
             build/visible_colour_out_of_sample_v0_1
+            build/visible_colour_provenance_cv_sensitivity_v0_1
           if-no-files-found: error
