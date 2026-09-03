@@ -1,0 +1,51 @@
+name: Micro ecology overlap audit v0.1
+
+on:
+  pull_request:
+    paths:
+      - 'data/micro_ecology_overlap_contract_v0_1.csv'
+      - 'data/paper1_fig2_candidate_free_signature_v0_2.csv'
+      - 'data/camellia_pollination_function_meta_v0_3.csv'
+      - 'scripts/audit_micro_ecology_overlap_v0_1.py'
+      - 'docs/MICRO_ECOLOGY_OVERLAP_AUDIT_V0_1.md'
+      - '.github/workflows/micro-ecology-overlap-v0-1.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Run overlap audit
+        run: |
+          mkdir -p build/micro_ecology_overlap_v0_1
+          python scripts/audit_micro_ecology_overlap_v0_1.py \
+            --contract data/micro_ecology_overlap_contract_v0_1.csv \
+            --candidate-free data/paper1_fig2_candidate_free_signature_v0_2.csv \
+            --pollination data/camellia_pollination_function_meta_v0_3.csv \
+            --out-dir build/micro_ecology_overlap_v0_1
+      - name: Report
+        if: always()
+        run: |
+          for f in summary.json overlap_audit.csv; do
+            if [ -f "build/micro_ecology_overlap_v0_1/$f" ]; then
+              echo "### $f" >> "$GITHUB_STEP_SUMMARY"
+              echo '```' >> "$GITHUB_STEP_SUMMARY"
+              cat "build/micro_ecology_overlap_v0_1/$f" >> "$GITHUB_STEP_SUMMARY"
+              echo '```' >> "$GITHUB_STEP_SUMMARY"
+            fi
+          done
+      - name: Upload outputs
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: micro-ecology-overlap-v0-1
+          path: build/micro_ecology_overlap_v0_1
+          if-no-files-found: error
