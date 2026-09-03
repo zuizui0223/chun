@@ -1,0 +1,8 @@
+anchor_id,endpoint,summer_value,winter_value,winter_to_summer_ratio,unit,source_status,source,interpretation_ceiling
+CP_NECTAR_VOLUME,nectar_volume_per_flower,129.14,453.66,3.5129317020,uL,peer_reviewed_final,10.1016/j.flora.2025.152727,"seasonal reward anchor; not evidence of petal sensory mediation"
+CP_SUCROSE_RATIO_FULL_BLOOM,sucrose_over_glucose_plus_fructose,6.99,49.69,7.1087267525,ratio,peer_reviewed_final,10.1016/j.flora.2025.152727,"full-bloom nectar chemistry anchor"
+CP_TOTAL_NECTAR_AMINO_ACIDS,total_amino_acids,1317,530,0.4024297646,ug_per_mL,precursor_numeric_anchor_confirmed_direction_in_final,10.22541/au.167785049.94248293/v1,"legacy quantitative precursor anchor; summer exceeds winter; do not treat as independent replication of final article"
+CP_BIRD_VISIT,Aethopyga_christinae_visitation,0.20,0.58,2.9,visits_per_flower_per_hour,precursor_numeric_anchor_final_supports_direction,10.22541/au.167785049.94248293/v1,"bird visitation weighting only; not per-visit effectiveness"
+CP_APIS_CERANA_VISIT,Apis_cerana_visitation,4.23,1.02,0.2411347518,visits_per_flower_per_hour,precursor_numeric_anchor_final_supports_direction,10.22541/au.167785049.94248293/v1,"bee visitation weighting only; not per-visit effectiveness"
+CP_APIS_MELLIFERA_VISIT,Apis_mellifera_ligustica_visitation,5.26,0.98,0.1863117871,visits_per_flower_per_hour,precursor_numeric_anchor_final_supports_direction,10.22541/au.167785049.94248293/v1,"bee visitation weighting only; not per-visit effectiveness"
+CP_BIRD_TO_TWO_BEE_RATIO,bird_to_two_bee_visitation_ratio,0.0210748156,0.29,13.7605,ratio,derived_from_precursor_numeric_anchors,10.22541/au.167785049.94248293/v1,"descriptive guild-weighting shift; excludes other summer visitors and must not be interpreted as fitness ratio"
