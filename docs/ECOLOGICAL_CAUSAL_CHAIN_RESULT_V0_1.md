@@ -22,9 +22,11 @@ A historical colour-transition cause is claimed only if these links can eventual
 
 A title-based Camellia search misses Chen et al. (2020), DOI `10.1093/jpe/rtaa023`, because the paper is titled around a bee-pollinated *Onosma*. Its experience-controlled experiment nevertheless used two cultivated *Camellia japonica* varieties as the test stimuli.
 
-The two Camellia flowers appeared similarly red to humans but differed in UV reflectance. Sixteen flower-naive *Bombus terrestris* were tested. UV-reflecting red Camellia targets received **42 of 57 first choices**, versus **15 of 57** for UV-absorbing red targets; the published test was chi-square = 6.136, **P = 0.013**. The descriptive UV+/UV- choice ratio is 2.80.
+The two Camellia flowers appeared similarly red to humans but differed in UV reflectance. Sixteen flower-naive *Bombus terrestris* were tested. UV-reflecting red Camellia targets received **42 of 57 reported first choices across bouts**, versus **15 of 57** for UV-absorbing red targets; the published test was chi-square = 6.136, **P = 0.013**. The descriptive UV+/UV- choice ratio is 2.80.
 
-This is not a natural-selection or fitness experiment and does not represent an independent evolutionary origin. It is valuable because it provides a controlled Camellia demonstration that a human-hidden spectral component can change pollinator behaviour while coarse visible hue remains red.
+The 57 choices are repeated bouts from 16 bees, so this audit does **not** reinterpret them as 57 independent animals or recompute an independent-binomial P value. It retains the study's published test as reported. The Camellia contrast is also between cultivated varieties, not a within-genotype UV manipulation. Scent and target position were controlled in the assay, but the experiment remains behavioural rather than a natural-selection or fitness test and does not represent an independent evolutionary origin.
+
+Its value is narrower and useful: it provides controlled Camellia evidence that a human-hidden spectral component is associated with a strong pollinator-choice difference while coarse visible hue remains red.
 
 ## Link 1 — flowering-window environment changes pollinator reliability
 
@@ -41,12 +43,12 @@ These outcomes are heterogeneous and are not pooled onto one effect scale. Their
 
 There are now two independent Camellia behavioural studies in the audit.
 
-1. **Mori et al. 2023** (`10.1016/j.phytochem.2022.113559`): two wild Camellia species are both human-visible red, but *C. rusticana* received 25.8 visits/10 min versus 1.1 for *C. japonica* in the bumblebee two-choice assay, a descriptive ratio of approximately **23.45**. The species differ in UV reflectance, bee-visible chromatic contrast and fluorescence.
-2. **Chen et al. 2020** (`10.1093/jpe/rtaa023`): two cultivated *C. japonica* red varieties differing in UV reflectance produced **42 vs 15** choices by flower-naive bumblebees, **P = 0.013**.
+1. **Mori et al. 2023** (`10.1016/j.phytochem.2022.113559`): two wild Camellia species are both human-visible red, but *C. rusticana* received 25.8 visits/10 min versus 1.1 for *C. japonica* in the bumblebee two-choice assay, a descriptive ratio of approximately **23.45**. The species differ in UV reflectance, bee-visible chromatic contrast and fluorescence. Because this is a paired species contrast, the response cannot be assigned uniquely to one spectral component.
+2. **Chen et al. 2020** (`10.1093/jpe/rtaa023`): two cultivated *C. japonica* red varieties differing in UV reflectance produced **42 vs 15** reported choices by flower-naive bumblebees, **published P = 0.013**. The statistical unit ceiling above is retained.
 
-These are not commensurable effect sizes and are not pooled. Their important shared result is that **human-visible red is not the operative ecological state**. Pollinator response changes strongly along spectral/UV axes that the A/W/Y coding compresses.
+These are not commensurable effect sizes and are not pooled. Their important shared result is that **human-visible red is not the operative ecological state**. Pollinator response changes strongly along spectral/UV-associated axes that the A/W/Y coding compresses.
 
-This independently strengthens H8, the latent-sensory-state filtering hypothesis.
+This independently strengthens H8, the latent-sensory-state filtering hypothesis, while leaving the exact causal sensory component open.
 
 ## Link 3 — pollinator service changes reproductive success
 
@@ -76,7 +78,7 @@ No admitted taxon currently closes all three links with a direct sensory manipul
 
 The strongest ecological interpretation can now be made more specific than `ecology may filter accessible states`:
 
-> **Camellia contains repeated quantitative evidence for a context-dependent pollinator-mediated filter: flowering-window environment changes pollinator/reward conditions; latent spectral traits can strongly alter pollinator choice even within the same human-visible hue; and effective pollinator access repeatedly has large reproductive consequences.**
+> **Camellia contains repeated quantitative evidence for a context-dependent pollinator-mediated filter: flowering-window environment changes pollinator/reward conditions; latent spectral traits are associated with strong pollinator-choice differences even within the same human-visible hue; and effective pollinator access repeatedly has large reproductive consequences.**
 
 This is **mechanistic support for ecological filtering**, not proof that pollinators caused any particular accepted-species flower-colour transition.
 
@@ -95,7 +97,7 @@ The best current causal architecture is therefore:
 ## Hypothesis update
 
 - **H6 pollinator-reliability filtering:** strengthened from plausibility to mechanistic/service-level support; macrohistorical causation remains unidentified.
-- **H8 latent sensory-state filtering:** strengthened by a second independent Camellia behavioural experiment recovered outside title-based Camellia literature.
+- **H8 latent sensory-state filtering:** strengthened by a second independent Camellia behavioural study recovered outside title-based Camellia literature; the exact causal spectral component is not isolated across both studies.
 - **H10 flowering-window selection:** supported as an upstream pollination mediator, not as a direct visible-colour cause.
 - **H7 ecological preadaptation vs genetic lineage permissivity:** still unresolved; both can generate lineage concentration.
 - **Direct annual cold -> anthocyanin-like visible colour:** remains unsupported as a general explanation after historical blocking.
