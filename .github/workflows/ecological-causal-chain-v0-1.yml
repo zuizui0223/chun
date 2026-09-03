@@ -6,6 +6,7 @@ on:
       - 'data/ecological_causal_chain_registry_v0_1.csv'
       - 'data/ecological_same_system_bridge_screen_v0_1.csv'
       - 'data/ecological_competing_model_contract_v0_1.csv'
+      - 'data/pollinator_filter_direction_contract_v0_1.csv'
       - 'data/ecological_driver_study_registry_v0_2.csv'
       - 'data/ecological_driver_effect_size_registry_v0_2.csv'
       - 'data/camellia_visible_state_compression_models_v0_2_provenance_clean.csv'
@@ -19,11 +20,13 @@ on:
       - 'scripts/validate_visible_colour_out_of_sample_v0_1.py'
       - 'scripts/validate_visible_colour_provenance_cv_sensitivity_v0_1.py'
       - 'scripts/validate_visible_colour_balance_sensitivity_v0_1.py'
+      - 'scripts/test_pollinator_filter_direction_consistency_v0_1.py'
       - 'docs/ECOLOGICAL_CAUSAL_CHAIN_RESULT_V0_1.md'
       - 'docs/ECOLOGICAL_COMPETING_MODEL_SELF_TEST_V0_1.md'
       - 'docs/VISIBLE_COLOUR_OUT_OF_SAMPLE_VALIDATION_V0_1.md'
       - 'docs/VISIBLE_COLOUR_PROVENANCE_CV_SENSITIVITY_V0_1.md'
       - 'docs/VISIBLE_COLOUR_BALANCE_SENSITIVITY_V0_1.md'
+      - 'docs/POLLINATOR_FILTER_DIRECTION_CONSISTENCY_V0_1.md'
       - '.github/workflows/ecological-causal-chain-v0-1.yml'
   workflow_dispatch:
 
@@ -87,6 +90,13 @@ jobs:
             --out-dir build/visible_colour_balance_sensitivity_v0_1 \
             --reps 10000 \
             --seed 20260903
+      - name: Run study-level pollinator direction consistency
+        run: |
+          mkdir -p build/pollinator_filter_direction_consistency_v0_1
+          python scripts/test_pollinator_filter_direction_consistency_v0_1.py \
+            --contract data/pollinator_filter_direction_contract_v0_1.csv \
+            --effects data/ecological_driver_effect_size_registry_v0_2.csv \
+            --out-dir build/pollinator_filter_direction_consistency_v0_1
       - name: Report
         if: always()
         run: |
@@ -144,6 +154,15 @@ jobs:
               echo '```' >> "$GITHUB_STEP_SUMMARY"
             fi
           done
+          echo '### Pollinator-filter direction consistency v0.1' >> "$GITHUB_STEP_SUMMARY"
+          for f in summary.json study_cluster_votes.csv leave_one_study_out.csv; do
+            if [ -f "build/pollinator_filter_direction_consistency_v0_1/$f" ]; then
+              echo "#### direction-consistency/$f" >> "$GITHUB_STEP_SUMMARY"
+              echo '```' >> "$GITHUB_STEP_SUMMARY"
+              cat "build/pollinator_filter_direction_consistency_v0_1/$f" >> "$GITHUB_STEP_SUMMARY"
+              echo '```' >> "$GITHUB_STEP_SUMMARY"
+            fi
+          done
       - name: Upload audit outputs
         if: always()
         uses: actions/upload-artifact@v4
@@ -156,4 +175,5 @@ jobs:
             build/visible_colour_out_of_sample_v0_1
             build/visible_colour_provenance_cv_sensitivity_v0_1
             build/visible_colour_balance_sensitivity_v0_1
+            build/pollinator_filter_direction_consistency_v0_1
           if-no-files-found: error
