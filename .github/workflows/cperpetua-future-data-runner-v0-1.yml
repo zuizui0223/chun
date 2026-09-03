@@ -1,0 +1,85 @@
+name: C. perpetua future seasonal data runner v0.1
+
+on:
+  pull_request:
+    paths:
+      - 'data/cperpetua_seasonal_input_template_v0_1.csv'
+      - 'data/cperpetua_equivalence_bound_template_v0_1.csv'
+      - 'scripts/validate_cperpetua_future_input_template_v0_1.py'
+      - 'scripts/analyze_cperpetua_future_seasonal_data_v0_1.py'
+      - 'scripts/generate_cperpetua_future_synthetic_smoke_v0_1.py'
+      - 'scripts/summarize_cperpetua_secondary_endpoints_v0_1.py'
+      - 'docs/CPERPETUA_FUTURE_DATA_RUNNER_V0_1.md'
+      - '.github/workflows/cperpetua-future-data-runner-v0-1.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install runtime dependency
+        run: python -m pip install --quiet numpy
+      - name: Validate blank 15 x 2 input template
+        run: |
+          mkdir -p build/cperpetua_future_template_v0_1
+          python scripts/validate_cperpetua_future_input_template_v0_1.py \
+            --input data/cperpetua_seasonal_input_template_v0_1.csv \
+            --out-dir build/cperpetua_future_template_v0_1
+      - name: Run three deterministic classification smoke cases
+        run: |
+          for scenario in sensory_plus_reward reward_only latent_unresolved; do
+            mkdir -p "build/$scenario/input" "build/$scenario/result" "build/$scenario/secondary"
+            python scripts/generate_cperpetua_future_synthetic_smoke_v0_1.py \
+              --scenario "$scenario" \
+              --out-dir "build/$scenario/input"
+            python scripts/analyze_cperpetua_future_seasonal_data_v0_1.py \
+              --data "build/$scenario/input/synthetic.csv" \
+              --bounds "build/$scenario/input/bounds.csv" \
+              --out-dir "build/$scenario/result"
+            python scripts/summarize_cperpetua_secondary_endpoints_v0_1.py \
+              --data "build/$scenario/input/synthetic.csv" \
+              --out-dir "build/$scenario/secondary"
+          done
+          python - <<'PY'
+          import json
+          expected={'sensory_plus_reward':'M_SENSORY_PLUS_REWARD','reward_only':'M_REWARD_ONLY','latent_unresolved':'LATENT_STATE_UNRESOLVED'}
+          for scenario,want in expected.items():
+            x=json.load(open(f'build/{scenario}/result/summary.json'))
+            assert x['classification']==want,(scenario,x)
+            print(scenario,'->',x['classification'])
+          s=json.load(open('build/sensory_plus_reward/result/summary.json'))
+          assert all(s['gates'][g] for g in ('G0','G2','G3','G4','G5')) and not s['gates']['G1']
+          r=json.load(open('build/reward_only/result/summary.json'))
+          assert r['gates']['G0'] and r['gates']['G1'] and not r['gates']['G2'] and not r['gates']['G3'] and not r['gates']['G4']
+          u=json.load(open('build/latent_unresolved/result/summary.json'))
+          assert u['gates']['G0'] and not u['gates']['G1'] and not u['gates']['G2']
+          PY
+      - name: Report
+        if: always()
+        run: |
+          echo '### C. perpetua future-data runner v0.1' >> "$GITHUB_STEP_SUMMARY"
+          for scenario in sensory_plus_reward reward_only latent_unresolved; do
+            echo "## $scenario" >> "$GITHUB_STEP_SUMMARY"
+            for f in summary.json gate_results.csv equivalence_results.csv fitness_endpoint_rmse.csv; do
+              if [ -f "build/$scenario/result/$f" ]; then
+                echo "#### primary/$f" >> "$GITHUB_STEP_SUMMARY"
+                echo '```' >> "$GITHUB_STEP_SUMMARY"
+                cat "build/$scenario/result/$f" >> "$GITHUB_STEP_SUMMARY"
+                echo '```' >> "$GITHUB_STEP_SUMMARY"
+              fi
+            done
+            if [ -f "build/$scenario/secondary/secondary_seasonal_summary.csv" ]; then
+              echo '#### secondary/secondary_seasonal_summary.csv' >> "$GITHUB_STEP_SUMMARY"
+              echo '```' >> "$GITHUB_STEP_SUMMARY"
+              cat "build/$scenario/secondary/secondary_seasonal_summary.csv" >> "$GITHUB_STEP_SUMMARY"
+              echo '```' >> "$GITHUB_STEP_SUMMARY"
+            fi
+          done
