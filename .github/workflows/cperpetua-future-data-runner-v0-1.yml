@@ -8,6 +8,7 @@ on:
       - 'scripts/validate_cperpetua_future_input_template_v0_1.py'
       - 'scripts/analyze_cperpetua_future_seasonal_data_v0_1.py'
       - 'scripts/generate_cperpetua_future_synthetic_smoke_v0_1.py'
+      - 'scripts/summarize_cperpetua_secondary_endpoints_v0_1.py'
       - 'docs/CPERPETUA_FUTURE_DATA_RUNNER_V0_1.md'
       - '.github/workflows/cperpetua-future-data-runner-v0-1.yml'
   workflow_dispatch:
@@ -35,7 +36,7 @@ jobs:
       - name: Run three deterministic classification smoke cases
         run: |
           for scenario in sensory_plus_reward reward_only latent_unresolved; do
-            mkdir -p "build/$scenario/input" "build/$scenario/result"
+            mkdir -p "build/$scenario/input" "build/$scenario/result" "build/$scenario/secondary"
             python scripts/generate_cperpetua_future_synthetic_smoke_v0_1.py \
               --scenario "$scenario" \
               --out-dir "build/$scenario/input"
@@ -43,14 +44,13 @@ jobs:
               --data "build/$scenario/input/synthetic.csv" \
               --bounds "build/$scenario/input/bounds.csv" \
               --out-dir "build/$scenario/result"
+            python scripts/summarize_cperpetua_secondary_endpoints_v0_1.py \
+              --data "build/$scenario/input/synthetic.csv" \
+              --out-dir "build/$scenario/secondary"
           done
           python - <<'PY'
           import json
-          expected={
-            'sensory_plus_reward':'M_SENSORY_PLUS_REWARD',
-            'reward_only':'M_REWARD_ONLY',
-            'latent_unresolved':'LATENT_STATE_UNRESOLVED',
-          }
+          expected={'sensory_plus_reward':'M_SENSORY_PLUS_REWARD','reward_only':'M_REWARD_ONLY','latent_unresolved':'LATENT_STATE_UNRESOLVED'}
           for scenario,want in expected.items():
             x=json.load(open(f'build/{scenario}/result/summary.json'))
             assert x['classification']==want,(scenario,x)
@@ -70,10 +70,16 @@ jobs:
             echo "## $scenario" >> "$GITHUB_STEP_SUMMARY"
             for f in summary.json gate_results.csv equivalence_results.csv fitness_endpoint_rmse.csv; do
               if [ -f "build/$scenario/result/$f" ]; then
-                echo "#### $f" >> "$GITHUB_STEP_SUMMARY"
+                echo "#### primary/$f" >> "$GITHUB_STEP_SUMMARY"
                 echo '```' >> "$GITHUB_STEP_SUMMARY"
                 cat "build/$scenario/result/$f" >> "$GITHUB_STEP_SUMMARY"
                 echo '```' >> "$GITHUB_STEP_SUMMARY"
               fi
             done
+            if [ -f "build/$scenario/secondary/secondary_seasonal_summary.csv" ]; then
+              echo '#### secondary/secondary_seasonal_summary.csv' >> "$GITHUB_STEP_SUMMARY"
+              echo '```' >> "$GITHUB_STEP_SUMMARY"
+              cat "build/$scenario/secondary/secondary_seasonal_summary.csv" >> "$GITHUB_STEP_SUMMARY"
+              echo '```' >> "$GITHUB_STEP_SUMMARY"
+            fi
           done
