@@ -36,7 +36,17 @@ The independent history-aware diagnostic also fails the predicted direct-cold pa
 - section-block cold-direction P = **0.37350**;
 - within-section prediction that different-colour pairs are more climatically divergent: one-sided P = **1.0**, with the observed difference in the opposite direction.
 
-Thus the direct annual-climate model fails both a prediction test and a history-control test. This does not reject flowering-window climate acting upstream through pollinators.
+### Additional history-conditioned AIC check
+
+A second self-check asks a still more direct question: after a traditional-section history proxy is already in the model, does adding visible A/W colour improve fit?
+
+Across the same four frozen metrics, `section+colour` is compared against `section` alone. Adding colour improves AIC in:
+
+> **0/4 metrics.**
+
+This check is intentionally descriptive because traditional section is only a coarse history proxy. Its value is that the same conclusion is recovered from model comparison rather than only from the permutation tests: coarse visible colour does not add detectable annual-climate information after the current history proxy is present.
+
+Thus the direct annual-climate model fails a null-model prediction, a history-blocked directional test, and a history-conditioned AIC sensitivity. This does not reject flowering-window climate acting upstream through pollinators.
 
 ## Negative control 2 — visible hue is not a deterministic pollination state
 
@@ -114,6 +124,8 @@ Under the frozen constraint contract:
 - `M_DIRECT_ANNUAL_CLIMATE`: **0 supported / 2 not supported**;
 - `M_VISIBLE_HUE_SYNDROME`: **0 supported / 1 not supported / 1 unresolved**;
 - `M_POLLINATOR_FILTER`: **4 supported / 0 not supported / 1 unresolved**.
+
+The additional history-conditioned 0/4 AIC check is an orthogonal sensitivity and is not counted as an extra pseudo-independent constraint in those totals.
 
 These counts are descriptive constraint survival, not a statistical model probability.
 
