@@ -1,0 +1,36 @@
+name: C. perpetua intervention causal closure v0.1
+
+on:
+  pull_request:
+    paths:
+      - 'data/cperpetua_intervention_causal_contract_v0_1.csv'
+      - 'data/cperpetua_intervention_allocation_v0_1.csv'
+      - 'scripts/validate_cperpetua_intervention_contract_v0_1.py'
+      - 'docs/CPERPETUA_INTERVENTION_CAUSAL_CLOSURE_V0_1.md'
+      - '.github/workflows/cperpetua-intervention-causal-closure-v0-1.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Validate intervention allocation and causal gates
+        run: |
+          mkdir -p build/cperpetua_intervention_v0_1
+          python scripts/validate_cperpetua_intervention_contract_v0_1.py \
+            --contract data/cperpetua_intervention_causal_contract_v0_1.csv \
+            --allocation data/cperpetua_intervention_allocation_v0_1.csv \
+            --out-dir build/cperpetua_intervention_v0_1
+      - name: Report
+        if: always()
+        run: |
+          echo '### C. perpetua intervention causal closure v0.1' >> "$GITHUB_STEP_SUMMARY"
+          cat build/cperpetua_intervention_v0_1/summary.json >> "$GITHUB_STEP_SUMMARY" || true
