@@ -11,6 +11,17 @@ To demonstrate an extant ecological-filter mechanism more directly, add two orth
 
 These experiments are independent of historical branch reconstruction.
 
+## Independence and randomization frame
+
+Two inferential frames must not be conflated.
+
+- For the **natural winter/summer observational comparison**, the tagged plant remains the biological independence unit.
+- For **G4X/G5X interventions**, treatment is randomized to individual flowers/buds *within each plant × season block*. The randomized flower/bud is therefore the experimental unit for the treatment effect, while plant × season is the blocking unit and the 15 plants define the biological generalization frame.
+
+Using the randomized flower-level outcomes is not pseudoreplication: the treatment labels themselves are assigned at that level. Primary intervention P values are randomization-based and preserve the exact treatment counts within every plant-season block. Plant-level treatment contrasts and heterogeneity are always reported alongside the blocked estimate.
+
+This distinction prevents two opposite errors: pretending observational flowers are independent replicates, or discarding valid randomized flower-level information by collapsing every intervention to only 15 numbers.
+
 ## A. Sensory intervention — G4X
 
 Use flowers separate from the 30-bud reproductive cohort.
@@ -20,7 +31,9 @@ Per plant per season:
 - 6 active spectral-manipulation flowers;
 - 6 vehicle/sham flowers.
 
-Across 15 plants × 2 seasons this gives 180 active and 180 sham flowers while the **plant remains the inferential unit**.
+Across 15 plants × 2 seasons this gives 180 active and 180 sham flowers.
+
+Treatment labels are randomized among the 12 comparable trial flowers separately within each plant-season block.
 
 ### Intervention specification
 
@@ -34,17 +47,25 @@ Do not freeze a chemical/material after seeing pollinator outcomes. Before field
 
 If these manipulation checks fail, G4X cannot be interpreted even if pollinator behavior differs.
 
-### Behavioral/service endpoint
+### Behavioral/service endpoint and inference
 
 Bag trial flowers until testing. Record:
 
 - first legitimate Apis approach/contact;
 - latency and visitor identity;
-- stigma pollen deposition after a standardized single legitimate visit whenever feasible.
+- stigma pollen deposition after a standardized legitimate-visit/trial protocol whenever feasible.
 
-Primary G4X outcome should privilege **single-visit pollen deposition/effectiveness** over visit count if the sample is sufficient.
+The endpoint definition and exposure window must be frozen before treatment labels are linked to outcomes. Pollen-deposition/effectiveness is preferred over visit count when the protocol yields a complete comparable outcome; behavioral response remains fully reported.
 
-For each tagged plant, average the active-minus-sham response across its valid trial flowers. Use exact plant-level sign-flip inference. The prespecified direction is active manipulation -> lower bee response if the manipulation reduces bee-facing contrast.
+Primary G4X inference uses treatment-label randomization **within every plant-season block**, preserving 6 active / 6 sham assignments. The test statistic is an equally block-weighted active-minus-sham contrast so one high-visit plant or season cannot dominate merely because it contributes more observations. Exact enumeration over all blocks is infeasible, so use a deterministic Monte Carlo randomization distribution with a frozen seed and at least 100,000 joint within-block reassignments.
+
+Report in parallel:
+
+- pooled blocked treatment effect;
+- each plant-season treatment contrast;
+- each plant's season-specific and across-season effect summaries.
+
+The prespecified direction is active manipulation -> lower bee response if the active manipulation reduces bee-facing contrast.
 
 G4X requires both the optical manipulation check and the behavioral/effectiveness contrast.
 
@@ -52,7 +73,7 @@ G4X requires both the optical manipulation check and the behavioral/effectivenes
 
 Reuse the published scale of 30 marked buds per plant in each season.
 
-Randomize similar buds within each plant to:
+Randomize comparable buds **within each plant × season** to:
 
 - **open: 8**;
 - **bird exclusion: 8**;
@@ -61,7 +82,7 @@ Randomize similar buds within each plant to:
 
 Total = 30 buds per plant per season.
 
-Randomization occurs within plant and season; treatment labels are assigned before fruit outcome is known.
+Treatment labels are assigned before fruit outcome is known. The randomized bud is the treatment unit; the plant-season block absorbs shared plant quality and seasonal background.
 
 ### Treatment validation
 
@@ -76,31 +97,47 @@ Full-exclusion bags provide the autonomous baseline. Hand-cross flowers receive 
 
 ### Prespecified causal contrasts
 
-Define plant-level seed-set contrasts first; fruit set is reported as a parallel endpoint.
+Seed set is the primary reproductive endpoint; fruit set is reported as a parallel endpoint and cannot replace a failed seed-set gate post hoc.
+
+For pairwise intervention gates, inference is restricted to the relevant arms and treatment labels are permuted only among those buds **within each plant-season**, preserving the observed arm sizes.
 
 **Bird contribution in winter**
 
-`B_winter = seed_set(open,winter) - seed_set(bird_exclusion,winter)`
+`B_winter = mean_block[seed_set(open,winter) - seed_set(bird_exclusion,winter)]`
 
 Prediction: `B_winter > 0`.
 
+For each winter plant, permute the 8 open / 8 bird-exclusion labels among its 16 eligible buds. The primary test statistic is the equally plant-weighted average contrast. Use deterministic joint blocked randomization with at least 100,000 draws; also report all 15 plant-specific contrasts.
+
 **Seasonal change in bird contribution**
 
-`Delta_B = B_winter - B_summer`
+`Delta_B = mean_block[B_winter] - mean_block[B_summer]`
 
 Prediction: `Delta_B > 0` because the existing ecology is more bird-weighted in winter.
 
+For the interaction randomization distribution, independently reshuffle the 8/8 open/exclusion labels within **every plant-season block** and recompute the winter-minus-summer treatment-contrast difference. Season labels themselves are not permuted because season was not randomized.
+
 **Insect contribution in summer**
 
-`I_summer = seed_set(bird_exclusion,summer) - seed_set(full_exclusion,summer)`
+`I_summer = mean_block[seed_set(bird_exclusion,summer) - seed_set(full_exclusion,summer)]`
 
 Prediction: `I_summer > 0` because bee visitation is much greater in summer.
 
-Test each contrast by exact plant-level sign flipping across the 15 tagged plants; correct the three core G5X seed-set tests as one prespecified family. Fruit-set directions must be reported and cannot replace failed seed-set gates post hoc.
+Within each summer plant, permute 8 bird-exclusion / 7 full-exclusion labels among the 15 eligible buds, preserving 8/7 allocation.
+
+The three core G5X seed-set tests form one prespecified multiplicity family. Fruit-set directions are always reported and cannot substitute for failed seed-set gates.
 
 **Pollen limitation context**
 
-`hand_cross - open` is reported in each season. It is useful for interpreting ceiling effects and pollen limitation but is not required to promote the sensory mechanism.
+`hand_cross - open` is reported in each season using the same within-block randomization logic. It is useful for interpreting ceiling effects and pollen limitation but is not required to promote the sensory mechanism.
+
+## Why blocked randomization is preferable to plant-only collapse
+
+The initial intervention draft proposed collapsing every treatment arm to a plant-level proportion and applying a 15-plant sign-flip test. That is conservative but wastes treatment randomization information. Design simulations showed that moderate bird-access differences can be detectable with 8 vs 8 flowers, while a seasonal difference-in-differences can remain weak after collapsing to only 15 paired contrasts.
+
+Because G4X/G5X labels are randomized at the flower/bud level, conditional randomization within plant-season blocks provides design-based causal inference without assuming that flowers are observationally independent. It therefore preserves the randomized information while protecting against plant-level confounding.
+
+The 15 plant-specific effects remain essential for effect heterogeneity, biological generalization and sensitivity analysis; the blocked randomized-flower P value is not permission to generalize beyond the sampled GBG population without those summaries.
 
 ## Experimental causal hierarchy
 
