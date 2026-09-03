@@ -5,10 +5,16 @@ on:
     paths:
       - 'data/ecological_causal_chain_registry_v0_1.csv'
       - 'data/ecological_same_system_bridge_screen_v0_1.csv'
+      - 'data/ecological_competing_model_contract_v0_1.csv'
       - 'data/ecological_driver_study_registry_v0_2.csv'
       - 'data/ecological_driver_effect_size_registry_v0_2.csv'
+      - 'data/camellia_visible_state_compression_models_v0_2_provenance_clean.csv'
+      - 'data/camellia_pollination_function_meta_summary_v0_2.csv'
+      - 'data/ultimate_cause_prebranch_hypothesis_results_v0_1.csv'
       - 'scripts/analyze_ecological_causal_chain_v0_1.py'
+      - 'scripts/analyze_ecological_competing_models_v0_1.py'
       - 'docs/ECOLOGICAL_CAUSAL_CHAIN_RESULT_V0_1.md'
+      - 'docs/ECOLOGICAL_COMPETING_MODEL_SELF_TEST_V0_1.md'
       - '.github/workflows/ecological-causal-chain-v0-1.yml'
   workflow_dispatch:
 
@@ -33,15 +39,34 @@ jobs:
             --studies data/ecological_driver_study_registry_v0_2.csv \
             --effects data/ecological_driver_effect_size_registry_v0_2.csv \
             --out-dir build/ecological_causal_chain_v0_1
+      - name: Run competing-model self-test
+        run: |
+          mkdir -p build/ecological_competing_model_v0_1
+          python scripts/analyze_ecological_competing_models_v0_1.py \
+            --contract data/ecological_competing_model_contract_v0_1.csv \
+            --climate-models data/camellia_visible_state_compression_models_v0_2_provenance_clean.csv \
+            --ultimate data/ultimate_cause_prebranch_hypothesis_results_v0_1.csv \
+            --pollination-summary data/camellia_pollination_function_meta_summary_v0_2.csv \
+            --chain data/ecological_causal_chain_registry_v0_1.csv \
+            --out-dir build/ecological_competing_model_v0_1
       - name: Report
         if: always()
         run: |
           echo '### Ecological causal-chain audit v0.1' >> "$GITHUB_STEP_SUMMARY"
           for f in summary.json link_summary.csv; do
             if [ -f "build/ecological_causal_chain_v0_1/$f" ]; then
-              echo "#### $f" >> "$GITHUB_STEP_SUMMARY"
+              echo "#### causal-chain/$f" >> "$GITHUB_STEP_SUMMARY"
               echo '```' >> "$GITHUB_STEP_SUMMARY"
               cat "build/ecological_causal_chain_v0_1/$f" >> "$GITHUB_STEP_SUMMARY"
+              echo '```' >> "$GITHUB_STEP_SUMMARY"
+            fi
+          done
+          echo '### Ecological competing-model self-test v0.1' >> "$GITHUB_STEP_SUMMARY"
+          for f in summary.json model_summary.csv constraint_decisions.csv leave_one_out.csv climate_negative_control.csv; do
+            if [ -f "build/ecological_competing_model_v0_1/$f" ]; then
+              echo "#### competing-model/$f" >> "$GITHUB_STEP_SUMMARY"
+              echo '```' >> "$GITHUB_STEP_SUMMARY"
+              cat "build/ecological_competing_model_v0_1/$f" >> "$GITHUB_STEP_SUMMARY"
               echo '```' >> "$GITHUB_STEP_SUMMARY"
             fi
           done
@@ -50,5 +75,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: ecological-causal-chain-v0-1
-          path: build/ecological_causal_chain_v0_1
+          path: |
+            build/ecological_causal_chain_v0_1
+            build/ecological_competing_model_v0_1
           if-no-files-found: error
