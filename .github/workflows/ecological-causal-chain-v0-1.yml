@@ -11,11 +11,15 @@ on:
       - 'data/camellia_visible_state_compression_models_v0_2_provenance_clean.csv'
       - 'data/camellia_pollination_function_meta_summary_v0_2.csv'
       - 'data/ultimate_cause_prebranch_hypothesis_results_v0_1.csv'
+      - 'data/fan2026_chelsa_species_compact_v0_1.csv'
+      - 'data/camellia_coldtail_provenance_sensitivity_v0_1.csv'
       - 'scripts/analyze_ecological_causal_chain_v0_1.py'
       - 'scripts/analyze_ecological_competing_models_v0_1.py'
       - 'scripts/analyze_history_conditioned_climate_v0_1.py'
+      - 'scripts/validate_visible_colour_out_of_sample_v0_1.py'
       - 'docs/ECOLOGICAL_CAUSAL_CHAIN_RESULT_V0_1.md'
       - 'docs/ECOLOGICAL_COMPETING_MODEL_SELF_TEST_V0_1.md'
+      - 'docs/VISIBLE_COLOUR_OUT_OF_SAMPLE_VALIDATION_V0_1.md'
       - '.github/workflows/ecological-causal-chain-v0-1.yml'
   workflow_dispatch:
 
@@ -56,6 +60,13 @@ jobs:
           python scripts/analyze_history_conditioned_climate_v0_1.py \
             --models data/camellia_visible_state_compression_models_v0_2_provenance_clean.csv \
             --out-dir build/history_conditioned_climate_v0_1
+      - name: Run out-of-sample visible-colour climate validation
+        run: |
+          mkdir -p build/visible_colour_out_of_sample_v0_1
+          python scripts/validate_visible_colour_out_of_sample_v0_1.py \
+            --species data/fan2026_chelsa_species_compact_v0_1.csv \
+            --provenance data/camellia_coldtail_provenance_sensitivity_v0_1.csv \
+            --out-dir build/visible_colour_out_of_sample_v0_1
       - name: Report
         if: always()
         run: |
@@ -86,6 +97,15 @@ jobs:
               echo '```' >> "$GITHUB_STEP_SUMMARY"
             fi
           done
+          echo '### Visible-colour out-of-sample validation v0.1' >> "$GITHUB_STEP_SUMMARY"
+          for f in summary.json cv_metric_summary.csv; do
+            if [ -f "build/visible_colour_out_of_sample_v0_1/$f" ]; then
+              echo "#### out-of-sample/$f" >> "$GITHUB_STEP_SUMMARY"
+              echo '```' >> "$GITHUB_STEP_SUMMARY"
+              cat "build/visible_colour_out_of_sample_v0_1/$f" >> "$GITHUB_STEP_SUMMARY"
+              echo '```' >> "$GITHUB_STEP_SUMMARY"
+            fi
+          done
       - name: Upload audit outputs
         if: always()
         uses: actions/upload-artifact@v4
@@ -95,4 +115,5 @@ jobs:
             build/ecological_causal_chain_v0_1
             build/ecological_competing_model_v0_1
             build/history_conditioned_climate_v0_1
+            build/visible_colour_out_of_sample_v0_1
           if-no-files-found: error
