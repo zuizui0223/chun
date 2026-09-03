@@ -98,8 +98,9 @@ def main():
     # G3: prespecified winter decrease in Apis color-hexagon contrast.
     d_hex=pair_deltas(rows,'bee_hex_contrast');p3=left_p(d_hex,signs);g3=d_hex.mean()<0 and p3<0.05
 
-    # G4: sensory adds held-out prediction beyond reward + observation temperature.
-    base4=['nectar_volume','sucrose_ratio','temperature_c'];sens4=base4+['bee_hex_contrast']
+    # G4: sensory adds held-out prediction beyond explicit season + reward + observation temperature.
+    # Including season_code prevents a season-linked bee_hex shift from earning credit merely as a proxy for winter/summer.
+    base4=['season_code','nectar_volume','sucrose_ratio','temperature_c'];sens4=base4+['bee_hex_contrast']
     pb=lopo_predictions(rows,base4,'bird_share');ps=lopo_predictions(rows,sens4,'bird_share');y=np.array([r['bird_share'] for r in rows])
     plant_diff4=[]
     for i in range(15):
@@ -129,10 +130,10 @@ def main():
       {'gate':'G1','pass':g1,'statistic':'all A/F/C/P/BEE_HEX 90% CIs inside frozen bounds'},
       {'gate':'G2','pass':g2,'statistic':f'T={T:.6g}; exact_p={pA:.6g}'},
       {'gate':'G3','pass':g3,'statistic':f'mean_winter_minus_summer={d_hex.mean():.6g}; left_p={p3:.6g}'},
-      {'gate':'G4','pass':g4,'statistic':f'baseline_rmse={rmse4b:.6g}; sensory_rmse={rmse4s:.6g}; exact_p={p4:.6g}'},
+      {'gate':'G4','pass':g4,'statistic':f'season_adjusted_baseline_rmse={rmse4b:.6g}; sensory_rmse={rmse4s:.6g}; exact_p={p4:.6g}'},
       {'gate':'G5','pass':g5,'statistic':f'baseline_joint_rmse={rmse5b:.6g}; service_joint_rmse={rmse5s:.6g}; exact_p={p5:.6g}'}]
     write_csv(a.out_dir/'gate_results.csv',gates);write_csv(a.out_dir/'equivalence_results.csv',eq_rows);write_csv(a.out_dir/'fitness_endpoint_rmse.csv',endpoint)
-    summary={'analysis':'cperpetua_future_seasonal_data_v0.1','n_plants':15,'n_rows':30,'exact_sign_assignments':32768,'classification':classification,'gates':{r['gate']:bool(r['pass']) for r in gates},'gateA_exact_p':pA,'equivalence_all_primary':g1,'bee_hex_left_p':p3,'sensory_incremental_p':p4,'service_fitness_incremental_p':p5,'claim_ceiling':'extant paired seasonal ecological-filter classification only; historical accepted-species flower-colour transition causation remains outside scope'}
+    summary={'analysis':'cperpetua_future_seasonal_data_v0.1','n_plants':15,'n_rows':30,'exact_sign_assignments':32768,'classification':classification,'gates':{r['gate']:bool(r['pass']) for r in gates},'gateA_exact_p':pA,'equivalence_all_primary':g1,'bee_hex_left_p':p3,'sensory_incremental_p':p4,'service_fitness_incremental_p':p5,'g4_baseline':'season_code + nectar_volume + sucrose_ratio + temperature_c','claim_ceiling':'extant paired seasonal ecological-filter classification only; historical accepted-species flower-colour transition causation remains outside scope'}
     (a.out_dir/'summary.json').write_text(json.dumps(summary,indent=2,ensure_ascii=False)+'\n',encoding='utf-8');print(json.dumps(summary,indent=2,ensure_ascii=False));return 0
 
 if __name__=='__main__':raise SystemExit(main())
