@@ -1,0 +1,7 @@
+cohort,arm,flowers_per_plant_per_season,n_plants,n_seasons,total_flowers,primary_endpoint,notes
+fitness30,open,8,15,2,240,fruit_set_and_seed_set,"natural access"
+fitness30,bird_exclusion,8,15,2,240,fruit_set_and_seed_set,"mesh/cage must exclude Aethopyga while demonstrably retaining bee access; verify by camera/visitor audit"
+fitness30,full_exclusion,7,15,2,210,fruit_set_and_seed_set,"fine bag excludes animal visitors; autonomous baseline"
+fitness30,hand_cross,7,15,2,210,fruit_set_and_seed_set,"bagged, standardized outcross pollen supplementation, then rebagged"
+sensory_extra,active_spectral,6,15,2,180,legitimate_Apis_response_and_single_visit_pollen_deposition,"separate flowers; spectral intervention frozen before outcome inspection"
+sensory_extra,vehicle_sham,6,15,2,180,legitimate_Apis_response_and_single_visit_pollen_deposition,"identical handling/vehicle without active optical change"
