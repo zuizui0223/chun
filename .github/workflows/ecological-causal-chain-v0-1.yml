@@ -1,0 +1,52 @@
+name: Ecological causal-chain audit v0.1
+
+on:
+  pull_request:
+    paths:
+      - 'data/ecological_causal_chain_registry_v0_1.csv'
+      - 'data/ecological_driver_study_registry_v0_2.csv'
+      - 'data/ecological_driver_effect_size_registry_v0_2.csv'
+      - 'scripts/analyze_ecological_causal_chain_v0_1.py'
+      - 'docs/ECOLOGICAL_CAUSAL_CHAIN_RESULT_V0_1.md'
+      - '.github/workflows/ecological-causal-chain-v0-1.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Run branch-safe ecological causal-chain audit
+        run: |
+          mkdir -p build/ecological_causal_chain_v0_1
+          python scripts/analyze_ecological_causal_chain_v0_1.py \
+            --chain data/ecological_causal_chain_registry_v0_1.csv \
+            --studies data/ecological_driver_study_registry_v0_2.csv \
+            --effects data/ecological_driver_effect_size_registry_v0_2.csv \
+            --out-dir build/ecological_causal_chain_v0_1
+      - name: Report
+        if: always()
+        run: |
+          echo '### Ecological causal-chain audit v0.1' >> "$GITHUB_STEP_SUMMARY"
+          for f in summary.json link_summary.csv; do
+            if [ -f "build/ecological_causal_chain_v0_1/$f" ]; then
+              echo "#### $f" >> "$GITHUB_STEP_SUMMARY"
+              echo '```' >> "$GITHUB_STEP_SUMMARY"
+              cat "build/ecological_causal_chain_v0_1/$f" >> "$GITHUB_STEP_SUMMARY"
+              echo '```' >> "$GITHUB_STEP_SUMMARY"
+            fi
+          done
+      - name: Upload audit outputs
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: ecological-causal-chain-v0-1
+          path: build/ecological_causal_chain_v0_1
+          if-no-files-found: error
