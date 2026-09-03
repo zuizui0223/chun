@@ -1,0 +1,66 @@
+name: C. perpetua future seasonal data runner v0.1
+
+on:
+  pull_request:
+    paths:
+      - 'data/cperpetua_seasonal_input_template_v0_1.csv'
+      - 'data/cperpetua_equivalence_bound_template_v0_1.csv'
+      - 'scripts/validate_cperpetua_future_input_template_v0_1.py'
+      - 'scripts/analyze_cperpetua_future_seasonal_data_v0_1.py'
+      - 'scripts/generate_cperpetua_future_synthetic_smoke_v0_1.py'
+      - 'docs/CPERPETUA_FUTURE_DATA_RUNNER_V0_1.md'
+      - '.github/workflows/cperpetua-future-data-runner-v0-1.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install runtime dependency
+        run: python -m pip install --quiet numpy
+      - name: Validate blank 15 x 2 input template
+        run: |
+          mkdir -p build/cperpetua_future_template_v0_1
+          python scripts/validate_cperpetua_future_input_template_v0_1.py \
+            --input data/cperpetua_seasonal_input_template_v0_1.csv \
+            --out-dir build/cperpetua_future_template_v0_1
+      - name: Generate deterministic synthetic complete dataset
+        run: |
+          mkdir -p build/cperpetua_future_smoke_v0_1
+          python scripts/generate_cperpetua_future_synthetic_smoke_v0_1.py \
+            --out-dir build/cperpetua_future_smoke_v0_1
+      - name: Run full future-data analysis smoke test
+        run: |
+          mkdir -p build/cperpetua_future_analysis_v0_1
+          python scripts/analyze_cperpetua_future_seasonal_data_v0_1.py \
+            --data build/cperpetua_future_smoke_v0_1/synthetic.csv \
+            --bounds build/cperpetua_future_smoke_v0_1/bounds.csv \
+            --out-dir build/cperpetua_future_analysis_v0_1
+          python - <<'PY'
+          import json
+          x=json.load(open('build/cperpetua_future_analysis_v0_1/summary.json'))
+          assert x['classification']=='M_SENSORY_PLUS_REWARD', x
+          assert x['gates']['G0'] and x['gates']['G2'] and x['gates']['G3'] and x['gates']['G4'] and x['gates']['G5']
+          assert not x['gates']['G1']
+          print('synthetic classification:',x['classification'])
+          PY
+      - name: Report
+        if: always()
+        run: |
+          echo '### C. perpetua future-data runner v0.1' >> "$GITHUB_STEP_SUMMARY"
+          for f in summary.json gate_results.csv equivalence_results.csv fitness_endpoint_rmse.csv; do
+            if [ -f "build/cperpetua_future_analysis_v0_1/$f" ]; then
+              echo "#### $f" >> "$GITHUB_STEP_SUMMARY"
+              echo '```' >> "$GITHUB_STEP_SUMMARY"
+              cat "build/cperpetua_future_analysis_v0_1/$f" >> "$GITHUB_STEP_SUMMARY"
+              echo '```' >> "$GITHUB_STEP_SUMMARY"
+            fi
+          done
