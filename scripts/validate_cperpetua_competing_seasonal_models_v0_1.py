@@ -43,18 +43,24 @@ def main():
     assert model_ids=={'M_REWARD_ONLY','M_GENERAL_SEASONAL_PHYSIOLOGY','M_SENSORY_PLUS_REWARD','M_BEHAVIOR_WITHOUT_FITNESS'}
     assert gate_ids=={'G0','G1','G2','G3','G4','G5','G6'}
     assert len(contract)==7
+    g1=next(r for r in contract if r['gate_id']=='G1')
+    g1_text=(g1['predeclared_observation']+' '+g1['decision_rule']+' '+g1['interpretation']).lower()
+    assert 'equival' in g1_text and 'nonsignificant' in g1_text
+    assert 'insufficient' in g1_text or 'unresolved' in g1_text
+
     summary={
         'analysis':'cperpetua_competing_seasonal_models_v0.1',
         'historical_anchor_ratios':{k:v for k,v in expected.items()},
         'bird_to_two_bee_weighting_shift_fold':expected['CP_BIRD_TO_TWO_BEE_RATIO'],
         'contract_gates':sorted(gate_ids),
         'predeclared_classification':{
-            'reward_only':'G0 replicated + G1 absent',
-            'general_seasonal_physiology':'G1 present but G3/G4 absent',
-            'sensory_plus_reward':'G0 + G1 + G3 + G4 + G5',
-            'behavior_without_fitness':'G3/G4 present but G5 absent'
+            'reward_only':'G0 replicated + G1 equivalence/stability gate passed; nonsignificant shift test alone does not qualify',
+            'general_seasonal_physiology':'G2 latent shift present but G3/G4 absent',
+            'sensory_plus_reward':'G0 + G2 + G3 + G4 + G5',
+            'behavior_without_fitness':'G3/G4 present but G5 absent',
+            'latent_state_unresolved':'Gate A nonsignificant but equivalence/SESOI gate not passed'
         },
-        'decision_boundary':'seasonal reward and guild shifts are already large enough that a molecular seasonal shift alone cannot establish sensory mediation; sensory incremental prediction and service-to-fitness gates are required',
+        'decision_boundary':'seasonal reward and guild shifts are already large enough that a molecular seasonal shift alone cannot establish sensory mediation, while a nonsignificant molecular test cannot establish stability; sensory incremental prediction, service-to-fitness, and equivalence logic are required',
         'claim_ceiling':'pre-registration and historical-anchor validation only; no winter petal data exist yet and no historical colour-transition causation is inferred'
     }
     with (a.out_dir/'ratio_checks.csv').open('w',newline='',encoding='utf-8') as f:

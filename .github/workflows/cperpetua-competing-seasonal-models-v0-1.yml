@@ -6,7 +6,10 @@ on:
       - 'data/cperpetua_seasonal_prior_anchors_v0_1.csv'
       - 'data/cperpetua_seasonal_competing_model_contract_v0_1.csv'
       - 'scripts/validate_cperpetua_competing_seasonal_models_v0_1.py'
+      - 'scripts/simulate_cperpetua_latent_gate_power_v0_1.py'
       - 'docs/CPERPETUA_COMPETING_SEASONAL_MODELS_V0_1.md'
+      - 'docs/CPERPETUA_COMPETING_SEASONAL_MODEL_SUMMARY_V0_1.md'
+      - 'docs/CPERPETUA_LATENT_GATE_POWER_CALIBRATION_V0_1.md'
       - '.github/workflows/cperpetua-competing-seasonal-models-v0-1.yml'
   workflow_dispatch:
 
@@ -16,12 +19,14 @@ permissions:
 jobs:
   validate:
     runs-on: ubuntu-latest
-    timeout-minutes: 10
+    timeout-minutes: 15
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
+      - name: Install simulation dependency
+        run: python -m pip install --quiet numpy
       - name: Validate quantitative anchors and competing-model contract
         run: |
           mkdir -p build/cperpetua_competing_seasonal_models_v0_1
@@ -29,15 +34,31 @@ jobs:
             --anchors data/cperpetua_seasonal_prior_anchors_v0_1.csv \
             --contract data/cperpetua_seasonal_competing_model_contract_v0_1.csv \
             --out-dir build/cperpetua_competing_seasonal_models_v0_1
+      - name: Calibrate exact latent-state gate power
+        run: |
+          mkdir -p build/cperpetua_latent_gate_power_v0_1
+          python scripts/simulate_cperpetua_latent_gate_power_v0_1.py \
+            --out-dir build/cperpetua_latent_gate_power_v0_1 \
+            --reps 500 \
+            --seed 20260903
       - name: Report
         if: always()
         run: |
           echo '### C. perpetua competing seasonal models v0.1' >> "$GITHUB_STEP_SUMMARY"
           for f in summary.json ratio_checks.csv; do
             if [ -f "build/cperpetua_competing_seasonal_models_v0_1/$f" ]; then
-              echo "#### $f" >> "$GITHUB_STEP_SUMMARY"
+              echo "#### competing/$f" >> "$GITHUB_STEP_SUMMARY"
               echo '```' >> "$GITHUB_STEP_SUMMARY"
               cat "build/cperpetua_competing_seasonal_models_v0_1/$f" >> "$GITHUB_STEP_SUMMARY"
+              echo '```' >> "$GITHUB_STEP_SUMMARY"
+            fi
+          done
+          echo '### C. perpetua latent-gate power v0.1' >> "$GITHUB_STEP_SUMMARY"
+          for f in summary.json power.csv; do
+            if [ -f "build/cperpetua_latent_gate_power_v0_1/$f" ]; then
+              echo "#### power/$f" >> "$GITHUB_STEP_SUMMARY"
+              echo '```' >> "$GITHUB_STEP_SUMMARY"
+              cat "build/cperpetua_latent_gate_power_v0_1/$f" >> "$GITHUB_STEP_SUMMARY"
               echo '```' >> "$GITHUB_STEP_SUMMARY"
             fi
           done

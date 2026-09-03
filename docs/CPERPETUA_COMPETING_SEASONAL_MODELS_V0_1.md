@@ -22,7 +22,7 @@ Exact visitation-rate anchors are retained from the study precursor; the 2025 pe
 
 Season changes nectar/reward and microclimate, which changes pollinator weighting and fitness, while the mature petal molecular/sensory state remains effectively stable.
 
-Prediction: the historical reward/guild shift replicates, but the prespecified petal latent-state test does not.
+This model is **not** supported by a nonsignificant petal test alone. It requires the reward/guild shift to replicate **and** a prespecified equivalence/SESOI analysis to exclude a biologically meaningful petal latent-state shift. If Gate A is nonsignificant but equivalence cannot be established, the latent-state result is unresolved.
 
 ### M_GENERAL_SEASONAL_PHYSIOLOGY
 
@@ -53,6 +53,18 @@ Use a sign-invariant scale for each axis, `s_j = sqrt(mean(delta_ij^2))`, and th
 Enumerate all **2^15 = 32,768** plant-level whole-vector sign flips. The exact two-sided multivariate P value is the fraction of sign assignments with `T_perm >= T_obs` (including the observed assignment). Axis-wise paired effects are secondary and Holm-adjusted across A/F/C/P.
 
 A significant Gate A says only that mature petal latent state is seasonal; it does not establish pollinator mediation.
+
+### Null-result correction — equivalence is separate from nonsignificance
+
+A deterministic power calibration of this exact 15-pair omnibus test shows near-nominal false-positive behavior but incomplete power for moderate shifts. With four axes correlated at 0.3, a standardized multivariate shift norm of 0.8 is detected in only about **41–54%** of simulations depending on whether the shift is concentrated in one axis or distributed across modules. Power rises to roughly **82–87%** at a shift norm of 1.2.
+
+Therefore:
+
+> **Gate A P >= 0.05 is not evidence of petal-state stability.**
+
+Reward-only classification requires a separate equivalence/SESOI gate. The equivalence bound must be frozen independently of the observed winter-summer mean, preferably from blinded same-season repeatability/pilot information plus a prespecified minimum biologically meaningful effect. If no defensible independent bound can be frozen, a nonsignificant Gate A remains **unresolved**.
+
+See `docs/CPERPETUA_LATENT_GATE_POWER_CALIBRATION_V0_1.md`.
 
 ## Sensory directional gate
 
@@ -107,9 +119,10 @@ Gate G5 requires incremental out-of-sample prediction from effective service. If
 
 ## Classification table
 
-- **G0 replicated + G1 absent** -> M_REWARD_ONLY.
-- **G1 present, G3/G4 absent** -> M_GENERAL_SEASONAL_PHYSIOLOGY.
-- **G0 + G1 + G3 + G4 + G5** -> M_SENSORY_PLUS_REWARD.
+- **G0 replicated + G1 equivalence/stability passed** -> M_REWARD_ONLY.
+- **Gate A nonsignificant but G1 equivalence not passed** -> latent state unresolved.
+- **G2 latent-state shift present, G3/G4 absent** -> M_GENERAL_SEASONAL_PHYSIOLOGY.
+- **G0 + G2 + G3 + G4 + G5** -> M_SENSORY_PLUS_REWARD.
 - **G3/G4 present, G5 absent** -> M_BEHAVIOR_WITHOUT_FITNESS.
 - mixed cases not matching these rules remain unresolved rather than being forced into the preferred mechanism.
 
@@ -119,6 +132,6 @@ Record observation-window temperature, relative humidity, PAR/UV irradiance and 
 
 ## Scientific consequence
 
-This contract raises the bar intentionally. Because reward and pollinator weighting already move dramatically between seasons, a positive winter-vs-summer molecular result alone would be weak evidence. The sensory mechanism is promoted only when petal state changes in the same tagged plants, the prespecified bee-facing sensory direction is met, sensory information improves held-out pollinator-service prediction beyond reward/microclimate, and effective service improves reproductive prediction.
+This contract raises the bar intentionally. Because reward and pollinator weighting already move dramatically between seasons, a positive winter-vs-summer molecular result alone would be weak evidence, while a negative significance test alone cannot prove stability. The sensory mechanism is promoted only when petal state changes in the same tagged plants, the prespecified bee-facing sensory direction is met, sensory information improves held-out pollinator-service prediction beyond reward/microclimate, and effective service improves reproductive prediction.
 
 Even a full pass demonstrates an extant seasonal ecological-filter mechanism, not the cause of a particular historical accepted-species flower-colour transition.
