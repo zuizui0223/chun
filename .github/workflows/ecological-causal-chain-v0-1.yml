@@ -4,6 +4,7 @@ on:
   pull_request:
     paths:
       - 'data/ecological_causal_chain_registry_v0_1.csv'
+      - 'data/ecological_same_system_bridge_screen_v0_1.csv'
       - 'data/ecological_driver_study_registry_v0_2.csv'
       - 'data/ecological_driver_effect_size_registry_v0_2.csv'
       - 'scripts/analyze_ecological_causal_chain_v0_1.py'
@@ -28,6 +29,7 @@ jobs:
           mkdir -p build/ecological_causal_chain_v0_1
           python scripts/analyze_ecological_causal_chain_v0_1.py \
             --chain data/ecological_causal_chain_registry_v0_1.csv \
+            --bridges data/ecological_same_system_bridge_screen_v0_1.csv \
             --studies data/ecological_driver_study_registry_v0_2.csv \
             --effects data/ecological_driver_effect_size_registry_v0_2.csv \
             --out-dir build/ecological_causal_chain_v0_1
