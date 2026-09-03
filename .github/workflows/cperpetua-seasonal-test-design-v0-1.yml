@@ -1,0 +1,38 @@
+name: C. perpetua seasonal test design v0.1
+
+on:
+  pull_request:
+    paths:
+      - 'data/cperpetua_seasonal_test_design_v0_1.csv'
+      - 'scripts/validate_cperpetua_seasonal_test_design_v0_1.py'
+      - 'docs/CPERPETUA_SEASONAL_CAUSAL_TEST_DESIGN_V0_1.md'
+      - '.github/workflows/cperpetua-seasonal-test-design-v0-1.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Validate design contract
+        run: |
+          mkdir -p build/cperpetua_seasonal_test_design_v0_1
+          python scripts/validate_cperpetua_seasonal_test_design_v0_1.py \
+            --design data/cperpetua_seasonal_test_design_v0_1.csv \
+            --out-dir build/cperpetua_seasonal_test_design_v0_1
+      - name: Report
+        if: always()
+        run: |
+          echo '### C. perpetua seasonal causal test design v0.1' >> "$GITHUB_STEP_SUMMARY"
+          if [ -f build/cperpetua_seasonal_test_design_v0_1/summary.json ]; then
+            echo '```' >> "$GITHUB_STEP_SUMMARY"
+            cat build/cperpetua_seasonal_test_design_v0_1/summary.json >> "$GITHUB_STEP_SUMMARY"
+            echo '```' >> "$GITHUB_STEP_SUMMARY"
+          fi
