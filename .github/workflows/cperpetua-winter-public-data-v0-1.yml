@@ -1,0 +1,47 @@
+name: C. perpetua winter public-data audit v0.1
+
+on:
+  pull_request:
+    paths:
+      - 'data/cperpetua_winter_public_data_screen_v0_1.csv'
+      - 'scripts/audit_cperpetua_winter_public_data_v0_1.py'
+      - 'docs/CPERPETUA_WINTER_PUBLIC_DATA_AUDIT_V0_1.md'
+      - '.github/workflows/cperpetua-winter-public-data-v0-1.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Audit winter mature-flower public-data gap
+        run: |
+          mkdir -p build/cperpetua_winter_public_data_v0_1
+          python scripts/audit_cperpetua_winter_public_data_v0_1.py \
+            --screen data/cperpetua_winter_public_data_screen_v0_1.csv \
+            --out-dir build/cperpetua_winter_public_data_v0_1
+      - name: Report
+        if: always()
+        run: |
+          echo '### C. perpetua winter public-data audit v0.1' >> "$GITHUB_STEP_SUMMARY"
+          for f in summary.json screen_decisions.csv; do
+            if [ -f "build/cperpetua_winter_public_data_v0_1/$f" ]; then
+              echo "#### $f" >> "$GITHUB_STEP_SUMMARY"
+              echo '```' >> "$GITHUB_STEP_SUMMARY"
+              cat "build/cperpetua_winter_public_data_v0_1/$f" >> "$GITHUB_STEP_SUMMARY"
+              echo '```' >> "$GITHUB_STEP_SUMMARY"
+            fi
+          done
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: cperpetua-winter-public-data-v0-1
+          path: build/cperpetua_winter_public_data_v0_1
+          if-no-files-found: error
