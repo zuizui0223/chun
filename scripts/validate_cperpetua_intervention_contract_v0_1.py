@@ -23,18 +23,35 @@ def main()->int:
     assert int(next(r for r in fitness if r['arm']=='bird_exclusion')['flowers_per_plant_per_season'])==8
     assert int(next(r for r in fitness if r['arm']=='full_exclusion')['flowers_per_plant_per_season'])==7
     assert int(next(r for r in fitness if r['arm']=='hand_cross')['flowers_per_plant_per_season'])==7
+
+    # Intervention causal estimands must preserve the actual randomized flower/bud unit.
+    assert all('randomized within plant-season block' in r['primary_unit'] for r in c)
+    assert '6/6' in gates['G4X_MANIP_CHECK']['decision_rule']
+    assert '6/6' in gates['G4X_BEE_RESPONSE']['decision_rule']
+    assert '8/8' in gates['G5X_BIRD_WINTER']['decision_rule']
+    assert '8/8' in gates['G5X_BIRD_SEASON']['decision_rule']
+    assert '8/7' in gates['G5X_INSECT_SUMMER']['decision_rule']
     assert 'difference-in-differences' in gates['G5X_BIRD_SEASON']['decision_rule']
+    assert 'independently permutes' in gates['G5X_BIRD_SEASON']['decision_rule']
     assert 'manipulation check' in gates['G4X_BEE_RESPONSE']['decision_rule']
+    assert 'plant-level' in gates['G4X_BEE_RESPONSE']['decision_rule']
+    assert 'plant-level' in gates['G5X_BIRD_WINTER']['decision_rule']
+    assert 'plant-level' in gates['G5X_INSECT_SUMMER']['decision_rule']
+
     summary={
-      'analysis':'cperpetua_intervention_causal_contract_v0.1',
+      'analysis':'cperpetua_intervention_causal_contract_v0.2_blocked_randomization',
       'n_tagged_plants':15,
       'n_seasons':2,
       'fitness_buds_per_plant_per_season':30,
       'fitness_total_buds':sum(int(r['total_flowers']) for r in fitness),
       'sensory_trial_flowers_per_plant_per_season':12,
       'sensory_total_flowers':sum(int(r['total_flowers']) for r in sens),
+      'natural_seasonal_independence_unit':'plant',
+      'intervention_randomized_unit':'flower_or_bud',
+      'intervention_block':'plant_x_season',
+      'intervention_inference':'within-block treatment-label randomization preserving allocation counts; plant-level effects always reported',
       'experimental_gates':sorted(gates),
-      'decision':'sensory and pollinator-service causation are tested with separate interventions; manipulation validity is required before outcome interpretation',
+      'decision':'sensory and pollinator-service causation are tested with randomized flower-level interventions blocked by plant-season; manipulation validity is required before outcome interpretation',
       'claim_ceiling':'extant same-population seasonal causal closure only; historical accepted-species transition causation remains outside scope'
     }
     (a.out_dir/'summary.json').write_text(json.dumps(summary,indent=2)+'\n',encoding='utf-8');print(json.dumps(summary,indent=2));return 0
