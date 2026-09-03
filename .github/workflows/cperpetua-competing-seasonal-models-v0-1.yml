@@ -1,0 +1,43 @@
+name: C. perpetua competing seasonal models v0.1
+
+on:
+  pull_request:
+    paths:
+      - 'data/cperpetua_seasonal_prior_anchors_v0_1.csv'
+      - 'data/cperpetua_seasonal_competing_model_contract_v0_1.csv'
+      - 'scripts/validate_cperpetua_competing_seasonal_models_v0_1.py'
+      - 'docs/CPERPETUA_COMPETING_SEASONAL_MODELS_V0_1.md'
+      - '.github/workflows/cperpetua-competing-seasonal-models-v0-1.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Validate quantitative anchors and competing-model contract
+        run: |
+          mkdir -p build/cperpetua_competing_seasonal_models_v0_1
+          python scripts/validate_cperpetua_competing_seasonal_models_v0_1.py \
+            --anchors data/cperpetua_seasonal_prior_anchors_v0_1.csv \
+            --contract data/cperpetua_seasonal_competing_model_contract_v0_1.csv \
+            --out-dir build/cperpetua_competing_seasonal_models_v0_1
+      - name: Report
+        if: always()
+        run: |
+          echo '### C. perpetua competing seasonal models v0.1' >> "$GITHUB_STEP_SUMMARY"
+          for f in summary.json ratio_checks.csv; do
+            if [ -f "build/cperpetua_competing_seasonal_models_v0_1/$f" ]; then
+              echo "#### $f" >> "$GITHUB_STEP_SUMMARY"
+              echo '```' >> "$GITHUB_STEP_SUMMARY"
+              cat "build/cperpetua_competing_seasonal_models_v0_1/$f" >> "$GITHUB_STEP_SUMMARY"
+              echo '```' >> "$GITHUB_STEP_SUMMARY"
+            fi
+          done
