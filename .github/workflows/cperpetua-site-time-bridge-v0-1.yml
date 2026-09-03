@@ -1,0 +1,47 @@
+name: C perpetua site time bridge v0.1
+
+on:
+  pull_request:
+    paths:
+      - 'data/cperpetua_site_time_bridge_v0_1.csv'
+      - 'scripts/audit_cperpetua_site_time_bridge_v0_1.py'
+      - 'docs/CPERPETUA_SITE_TIME_BRIDGE_V0_1.md'
+      - '.github/workflows/cperpetua-site-time-bridge-v0-1.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Run site-time bridge audit
+        run: |
+          mkdir -p build/cperpetua_site_time_bridge_v0_1
+          python scripts/audit_cperpetua_site_time_bridge_v0_1.py \
+            --bridge data/cperpetua_site_time_bridge_v0_1.csv \
+            --out-dir build/cperpetua_site_time_bridge_v0_1
+      - name: Report
+        if: always()
+        run: |
+          for f in summary.json bridge_gates.csv; do
+            if [ -f "build/cperpetua_site_time_bridge_v0_1/$f" ]; then
+              echo "### $f" >> "$GITHUB_STEP_SUMMARY"
+              echo '```' >> "$GITHUB_STEP_SUMMARY"
+              cat "build/cperpetua_site_time_bridge_v0_1/$f" >> "$GITHUB_STEP_SUMMARY"
+              echo '```' >> "$GITHUB_STEP_SUMMARY"
+            fi
+          done
+      - name: Upload outputs
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: cperpetua-site-time-bridge-v0-1
+          path: build/cperpetua_site_time_bridge_v0_1
+          if-no-files-found: error
