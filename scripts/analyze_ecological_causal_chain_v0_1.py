@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Validate and summarize a branch-safe ecological causal chain for Camellia.
 
-This audit does NOT reconstruct historical colour-transition causes.  It asks a
+This audit does NOT reconstruct historical colour-transition causes. It asks a
 narrower mechanistic question that remains identifiable when individual macro
 transition branches are unstable:
 
@@ -10,10 +10,15 @@ transition branches are unstable:
     pollinator service -> reproductive success
 
 The first and third links are already frozen in the ecological-driver v2
-registries.  The sensory link is tested with two independent published Camellia
+registries. The sensory link is tested with two independent published Camellia
 behavioural studies, including Chen et al. 2020 (DOI 10.1093/jpe/rtaa023), which
 was absent from the repository because Camellia is only a behavioural stimulus
 inside a paper titled around Onosma.
+
+A separate same-system bridge screen prevents distributed evidence from being
+silently upgraded into a complete causal chain. It records peer-reviewed and
+preprint evidence at different ceilings and asks whether a spectral/colour-state
+contrast has yet been connected to reproductive fitness in one admitted system.
 """
 from __future__ import annotations
 
@@ -21,7 +26,7 @@ import argparse
 import csv
 import json
 import math
-from collections import Counter, defaultdict
+from collections import defaultdict
 from pathlib import Path
 
 
@@ -50,6 +55,7 @@ def geometric_mean(values: list[float]) -> float:
 def main() -> int:
     ap = argparse.ArgumentParser()
     ap.add_argument("--chain", type=Path, required=True)
+    ap.add_argument("--bridges", type=Path, required=True)
     ap.add_argument("--studies", type=Path, required=True)
     ap.add_argument("--effects", type=Path, required=True)
     ap.add_argument("--out-dir", type=Path, required=True)
@@ -57,12 +63,15 @@ def main() -> int:
     args.out_dir.mkdir(parents=True, exist_ok=True)
 
     chain = read_csv(args.chain)
+    bridges = read_csv(args.bridges)
     studies = read_csv(args.studies)
     effects = read_csv(args.effects)
 
     # Fail closed on duplicated identifiers.
     ids = [r["evidence_id"] for r in chain]
     assert len(ids) == len(set(ids)), "duplicate causal-chain evidence_id"
+    bridge_ids = [r["evidence_id"] for r in bridges]
+    assert len(bridge_ids) == len(set(bridge_ids)), "duplicate bridge-screen evidence_id"
     study_by_id = {r["study_id"]: r for r in studies}
     effect_by_id = {r["effect_id"]: r for r in effects}
     assert len(study_by_id) == len(studies), "duplicate ecological study_id"
@@ -80,7 +89,10 @@ def main() -> int:
             unresolved.append((row["evidence_id"], ref))
     assert not unresolved, f"unresolved inherited references: {unresolved}"
 
-    admitted = [r for r in chain if r["admission_status"] == "admit_primary" or r["admission_status"] == "admit_mediation"]
+    admitted = [
+        r for r in chain
+        if r["admission_status"] in {"admit_primary", "admit_mediation"}
+    ]
     by_link: dict[str, list[dict[str, str]]] = defaultdict(list)
     for row in admitted:
         by_link[row["link_class"]].append(row)
@@ -132,18 +144,18 @@ def main() -> int:
     assert 3.52 < gm_rr < 3.54
 
     # Within C. oleifera service replication: bird and honeybee experiments.
-    ole = [r for r in service if r["taxon"] == "Camellia oleifera"]
+    ole_ids = {"SERVICE_OLEIFERA_2024", "SERVICE_OLEIFERA_2025"}
+    ole = [r for r in service if r["evidence_id"] in ole_ids]
     assert {r["study_id"] for r in ole} == {"Zhang2024", "Liu2025"}
     ole_rr = [rr(r["numerator"], r["denominator"]) for r in ole]
     assert all(v is not None for v in ole_rr)
     ole_gm = geometric_mean([float(v) for v in ole_rr if v is not None])
     assert 2.41 < ole_gm < 2.43
 
-    # Same-taxon bridge that does not require assigning a historical colour-change branch.
+    # Same-taxon bridge assembled from independent evidence rows. This is useful
+    # but is not a single-design causal chain.
     links_by_taxon: dict[str, set[str]] = defaultdict(set)
     for row in admitted:
-        # paired sensory row contains two taxa and is deliberately not split into a
-        # pseudo-independent same-taxon bridge.
         if ";" not in row["taxon"]:
             links_by_taxon[row["taxon"]].add(row["link_class"])
     two_link_bridges = {
@@ -152,9 +164,31 @@ def main() -> int:
         if len(links) >= 2
     }
     assert "Camellia petelotii" in two_link_bridges
-    # We do NOT claim a full same-system 3-link chain.  That remains the next empirical gap.
-    full_same_system = [taxon for taxon, links in links_by_taxon.items() if required_links.issubset(links)]
+    full_same_system = [
+        taxon for taxon, links in links_by_taxon.items()
+        if required_links.issubset(links)
+    ]
     assert not full_same_system
+
+    # Same-study bridge screen. Keep peer-reviewed evidence separate from
+    # non-peer-reviewed sensitivity rows and ask explicitly whether the missing
+    # spectral/colour-state -> pollinator -> fitness link has been closed.
+    peer_reviewed = [r for r in bridges if r["peer_reviewed"] == "yes"]
+    sensitivity = [r for r in bridges if r["admission_status"] == "sensitivity_only"]
+    assert all(r["peer_reviewed"] == "no" for r in sensitivity)
+    perpetua = next(r for r in bridges if r["evidence_id"] == "PERPETUA_SEASON_2025")
+    assert perpetua["peer_reviewed"] == "yes" and perpetua["admission_status"] == "admit_primary"
+    assert "nectar_reward" in perpetua["link_coverage"]
+    assert "fruit_seed_success" in perpetua["link_coverage"]
+
+    peer_reviewed_spectral_to_fitness = []
+    for row in peer_reviewed:
+        coverage = row["link_coverage"].lower()
+        sensory_state = any(token in coverage for token in ("spectral", "fluorescence", "colour_state", "color_state"))
+        fitness = any(token in coverage for token in ("reproductive_success", "fruit_seed_success", "fruit_set", "seed_set"))
+        if sensory_state and fitness:
+            peer_reviewed_spectral_to_fitness.append(row["evidence_id"])
+    assert not peer_reviewed_spectral_to_fitness
 
     summary = {
         "audit_version": "ecological-causal-chain-v0.1",
@@ -174,7 +208,7 @@ def main() -> int:
             "chen_2020_descriptive_uv_plus_to_uv_minus_ratio": chen_descriptive_ratio,
             "chen_2020_published_p": chen_p,
             "status": "supported_for_latent_spectral_state_not_coarse_human_hue",
-            "ceiling": "behavioural choice, not lifetime fitness; Chen 2020 uses cultivated C. japonica varieties",
+            "ceiling": "behavioural choice, not lifetime fitness; Chen 2020 uses cultivated C. japonica varieties and repeated bouts from 16 bees",
         },
         "pollinator_service_to_reproductive_success": {
             "cross_species_k": len(cross),
@@ -187,22 +221,33 @@ def main() -> int:
         },
         "same_system_bridges": two_link_bridges,
         "full_three_link_same_system_chain": full_same_system,
+        "same_study_bridge_screen": {
+            "k_peer_reviewed_rows": len(peer_reviewed),
+            "k_preprint_sensitivity_rows": len(sensitivity),
+            "perpetua_peer_reviewed_chain": "season -> nectar reward -> bird visitation -> fruit/seed success",
+            "perpetua_status": "strong_same-study_observational_mediation_bridge_not_colour_state_test",
+            "peer_reviewed_spectral_state_to_fitness_rows": peer_reviewed_spectral_to_fitness,
+            "spectral_state_to_fitness_gap_closed": False,
+        },
         "hypothesis_updates": {
             "H6_pollinator_reliability_filter": "strengthened_to_mechanistic_support_not_macrohistorical_causation",
-            "H8_latent_sensory_state_filtering": "strengthened_by_second_independent_Camellia_behavioural_experiment",
-            "H10_flowering_window_selection": "supported_as_environment_to_service_mediation_not_direct_colour_cause",
+            "H8_latent_sensory_state_filtering": "strengthened_by_second_independent_Camellia_behavioural_experiment_but_not_linked_to_fitness",
+            "H10_flowering_window_selection": "strengthened_by_C_perpetua_same-study_season_reward_visitation_fitness_bridge_but_remains_observational",
             "H7_ecological_preadaptation_vs_genetic_permissivity": "unresolved",
         },
         "decision": {
             "best_supported_ecological_cause_layer": "context-dependent pollinator-mediated filtering of latent floral sensory/reward states",
             "upstream_modifier": "flowering-window weather/season/phenology",
             "rejected_as_general_explanation": "annual cold -> anthocyanin-like visible colour",
-            "not_yet_identified": "a complete same-system sensory-state -> pollinator choice -> reproductive fitness chain tied to a robust historical flower-colour transition",
+            "not_yet_identified": "a peer-reviewed same-system spectral/flower-colour-state -> pollinator response -> reproductive-fitness chain tied to a robust historical flower-colour transition",
             "paper1_boundary": "This strengthens ecological mechanism/service interpretation but must not alter the frozen zero-shared-event branch-causation ceiling.",
         },
     }
 
-    (args.out_dir / "summary.json").write_text(json.dumps(summary, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
+    (args.out_dir / "summary.json").write_text(
+        json.dumps(summary, indent=2, ensure_ascii=False) + "\n",
+        encoding="utf-8",
+    )
 
     rows = []
     for link in sorted(by_link):
@@ -215,7 +260,10 @@ def main() -> int:
         })
     out_csv = args.out_dir / "link_summary.csv"
     with out_csv.open("w", newline="", encoding="utf-8") as handle:
-        writer = csv.DictWriter(handle, fieldnames=["link_class", "k_rows", "k_independent_studies", "studies"])
+        writer = csv.DictWriter(
+            handle,
+            fieldnames=["link_class", "k_rows", "k_independent_studies", "studies"],
+        )
         writer.writeheader()
         writer.writerows(rows)
 
