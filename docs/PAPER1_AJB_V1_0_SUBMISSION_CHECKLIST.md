@@ -10,6 +10,8 @@ This checklist is tied to **science v0.2.2 + framing v0.3.4 + AJB bundle v1.0**.
 - [x] Event-boundary-safe framing: **v0.3.4**
 - [x] AJB upload route: **v1.0**
 - [x] State-identity gate: wording-only; no new quantified result; AJB locked.
+- [x] Scientific closure contract: `docs/PAPER1_SCIENTIFIC_CLOSURE_V1_0.md`.
+- [x] Post-Paper-1 *C. perpetua* seasonal ecology/intervention work is explicitly non-blocking and excluded from the AJB v1.0 scientific gate.
 - [x] The v1.0 workflow passed for the route promoted to `main` (run **33072640192**); retain the final PR check as release evidence.
 - [x] Journal-facing reference registry: **25/25 DOI agreement**.
 - [x] Structured AJB Abstract: **242 words**, below the 250-word limit.
@@ -69,6 +71,7 @@ These values are deliberately not inferred by the repository.
 - [ ] **Do not** claim a definitive white *Camellia* ancestor or describe visible white as molecular zero.
 - [ ] **Do not** infer missing taxon-level A/F/C/P states from visible hue.
 - [ ] **Do not** claim a universal colour–pollinator syndrome or branch-specific climate/pollinator cause.
+- [ ] **Do not** import future *C. perpetua* seasonal/sensory/intervention hypotheses as current Paper 1 results.
 - [ ] **Do not** claim one recurrent complete pigment programme or no molecular recurrence.
 - [ ] **Do not** call developmental or petal-sector RNA-seq contrasts independent macroevolutionary origins.
 - [ ] **Do not** claim a new quantified joint state-resolution result.
@@ -86,4 +89,4 @@ These values are deliberately not inferred by the repository.
 
 ## Remaining blocker
 
-The reproducible science, framing, and AJB v1.0 package are complete. Submission remains blocked only by **human author metadata, signed approvals/declarations, the permanent archive DOI, and final visual approval of the metadata-complete Word/submission PDF**.
+The reproducible science, framing, figures, SI, and AJB v1.0 package are scientifically closed. Submission remains blocked only by **human author metadata, signed approvals/declarations, the permanent archive DOI, and final visual approval of the metadata-complete Word/submission PDF**. Future ecological or *C. perpetua* work is not a Paper 1 blocker.
