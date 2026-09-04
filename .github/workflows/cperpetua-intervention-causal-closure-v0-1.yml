@@ -6,7 +6,9 @@ on:
       - 'data/cperpetua_intervention_causal_contract_v0_1.csv'
       - 'data/cperpetua_intervention_allocation_v0_1.csv'
       - 'scripts/validate_cperpetua_intervention_contract_v0_1.py'
+      - 'scripts/simulate_cperpetua_intervention_randomization_power_v0_1.py'
       - 'docs/CPERPETUA_INTERVENTION_CAUSAL_CLOSURE_V0_1.md'
+      - 'docs/CPERPETUA_INTERVENTION_RANDOMIZATION_POWER_V0_1.md'
       - '.github/workflows/cperpetua-intervention-causal-closure-v0-1.yml'
   workflow_dispatch:
 
@@ -16,12 +18,14 @@ permissions:
 jobs:
   validate:
     runs-on: ubuntu-latest
-    timeout-minutes: 10
+    timeout-minutes: 20
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
+      - name: Install runtime dependency
+        run: python -m pip install --quiet numpy
       - name: Validate intervention allocation and causal gates
         run: |
           mkdir -p build/cperpetua_intervention_v0_1
@@ -29,8 +33,40 @@ jobs:
             --contract data/cperpetua_intervention_causal_contract_v0_1.csv \
             --allocation data/cperpetua_intervention_allocation_v0_1.csv \
             --out-dir build/cperpetua_intervention_v0_1
+      - name: Calibrate blocked-randomization design
+        run: |
+          mkdir -p build/cperpetua_intervention_randomization_power_v0_1
+          python scripts/simulate_cperpetua_intervention_randomization_power_v0_1.py \
+            --out-dir build/cperpetua_intervention_randomization_power_v0_1 \
+            --reps 500 \
+            --permutations 3000
+          python - <<'PY'
+          import csv, json
+          s=json.load(open('build/cperpetua_intervention_randomization_power_v0_1/summary.json'))
+          assert s['blocked_null_rejection'] < 0.08, s
+          rows=list(csv.DictReader(open('build/cperpetua_intervention_randomization_power_v0_1/power_calibration.csv')))
+          pair={float(r['winter_delta']):float(r['blocked_randomization_rejection']) for r in rows if r['scenario']=='single_season_8v8'}
+          assert pair[0.20] > 0.80, pair
+          print('blocked randomization calibration OK',s['blocked_null_rejection'],pair[0.20])
+          PY
       - name: Report
         if: always()
         run: |
           echo '### C. perpetua intervention causal closure v0.1' >> "$GITHUB_STEP_SUMMARY"
-          cat build/cperpetua_intervention_v0_1/summary.json >> "$GITHUB_STEP_SUMMARY" || true
+          for f in build/cperpetua_intervention_v0_1/summary.json build/cperpetua_intervention_randomization_power_v0_1/summary.json build/cperpetua_intervention_randomization_power_v0_1/power_calibration.csv; do
+            if [ -f "$f" ]; then
+              echo "#### $f" >> "$GITHUB_STEP_SUMMARY"
+              echo '```' >> "$GITHUB_STEP_SUMMARY"
+              cat "$f" >> "$GITHUB_STEP_SUMMARY"
+              echo '```' >> "$GITHUB_STEP_SUMMARY"
+            fi
+          done
+      - name: Upload validation outputs
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: cperpetua-intervention-causal-closure-v0-1
+          path: |
+            build/cperpetua_intervention_v0_1
+            build/cperpetua_intervention_randomization_power_v0_1
+          if-no-files-found: error
