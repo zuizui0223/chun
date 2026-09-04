@@ -1,0 +1,34 @@
+name: C. perpetua future hypotheses v0.1
+
+on:
+  pull_request:
+    paths:
+      - 'data/cperpetua_future_hypothesis_contract_v0_1.csv'
+      - 'docs/CPERPETUA_FUTURE_HYPOTHESES_V0_1.md'
+      - 'scripts/validate_cperpetua_future_hypotheses_v0_1.py'
+      - '.github/workflows/cperpetua-future-hypotheses-v0-1.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Validate future hypothesis contract
+        run: |
+          mkdir -p build/cperpetua_future_hypotheses_v0_1
+          python scripts/validate_cperpetua_future_hypotheses_v0_1.py \
+            --contract data/cperpetua_future_hypothesis_contract_v0_1.csv \
+            --out-dir build/cperpetua_future_hypotheses_v0_1
+      - name: Report
+        if: always()
+        run: |
+          echo '### C. perpetua future hypotheses v0.1' >> "$GITHUB_STEP_SUMMARY"
+          cat build/cperpetua_future_hypotheses_v0_1/summary.json >> "$GITHUB_STEP_SUMMARY" || true
