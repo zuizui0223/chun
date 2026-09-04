@@ -13,6 +13,14 @@ No candidate-free measurement, yellow-development result, macro phylogenetic res
 
 Issue #131 tested whether these molecular and macro contractions support a stronger resolution-dependent state-identity framing. The result is **wording-only**: the molecular and macro arms have different units and estimands, and the current accepted-species tree has 0/53 tips with complete defensible A/F/C/P states. The v0.3.4 title and manuscript are retained, AJB is locked, and the adopted state-identity sentence is limited to the cover letter/editorial pitch.
 
+## Scientific closure
+
+Paper 1 is scientifically closed for first submission. The closure contract is recorded in `docs/PAPER1_SCIENTIFIC_CLOSURE_V1_0.md`.
+
+No additional molecular, macroevolutionary, climate, pollination, *C. perpetua* seasonal, or intervention result is required for AJB v1.0 unless a direct reproducibility inconsistency is discovered in a frozen result. The *C. perpetua* seasonal ecological programme is post-Paper-1 work and is not a submission blocker. *C. perpetua* remains in the manuscript only where it already contributes to the frozen yellow-development molecular comparison.
+
+Issue #85 is the only active first-submission gate. Scientific reopening requires a concrete inconsistency in a frozen authoritative result, figure dependency, reference contract, or bundle audit; a new hypothesis, additional public dataset, or stronger ecological narrative is not sufficient reason to delay submission.
+
 ## Biological headline
 
 The paper does not rely on the generic claim that similar flower colours can evolve through different mechanisms, nor on a simple replay/non-replay dichotomy. Its strongest defensible result is hierarchical, transition-class-dependent repeatability across distinct inferential levels.
