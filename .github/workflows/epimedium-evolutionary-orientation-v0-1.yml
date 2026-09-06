@@ -1,0 +1,30 @@
+name: Epimedium evolutionary orientation v0.1
+
+on:
+  pull_request:
+    paths:
+      - 'data/epimedium_molecular_accession_orientation_v0_1.csv'
+      - 'docs/EPIMEDIUM_EVOLUTIONARY_ORIENTATION_GATE_V0_1.md'
+      - 'scripts/validate_epimedium_evolutionary_orientation_v0_1.py'
+      - '.github/workflows/epimedium-evolutionary-orientation-v0-1.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Validate Epimedium evolutionary orientation gate
+        run: |
+          mkdir -p build/epimedium_orientation_v0_1
+          python scripts/validate_epimedium_evolutionary_orientation_v0_1.py \
+            --matrix data/epimedium_molecular_accession_orientation_v0_1.csv \
+            --out build/epimedium_orientation_v0_1/summary.json
+      - name: Report
+        run: cat build/epimedium_orientation_v0_1/summary.json >> "$GITHUB_STEP_SUMMARY"
