@@ -1,0 +1,32 @@
+name: Epimedium supplementary API discovery v0.1
+
+on:
+  pull_request:
+    paths:
+      - 'scripts/discover_epimedium_supplement_api_v0_1.py'
+      - '.github/workflows/epimedium-supplement-api-discovery-v0-1.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  discover:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Query NCBI supplementary-material API
+        run: |
+          python scripts/discover_epimedium_supplement_api_v0_1.py \
+            --out-dir build/epimedium_supplement_api_v0_1
+      - name: Report discovery
+        run: cat build/epimedium_supplement_api_v0_1/summary.json >> "$GITHUB_STEP_SUMMARY"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: epimedium-supplement-api-v0-1
+          path: build/epimedium_supplement_api_v0_1/
+          if-no-files-found: error
