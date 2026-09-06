@@ -1,0 +1,30 @@
+name: Flower-colour mechanistic anchor search v0.1
+
+on:
+  pull_request:
+    paths:
+      - 'data/flower_colour_mechanistic_anchor_search_v0_1.csv'
+      - 'docs/MECHANISTIC_ANCHOR_SEARCH_STOP_RULE_V0_1.md'
+      - 'scripts/validate_flower_colour_mechanistic_anchor_search_v0_1.py'
+      - '.github/workflows/flower-colour-mechanistic-anchor-search-v0-1.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Validate candidate search and stop rule
+        run: |
+          mkdir -p build/mechanistic_anchor_search_v0_1
+          python scripts/validate_flower_colour_mechanistic_anchor_search_v0_1.py \
+            --registry data/flower_colour_mechanistic_anchor_search_v0_1.csv \
+            --out build/mechanistic_anchor_search_v0_1/summary.json
+      - name: Report
+        run: cat build/mechanistic_anchor_search_v0_1/summary.json >> "$GITHUB_STEP_SUMMARY"
