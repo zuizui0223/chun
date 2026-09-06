@@ -1,0 +1,32 @@
+name: White-baseline source ingestion v0.2
+
+on:
+  pull_request:
+    paths:
+      - 'data/white_baseline_source_ingestion_v0_2.csv'
+      - 'data/white_baseline_terminal_trait_template_v0_3.csv'
+      - 'docs/WHITE_BASELINE_SOURCE_INGESTION_V0_2.md'
+      - 'scripts/validate_white_baseline_source_ingestion_v0_2.py'
+      - '.github/workflows/white-baseline-source-ingestion-v0-2.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Validate source-ingestion gate
+        run: |
+          mkdir -p build/white_baseline_source_ingestion_v0_2
+          python scripts/validate_white_baseline_source_ingestion_v0_2.py \
+            --manifest data/white_baseline_source_ingestion_v0_2.csv \
+            --out build/white_baseline_source_ingestion_v0_2/summary.json
+      - name: Report
+        run: cat build/white_baseline_source_ingestion_v0_2/summary.json >> "$GITHUB_STEP_SUMMARY"
