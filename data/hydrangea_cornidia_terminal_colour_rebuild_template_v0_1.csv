@@ -1,0 +1,2 @@
+accepted_taxon,source_taxon_name,phylogeny_tip,flower_type,display_organ,visible_state,source_doi,source_record,source_locator,agreement_status,polymorphism_status,uncertainty_class,include_macro,notes
+Hydrangea_example,Hydrangea_example,Hydrangea_example,UNKNOWN,SOURCE_TYPED_DISPLAY_PERIANTH,UNKNOWN,NA,NA,NA,UNRESOLVED,UNKNOWN,UNRESOLVED,0,"Template row only; delete before real ingestion."
