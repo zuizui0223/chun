@@ -9,6 +9,7 @@ on:
       - 'docs/EPIMEDIUM_CRA014550_INGESTION_V0_1.md'
       - 'scripts/validate_epimedium_cra014550_ingestion_v0_1.py'
       - 'scripts/probe_epimedium_cra014550_metadata_v0_1.py'
+      - 'scripts/probe_epub_reference_annotation_v0_1.py'
       - '.github/workflows/epimedium-cra014550-ingestion-v0-1.yml'
   workflow_dispatch:
 
@@ -35,11 +36,17 @@ jobs:
         run: |
           python scripts/probe_epimedium_cra014550_metadata_v0_1.py \
             --out build/epimedium_cra014550_ingestion_v0_1/remote_probe.json
+      - name: Probe common-reference annotation
+        run: |
+          python scripts/probe_epub_reference_annotation_v0_1.py \
+            --out build/epimedium_cra014550_ingestion_v0_1/reference_probe.json
       - name: Report
         run: |
           cat build/epimedium_cra014550_ingestion_v0_1/summary.json >> "$GITHUB_STEP_SUMMARY"
           printf '\n\n## Remote metadata probe\n\n' >> "$GITHUB_STEP_SUMMARY"
           cat build/epimedium_cra014550_ingestion_v0_1/remote_probe.json >> "$GITHUB_STEP_SUMMARY"
+          printf '\n\n## Reference annotation probe\n\n' >> "$GITHUB_STEP_SUMMARY"
+          cat build/epimedium_cra014550_ingestion_v0_1/reference_probe.json >> "$GITHUB_STEP_SUMMARY"
       - uses: actions/upload-artifact@v4
         with:
           name: epimedium-cra014550-metadata-probe-v0-1
