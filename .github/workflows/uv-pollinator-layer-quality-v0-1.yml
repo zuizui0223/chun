@@ -1,0 +1,27 @@
+name: UV-pollinator layer quality v0.1
+
+on:
+  pull_request:
+    paths:
+      - 'data/uv_pollinator_layer_quality_manifest_v0_1.csv'
+      - 'docs/UV_POLLINATOR_LAYER_QUALITY_SCREEN_V0_1.md'
+      - 'scripts/validate_uv_pollinator_layer_quality_v0_1.py'
+      - '.github/workflows/uv-pollinator-layer-quality-v0-1.yml'
+  workflow_dispatch:
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Validate UV-pollinator quality screen
+        run: |
+          mkdir -p build/uv_pollinator_layer_quality_v0_1
+          python scripts/validate_uv_pollinator_layer_quality_v0_1.py \
+            --manifest data/uv_pollinator_layer_quality_manifest_v0_1.csv \
+            --out build/uv_pollinator_layer_quality_v0_1/summary.json
+      - name: Report
+        run: cat build/uv_pollinator_layer_quality_v0_1/summary.json >> "$GITHUB_STEP_SUMMARY"
