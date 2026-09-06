@@ -1,0 +1,32 @@
+name: Epimedium second anchor v0.1
+
+on:
+  pull_request:
+    paths:
+      - 'data/epimedium_eight_species_molecular_panel_v0_1.csv'
+      - 'data/epimedium_dependence_evidence_v0_1.csv'
+      - 'docs/EPIMEDIUM_SECOND_ANCHOR_SCREEN_V0_1.md'
+      - 'scripts/validate_epimedium_second_anchor_v0_1.py'
+      - '.github/workflows/epimedium-second-anchor-v0-1.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Validate Epimedium common-panel and event-independence gates
+        run: |
+          mkdir -p build/epimedium_second_anchor_v0_1
+          python scripts/validate_epimedium_second_anchor_v0_1.py \
+            --panel data/epimedium_eight_species_molecular_panel_v0_1.csv \
+            --dependence data/epimedium_dependence_evidence_v0_1.csv \
+            --out build/epimedium_second_anchor_v0_1/summary.json
+      - name: Report
+        run: cat build/epimedium_second_anchor_v0_1/summary.json >> "$GITHUB_STEP_SUMMARY"
