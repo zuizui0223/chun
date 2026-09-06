@@ -1,0 +1,34 @@
+name: Cross-clade mechanistic recurrence benchmark v0.1
+
+on:
+  pull_request:
+    paths:
+      - 'data/erica_white_yellow_mechanisms_v0_1.csv'
+      - 'data/petunia_colour_regain_mechanisms_v0_1.csv'
+      - 'data/cross_clade_mechanistic_recurrence_benchmark_v0_1.csv'
+      - 'docs/CROSS_CLADE_MECHANISTIC_RECURRENCE_BENCHMARK_V0_1.md'
+      - 'scripts/validate_cross_clade_mechanistic_benchmark_v0_1.py'
+      - '.github/workflows/cross-clade-mechanistic-benchmark-v0-1.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Validate mechanistic recurrence benchmark
+        run: |
+          mkdir -p build/cross_clade_mechanistic_benchmark_v0_1
+          python scripts/validate_cross_clade_mechanistic_benchmark_v0_1.py \
+            --benchmark data/cross_clade_mechanistic_recurrence_benchmark_v0_1.csv \
+            --erica data/erica_white_yellow_mechanisms_v0_1.csv \
+            --petunia data/petunia_colour_regain_mechanisms_v0_1.csv \
+            --out build/cross_clade_mechanistic_benchmark_v0_1/summary.json
+      - name: Report
+        run: cat build/cross_clade_mechanistic_benchmark_v0_1/summary.json >> "$GITHUB_STEP_SUMMARY"

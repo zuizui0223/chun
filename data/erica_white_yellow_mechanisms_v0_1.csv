@@ -1,0 +1,9 @@
+comparison_group,taxon,target_state,focal_node,node_level,expression_state,coding_state,regulatory_or_coding,flux_consequence,event_independence,source_doi
+B,Erica sparmannii,WHITE,UDP_GST,STRUCTURAL_LATE,NOT_EXPRESSED,NO_CODING_LOSS_REPORTED,REGULATORY_MRE,"very little anthocyanin",PUTATIVE_COMPARISON_SET,10.3389/fpls.2019.01565
+D,Erica plukenetii subsp. plukenetii,WHITE,ANS,STRUCTURAL_LATE,NOT_EXPRESSED,NO_CODING_LOSS_REPORTED,REGULATORY_MRE,"no intermediates after ANS; procyanidins",PUTATIVE_COMPARISON_SET,10.3389/fpls.2019.01565
+D,Erica plukenetii subsp. breviflora,WHITE,UDP_GST,STRUCTURAL_LATE,NOT_EXPRESSED,NO_CODING_LOSS_REPORTED,REGULATORY_MRE,"very little anthocyanin",PUTATIVE_COMPARISON_SET,10.3389/fpls.2019.01565
+E,Erica coccinea,YELLOW,F3_PRIME_H,BRANCH_HYDROXYLATION,NOT_EXPRESSED,NO_CODING_LOSS_REPORTED,REGULATORY_MRE,"pelargonidin-hexose rather than cyanidin",PUTATIVE_COMPARISON_SET,10.3389/fpls.2019.01565
+F,Erica sessiliflora,WHITE,DFR,STRUCTURAL_LATE,NOT_EXPRESSED,NO_CODING_LOSS_REPORTED,REGULATORY_PROMOTER_INSERTION,"no intermediates after DFR; kaempferol/quercetin diversion",PUTATIVE_COMPARISON_SET,10.3389/fpls.2019.01565
+F,Erica filipendula subsp. filipendula,WHITE,DFR,STRUCTURAL_LATE,NORMAL,EXON2_LARGELY_MISSING,CODING_LOSS,"no intermediates after DFR; kaempferol/quercetin diversion",PUTATIVE_COMPARISON_SET,10.3389/fpls.2019.01565
+H,Erica viscaria subsp. longifolia,WHITE,bHLH,TRANS_REGULATOR,NOT_EXPRESSED,NO_CODING_LOSS_REPORTED,REGULATOR_EXPRESSION_LOSS,"whole pathway downregulated; quercetins retained",PUTATIVE_COMPARISON_SET,10.3389/fpls.2019.01565
+J,Erica stagnalis subsp. stagnalis,YELLOW,F3_PRIME_H,BRANCH_HYDROXYLATION,NORMAL,EXON1_FRAMESHIFT,CODING_LOSS,"pelargonidin-hexose rather than cyanidin",PUTATIVE_COMPARISON_SET,10.3389/fpls.2019.01565
