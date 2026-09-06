@@ -1,0 +1,2 @@
+accepted_taxon,source_taxon_name,phylogeny_tip,visible_state,source_ids,source_locator,agreement_status,wild_or_cultivar,polymorphism_status,uncertainty_class,include_macro,notes
+Linum_example,Linum_example,Linum_example,UNKNOWN,NA,NA,UNRESOLVED,WILD,UNKNOWN,UNRESOLVED,0,"Template row only; delete before real ingestion."
