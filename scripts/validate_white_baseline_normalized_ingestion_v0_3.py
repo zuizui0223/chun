@@ -55,8 +55,11 @@ def main() -> int:
         raise SystemExit("Epimedium contract must preserve INNER_SEPAL and PETAL_SPUR separately")
 
     hyd = [r for r in rows if r["clade_id"] == "HYDRANGEA_CORNIDIA"]
-    if not hyd or hyd[0]["display_organ"] != "FLORAL_DISPLAY_SEPAL":
-        raise SystemExit("Hydrangea display organ must be explicitly typed as FLORAL_DISPLAY_SEPAL")
+    if not hyd or hyd[0]["display_organ"] != "SOURCE_TYPED_DISPLAY_PERIANTH":
+        raise SystemExit(
+            "Hydrangea contract must preserve source-typed display organ: "
+            "sepal in enlarged marginal flowers versus petal in reduced flowers"
+        )
 
     ready = [r for r in rows if r["admission_status"] == "READY_FOR_EXTRACTION"]
     rebuild = [r for r in rows if r["admission_status"] == "REBUILD_REQUIRED"]
@@ -69,13 +72,14 @@ def main() -> int:
         raise SystemExit("need at least one coloured-ancestor control")
 
     summary = {
-        "version": "v0.3",
+        "version": "v0.3.1",
         "contract_rows": len(rows),
         "unique_clades": len({r['clade_id'] for r in rows}),
         "extraction_ready_clades": len({r['clade_id'] for r in ready}),
         "rebuild_required_clades": len({r['clade_id'] for r in rebuild}),
         "control_ready_clades": len({r['clade_id'] for r in controls}),
         "organ_typing_gate": "PASS",
+        "hydrangea_source_typed_organ_gate": "PASS",
         "polymorphism_preservation_gate": "PASS",
         "pooled_analysis_gate": "BLOCKED_PENDING_TRAIT_ROWS",
         "paper1_science_changed": False,
