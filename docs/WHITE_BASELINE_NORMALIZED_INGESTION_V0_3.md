@@ -1,4 +1,4 @@
-# White-baseline atlas normalized ingestion — v0.3
+# White-baseline atlas normalized ingestion — v0.3.1
 
 ## Current advance
 
@@ -23,7 +23,9 @@ These cannot be collapsed to one hue. A species may combine differently coloured
 
 ### Hydrangea sect. Cornidia
 
-The showy floral colour state is associated with display sepals rather than being silently treated as a petal state. The atlas records the organ as `FLORAL_DISPLAY_SEPAL`.
+The source character is not a single homologous sepal trait. The primary Methods define flower colour as the colour of the **sepals in enlarged marginal flowers** and the **petals in reduced flowers**. The atlas therefore records the clade-level contract as `SOURCE_TYPED_DISPLAY_PERIANTH` until row-level evidence establishes which floral organ supplies the displayed colour for each taxon/flower type.
+
+This distinction must survive ingestion. A taxon cannot be assigned `SEPAL` or `PETAL` merely because one organ is typical elsewhere in *Hydrangea*; the row must carry source-supported flower-type/organ context or remain source-typed and unresolved at the finer organ level.
 
 ### Antirrhineae / Iochrominae / Linoideae
 
@@ -58,7 +60,7 @@ The terminal 112-species colour matrix must be reconstructed with row-level prov
 
 ### Hydrangea sect. Cornidia
 
-Wild display-sepal colour states must likewise be rebuilt from article/field/taxonomic evidence before a common transition model is fitted.
+Wild flower-colour states must be rebuilt from article, field and taxonomic evidence while preserving the source-defined organ context: sepal for enlarged marginal flowers, petal for reduced flowers, and `SOURCE_TYPED_DISPLAY_PERIANTH` whenever the finer assignment is not recoverable. Only then can a common transition model be fitted.
 
 ## Cross-clade state hierarchy
 
@@ -66,6 +68,7 @@ The normalized trait table keeps visible states and molecular functions separate
 
 Visible/display layer:
 - organ-typed colour state;
+- flower/display-organ context;
 - polymorphism status;
 - wild/cultivar status;
 - provenance and uncertainty.
@@ -80,7 +83,7 @@ Functional molecular layer (later phase):
 
 A visible yellow observation does not automatically imply carotenoid deployment; a white display organ does not imply absence of pigment machinery.
 
-## Gate after v0.3
+## Gate after v0.3.1
 
 `pooled_analysis` remains blocked until real normalized rows exist.
 
