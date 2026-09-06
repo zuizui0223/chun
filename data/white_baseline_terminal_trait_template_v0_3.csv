@@ -1,0 +1,2 @@
+clade_id,accepted_taxon,source_taxon_name,phylogeny_tip,display_organ,visible_state_primary,visible_state_secondary,anthocyanin_presence,yellow_pigment_type,polymorphism_type,wild_or_cultivar,provenance_class,source_doi,source_record,uncertainty_class,include_macro,include_molecular,notes
+EXAMPLE,Genus species,Genus species,Genus_species,PETAL_OR_TEPAL,WHITE,NA,ABSENT_OR_LOW,NONE_OR_UNKNOWN,MONOMORPHIC,WILD,PRIMARY_TAXONOMIC_SOURCE,NA,NA,RESOLVED,0,0,"Template row only; delete before ingestion."
