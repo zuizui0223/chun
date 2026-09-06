@@ -1,0 +1,31 @@
+name: White-baseline cross-clade atlas v0.1
+
+on:
+  pull_request:
+    paths:
+      - 'data/white_baseline_cross_clade_atlas_v0_1.csv'
+      - 'docs/WHITE_BASELINE_CROSS_CLADE_ATLAS_PHASE1_V0_1.md'
+      - 'scripts/validate_white_baseline_cross_clade_atlas_v0_1.py'
+      - '.github/workflows/white-baseline-cross-clade-atlas-v0-1.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Validate phase-1 atlas
+        run: |
+          mkdir -p build/white_baseline_atlas_v0_1
+          python scripts/validate_white_baseline_cross_clade_atlas_v0_1.py \
+            --atlas data/white_baseline_cross_clade_atlas_v0_1.csv \
+            --out build/white_baseline_atlas_v0_1/summary.json
+      - name: Report
+        run: cat build/white_baseline_atlas_v0_1/summary.json >> "$GITHUB_STEP_SUMMARY"
