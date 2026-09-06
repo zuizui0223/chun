@@ -1,0 +1,30 @@
+name: Cross-clade evidence tiers v0.5
+
+on:
+  pull_request:
+    paths:
+      - 'data/cross_clade_evidence_tier_registry_v0_5.csv'
+      - 'docs/CROSS_CLADE_EVIDENCE_TIER_ARCHITECTURE_V0_5.md'
+      - 'scripts/validate_cross_clade_evidence_tiers_v0_5.py'
+      - '.github/workflows/cross-clade-evidence-tiers-v0-5.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Validate evidence-tier registry
+        run: |
+          mkdir -p build/cross_clade_evidence_tiers_v0_5
+          python scripts/validate_cross_clade_evidence_tiers_v0_5.py \
+            --registry data/cross_clade_evidence_tier_registry_v0_5.csv \
+            --out build/cross_clade_evidence_tiers_v0_5/summary.json
+      - name: Report
+        run: cat build/cross_clade_evidence_tiers_v0_5/summary.json >> "$GITHUB_STEP_SUMMARY"
