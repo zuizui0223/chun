@@ -1,0 +1,30 @@
+name: Epimedium provenance-event gate v0.2
+
+on:
+  pull_request:
+    paths:
+      - 'data/epimedium_molecular_provenance_gate_v0_2.csv'
+      - 'docs/EPIMEDIUM_PROVENANCE_EVENT_GATE_V0_2.md'
+      - 'scripts/validate_epimedium_provenance_event_gate_v0_2.py'
+      - '.github/workflows/epimedium-provenance-event-gate-v0-2.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Validate Epimedium provenance/event gate
+        run: |
+          mkdir -p build/epimedium_provenance_gate_v0_2
+          python scripts/validate_epimedium_provenance_event_gate_v0_2.py \
+            --table data/epimedium_molecular_provenance_gate_v0_2.csv \
+            --out build/epimedium_provenance_gate_v0_2/summary.json
+      - name: Report gate
+        run: cat build/epimedium_provenance_gate_v0_2/summary.json >> "$GITHUB_STEP_SUMMARY"
