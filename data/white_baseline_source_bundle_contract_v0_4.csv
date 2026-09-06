@@ -1,3 +1,3 @@
-clade_id,source_doi,expected_filename,expected_size_bytes,checksum_type,expected_checksum,license,required_content,bundle_status
-ANTIRRHINEAE,10.15479/AT:ISTA:34,IST-2016-34-v1+1_tellis_flower_colour_data.zip,4687135,MD5,950f85b80427d357bfeff09608ba02e9,CC0,"flower-colour table;NEXUS phylogeny",REMOTE_VERIFIED_NOT_INGESTED
-EPIMEDIUM_DIPHYLLON,10.3389/fpls.2023.1234148,article_supplement_xlsx,161075,NA,NA,CC-BY,"Supplementary Table S4;699 individual reproductive rows;inner sepal colour;petal/spur colour",REMOTE_VERIFIED_NOT_INGESTED
+clade_id,source_doi,expected_filename_or_attachment,reported_display_size,checksum_type,expected_checksum,license,required_content,bundle_status
+ANTIRRHINEAE,10.15479/AT:ISTA:34,IST-2016-34-v1+1_tellis_flower_colour_data.zip,4.47 MB,MD5,950f85b80427d357bfeff09608ba02e9,CC0,"flower-colour table;NEXUS phylogeny",REMOTE_VERIFIED_NOT_INGESTED
+EPIMEDIUM_DIPHYLLON,10.3389/fpls.2023.1234148,supplementary_xlsx_attachment,157.3 KB,NA,NA,CC-BY,"Supplementary Table S4;699 individual reproductive rows;inner sepal colour;petal/spur colour",REMOTE_VERIFIED_NOT_INGESTED
