@@ -1,0 +1,27 @@
+name: Linoideae terminal colour evidence seed v0.1
+
+on:
+  pull_request:
+    paths:
+      - 'data/linoideae_terminal_colour_evidence_seed_v0_1.csv'
+      - 'docs/LINOIDEAE_TERMINAL_COLOUR_EVIDENCE_SEED_V0_1.md'
+      - 'scripts/validate_linoideae_terminal_colour_evidence_seed_v0_1.py'
+      - '.github/workflows/linoideae-terminal-colour-evidence-seed-v0-1.yml'
+  workflow_dispatch:
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Validate seed evidence rows
+        run: |
+          mkdir -p build/linoideae_terminal_colour_evidence_seed_v0_1
+          python scripts/validate_linoideae_terminal_colour_evidence_seed_v0_1.py \
+            --seed data/linoideae_terminal_colour_evidence_seed_v0_1.csv \
+            --out build/linoideae_terminal_colour_evidence_seed_v0_1/summary.json
+      - name: Report
+        run: cat build/linoideae_terminal_colour_evidence_seed_v0_1/summary.json >> "$GITHUB_STEP_SUMMARY"
