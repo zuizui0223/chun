@@ -1,0 +1,34 @@
+name: Epimedium CRA014550 ingestion v0.1
+
+on:
+  pull_request:
+    paths:
+      - 'data/epimedium_cra014550_expected_groups_v0_1.csv'
+      - 'data/epimedium_cra014550_source_contract_v0_1.csv'
+      - 'data/epimedium_cra014550_sample_manifest_template_v0_1.csv'
+      - 'docs/EPIMEDIUM_CRA014550_INGESTION_V0_1.md'
+      - 'scripts/validate_epimedium_cra014550_ingestion_v0_1.py'
+      - '.github/workflows/epimedium-cra014550-ingestion-v0-1.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Validate CRA014550 pre-ingestion contract
+        run: |
+          mkdir -p build/epimedium_cra014550_ingestion_v0_1
+          python scripts/validate_epimedium_cra014550_ingestion_v0_1.py \
+            --groups data/epimedium_cra014550_expected_groups_v0_1.csv \
+            --sources data/epimedium_cra014550_source_contract_v0_1.csv \
+            --sample-manifest data/epimedium_cra014550_sample_manifest_template_v0_1.csv \
+            --out build/epimedium_cra014550_ingestion_v0_1/summary.json
+      - name: Report
+        run: cat build/epimedium_cra014550_ingestion_v0_1/summary.json >> "$GITHUB_STEP_SUMMARY"
