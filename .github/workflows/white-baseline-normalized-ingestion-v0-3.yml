@@ -1,0 +1,31 @@
+name: White-baseline normalized ingestion v0.3
+
+on:
+  pull_request:
+    paths:
+      - 'data/white_baseline_normalized_ingestion_contract_v0_3.csv'
+      - 'docs/WHITE_BASELINE_NORMALIZED_INGESTION_V0_3.md'
+      - 'scripts/validate_white_baseline_normalized_ingestion_v0_3.py'
+      - '.github/workflows/white-baseline-normalized-ingestion-v0-3.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Validate normalized ingestion contract
+        run: |
+          mkdir -p build/white_baseline_normalized_ingestion_v0_3
+          python scripts/validate_white_baseline_normalized_ingestion_v0_3.py \
+            --contract data/white_baseline_normalized_ingestion_contract_v0_3.csv \
+            --out build/white_baseline_normalized_ingestion_v0_3/summary.json
+      - name: Report
+        run: cat build/white_baseline_normalized_ingestion_v0_3/summary.json >> "$GITHUB_STEP_SUMMARY"
