@@ -1,0 +1,10 @@
+group_id,species,organ,visible_state,expected_biological_replicates,individuals_per_replicate,voucher,primary_flower_analysis,source_basis
+PETAL_PSEUDOWUSHANENSE_MAGENTA,Epimedium pseudowushanense,PETAL,MAGENTA,3,3,"B. L. Guo 0312",yes,"Xu et al. 2024 Methods/Fig.6"
+PETAL_ACUMINATUM_MAGENTA,Epimedium acuminatum,PETAL,MAGENTA,3,3,"B. L. Guo 0342",yes,"Xu et al. 2024 Methods/Fig.6"
+PETAL_JINCHENGSHANENSE_YELLOW,Epimedium jinchengshanense,PETAL,YELLOW,3,3,"B. L. Guo 0524",yes,"Xu et al. 2024 Methods/Fig.6"
+PETAL_BAOJINGENSE_GREEN,Epimedium baojingense,PETAL,GREEN,3,3,"B. L. Guo 0332",yes,"Xu et al. 2024 Methods/Fig.6"
+SEPAL_HUNANENSE_RED,Epimedium hunanense,SEPAL,RED,3,3,"B. L. Guo 0402",yes,"Xu et al. 2024 Methods/Fig.6"
+SEPAL_BAOJINGENSE_GREEN,Epimedium baojingense,SEPAL,GREEN,3,3,"B. L. Guo 0332",yes,"Xu et al. 2024 Methods/Fig.6"
+SEPAL_ACUMINATUM_WHITE,Epimedium acuminatum,SEPAL,WHITE,3,3,"B. L. Guo 0342",yes,"Xu et al. 2024 Methods/Fig.6"
+LEAF_PUBESCENS_GREEN,Epimedium pubescens,LEAF,GREEN,3,3,"B. L. Guo 0711-3",no,"Xu et al. 2024 Methods/Fig.6; secondary non-floral context"
+LEAF_PUBESCENS_MAGENTA,Epimedium pubescens,LEAF,MAGENTA,3,3,"B. L. Guo 0711-3",no,"Xu et al. 2024 Methods/Fig.6; secondary non-floral context"

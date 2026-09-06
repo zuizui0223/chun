@@ -1,0 +1,56 @@
+name: Epimedium CRA014550 ingestion v0.1
+
+on:
+  pull_request:
+    paths:
+      - 'data/epimedium_cra014550_expected_groups_v0_1.csv'
+      - 'data/epimedium_cra014550_source_contract_v0_1.csv'
+      - 'data/epimedium_cra014550_sample_manifest_template_v0_1.csv'
+      - 'data/epimedium_ancestral_organ_state_contract_v0_1.csv'
+      - 'docs/EPIMEDIUM_CRA014550_INGESTION_V0_1.md'
+      - 'scripts/validate_epimedium_cra014550_ingestion_v0_1.py'
+      - 'scripts/probe_epimedium_cra014550_metadata_v0_1.py'
+      - 'scripts/probe_epub_reference_annotation_v0_1.py'
+      - '.github/workflows/epimedium-cra014550-ingestion-v0-1.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Validate CRA014550 pre-ingestion contract
+        run: |
+          mkdir -p build/epimedium_cra014550_ingestion_v0_1
+          python scripts/validate_epimedium_cra014550_ingestion_v0_1.py \
+            --groups data/epimedium_cra014550_expected_groups_v0_1.csv \
+            --sources data/epimedium_cra014550_source_contract_v0_1.csv \
+            --sample-manifest data/epimedium_cra014550_sample_manifest_template_v0_1.csv \
+            --ancestral-organ-states data/epimedium_ancestral_organ_state_contract_v0_1.csv \
+            --out build/epimedium_cra014550_ingestion_v0_1/summary.json
+      - name: Probe remote GSA project metadata
+        run: |
+          python scripts/probe_epimedium_cra014550_metadata_v0_1.py \
+            --out build/epimedium_cra014550_ingestion_v0_1/remote_probe.json
+      - name: Probe common-reference annotation
+        run: |
+          python scripts/probe_epub_reference_annotation_v0_1.py \
+            --out build/epimedium_cra014550_ingestion_v0_1/reference_probe.json
+      - name: Report
+        run: |
+          cat build/epimedium_cra014550_ingestion_v0_1/summary.json >> "$GITHUB_STEP_SUMMARY"
+          printf '\n\n## Remote metadata probe\n\n' >> "$GITHUB_STEP_SUMMARY"
+          cat build/epimedium_cra014550_ingestion_v0_1/remote_probe.json >> "$GITHUB_STEP_SUMMARY"
+          printf '\n\n## Reference annotation probe\n\n' >> "$GITHUB_STEP_SUMMARY"
+          cat build/epimedium_cra014550_ingestion_v0_1/reference_probe.json >> "$GITHUB_STEP_SUMMARY"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: epimedium-cra014550-metadata-probe-v0-1
+          path: build/epimedium_cra014550_ingestion_v0_1/
+          if-no-files-found: error

@@ -1,0 +1,6 @@
+resource_id,resource_type,accession,source,expected_role,status,notes
+CRA014550,raw_rnaseq,CRA014550,CNCB_GSA,"cross_species_flower_and_leaf_RNAseq",REMOTE_VERIFIED_NOT_INGESTED,"Xu et al. 2024 data availability assigns CRA014550 to the six-species colour experiment. No run/sample IDs are invented before repository metadata ingestion."
+EPUB_GENOME,reference_genome,GWHBECS00000000,NGDC_GWH,"common_reference",REMOTE_VERIFIED,"Chromosome-level E. pubescens genome; BioProject PRJCA006303; Biosample SAMC448786; assembly page 21845."
+EPUB_NCBI_PROJECT,reference_raw_support,PRJNA747870,NCBI_BioProject,"reference_genome_raw_support",REMOTE_VERIFIED,"Original E. pubescens genome sequencing and assembly project."
+FLOWER_EXPECTATION,derived_source_contract,NA,PRIMARY_METHODS,"7 organ-state flower groups x 3 biological replicates = 21 expected floral biological libraries",FROZEN_PRE_INGESTION,"This is an expectation from the paper design, not a claim about deposited run count; raw metadata must reconcile to it or ingestion fails."
+LEAF_CONTEXT_EXPECTATION,derived_source_contract,NA,PRIMARY_METHODS,"2 leaf-colour groups x 3 biological replicates = 6 secondary libraries",FROZEN_PRE_INGESTION,"Leaf data are reported context and are excluded from the primary flower-colour state estimator."
