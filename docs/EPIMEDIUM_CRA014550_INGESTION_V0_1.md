@@ -6,6 +6,15 @@ Freeze the expected biological design and source identity **before** reading dep
 
 The primary source is Xu et al. 2024 (`10.1186/s12870-024-05480-z`), which assigns the cross-species colour RNA-seq experiment to GSA accession `CRA014550` and maps reads to the chromosome-level *Epimedium pubescens* reference genome `GWHBECS00000000`.
 
+## Evolutionary-state boundary
+
+Epimedium is **not** treated as a simple whole-flower white-ancestor replicate of Camellia. The 2023 sect. Diphyllon reconstruction (`10.3389/fpls.2023.1234148`) is organ-specific:
+
+- inner-sepal colour: **WHITE** plesiomorphic, followed by yellow/red/purple diversification;
+- petal/spur colour: **YELLOW** plesiomorphic, followed by repeated purple/white/red/brown shifts.
+
+The frozen contract is `data/epimedium_ancestral_organ_state_contract_v0_1.csv`. This makes Epimedium a mixed ancestral-state radiation within one flower: a white-like ancestral display module coexists with a non-white ancestral petal module. No whole-flower white ancestor is inferred.
+
 ## Expected biological design from the paper
 
 Primary flower state groups:
@@ -57,7 +66,7 @@ Primary common reference:
 - source genome project: `PRJCA006303`;
 - corresponding NCBI raw-support project: `PRJNA747870`.
 
-Reference and annotation versions must be pinned before expression inspection. Module completeness is evaluated before any direction or state-similarity result is used.
+Genome Warehouse exposes the DNA, GFF, RNA, CDS and protein files for this assembly. Reference and annotation versions must be pinned before expression inspection. Module completeness is evaluated before any direction or state-similarity result is used.
 
 ## Primary analysis boundary
 
@@ -79,7 +88,9 @@ After successful ingestion and standardized remeasurement, this resource can tes
 2. whether the two magenta petal taxa occupy similar molecular states under one outcome-independent measurement rule;
 3. whether candidate-selected PAL/DFR/ANS framing overstates or understates whole-state similarity relative to the standardized module space.
 
-It **cannot**, by itself, identify independent historical transition branches. Cross-sectional species differences remain current-state contrasts until a separate event-identifiability gate is passed.
+The magenta pair is a **same-visible-state replicate**, not a predeclared claim of two independent historical origins. Plastid and nuclear evidence show a rapid, reticulate radiation, and exact event identity remains a separate gate.
+
+CRA014550 **cannot**, by itself, identify independent historical transition branches. Cross-sectional species differences remain current-state contrasts until a separate event-identifiability gate is passed.
 
 ## Claim ceiling
 
@@ -88,6 +99,7 @@ Until real GSA metadata and raw binaries are ingested:
 - expected library counts are design expectations only;
 - no standardized expression result exists;
 - no historical transition vector is inferred;
+- no whole-flower white ancestor is assigned to Epimedium;
 - no cross-clade generality claim is promoted.
 
 Camellia Paper 1 remains unchanged and scientifically closed.
