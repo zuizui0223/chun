@@ -1,0 +1,33 @@
+name: Linoideae terminal colour rebuild v0.1
+
+on:
+  pull_request:
+    paths:
+      - 'data/linoideae_colour_rebuild_sources_v0_1.csv'
+      - 'data/linoideae_terminal_colour_rebuild_template_v0_1.csv'
+      - 'docs/LINOIDEAE_TERMINAL_COLOUR_REBUILD_V0_1.md'
+      - 'scripts/validate_linoideae_rebuild_contract_v0_1.py'
+      - '.github/workflows/linoideae-terminal-colour-rebuild-v0-1.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Validate Linoideae rebuild contract
+        run: |
+          mkdir -p build/linoideae_rebuild_v0_1
+          python scripts/validate_linoideae_rebuild_contract_v0_1.py \
+            --sources data/linoideae_colour_rebuild_sources_v0_1.csv \
+            --template data/linoideae_terminal_colour_rebuild_template_v0_1.csv \
+            --out build/linoideae_rebuild_v0_1/summary.json
+      - name: Report
+        run: cat build/linoideae_rebuild_v0_1/summary.json >> "$GITHUB_STEP_SUMMARY"
