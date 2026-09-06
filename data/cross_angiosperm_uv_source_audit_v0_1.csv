@@ -1,0 +1,11 @@
+claim_id,source_section,reported_value,derived_check,status,notes
+ABSTRACT_SPECIES,ABSTRACT,"245 species",245,CONSISTENT_WITH_PRIMARY_CLAIM,"Primary headline sample size."
+METHODS_TAXONOMY,MATERIAL_AND_METHODS,"245 species; 180 genera; 71 families",245,HOLD_RECONCILE,"Species count matches abstract; genus/family counts conflict with Fig.2 caption."
+FIG2_TAXONOMY,FIGURE_2_CAPTION,"245 species; 205 genera; 76 families",245,HOLD_RECONCILE,"Species count matches abstract; genus/family counts differ from Methods."
+SUPPORTING_TABLE_S1,SUPPORTING_INFORMATION,"Table S1 described as list of 245 plant species; PLB-28-201-s001.docx; 88.4 KB",245,REMOTE_VERIFIED_NOT_INGESTED,"This table is the arbitration source for admission."
+HUE_CATEGORY_COUNTS,METHODS_HUE_CATEGORIES,"cyan 2; green 3; black 3; blue 24; pink 46; yellow 47; white 75; red 94",294,HOLD_RECONCILE,"Category counts sum to 294, not the stated 245. Could reflect a different sampling frame or text/version inconsistency; do not infer which without Table S1."
+WHITE_RED_SET_RESULTS,RESULTS,"red 94; white 74; other 124",292,HOLD_RECONCILE,"Counts sum to 292; percentages printed in article are approximately consistent with a denominator near 292 rather than 245."
+YELLOW_SET_RESULTS,RESULTS,"yellow 46; other 246",292,HOLD_RECONCILE,"Counts sum to 292, not 245."
+UV_BINARY_RESULTS,RESULTS,"UV- 197; UV+ 93",290,HOLD_RECONCILE,"Counts sum to 290; missing/other records may be possible but are not resolved from narrative text."
+ATTRACTANT_ORGAN_SCHEMA,SUPPORTING_INFORMATION,"P petal; SP sepal; B bract; ST stamen",NA,COMPATIBLE_WITH_ATLAS,"Organ-typed display structure can map directly to atlas observation model after Table S1 ingestion."
+DATA_AVAILABILITY,DATA_AVAILABILITY_STATEMENT,"All supporting datasets included within Supporting Information",NA,ADMISSION_POSSIBLE_AFTER_INGESTION,"Do not use narrative counts as row-level data substitute."
