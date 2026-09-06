@@ -1,0 +1,27 @@
+name: Linoideae target coverage v0.2
+
+on:
+  pull_request:
+    paths:
+      - 'data/linoideae_target_coverage_contract_v0_2.csv'
+      - 'docs/LINOIDEAE_TARGET_COVERAGE_V0_2.md'
+      - 'scripts/validate_linoideae_target_coverage_v0_2.py'
+      - '.github/workflows/linoideae-target-coverage-v0-2.yml'
+  workflow_dispatch:
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Validate 113-tip Linoideae denominator
+        run: |
+          mkdir -p build/linoideae_target_coverage_v0_2
+          python scripts/validate_linoideae_target_coverage_v0_2.py \
+            --contract data/linoideae_target_coverage_contract_v0_2.csv \
+            --out build/linoideae_target_coverage_v0_2/summary.json
+      - name: Report
+        run: cat build/linoideae_target_coverage_v0_2/summary.json >> "$GITHUB_STEP_SUMMARY"
