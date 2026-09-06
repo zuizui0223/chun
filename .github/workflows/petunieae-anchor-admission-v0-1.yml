@@ -1,0 +1,30 @@
+name: Petunieae mechanistic-anchor admission v0.1
+
+on:
+  pull_request:
+    paths:
+      - 'data/petunieae_anchor_admission_v0_1.csv'
+      - 'docs/PETUNIEAE_MECHANISTIC_ANCHOR_SCREEN_V0_1.md'
+      - 'scripts/validate_petunieae_anchor_admission_v0_1.py'
+      - '.github/workflows/petunieae-anchor-admission-v0-1.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Validate Petunieae source admission
+        run: |
+          mkdir -p build/petunieae_anchor_v0_1
+          python scripts/validate_petunieae_anchor_admission_v0_1.py \
+            --registry data/petunieae_anchor_admission_v0_1.csv \
+            --out build/petunieae_anchor_v0_1/summary.json
+      - name: Report admission
+        run: cat build/petunieae_anchor_v0_1/summary.json >> "$GITHUB_STEP_SUMMARY"
