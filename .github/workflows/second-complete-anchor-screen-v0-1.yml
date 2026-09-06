@@ -1,0 +1,30 @@
+name: Second complete anchor screen v0.1
+
+on:
+  pull_request:
+    paths:
+      - 'data/second_complete_anchor_screen_v0_1.csv'
+      - 'docs/SECOND_COMPLETE_ANCHOR_SCREEN_V0_1.md'
+      - 'scripts/validate_second_complete_anchor_screen_v0_1.py'
+      - '.github/workflows/second-complete-anchor-screen-v0-1.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Validate finite second-anchor screen
+        run: |
+          mkdir -p build/second_complete_anchor_screen_v0_1
+          python scripts/validate_second_complete_anchor_screen_v0_1.py \
+            --screen data/second_complete_anchor_screen_v0_1.csv \
+            --out build/second_complete_anchor_screen_v0_1/summary.json
+      - name: Report
+        run: cat build/second_complete_anchor_screen_v0_1/summary.json >> "$GITHUB_STEP_SUMMARY"
