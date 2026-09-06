@@ -6,6 +6,7 @@ on:
       - 'data/epimedium_cra014550_expected_groups_v0_1.csv'
       - 'data/epimedium_cra014550_source_contract_v0_1.csv'
       - 'data/epimedium_cra014550_sample_manifest_template_v0_1.csv'
+      - 'data/epimedium_ancestral_organ_state_contract_v0_1.csv'
       - 'docs/EPIMEDIUM_CRA014550_INGESTION_V0_1.md'
       - 'scripts/validate_epimedium_cra014550_ingestion_v0_1.py'
       - 'scripts/probe_epimedium_cra014550_metadata_v0_1.py'
@@ -31,6 +32,7 @@ jobs:
             --groups data/epimedium_cra014550_expected_groups_v0_1.csv \
             --sources data/epimedium_cra014550_source_contract_v0_1.csv \
             --sample-manifest data/epimedium_cra014550_sample_manifest_template_v0_1.csv \
+            --ancestral-organ-states data/epimedium_ancestral_organ_state_contract_v0_1.csv \
             --out build/epimedium_cra014550_ingestion_v0_1/summary.json
       - name: Probe remote GSA project metadata
         run: |
