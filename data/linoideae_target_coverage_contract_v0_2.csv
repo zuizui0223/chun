@@ -1,0 +1,11 @@
+metric,value,status,notes
+LINOIDEAE_PHYLOGENY_SPECIES,113,REFERENCE,"Methods: 451 accessions of 113 Linoideae species; outgroups separate"
+LINOIDEAE_COLOUR_RECORDED_SPECIES,112,REFERENCE,"Methods: flower colours recorded for 112 Linoideae species"
+EXPECTED_UNCOLOURED_LINOIDEAE_TIPS,1,DERIVED,"113 - 112"
+RAW_MAX_COLOUR_COVERAGE,0.9911504425,DERIVED,"112 / 113; before atlas additions"
+ATLAS_MIN_PROVENANCE_COVERAGE,0.80,FROZEN,"Existing rebuild gate"
+ATLAS_MIN_PROVENANCE_COMPLETE_ROWS,91,DERIVED,"ceil(113 * 0.80)"
+OUTGROUP_SPECIES_IN_PHYLOGENETIC_ANALYSIS,3,REFERENCE,"Hugonia busseana; Phyllanthus emblica; Ixonanthes chinensis; excluded from Linoideae colour denominator"
+ALLOWED_TERMINAL_COLOUR_STATES,6,REFERENCE,"yellow; blue; white; purple; red; pink"
+SUPPLEMENT_S1_ARCHIVE_SIZE_MB,3.4,REFERENCE,"PMC supplementary archive described as 3.4 MB; Table S1 contains accessions/species but no standalone colour column"
+MATRIX_ROW_POLICY,113,FROZEN,"Create one row for every Linoideae target tip; unresolved source-study tip remains explicit UNKNOWN, never dropped"
