@@ -1,0 +1,41 @@
+name: Hydrangea Cornidia rebuild v0.1
+
+on:
+  pull_request:
+    paths:
+      - 'data/hydrangea_cornidia_published_transition_summary_v0_1.csv'
+      - 'data/hydrangea_cornidia_terminal_colour_rebuild_template_v0_1.csv'
+      - 'docs/HYDRANGEA_CORNIDIA_TERMINAL_COLOUR_REBUILD_V0_1.md'
+      - 'scripts/summarize_hydrangea_cornidia_transition_qc_v0_1.py'
+      - 'scripts/validate_hydrangea_cornidia_rebuild_v0_1.py'
+      - '.github/workflows/hydrangea-cornidia-rebuild-v0-1.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Summarize published transition QC
+        run: |
+          mkdir -p build/hydrangea_cornidia_rebuild_v0_1
+          python scripts/summarize_hydrangea_cornidia_transition_qc_v0_1.py \
+            --transitions data/hydrangea_cornidia_published_transition_summary_v0_1.csv \
+            --out build/hydrangea_cornidia_rebuild_v0_1/published_transition_qc.json
+      - name: Validate rebuild contract
+        run: |
+          python scripts/validate_hydrangea_cornidia_rebuild_v0_1.py \
+            --transitions data/hydrangea_cornidia_published_transition_summary_v0_1.csv \
+            --template data/hydrangea_cornidia_terminal_colour_rebuild_template_v0_1.csv \
+            --summary build/hydrangea_cornidia_rebuild_v0_1/summary.json
+      - name: Report
+        run: |
+          cat build/hydrangea_cornidia_rebuild_v0_1/published_transition_qc.json >> "$GITHUB_STEP_SUMMARY"
+          cat build/hydrangea_cornidia_rebuild_v0_1/summary.json >> "$GITHUB_STEP_SUMMARY"
