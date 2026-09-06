@@ -39,13 +39,15 @@ def main() -> int:
     ap.add_argument('--groups', type=Path, required=True)
     ap.add_argument('--sources', type=Path, required=True)
     ap.add_argument('--sample-manifest', type=Path, required=True)
+    ap.add_argument('--ancestral-organ-states', type=Path, required=True)
     ap.add_argument('--out', type=Path, required=True)
     a = ap.parse_args()
 
     groups = read(a.groups)
     sources = read(a.sources)
+    ancestral = read(a.ancestral_organ_states)
     sample_header, sample_rows = read_with_header(a.sample_manifest)
-    if not groups or not sources:
+    if not groups or not sources or not ancestral:
         raise SystemExit('empty CRA014550 contract input')
     if sample_header != SAMPLE_COLUMNS:
         raise SystemExit(f'sample-manifest header drift: {sample_header}')
@@ -74,6 +76,16 @@ def main() -> int:
     if flower_libs != 21 or leaf_libs != 6:
         raise SystemExit(f'expected library-count contract drift: flower={flower_libs}, leaf={leaf_libs}')
 
+    ancestral_map = {r['trait_axis']: r for r in ancestral}
+    inner = ancestral_map.get('INNER_SEPAL_COLOUR')
+    petal = ancestral_map.get('PETAL_SPUR_COLOUR')
+    if not inner or inner['published_plesiomorphic_state'] != 'WHITE':
+        raise SystemExit('Epimedium inner-sepal plesiomorphic state must remain WHITE')
+    if not petal or petal['published_plesiomorphic_state'] != 'YELLOW':
+        raise SystemExit('Epimedium petal/spur plesiomorphic state must remain YELLOW')
+    if inner['display_organ'] == petal['display_organ']:
+        raise SystemExit('ancestral organ states must remain organ-specific')
+
     src = {r['resource_id']: r for r in sources}
     if src.get('CRA014550', {}).get('accession') != 'CRA014550':
         raise SystemExit('CRA014550 accession drift')
@@ -92,6 +104,9 @@ def main() -> int:
         'expected_secondary_leaf_libraries': leaf_libs,
         'sample_manifest_rows': len(sample_rows),
         'sample_manifest_status': 'EMPTY_BY_DESIGN_PRE_INGESTION',
+        'ancestral_inner_sepal_state': 'WHITE',
+        'ancestral_petal_spur_state': 'YELLOW',
+        'whole_flower_white_ancestor_claim': 'FORBIDDEN',
         'raw_accession': 'CRA014550',
         'reference_genome': 'GWHBECS00000000',
         'raw_ingestion_status': 'BLOCKED_PENDING_REPOSITORY_METADATA_AND_BINARIES',
