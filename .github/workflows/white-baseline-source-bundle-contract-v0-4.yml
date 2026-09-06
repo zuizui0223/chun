@@ -1,0 +1,31 @@
+name: White-baseline source bundle contract v0.4
+
+on:
+  pull_request:
+    paths:
+      - 'data/white_baseline_source_bundle_contract_v0_4.csv'
+      - 'docs/WHITE_BASELINE_SOURCE_BUNDLE_CONTRACT_V0_4.md'
+      - 'scripts/validate_white_baseline_source_bundle_contract_v0_4.py'
+      - '.github/workflows/white-baseline-source-bundle-contract-v0-4.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Validate source identities
+        run: |
+          mkdir -p build/white_baseline_source_bundle_contract_v0_4
+          python scripts/validate_white_baseline_source_bundle_contract_v0_4.py \
+            --contract data/white_baseline_source_bundle_contract_v0_4.csv \
+            --out build/white_baseline_source_bundle_contract_v0_4/summary.json
+      - name: Report
+        run: cat build/white_baseline_source_bundle_contract_v0_4/summary.json >> "$GITHUB_STEP_SUMMARY"
