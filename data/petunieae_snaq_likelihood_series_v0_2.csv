@@ -1,0 +1,7 @@
+hmax,source_value,source_path,source_blob_sha,atlas_selection_status,notes
+0,1181.4389831867354,Data/SNaQ/likelihoods.txt,3f9ced00bc8fcb11094e3db977d505a97eabcfa4,RETAIN_ALL,"Source column is named loglik; atlas does not reinterpret direction or select h from pigment outcomes."
+1,724.4661130815608,Data/SNaQ/likelihoods.txt,3f9ced00bc8fcb11094e3db977d505a97eabcfa4,RETAIN_ALL,"All h values are topology/network sensitivities."
+2,715.7344385409552,Data/SNaQ/likelihoods.txt,3f9ced00bc8fcb11094e3db977d505a97eabcfa4,RETAIN_ALL,"net2.tree and net3.tree are identical blobs in pinned source commit."
+3,646.2237158006756,Data/SNaQ/likelihoods.txt,3f9ced00bc8fcb11094e3db977d505a97eabcfa4,RETAIN_ALL,"net2.tree and net3.tree are identical blobs in pinned source commit."
+4,608.0150491452403,Data/SNaQ/likelihoods.txt,3f9ced00bc8fcb11094e3db977d505a97eabcfa4,RETAIN_ALL,"No event-result-conditioned network selection."
+5,576.157487931449,Data/SNaQ/likelihoods.txt,3f9ced00bc8fcb11094e3db977d505a97eabcfa4,RETAIN_ALL,"No event-result-conditioned network selection."
