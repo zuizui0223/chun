@@ -1,0 +1,32 @@
+name: Petunieae event-topology gate v0.2
+
+on:
+  pull_request:
+    paths:
+      - 'data/petunieae_topology_sensitivity_manifest_v0_2.csv'
+      - 'data/petunieae_snaq_likelihood_series_v0_2.csv'
+      - 'docs/PETUNIEAE_EVENT_TOPOLOGY_GATE_V0_2.md'
+      - 'scripts/validate_petunieae_event_topology_gate_v0_2.py'
+      - '.github/workflows/petunieae-event-topology-gate-v0-2.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Validate Petunieae topology/network gate
+        run: |
+          mkdir -p build/petunieae_topology_gate_v0_2
+          python scripts/validate_petunieae_event_topology_gate_v0_2.py \
+            --manifest data/petunieae_topology_sensitivity_manifest_v0_2.csv \
+            --likelihood-series data/petunieae_snaq_likelihood_series_v0_2.csv \
+            --out build/petunieae_topology_gate_v0_2/summary.json
+      - name: Report gate
+        run: cat build/petunieae_topology_gate_v0_2/summary.json >> "$GITHUB_STEP_SUMMARY"
