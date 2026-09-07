@@ -1,0 +1,66 @@
+{
+  "version": "0.2",
+  "doi": "10.3390/plants11121579",
+  "source_pmcid": "PMC9231132",
+  "source_license": "CC-BY",
+  "artifact": {
+    "run": 34115602382,
+    "id": 10016488210,
+    "sha256": "143c2b09acc4d31ee3fe7d9b78f09fb445cf4638b2429270b5efac3a97910f6d",
+    "source_code_sha": "2d352f86a87868deb30a8691a3d50c581c538414"
+  },
+  "nuclear_sensitivity_artifact": {
+    "run": 34117696576,
+    "id": 10016967681,
+    "sha256": "7892531a19d4dcba142a333dd75d911af646a76bf425a854e8d1d444765831b4",
+    "tree_sha256": "45f920f74c0e7cc65a9dc4abbb448cc237d4a4035f9375b4190098737ad30f80",
+    "ingroup_tips": 110
+  },
+  "source_sha256": {
+    "article.pdf": "252acb20b4574bb50af1defb84bea57fd71ff4650394c5dc7fe4e316cf18a35f",
+    "files/plants-11-01579-s001/Supplementary material.pdf": "040912cc9df2441e8dcb1bb943f9b9845d3e74f4605abc1ec0ff9c5e4cfbdde1",
+    "sequences/source_accessions.csv": "faa26248b5a1c22d47b86e45b94caea843c26141ac2999fda7f88c9d06a790ec",
+    "sequences/sequence_assignment_audit.csv": "3a92d0c7db2a9d03413c648171c5b9aeafabe4cd1e0d006b0fe554b1374815d8",
+    "trees/full.treefile": "2a43f3ce128059d514d4604f36548376ac96ad9986a5aa52149ed35bf89d5eef",
+    "trees/occupancy50.treefile": "893ff214656084742298f1d1760e04ad74d07b5dd93d3c8ad2300084282a822a"
+  },
+  "source_set_semantics": "Visible terminal markers transcribed and pixel-checked; multiple colours retained as source uncertainty, NOT proof of natural population polymorphism. All phylogeny likelihoods re-estimated, no ancestral nodes copied.",
+  "primary_coding": "UNION across Figure2 and S5; no majority vote. Strict WHITE versus other visible colours.",
+  "claim_boundary": "One independent radiation, 118 admitted ingroup composite tips. Gene-table/taxon mismatches held or explicitly reassigned by record gene. Not a dated species tree, not a causal ecological test.",
+  "source_rows_path": "terminal_sources.csv",
+  "tree_files": {
+    "full": "full.newick",
+    "occupancy50": "occupancy50.newick",
+    "ITS_nuclear": "ITS_nuclear.newick"
+  },
+  "frozen_files_sha256": {
+    "terminal_sources.csv": "2a716c7edbb24c8a832aaaea73a62546ca77596fca86ef37932af42495819a92",
+    "full.newick": "2a43f3ce128059d514d4604f36548376ac96ad9986a5aa52149ed35bf89d5eef",
+    "occupancy50.newick": "893ff214656084742298f1d1760e04ad74d07b5dd93d3c8ad2300084282a822a",
+    "ITS_nuclear.newick": "45f920f74c0e7cc65a9dc4abbb448cc237d4a4035f9375b4190098737ad30f80"
+  },
+  "sequence_audit": {
+    "source_rows": 121,
+    "source_ingroup_rows": 120,
+    "source_unique_taxon_units": 114,
+    "valid_unique_accessions": 450,
+    "records_recovered": 450,
+    "status_counts": {
+      "EXACT_SOURCE_MATCH": 427,
+      "SOURCE_MISSING": 28,
+      "TAXON_MISMATCH_HELD": 18,
+      "INVALID_SOURCE_ACCESSION": 1,
+      "SOURCE_COLUMN_REASSIGNED_BY_RECORD": 10
+    },
+    "admitted_per_locus": {
+      "ndhF": 102,
+      "matK": 112,
+      "trnLF": 112,
+      "ITS": 111
+    },
+    "admitted_tips": 119,
+    "claim_boundary": "Metadata-validated public source reconstruction; not an author alignment or accepted-species tree."
+  },
+  "tree_units": "sequence substitutions per site; no calendar ages",
+  "sampling": "composite source taxon rows; one tip per source binomial in balanced sensitivity; not an accepted-taxonomy assertion"
+}

@@ -1,0 +1,53 @@
+{
+  "version": "0.2",
+  "status": "EXECUTED_SECOND_RADIATION_CONDITIONAL_REANALYSIS",
+  "source_terminal_rows": 121,
+  "source_ingroup_rows": 120,
+  "source_ingroup_colour_set_disagreements": 42,
+  "admitted_ingroup_tips": {"full": 118, "occupancy50": 118, "ITS_nuclear": 110},
+  "primary_binary_model_fits": 36,
+  "taxon_balanced_model_fits": 180,
+  "balanced_draws_per_tree_coding": 10,
+  "source_codings": ["FIGURE2", "FIGURES5", "UNION"],
+  "white_binary_signal": {"tests": 27, "p_range": [0.1307, 1.0], "observed_over_null_range": [0.874408, 1.019518]},
+  "six_colour_signal": {"tests": 27, "p_range": [0.0001, 0.0001], "observed_over_null_range": [0.232961, 0.59097]},
+  "hue_signal_conditional_on_white_status": {
+    "tests": 54,
+    "p_range": [0.0001, 0.0001],
+    "observed_over_null_range": [0.262729, 0.610739],
+    "crop_exclusion_included": true,
+    "nuclear_ITS_included": true,
+    "null": "All tips retain their white/nonwhite/ambiguous mask. Exchange six-colour allowed-state vectors only within those classes."
+  },
+  "union_primary_fits": [
+    {"alignment":"full","model":"ER","root_prior":"equal","n_tips":118,"AIC":22.83973,"rate_ratio_return_to_gain":1.0,"root_probability_white":0.024637,"optimization_bound_hit":false,"high_rate_plateau":false},
+    {"alignment":"full","model":"ARD","root_prior":"equal","n_tips":118,"AIC":23.9353,"rate_ratio_return_to_gain":0.106535,"root_probability_white":0.691566,"optimization_bound_hit":false,"high_rate_plateau":false},
+    {"alignment":"full","model":"ER","root_prior":"stationary","n_tips":118,"AIC":22.83973,"rate_ratio_return_to_gain":1.0,"root_probability_white":0.024637,"optimization_bound_hit":false,"high_rate_plateau":false},
+    {"alignment":"full","model":"ARD","root_prior":"stationary","n_tips":118,"AIC":24.127371,"rate_ratio_return_to_gain":0.246918,"root_probability_white":0.125351,"optimization_bound_hit":false,"high_rate_plateau":false},
+    {"alignment":"occupancy50","model":"ER","root_prior":"equal","n_tips":118,"AIC":22.785524,"rate_ratio_return_to_gain":1.0,"root_probability_white":0.023661,"optimization_bound_hit":false,"high_rate_plateau":false},
+    {"alignment":"occupancy50","model":"ARD","root_prior":"equal","n_tips":118,"AIC":20.151258,"rate_ratio_return_to_gain":1.36442e-06,"root_probability_white":1.0,"optimization_bound_hit":true,"high_rate_plateau":false},
+    {"alignment":"occupancy50","model":"ER","root_prior":"stationary","n_tips":118,"AIC":22.785524,"rate_ratio_return_to_gain":1.0,"root_probability_white":0.023661,"optimization_bound_hit":false,"high_rate_plateau":false},
+    {"alignment":"occupancy50","model":"ARD","root_prior":"stationary","n_tips":118,"AIC":21.888403,"rate_ratio_return_to_gain":0.146604,"root_probability_white":0.15394,"optimization_bound_hit":false,"high_rate_plateau":false},
+    {"alignment":"ITS_nuclear","model":"ER","root_prior":"equal","n_tips":110,"AIC":15.776754,"rate_ratio_return_to_gain":1.0,"root_probability_white":0.008906,"optimization_bound_hit":false,"high_rate_plateau":false},
+    {"alignment":"ITS_nuclear","model":"ARD","root_prior":"equal","n_tips":110,"AIC":17.641902,"rate_ratio_return_to_gain":0.128219,"root_probability_white":0.431628,"optimization_bound_hit":false,"high_rate_plateau":false},
+    {"alignment":"ITS_nuclear","model":"ER","root_prior":"stationary","n_tips":110,"AIC":15.776754,"rate_ratio_return_to_gain":1.0,"root_probability_white":0.008906,"optimization_bound_hit":false,"high_rate_plateau":false},
+    {"alignment":"ITS_nuclear","model":"ARD","root_prior":"stationary","n_tips":110,"AIC":17.1649,"rate_ratio_return_to_gain":0.269822,"root_probability_white":0.055663,"optimization_bound_hit":false,"high_rate_plateau":false}
+  ],
+  "regular_conditional_profiles": [
+    {"conditioning":"fixed_tree_source_set_coding_equal_root_prior_asymptotic_profile","LR_p_equal_rates":0.343889,"low":0.005668,"low_search_ratio_limit":4.53999e-05,"high":null,"high_search_ratio_limit":22026.465795,"alignment":"full","coding":"FIGURE2"},
+    {"conditioning":"fixed_tree_source_set_coding_equal_root_prior_asymptotic_profile","LR_p_equal_rates":0.091903,"low":0.073431,"low_search_ratio_limit":4.53999e-05,"high":null,"high_search_ratio_limit":22026.465795,"alignment":"full","coding":"FIGURES5"},
+    {"conditioning":"fixed_tree_source_set_coding_equal_root_prior_asymptotic_profile","LR_p_equal_rates":0.341597,"low":0.006112,"low_search_ratio_limit":4.53999e-05,"high":null,"high_search_ratio_limit":22026.465795,"alignment":"full","coding":"UNION"},
+    {"conditioning":"fixed_tree_source_set_coding_equal_root_prior_asymptotic_profile","LR_p_equal_rates":0.064311,"low":0.069787,"low_search_ratio_limit":4.53999e-05,"high":1.211909,"high_search_ratio_limit":22026.465795,"alignment":"occupancy50","coding":"FIGURES5"},
+    {"conditioning":"fixed_tree_source_set_coding_equal_root_prior_asymptotic_profile","LR_p_equal_rates":0.697202,"low":null,"low_search_ratio_limit":4.53999e-05,"high":null,"high_search_ratio_limit":22026.465795,"alignment":"ITS_nuclear","coding":"FIGURE2"},
+    {"conditioning":"fixed_tree_source_set_coding_equal_root_prior_asymptotic_profile","LR_p_equal_rates":2.9316e-07,"low":0.02836,"low_search_ratio_limit":4.53999e-05,"high":0.15341,"high_search_ratio_limit":22026.465795,"alignment":"ITS_nuclear","coding":"FIGURES5"},
+    {"conditioning":"fixed_tree_source_set_coding_equal_root_prior_asymptotic_profile","LR_p_equal_rates":0.713454,"low":null,"low_search_ratio_limit":4.53999e-05,"high":null,"high_search_ratio_limit":22026.465795,"alignment":"ITS_nuclear","coding":"UNION"}
+  ],
+  "boundary_primary_fits": [
+    {"tree":"occupancy50","coding":"FIGURE2","model":"ARD","prior":"equal"},
+    {"tree":"occupancy50","coding":"UNION","model":"ARD","prior":"equal"}
+  ],
+  "ancestral_white_admission": "NOT_ROBUST_TO_SOURCE_CODING_MODEL_AND_ROOT_PRIOR",
+  "pooled_white_ancestry_effect_estimated": false,
+  "paper1_science_changed": false,
+  "interpretation": "Hue-specific phylogenetic organization is supported in Linoideae even conditional on white status. This is not a universal direction, confirmed white ancestor, pigment mechanism, or ecological causal test. Sensitivity combinations are not independent clades."
+}
