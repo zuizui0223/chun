@@ -30,7 +30,14 @@ jobs:
         run: python -m pip install --disable-pip-version-check xlrd==2.0.1
       - name: Retrieve real article supplement and export source rows
         run: |
-          python scripts/ingest_antirrhineae_source_v0_1.py --out-dir data/atlas_antirrhineae_ingested_v0_1
+          mkdir -p data/atlas_antirrhineae_ingested_v0_1
+          set +e
+          python scripts/ingest_antirrhineae_source_v0_1.py \
+            --out-dir data/atlas_antirrhineae_ingested_v0_1 \
+            > data/atlas_antirrhineae_ingested_v0_1/run.log 2>&1
+          status=$?
+          cat data/atlas_antirrhineae_ingested_v0_1/run.log
+          exit $status
       - name: Analyze extracted trait/tree content when implemented
         run: |
           if test -f scripts/analyze_antirrhineae_source_v0_1.py; then
