@@ -5,47 +5,52 @@ on:
       - 'scripts/ingest_epimedium_source_v0_1.py'
       - 'scripts/analyze_epimedium_organ_states_v0_1.py'
       - 'tests/test_epimedium_organ_states_v0_1.py'
+      - 'data/atlas_epimedium_ingested_v0_1/**'
+      - 'docs/EPIMEDIUM_REAL_INGESTION_RESULT_V0_1.md'
       - '.github/workflows/epimedium-real-ingestion-v0-1.yml'
   workflow_dispatch:
 permissions:
   contents: read
 jobs:
-  ingest:
-    if: github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository && github.event.pull_request.head.ref == 'atlas/epimedium-real-ingestion-v0-1'
+  verify:
     runs-on: ubuntu-latest
-    timeout-minutes: 12
-    permissions:
-      contents: write
+    timeout-minutes: 8
     steps:
       - uses: actions/checkout@v4
-        with:
-          ref: ${{ github.event.pull_request.head.sha }}
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
-      - name: Retrieve actual open source and preserve original cells
+      - name: Reanalyse actual pinned source cells without network retrieval
         run: |
-          python scripts/ingest_epimedium_source_v0_1.py --out-dir data/atlas_epimedium_ingested_v0_1
-      - name: Analyze decoded organ states when implemented
+          python scripts/analyze_epimedium_organ_states_v0_1.py \
+            --source-dir data/atlas_epimedium_ingested_v0_1 \
+            --out-dir build/epimedium_organ_audit
+      - name: Run nominal-state, crosswalk and source-integrity tests
+        run: python -m unittest discover -s tests -p 'test_epimedium_organ_states_v0_1.py' -v
+      - name: Compare all regenerated scientific outputs with frozen outputs
         run: |
-          if test -f scripts/analyze_epimedium_organ_states_v0_1.py; then
-            python scripts/analyze_epimedium_organ_states_v0_1.py --source-dir data/atlas_epimedium_ingested_v0_1 --out-dir data/atlas_epimedium_ingested_v0_1/analysis
-            python -m unittest discover -s tests -p 'test_epimedium_organ_states_v0_1.py'
-          fi
-      - name: Preserve only generated source snapshots on the analysis branch
-        env:
-          HEAD_BRANCH: ${{ github.event.pull_request.head.ref }}
-        run: |
-          git config user.name 'github-actions[bot]'
-          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
-          git add data/atlas_epimedium_ingested_v0_1/
-          if ! git diff --cached --quiet; then
-            git commit -m 'Preserve actual Epimedium source cells and reproducible audit outputs'
-            git push origin "HEAD:refs/heads/$HEAD_BRANCH"
-          fi
+          python - <<'PY'
+          from pathlib import Path
+          saved = Path('data/atlas_epimedium_ingested_v0_1/analysis')
+          fresh = Path('build/epimedium_organ_audit')
+          expected = {
+              'individual_organ_codes.csv', 'source_taxon_summary.csv',
+              'organ_joint_codes.csv', 's9_s1_s4_crosswalk.csv',
+              'molecular_panel_overlap.csv', 'summary.json',
+          }
+          for root in (saved, fresh):
+              found = {p.name for p in root.iterdir() if p.is_file()}
+              if found != expected:
+                  raise SystemExit(f'output inventory mismatch: {root}: {found}')
+          for name in sorted(expected):
+              if (saved / name).read_bytes() != (fresh / name).read_bytes():
+                  raise SystemExit(f'nonreproducible output: {name}')
+          print('PASS: all six regenerated outputs are byte-identical')
+          PY
+      - name: Report executed result
+        run: cat build/epimedium_organ_audit/summary.json >> "$GITHUB_STEP_SUMMARY"
       - uses: actions/upload-artifact@v4
-        if: always()
         with:
-          name: epimedium-real-source-ingestion-v0-1
-          path: data/atlas_epimedium_ingested_v0_1/
-          if-no-files-found: warn
+          name: epimedium-verified-organ-analysis-v0-1
+          path: build/epimedium_organ_audit/
+          if-no-files-found: error
