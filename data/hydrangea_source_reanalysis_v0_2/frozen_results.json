@@ -1,0 +1,34 @@
+{
+  "schema": "hydrangea_independent_reanalysis_v0.2",
+  "source_doi": "10.3389/fpls.2021.661522",
+  "source_run": 34111490311,
+  "source_artifact": 10014665888,
+  "atlas_asr_status": "EXECUTED_CONDITIONAL_TWO_LOCUS_INGROUP_MK",
+  "pooled_cross_clade_status": "NOT_RUN",
+  "n_terminal_accessions": 97,
+  "ingroup_states": {"WHITE": 57, "RED": 31},
+  "outgroup_states": {"WHITE": 5, "PURPLE": 4},
+  "ingroup_source_taxon_units": 35,
+  "accepted_taxonomy_reconciled": false,
+  "canonical_input_sha256": "8e92550a46b1a7bb18f2aa77d2d33b73ddb5544b441d3aaab0ef62916ddc8c49",
+  "primary_fits": [
+    {"alignment":"short_3161","model":"ER","root_prior":"equal","log_likelihood":-44.89100838786687,"AIC":91.78201677573374,"rate_ratio_return_to_gain":1.0,"root_probability_white":0.585277361561845,"expected_white_to_red":14.674640559699014,"expected_red_to_white":16.059969921698617},
+    {"alignment":"short_3161","model":"ARD","root_prior":"equal","log_likelihood":-43.08424548391191,"AIC":90.16849096782381,"rate_ratio_return_to_gain":2.2098053590568054,"root_probability_white":0.4661146993808587,"expected_white_to_red":12.562838535540045,"expected_red_to_white":16.794867140645607,"profile95_lower":0.9758679277773991,"profile95_upper":7.282575726609868,"LR_against_equal_rates":3.6135258079098804,"asymptotic_chi2_p":0.057311494073442944},
+    {"alignment":"short_3161","model":"ER","root_prior":"stationary","log_likelihood":-44.89100838786687,"AIC":91.78201677573374,"rate_ratio_return_to_gain":1.0,"root_probability_white":0.585277361561845,"expected_white_to_red":14.674640559699014,"expected_red_to_white":16.059969921698617},
+    {"alignment":"short_3161","model":"ARD","root_prior":"stationary","log_likelihood":-43.1078345533661,"AIC":90.2156691067322,"rate_ratio_return_to_gain":2.14777456048031,"root_probability_white":0.6564509894429028,"expected_white_to_red":13.082358828345642,"expected_red_to_white":16.475067264531923,"profile95_lower":0.9715628406683818,"profile95_upper":6.079554630502433,"LR_against_equal_rates":3.5663476690015017,"asymptotic_chi2_p":0.05896186147839814},
+    {"alignment":"long_3167","model":"ER","root_prior":"equal","log_likelihood":-45.57627163302317,"AIC":93.15254326604634,"rate_ratio_return_to_gain":1.0,"root_probability_white":0.5922507916053971,"expected_white_to_red":14.979436341406279,"expected_red_to_white":15.562745206763445},
+    {"alignment":"long_3167","model":"ARD","root_prior":"equal","log_likelihood":-43.93021412831908,"AIC":91.86042825663816,"rate_ratio_return_to_gain":2.10339580779752,"root_probability_white":0.47935655912962677,"expected_white_to_red":13.490210596729206,"expected_red_to_white":16.685671479720554,"profile95_lower":0.9410699319884084,"profile95_upper":6.484295599932809,"LR_against_equal_rates":3.292115009408022,"asymptotic_chi2_p":0.0696132978045921},
+    {"alignment":"long_3167","model":"ER","root_prior":"stationary","log_likelihood":-45.57627163302317,"AIC":93.15254326604634,"rate_ratio_return_to_gain":1.0,"root_probability_white":0.5922507916053971,"expected_white_to_red":14.979436341406279,"expected_red_to_white":15.562745206763445},
+    {"alignment":"long_3167","model":"ARD","root_prior":"stationary","log_likelihood":-43.943659561208506,"AIC":91.88731912241701,"rate_ratio_return_to_gain":2.058925936778307,"root_probability_white":0.6574761617874635,"expected_white_to_red":13.90953571084397,"expected_red_to_white":16.346936331099485,"profile95_lower":0.9397117961997608,"profile95_upper":5.585637307060066,"LR_against_equal_rates":3.265224143629169,"asymptotic_chi2_p":0.07076335159235449}
+  ],
+  "taxon_balanced_sensitivity": {
+    "short_3161":{"draws":20,"interior_ARD_draws":20,"ratio_gt_one_interior":20,"interior_ratio_min_median_max":[1.9982077541848475,2.505931671134195,3.4872220025824103],"bound_hit_draws":[]},
+    "long_3167":{"draws":20,"interior_ARD_draws":19,"ratio_gt_one_interior":19,"interior_ratio_min_median_max":[1.95753781594565,2.414077636325336,3.4258712609013444],"bound_hit_draws":[0]}
+  },
+  "sequence_bootstrap_sensitivity": {
+    "short_3161":{"total_bootstrap_topologies":1000,"monophyletic":1000,"minimum_changes_quantiles":[9.0,11.0,14.0],"model_fits":20,"interior_model_fits":20,"rate_ratio_quantiles_interior":[1.678595121860432,2.140583869236906,11.626428580662516],"delta_AIC_quantiles_interior":[-8.844889188566157,-1.807013581432848,0.16415061059331038],"ratio_gt_one_interior":20},
+    "long_3167":{"total_bootstrap_topologies":1000,"monophyletic":1000,"minimum_changes_quantiles":[10.0,11.0,14.0],"model_fits":20,"interior_model_fits":20,"rate_ratio_quantiles_interior":[1.642294621674281,2.17288439216287,10.529419348343962],"delta_AIC_quantiles_interior":[-5.537166544908743,-1.7675551623884331,0.5145847983883982],"ratio_gt_one_interior":20}
+  },
+  "statistical_boundary": "95% profile LR intervals are asymptotic and conditional on the fixed tree; resampling ranges are NOT confidence intervals or independent replications. Rate units are nuclear substitutions/site, not years.",
+  "paper1_science_changed": false
+}
