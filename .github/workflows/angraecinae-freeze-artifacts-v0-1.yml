@@ -1,0 +1,79 @@
+name: Freeze Angraecinae executed artifacts v0.1
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/angraecinae-freeze-artifacts-v0-1.yml'
+  workflow_dispatch:
+permissions:
+  contents: write
+  actions: read
+jobs:
+  freeze:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.ref || github.ref_name }}
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install pinned inference dependencies
+        run: python -m pip install 'numpy==2.2.6' 'biopython==1.85' 'scipy==1.15.3'
+      - name: Download the two executed reconstruction artifacts
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          mkdir -p build/resumed build/fresh
+          gh run download 34141115622 --repo "$GITHUB_REPOSITORY" --name angraecinae-resumed-final-v0-1 --dir build/resumed
+          gh run download 34138289110 --repo "$GITHUB_REPOSITORY" --name angraecinae-fast-mk-v0-1 --dir build/fresh
+      - name: Freeze exact model inputs and provenance
+        run: |
+          D=data/angraecinae_source_reanalysis_v0_1
+          mkdir -p "$D/trees/checkpoint_resume" "$D/trees/fresh_repeat"
+          cmp build/resumed/traits/terminal_organ_states.csv build/fresh/traits/terminal_organ_states.csv
+          cmp build/resumed/sequences/source_sample_manifest.csv build/fresh/sequences/source_sample_manifest.csv
+          cp build/resumed/traits/terminal_organ_states.csv "$D/terminal_organ_states.csv"
+          cp build/resumed/sequences/source_sample_manifest.csv "$D/source_sample_manifest.csv"
+          for T in plastid_full plastid50 all4_full; do
+            cp "build/resumed/trees/${T}.treefile" "$D/trees/checkpoint_resume/${T}.treefile"
+            cp "build/fresh/trees/${T}.treefile" "$D/trees/fresh_repeat/${T}.treefile"
+          done
+          python - <<'PY'
+          from pathlib import Path
+          import hashlib,json
+          d=Path('data/angraecinae_source_reanalysis_v0_1')
+          files=['terminal_organ_states.csv','source_sample_manifest.csv']
+          files += [f'trees/{r}/{t}.treefile' for r in ('checkpoint_resume','fresh_repeat') for t in ('plastid_full','plastid50','all4_full')]
+          obj={
+            'version':'v0.1','source_doi':'10.1371/journal.pone.0163194',
+            'source_acquisition':{'run_id':34127148822,'artifact_id':10020825693,'artifact_sha256':'de811f75fb3df66c640f84e82c62a0d07fdd5a7220ddd733c3da3d3c62c11848'},
+            'tree_reconstruction_sets':{
+              'checkpoint_resume':{'run_id':34141115622,'artifact_id':10026168219,'artifact_sha256':'1688f6f87d556de5daea54f747628ecb00a620962c388ddb170042f46b3a381c','head_sha':'ac22aac5fd09e23175caf152cfaef2166d7cccae','provenance':'Resume the interrupted original all4 IQ-TREE checkpoint while retaining the already-completed plastid trees from the original attempt.'},
+              'fresh_repeat':{'run_id':34138289110,'artifact_id':10025946443,'artifact_sha256':'d256dd9f7d393956673afcffb4c4dee3fcd7405c6df7e859f234fe5b0116ab82','head_sha':'6696c3aad91b0abe80957c715fd2285afd99e824','provenance':'Fresh full rerun of all three no-bootstrap GTR+G4 ML searches under the same source inputs and seed.'}},
+            'frozen_files_sha256':{p:hashlib.sha256((d/p).read_bytes()).hexdigest() for p in files},
+            'claim_boundary':'The two ML reconstruction sets are topology-reconstruction sensitivities within one Angraecinae radiation, not independent biological replications. Rates are conditional on each fixed tree and measured per sequence substitution/site, not years.',
+            'paper1_science_changed':False}
+          (d/'snapshot_manifest.json').write_text(json.dumps(obj,indent=2)+'\n')
+          PY
+      - name: Replay both reconstructions against the frozen summary
+        run: |
+          D=data/angraecinae_source_reanalysis_v0_1
+          for REP in checkpoint_resume fresh_repeat; do
+            mkdir -p "build/replay/${REP}"
+            python scripts/analyze_angraecinae_mk_v0_1.py --trees-dir "$D/trees/$REP" --sample-manifest "$D/source_sample_manifest.csv" --traits "$D/terminal_organ_states.csv" --out-dir "build/replay/$REP"
+            python scripts/audit_angraecinae_organ_signal_v0_1.py --trees-dir "$D/trees/$REP" --sample-manifest "$D/source_sample_manifest.csv" --traits "$D/terminal_organ_states.csv" --out "build/replay/$REP/conditional_organ_state_results.json" --permutations 9999
+          done
+          python scripts/summarize_angraecinae_reanalysis_v0_1.py --resumed build/replay/checkpoint_resume --fresh build/replay/fresh_repeat --manifest "$D/snapshot_manifest.json" --out build/replay/analysis_summary.json --expected "$D/analysis_summary.json"
+      - name: Commit frozen inputs to the PR branch
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add data/angraecinae_source_reanalysis_v0_1
+          if git diff --cached --quiet; then
+            echo 'Frozen inputs already present.'
+          else
+            git commit -m 'Freeze executed Angraecinae inputs and tree-reconstruction sensitivity'
+            git push origin HEAD:${{ github.event.pull_request.head.ref || github.ref_name }}
+          fi
