@@ -1,0 +1,38 @@
+{
+  "version": "v0.1",
+  "source_doi": "10.1371/journal.pone.0163194",
+  "source_acquisition": {
+    "run_id": 34127148822,
+    "artifact_id": 10020825693,
+    "artifact_sha256": "de811f75fb3df66c640f84e82c62a0d07fdd5a7220ddd733c3da3d3c62c11848"
+  },
+  "tree_reconstruction_sets": {
+    "checkpoint_resume": {
+      "run_id": 34141115622,
+      "artifact_id": 10026168219,
+      "artifact_sha256": "1688f6f87d556de5daea54f747628ecb00a620962c388ddb170042f46b3a381c",
+      "head_sha": "ac22aac5fd09e23175caf152cfaef2166d7cccae",
+      "provenance": "Resume the interrupted original all4 IQ-TREE checkpoint while retaining the already-completed plastid trees from the original attempt."
+    },
+    "fresh_repeat": {
+      "run_id": 34138289110,
+      "artifact_id": 10025946443,
+      "artifact_sha256": "d256dd9f7d393956673afcffb4c4dee3fcd7405c6df7e859f234fe5b0116ab82",
+      "head_sha": "6696c3aad91b0abe80957c715fd2285afd99e824",
+      "provenance": "Fresh full rerun of all three no-bootstrap GTR+G4 ML searches under the same source inputs and seed."
+    }
+  },
+  "freeze_materialization_commit": "b3d6f73543585c284fba0c6634e268d6118b4841",
+  "frozen_files_sha256": {
+    "terminal_organ_states.csv": "ffff2a373e12c935104711dc82571e7f73caa72474b98ee761b937c89ad5dc74",
+    "source_sample_manifest.csv": "f6e1a1fc054dcf25753a742c1c5499eac3f00bdce23e0cb1f6a37394b338f3c4",
+    "trees/checkpoint_resume/plastid_full.treefile": "bb9010feb486fab0d6364584d342c44bac6918496cf0ef7f574ca9a6b54e6598",
+    "trees/checkpoint_resume/plastid50.treefile": "fc69c8722a496c84ffbc1dc37252eeff3d84ab05517682cd258d7b169e8ae5f4",
+    "trees/checkpoint_resume/all4_full.treefile": "3df2f057834e4753d13055dd933e75ac65ef4a6745c69c9fbb1e353f665b2ad0",
+    "trees/fresh_repeat/plastid_full.treefile": "4ca0ad0e4fca5df61940067dec4539b83451358225e1c4fc5216eeb7c9a5f5ab",
+    "trees/fresh_repeat/plastid50.treefile": "4a20f5625ee2bde4973f6a79b0369acb7b58d4dee3797efd9c92e2f2156e3e0b",
+    "trees/fresh_repeat/all4_full.treefile": "5e9bbf9bed02d73b10e653fe0f20daaa10d44ec33afe116a17174b0bb594f6b6"
+  },
+  "claim_boundary": "The two ML reconstruction sets are topology-reconstruction sensitivities within one Angraecinae radiation, not independent biological replications. Rates are conditional on each fixed tree and measured per sequence substitution/site, not years.",
+  "paper1_science_changed": false
+}

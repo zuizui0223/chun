@@ -1,0 +1,54 @@
+name: Angraecinae fast ML-Mk v0.1
+on:
+  workflow_dispatch:
+permissions:
+  contents: read
+env:
+  OMP_NUM_THREADS: '2'
+  OPENBLAS_NUM_THREADS: '1'
+jobs:
+  fast:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 35
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install pinned dependencies
+        run: |
+          python -m pip install 'numpy==2.2.6' 'biopython==1.85' 'scipy==1.15.3'
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq mafft iqtree
+      - name: Rebuild source traits and sequences
+        run: |
+          python scripts/ingest_angraecinae_sources_v0_1.py --out-dir build/angraecinae_fast
+          python scripts/prepare_angraecinae_traits_v0_1.py --source-dir build/angraecinae_fast --out-dir build/angraecinae_fast/traits
+          python scripts/recover_angraecinae_sequences_v0_1.py --source-dir build/angraecinae_fast --trait-csv build/angraecinae_fast/traits/terminal_organ_states.csv --out-dir build/angraecinae_fast/sequences
+          python scripts/align_angraecinae_sequences_v0_1.py --sequence-dir build/angraecinae_fast/sequences --out-dir build/angraecinae_fast/alignments
+      - name: Infer ML trees without bootstrap
+        run: |
+          mkdir -p build/angraecinae_fast/trees
+          IQ=$(command -v iqtree2 || command -v iqtree)
+          OUTGROUPS=$(python - <<'PY'
+          import json
+          d=json.load(open('build/angraecinae_fast/sequences/sequence_manifest.json'))
+          print(','.join(d['outgroup_tips']))
+          PY
+          )
+          for variant in plastid_full plastid50 all4_full; do
+            "$IQ" -s "build/angraecinae_fast/alignments/${variant}.fasta" -p "build/angraecinae_fast/alignments/${variant}.nex" -m GTR+G4 -o "$OUTGROUPS" -seed 20260907 -T 2 --prefix "build/angraecinae_fast/trees/${variant}"
+          done
+      - name: Fit organ-specific GREEN-WHITE Mk and conditional organ-state tests
+        run: |
+          python scripts/analyze_angraecinae_mk_v0_1.py --trees-dir build/angraecinae_fast/trees --sample-manifest build/angraecinae_fast/sequences/source_sample_manifest.csv --traits build/angraecinae_fast/traits/terminal_organ_states.csv --out-dir build/angraecinae_fast/analysis
+          python scripts/audit_angraecinae_organ_signal_v0_1.py --trees-dir build/angraecinae_fast/trees --sample-manifest build/angraecinae_fast/sequences/source_sample_manifest.csv --traits build/angraecinae_fast/traits/terminal_organ_states.csv --out build/angraecinae_fast/analysis/conditional_organ_signal.json --permutations 9999
+          cat build/angraecinae_fast/analysis/analysis_results.json >> "$GITHUB_STEP_SUMMARY"
+          cat build/angraecinae_fast/analysis/conditional_organ_signal.json >> "$GITHUB_STEP_SUMMARY"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: angraecinae-fast-mk-v0-1
+          path: build/angraecinae_fast/
+          if-no-files-found: error
+          retention-days: 90

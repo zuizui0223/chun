@@ -1,0 +1,80 @@
+{
+  "version": "v0.1",
+  "status": "EXECUTED_THIRD_RADIATION_WITH_TREE_RECONSTRUCTION_SENSITIVITY",
+  "source_doi": "10.1371/journal.pone.0163194",
+  "source_terminal_rows": 194,
+  "source_ingroup_rows": 189,
+  "exact_unique_ingroup_trait_joins": 186,
+  "source_four_organ_fully_binary_rows": 170,
+  "analysis_exact_four_organ_tips": 169,
+  "tree_reconstruction_sets": {
+    "checkpoint_resume": {
+      "run_id": 34141115622,
+      "artifact_id": 10026168219,
+      "artifact_sha256": "1688f6f87d556de5daea54f747628ecb00a620962c388ddb170042f46b3a381c",
+      "head_sha": "ac22aac5fd09e23175caf152cfaef2166d7cccae",
+      "provenance": "Resume the interrupted original all4 IQ-TREE checkpoint while retaining the already-completed plastid trees from the original attempt."
+    },
+    "fresh_repeat": {
+      "run_id": 34138289110,
+      "artifact_id": 10025946443,
+      "artifact_sha256": "d256dd9f7d393956673afcffb4c4dee3fcd7405c6df7e859f234fe5b0116ab82",
+      "head_sha": "6696c3aad91b0abe80957c715fd2285afd99e824",
+      "provenance": "Fresh full rerun of all three no-bootstrap GTR+G4 ML searches under the same source inputs and seed."
+    }
+  },
+  "replicates": {
+    "checkpoint_resume": {
+      "primary": {
+        "sepal_binary": {
+          "fits": [
+            {"tree":"plastid_full","n_tips":169,"rate_ratio_return_to_white_vs_gain_from_white":0.53998862,"delta_AIC_ARD_minus_ER":1.0708288,"profile95_low":0.0040778781,"profile95_high":2.2604213,"LR_p_equal_rates":0.33507838,"root_probability_white_equal_ARD":0.9960347,"optimization_bound_hit":false,"high_rate_plateau":false},
+            {"tree":"plastid50","n_tips":169,"rate_ratio_return_to_white_vs_gain_from_white":0.48649133,"delta_AIC_ARD_minus_ER":0.76287609,"profile95_low":null,"profile95_high":1.7394646,"LR_p_equal_rates":0.26602607,"root_probability_white_equal_ARD":0.9961957,"optimization_bound_hit":false,"high_rate_plateau":false},
+            {"tree":"all4_full","n_tips":169,"rate_ratio_return_to_white_vs_gain_from_white":0.41946743,"delta_AIC_ARD_minus_ER":0.45447818,"profile95_low":null,"profile95_high":1.7814025,"LR_p_equal_rates":0.21379776,"root_probability_white_equal_ARD":0.99651298,"optimization_bound_hit":false,"high_rate_plateau":false}
+          ],
+          "point_direction_all_three":"WHITE_TO_GREEN_FASTER","profiles_excluding_one_same_direction":0,"fits_with_AIC_improvement_ge2_same_direction":0,"min_root_probability_white_all_models_priors_trees":0.94641772,"robust_white_root_ge_0_8":true
+        },
+        "petal_binary": {
+          "fits": [
+            {"tree":"plastid_full","n_tips":183,"rate_ratio_return_to_white_vs_gain_from_white":0.17688105,"delta_AIC_ARD_minus_ER":-1.130802,"profile95_low":null,"profile95_high":1.1513282,"LR_p_equal_rates":0.076825938,"root_probability_white_equal_ARD":0.99960441,"optimization_bound_hit":false,"high_rate_plateau":false},
+            {"tree":"plastid50","n_tips":183,"rate_ratio_return_to_white_vs_gain_from_white":0.17935228,"delta_AIC_ARD_minus_ER":-1.7185076,"profile95_low":null,"profile95_high":1.0201682,"LR_p_equal_rates":0.053812449,"root_probability_white_equal_ARD":0.99951525,"optimization_bound_hit":false,"high_rate_plateau":false},
+            {"tree":"all4_full","n_tips":183,"rate_ratio_return_to_white_vs_gain_from_white":0.11504032,"delta_AIC_ARD_minus_ER":-2.0191189,"profile95_low":null,"profile95_high":0.95911794,"LR_p_equal_rates":0.044987211,"root_probability_white_equal_ARD":0.99972837,"optimization_bound_hit":false,"high_rate_plateau":false}
+          ],
+          "point_direction_all_three":"WHITE_TO_GREEN_FASTER","profiles_excluding_one_same_direction":1,"fits_with_AIC_improvement_ge2_same_direction":1,"min_root_probability_white_all_models_priors_trees":0.93827113,"robust_white_root_ge_0_8":true
+        }
+      },
+      "directional_asymmetry_gate":"FAIL","robust_white_root_gate":"PASS","robust_white_root_min_probability":0.93827113,
+      "conditional_organ_state_signal":{"tests":3,"p_range":[0.0001,0.0001],"observed_over_null_range":[0.51301258,0.54449433],"trees":{"plastid_full":{"observed_minimum_changes":29,"null_mean":54.062206,"observed_over_null_mean":0.5364191,"p":0.0001},"plastid50":{"observed_minimum_changes":28,"null_mean":54.579558,"observed_over_null_mean":0.51301258,"p":0.0001},"all4_full":{"observed_minimum_changes":29,"null_mean":53.260426,"observed_over_null_mean":0.54449433,"p":0.0001}}}
+    },
+    "fresh_repeat": {
+      "primary": {
+        "sepal_binary": {
+          "fits": [
+            {"tree":"plastid_full","n_tips":169,"rate_ratio_return_to_white_vs_gain_from_white":0.48584227,"delta_AIC_ARD_minus_ER":0.69724565,"profile95_low":null,"profile95_high":2.5423835,"LR_p_equal_rates":0.25371072,"root_probability_white_equal_ARD":0.99661918,"optimization_bound_hit":false,"high_rate_plateau":false},
+            {"tree":"plastid50","n_tips":169,"rate_ratio_return_to_white_vs_gain_from_white":0.48923981,"delta_AIC_ARD_minus_ER":0.78033563,"profile95_low":null,"profile95_high":1.7532048,"LR_p_equal_rates":0.26942653,"root_probability_white_equal_ARD":0.99614382,"optimization_bound_hit":false,"high_rate_plateau":false},
+            {"tree":"all4_full","n_tips":169,"rate_ratio_return_to_white_vs_gain_from_white":0.10995463,"delta_AIC_ARD_minus_ER":-2.2189632,"profile95_low":null,"profile95_high":0.91930458,"LR_p_equal_rates":0.03997458,"root_probability_white_equal_ARD":0.99970818,"optimization_bound_hit":false,"high_rate_plateau":false}
+          ],
+          "point_direction_all_three":"WHITE_TO_GREEN_FASTER","profiles_excluding_one_same_direction":1,"fits_with_AIC_improvement_ge2_same_direction":1,"min_root_probability_white_all_models_priors_trees":0.87497184,"robust_white_root_ge_0_8":true
+        },
+        "petal_binary": {
+          "fits": [
+            {"tree":"plastid_full","n_tips":183,"rate_ratio_return_to_white_vs_gain_from_white":0.1750529,"delta_AIC_ARD_minus_ER":-1.5983268,"profile95_low":null,"profile95_high":1.0459697,"LR_p_equal_rates":0.057837757,"root_probability_white_equal_ARD":0.99960672,"optimization_bound_hit":false,"high_rate_plateau":false},
+            {"tree":"plastid50","n_tips":183,"rate_ratio_return_to_white_vs_gain_from_white":0.180826,"delta_AIC_ARD_minus_ER":-1.685426,"profile95_low":null,"profile95_high":1.0257421,"LR_p_equal_rates":0.054889949,"root_probability_white_equal_ARD":0.99950674,"optimization_bound_hit":false,"high_rate_plateau":false},
+            {"tree":"all4_full","n_tips":183,"rate_ratio_return_to_white_vs_gain_from_white":0.11610234,"delta_AIC_ARD_minus_ER":-2.8008222,"profile95_low":null,"profile95_high":0.84652965,"LR_p_equal_rates":0.028446158,"root_probability_white_equal_ARD":0.99971789,"optimization_bound_hit":false,"high_rate_plateau":false}
+          ],
+          "point_direction_all_three":"WHITE_TO_GREEN_FASTER","profiles_excluding_one_same_direction":1,"fits_with_AIC_improvement_ge2_same_direction":1,"min_root_probability_white_all_models_priors_trees":0.92225987,"robust_white_root_ge_0_8":true
+        }
+      },
+      "directional_asymmetry_gate":"FAIL","robust_white_root_gate":"PASS","robust_white_root_min_probability":0.87497184,
+      "conditional_organ_state_signal":{"tests":3,"p_range":[0.0001,0.0001],"observed_over_null_range":[0.51301258,0.54856171],"trees":{"plastid_full":{"observed_minimum_changes":29,"null_mean":54.679868,"observed_over_null_mean":0.53035973,"p":0.0001},"plastid50":{"observed_minimum_changes":28,"null_mean":54.579558,"observed_over_null_mean":0.51301258,"p":0.0001},"all4_full":{"observed_minimum_changes":30,"null_mean":54.688469,"observed_over_null_mean":0.54856171,"p":0.0001}}}
+    }
+  },
+  "directional_asymmetry_gate":"FAIL_IN_BOTH_TREE_RECONSTRUCTIONS",
+  "robust_white_root_gate":"PASS_IN_BOTH_TREE_RECONSTRUCTIONS",
+  "robust_white_root_min_probability_across_reconstructions":0.87497184,
+  "conditional_organ_state_signal_across_reconstructions":{"tests":6,"p_range":[0.0001,0.0001],"observed_over_null_range":[0.51301258,0.54856171],"all_tests_p_0_0001":true},
+  "tree_reconstruction_nondeterminism_retained":true,
+  "universal_white_direction_law":"NOT_SUPPORTED",
+  "paper1_science_changed":false,
+  "interpretation":"Across two independently executed ML reconstruction sets, Angraecinae retains a robust WHITE root but fails the pre-frozen directional-asymmetry gate. Four-organ state structure remains phylogenetically organized conditional on coarse primary GREEN/WHITE status in all six tree tests. Tree-reconstruction variation is retained as sensitivity rather than hidden."
+}

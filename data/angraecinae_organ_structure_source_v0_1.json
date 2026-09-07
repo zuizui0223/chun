@@ -1,0 +1,46 @@
+{
+  "version": "v0.1",
+  "source_doi": "10.1371/journal.pone.0163194",
+  "source_table": "S3 morphology matrix",
+  "ingroup_rows": 189,
+  "organ_columns": {"sepal": 20, "petal": 23, "labellum": 31, "spur": 37},
+  "organ_binary_counts": {
+    "sepal": {"WHITE": 99, "GREEN": 71, "OUTSIDE_BINARY": 19},
+    "petal": {"WHITE": 114, "GREEN": 72, "OUTSIDE_BINARY": 3},
+    "labellum": {"WHITE": 124, "GREEN": 59, "OUTSIDE_BINARY": 6},
+    "spur": {"WHITE": 83, "GREEN": 104, "OUTSIDE_BINARY": 2}
+  },
+  "four_organ_fully_binary_rows": 170,
+  "four_organ_joint_pattern_counts": {
+    "WHITE_WHITE_WHITE_WHITE": 65,
+    "GREEN_GREEN_GREEN_GREEN": 59,
+    "WHITE_WHITE_WHITE_GREEN": 34,
+    "GREEN_GREEN_WHITE_GREEN": 9,
+    "GREEN_GREEN_WHITE_WHITE": 3
+  },
+  "four_organ_concordant_rows": 124,
+  "four_organ_discordant_rows": 46,
+  "four_organ_discordant_fraction": 0.27058823529411763,
+  "dominant_discordant_pattern": {"pattern": ["WHITE", "WHITE", "WHITE", "GREEN"], "rows": 34},
+  "pairwise_binary_discordance": {
+    "sepal_petal": {"n": 170, "discordant": 0, "fraction": 0.0},
+    "sepal_labellum": {"n": 170, "discordant": 12, "fraction": 0.07058823529411765},
+    "sepal_spur": {"n": 170, "discordant": 37, "fraction": 0.21764705882352942},
+    "petal_labellum": {"n": 183, "discordant": 13, "fraction": 0.07103825136612021},
+    "petal_spur": {"n": 186, "discordant": 40, "fraction": 0.21505376344086022},
+    "labellum_spur": {"n": 183, "discordant": 45, "fraction": 0.2459016393442623}
+  },
+  "equal_row_information_bits": {
+    "joint_four_organ_entropy": 1.8518156603915017,
+    "sepal_entropy": 0.9803418133570324,
+    "petal_entropy": 0.9803418133570324,
+    "labellum_entropy": 0.9314138709776405,
+    "spur_entropy": 0.9709505944546686,
+    "joint_entropy_fraction_lost_if_only_sepal": 0.4706050746164586,
+    "joint_entropy_fraction_lost_if_only_petal": 0.4706050746164586,
+    "joint_entropy_fraction_lost_if_only_labellum": 0.4970266798690289,
+    "joint_entropy_fraction_lost_if_only_spur": 0.47567643193524184
+  },
+  "claim_boundary": "Descriptive source-table result only. Entropies use equal weight per source row among the 170 four-organ fully binary rows; they are information summaries, not biological effect sizes. This does not estimate ancestral states, transition rates, selection, or natural polymorphism frequencies. OUTSIDE_BINARY source states are not recoded.",
+  "cross_clade_implication": "A single whole-flower GREEN/WHITE state discards observed organ-specific display structure in Angraecinae, independently reproducing the measurement-grain problem already found in Epimedium."
+}
