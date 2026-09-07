@@ -10,18 +10,63 @@ on:
 permissions:
   contents: read
 
+env:
+  OMP_NUM_THREADS: '2'
+  OPENBLAS_NUM_THREADS: '1'
+
 jobs:
   source:
     runs-on: ubuntu-24.04
-    timeout-minutes: 15
+    timeout-minutes: 40
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
+      - name: Install pinned source and tree dependencies
+        run: |
+          python -m pip install 'numpy==2.2.6' 'biopython==1.85'
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq mafft iqtree
       - name: Acquire PLOS/PMC supplementary trait sources
         run: python scripts/ingest_angraecinae_sources_v0_1.py --out-dir build/angraecinae_source_v0_1
-      - name: Preserve exact source acquisition code and environment
+      - name: Recover organ-specific terminal colour states
+        run: |
+          python scripts/prepare_angraecinae_traits_v0_1.py \
+            --source-dir build/angraecinae_source_v0_1 \
+            --out-dir build/angraecinae_source_v0_1/traits
+      - name: Recover source-mapped public sequences
+        run: |
+          python scripts/recover_angraecinae_sequences_v0_1.py \
+            --source-dir build/angraecinae_source_v0_1 \
+            --trait-csv build/angraecinae_source_v0_1/traits/terminal_organ_states.csv \
+            --out-dir build/angraecinae_source_v0_1/sequences
+      - name: Align and concatenate independent sequence inputs
+        run: |
+          python scripts/align_angraecinae_sequences_v0_1.py \
+            --sequence-dir build/angraecinae_source_v0_1/sequences \
+            --out-dir build/angraecinae_source_v0_1/alignments
+      - name: Independently infer three ML topologies
+        run: |
+          mkdir -p build/angraecinae_source_v0_1/trees
+          IQ=$(command -v iqtree2 || command -v iqtree)
+          "$IQ" --version > build/angraecinae_source_v0_1/iqtree_version.txt
+          mafft --version 2> build/angraecinae_source_v0_1/mafft_version.txt
+          OUTGROUPS=$(python - <<'PY'
+          import json
+          d=json.load(open('build/angraecinae_source_v0_1/sequences/sequence_manifest.json'))
+          print(','.join(d['outgroup_tips']))
+          PY
+          )
+          test -n "$OUTGROUPS"
+          for variant in plastid_full plastid50 all4_full; do
+            "$IQ" \
+              -s "build/angraecinae_source_v0_1/alignments/${variant}.fasta" \
+              -p "build/angraecinae_source_v0_1/alignments/${variant}.nex" \
+              -m GTR+G4 -o "$OUTGROUPS" -seed 20260907 -T 2 -B 1000 --bnni \
+              --prefix "build/angraecinae_source_v0_1/trees/${variant}"
+          done
+      - name: Preserve exact source acquisition and tree code
         if: always()
         run: |
           mkdir -p build/angraecinae_source_v0_1/repro_scripts
