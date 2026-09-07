@@ -1,0 +1,62 @@
+name: Linoideae inference replay v0.2
+
+on:
+  pull_request:
+    paths:
+      - 'scripts/analyze_linoideae_mk_v0_2.py'
+      - 'scripts/audit_linoideae_hue_signal_v0_2.py'
+      - 'scripts/summarize_linoideae_reanalysis_v0_2.py'
+      - 'tests/test_linoideae_mk_v0_2.py'
+      - 'data/linoideae_source_reanalysis_v0_2/**'
+      - '.github/workflows/linoideae-inference-replay-v0-2.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+env:
+  OPENBLAS_NUM_THREADS: '1'
+  OMP_NUM_THREADS: '1'
+
+jobs:
+  replay:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install pinned inference dependencies
+        run: python -m pip install 'numpy==2.2.6' 'biopython==1.85' 'scipy==1.15.3'
+      - name: Run mathematical and adversarial tests
+        run: python -m unittest discover -s tests -p 'test_linoideae_mk_v0_2.py' -v
+      - name: Refit binary and six-colour models and balanced sensitivities
+        run: |
+          mkdir -p build/linoideae_replay_v0_2
+          python scripts/analyze_linoideae_mk_v0_2.py \
+            --snapshot data/linoideae_source_reanalysis_v0_2/source_manifest.json \
+            --out build/linoideae_replay_v0_2 \
+            --balanced 10 \
+            --permutations 9999
+      - name: Recompute hue organization conditional on white status
+        run: |
+          python scripts/audit_linoideae_hue_signal_v0_2.py \
+            --snapshot data/linoideae_source_reanalysis_v0_2/source_manifest.json \
+            --out build/linoideae_replay_v0_2/conditional_hue_results.json \
+            --permutations 9999
+      - name: Verify frozen scientific summary
+        run: |
+          python scripts/summarize_linoideae_reanalysis_v0_2.py \
+            --manifest data/linoideae_source_reanalysis_v0_2/source_manifest.json \
+            --results-dir build/linoideae_replay_v0_2 \
+            --out build/linoideae_replay_v0_2/summary.json \
+            --expected data/linoideae_source_reanalysis_v0_2/analysis_summary.json
+          cat build/linoideae_replay_v0_2/summary.json >> "$GITHUB_STEP_SUMMARY"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: linoideae-inference-replay-v0-2
+          path: build/linoideae_replay_v0_2/
+          if-no-files-found: error
+          retention-days: 90
