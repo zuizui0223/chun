@@ -1,0 +1,56 @@
+name: Antirrhineae real source ingestion v0.1
+
+on:
+  pull_request:
+    paths:
+      - 'scripts/ingest_antirrhineae_source_v0_1.py'
+      - 'scripts/analyze_antirrhineae_source_v0_1.py'
+      - 'tests/test_antirrhineae_source_v0_1.py'
+      - '.github/workflows/antirrhineae-real-ingestion-v0-1.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  ingest:
+    if: github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository && github.event.pull_request.head.ref == 'atlas/antirrhineae-real-ingestion-v0-1'
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Retrieve and checksum the real CC0 source bundle
+        run: |
+          python scripts/ingest_antirrhineae_source_v0_1.py --out-dir data/atlas_antirrhineae_ingested_v0_1
+      - name: Analyze extracted trait/tree content when implemented
+        run: |
+          if test -f scripts/analyze_antirrhineae_source_v0_1.py; then
+            python scripts/analyze_antirrhineae_source_v0_1.py \
+              --source-dir data/atlas_antirrhineae_ingested_v0_1 \
+              --out-dir data/atlas_antirrhineae_ingested_v0_1/analysis
+            python -m unittest discover -s tests -p 'test_antirrhineae_source_v0_1.py'
+          fi
+      - name: Preserve generated source snapshot and audit outputs
+        env:
+          HEAD_BRANCH: ${{ github.event.pull_request.head.ref }}
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add data/atlas_antirrhineae_ingested_v0_1/
+          if ! git diff --cached --quiet; then
+            git commit -m 'Preserve Antirrhineae source bundle and audit outputs'
+            git push origin "HEAD:refs/heads/$HEAD_BRANCH"
+          fi
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: antirrhineae-real-source-ingestion-v0-1
+          path: data/atlas_antirrhineae_ingested_v0_1/
+          if-no-files-found: warn
