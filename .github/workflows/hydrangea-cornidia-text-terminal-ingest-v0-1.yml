@@ -1,0 +1,37 @@
+name: Hydrangea Cornidia text-terminal ingest v0.1
+
+on:
+  pull_request:
+    paths:
+      - 'data/hydrangea_cornidia_text_recovered_terminal_states_v0_1.csv'
+      - 'data/hydrangea_cornidia_text_terminal_ingest_summary_v0_1.json'
+      - 'docs/HYDRANGEA_CORNIDIA_TEXT_TERMINAL_INGEST_V0_1.md'
+      - 'scripts/validate_hydrangea_cornidia_text_terminal_ingest_v0_1.py'
+      - '.github/workflows/hydrangea-cornidia-text-terminal-ingest-v0-1.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Validate source-text terminal recovery
+        run: |
+          mkdir -p build/hydrangea_cornidia_text_terminal_ingest_v0_1
+          python scripts/validate_hydrangea_cornidia_text_terminal_ingest_v0_1.py \
+            --states data/hydrangea_cornidia_text_recovered_terminal_states_v0_1.csv \
+            --out build/hydrangea_cornidia_text_terminal_ingest_v0_1/summary.json
+      - name: Check frozen summary is reproducible
+        run: |
+          diff -u \
+            data/hydrangea_cornidia_text_terminal_ingest_summary_v0_1.json \
+            build/hydrangea_cornidia_text_terminal_ingest_v0_1/summary.json
+      - name: Report
+        run: cat build/hydrangea_cornidia_text_terminal_ingest_v0_1/summary.json >> "$GITHUB_STEP_SUMMARY"
