@@ -1,0 +1,25 @@
+source_row,col_1,col_2,col_3,col_4
+1,Table S2 Qualitative (QL) and quantitative (QN) characters included in the morphometric analyses,,,
+2,Character,,Code,Type of character
+3,Vegetative characters,Leaf texture,LeafT,QL
+4,,Middle leaflets length (mm),MLL,QN
+5,,Middle leaflets width  (mm),MLW,QN
+6,,Middle leaflets lobe length  (mm),MLLL,QN
+7,,Ratio of middle leaflets length to width,RatioML,QN
+8,,Lateral leaflet length  (mm),LLL,QN
+9,,lateral leaflets width  (mm),LLW,QN
+10,,Petiole length  (mm),PetioleL,QN
+11,,long lobe length of lateral leaflets  (mm),LonglobeL,QN
+12,,Short lobe length of lateral leaflets  (mm),ShortlobeL,QN
+13,,Sawtooth density  (no. / cm),SawtoothD,QN
+14,Reproductive traits,Spur reflexion,SpurR,QL
+15,,Color Sepal,SepalC,QL
+16,,Color Spur,SpurC,QL
+17,,Lamina,Lamina,QL
+18,,Inner sepal length  (mm),SepalL,QN
+19,,Inner sepal width  (mm),SepalW,QN
+20,,Spur length  (mm),SpurL,QN
+21,,Spur mouth length  (mm),SpurML,QN
+22,,Spur mouth width  (mm),SpurMW,QN
+23,,Stamen length  (mm),StamenL,QN
+24,,Pistil length  (mm),PistilL,QN

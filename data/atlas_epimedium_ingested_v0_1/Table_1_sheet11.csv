@@ -1,0 +1,20 @@
+source_row,col_1,col_2,col_3,col_4,col_5,col_6,col_7,col_8,col_9,col_10,col_11,col_12
+1,Table S11 Tree statistics ,,,,,,,,,,,
+2,,,W,E,E. brevicornu,W clade,,,E clade,,,
+3,Dataset,Methods,,,,W1,W2,W3,E1,E2,E3,E4
+4,denovo,RAxML,99,99,base,99,100,100,100,100,34,100
+5,,IQ-TREE,100,100,base,100,100,100,100,100,90,100
+6,,ExaBayes,1,1,west 1,1,1,1,1,1,1,1
+7,,SVDquartets,55,97,east 0.97,97,100,100,100,100,95,49 (-E. leptorrhizum JS63)
+8,denovo_SNP,RAxML,95,96,west 78,95,100,100,100,100,45,96 (-E. leptorrhizum JS63)
+9,,IQ-TREE,100,100,base,100,100,100,75,100,79,100
+10,,ExaBayes,1,1,west 1,1,1,1,1,1,1,1
+11,,SVDquartets,96,100,west 57,96,100,100,98,100,95,46(-E. leptorrhizum JS63)
+12,Ref,RAxML,77,98,base,77,100,93 (-E. ogisui),92,96,98 (-E. jinchengshanense),81
+13,,IQ-TREE,100,99,west 99,100,100,39,100,100,100 (-E. jinchengshanense),100
+14,,ExaBayes,1,1,base,1,1,1 (-E. ogisui),1,1,1 (-E. jinchengshanense),1
+15,,SVDquartets,100,94,base,100,99,96,96,100,60 (-E. jinchengshanense),36
+16,Ref_SNP,RAxML,100,71,west 83,100,100,55 (-E. ogisui),100,100,100 (-E. jinchengshanense),100
+17,,IQ-TREE,100,97,west 80,100,100,99 (-E. ogisui),91,100,100 (-E. jinchengshanense),93
+18,,ExaBayes,1,1,west 1,1,1,1,1,1,1 (-E. jinchengshanense),1
+19,,SVDquartets,97,97,east 36,97,99,96,97,100,53 (-E. jinchengshanense),36

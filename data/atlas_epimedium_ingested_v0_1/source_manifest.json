@@ -1,0 +1,1600 @@
+{
+  "source_doi": "10.3389/fpls.2023.1234148",
+  "pmcid": "PMC10616310",
+  "license_statements": [
+    "This is an open-access article distributed under the terms of the Creative Commons Attribution License (CC BY). The use, distribution or reproduction in other forums is permitted, provided the original author(s) and the copyright owner(s) are credited and that the original publication in this journal is cited, in accordance with accepted academic practice. No use, distribution or reproduction is permitted which does not comply with these terms."
+  ],
+  "xml_url": "https://www.ebi.ac.uk/europepmc/webservices/rest/PMC10616310/fullTextXML",
+  "xml_resolved_url": "https://www.ebi.ac.uk/europepmc/webservices/rest/PMC10616310/fullTextXML",
+  "xml_sha256": "0aeccd2f55d9cf0ccd1056c94f7426430836d6ee9daaff1a70a3b07d16ccb946",
+  "supplement_url": "https://www.ebi.ac.uk/europepmc/webservices/rest/PMC10616310/supplementaryFiles",
+  "supplement_resolved_url": "https://www.ebi.ac.uk/europepmc/webservices/rest/PMC10616310/supplementaryFiles",
+  "supplement_sha256": "af05c75300599b99b8c5861c09d7ffbc83bfd18839bd479ad48cf58bb18d6ced",
+  "supplement_bytes": 5282029,
+  "archive_members": [
+    {
+      "name": "fpls-14-1234148-g007.gif",
+      "bytes": 13417
+    },
+    {
+      "name": "Table_1.xlsx",
+      "bytes": 161106
+    },
+    {
+      "name": "Image_3.pdf",
+      "bytes": 969008
+    },
+    {
+      "name": "Image_2.pdf",
+      "bytes": 951788
+    },
+    {
+      "name": "Image_4.pdf",
+      "bytes": 956387
+    },
+    {
+      "name": "Image_5.tiff",
+      "bytes": 99858
+    },
+    {
+      "name": "fpls-14-1234148-g006.jpg",
+      "bytes": 108119
+    },
+    {
+      "name": "fpls-14-1234148-g006.gif",
+      "bytes": 11266
+    },
+    {
+      "name": "fpls-14-1234148-g004.jpg",
+      "bytes": 141450
+    },
+    {
+      "name": "fpls-14-1234148-g001.jpg",
+      "bytes": 153003
+    },
+    {
+      "name": "fpls-14-1234148-g005.gif",
+      "bytes": 20090
+    },
+    {
+      "name": "fpls-14-1234148-g005.jpg",
+      "bytes": 132875
+    },
+    {
+      "name": "fpls-14-1234148-g002.jpg",
+      "bytes": 239585
+    },
+    {
+      "name": "fpls-14-1234148-g002.gif",
+      "bytes": 18462
+    },
+    {
+      "name": "Table_2.docx",
+      "bytes": 687449
+    },
+    {
+      "name": "fpls-14-1234148-g003.gif",
+      "bytes": 19937
+    },
+    {
+      "name": "Image_1.pdf",
+      "bytes": 958496
+    },
+    {
+      "name": "fpls-14-1234148-g004.gif",
+      "bytes": 17619
+    },
+    {
+      "name": "fpls-14-1234148-g001.gif",
+      "bytes": 27129
+    },
+    {
+      "name": "fpls-14-1234148-g003.jpg",
+      "bytes": 145090
+    },
+    {
+      "name": "fpls-14-1234148-g007.jpg",
+      "bytes": 126205
+    }
+  ],
+  "workbooks": [
+    {
+      "source_filename": "Table_1.xlsx",
+      "sha256": "057a0aaa603cfa4d9683a2eac75e747cb14bd1294e541feb82483fe6bc160e45",
+      "bytes": 161106,
+      "sheets": [
+        {
+          "name": "Table S1",
+          "source_xml": "xl/worksheets/sheet1.xml",
+          "csv": "Table_1_sheet1.csv",
+          "nonempty_rows": 59,
+          "columns": 7,
+          "merge_ranges": [
+            "A1:G1"
+          ],
+          "formula_cells": [],
+          "preview": [
+            {
+              "source_row": 1,
+              "cells": {
+                "0": "Table S1 Sampling collection information in this study",
+                "1": "",
+                "2": "",
+                "3": "",
+                "4": "",
+                "5": "",
+                "6": ""
+              }
+            },
+            {
+              "source_row": 2,
+              "cells": {
+                "0": "Section",
+                "1": "Series",
+                "2": "Species",
+                "3": "ID",
+                "4": "Voucher",
+                "5": "Herbarium",
+                "6": "Locality"
+              }
+            },
+            {
+              "source_row": 3,
+              "cells": {
+                "0": "Macroceras",
+                "1": "/",
+                "2": "E. koreanum Nakai",
+                "3": "JS74",
+                "4": "C. Zhang Zhang304",
+                "5": "BNU",
+                "6": "China, Liangning, Xinbing"
+              }
+            },
+            {
+              "source_row": 4,
+              "cells": {
+                "0": "Diphyllon",
+                "1": "Dolichocerae",
+                "2": "E. acuminatum Franchet",
+                "3": "JS48",
+                "4": "C. Zhang Zhang233",
+                "5": "BNU",
+                "6": "China, Sichuan, Emei"
+              }
+            },
+            {
+              "source_row": 5,
+              "cells": {
+                "0": "Diphyllon",
+                "1": "Dolichocerae",
+                "2": "E. baojingense Q.L. Chen & B.M. Yang",
+                "3": "JS15",
+                "4": "C. Zhang Zhang307",
+                "5": "BNU",
+                "6": "China, Hunan, Longshan"
+              }
+            },
+            {
+              "source_row": 6,
+              "cells": {
+                "0": "Diphyllon",
+                "1": "Dolichocerae",
+                "2": "E. baojingense Q.L. Chen & B.M. Yang",
+                "3": "JS16",
+                "4": "C. Zhang Zhang306",
+                "5": "BNU",
+                "6": "China, Hunan, Fenghuang"
+              }
+            },
+            {
+              "source_row": 7,
+              "cells": {
+                "0": "Diphyllon",
+                "1": "Dolichocerae",
+                "2": "E. baojingense Q.L. Chen & B.M. Yang",
+                "3": "JS17",
+                "4": "C. Zhang Zhang167",
+                "5": "BNU",
+                "6": "China, Hubei, Wufeng"
+              }
+            },
+            {
+              "source_row": 8,
+              "cells": {
+                "0": "Diphyllon",
+                "1": "Dolichocerae",
+                "2": "E. baojingense Q.L. Chen & B.M. Yang",
+                "3": "JS21",
+                "4": "C. Zhang Zhang204",
+                "5": "BNU",
+                "6": "China, Hunan, Suining"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Table S2",
+          "source_xml": "xl/worksheets/sheet2.xml",
+          "csv": "Table_1_sheet2.csv",
+          "nonempty_rows": 24,
+          "columns": 4,
+          "merge_ranges": [
+            "A1:D1",
+            "A2:B2",
+            "A3:A13",
+            "A14:A24"
+          ],
+          "formula_cells": [],
+          "preview": [
+            {
+              "source_row": 1,
+              "cells": {
+                "0": "Table S2 Qualitative (QL) and quantitative (QN) characters included in the morphometric analyses",
+                "1": "",
+                "2": "",
+                "3": ""
+              }
+            },
+            {
+              "source_row": 2,
+              "cells": {
+                "0": "Character",
+                "1": "",
+                "2": "Code",
+                "3": "Type of character"
+              }
+            },
+            {
+              "source_row": 3,
+              "cells": {
+                "0": "Vegetative characters",
+                "1": "Leaf texture",
+                "2": "LeafT",
+                "3": "QL"
+              }
+            },
+            {
+              "source_row": 4,
+              "cells": {
+                "0": "",
+                "1": "Middle leaflets length (mm)",
+                "2": "MLL",
+                "3": "QN"
+              }
+            },
+            {
+              "source_row": 5,
+              "cells": {
+                "0": "",
+                "1": "Middle leaflets width  (mm)",
+                "2": "MLW",
+                "3": "QN"
+              }
+            },
+            {
+              "source_row": 6,
+              "cells": {
+                "0": "",
+                "1": "Middle leaflets lobe length  (mm)",
+                "2": "MLLL",
+                "3": "QN"
+              }
+            },
+            {
+              "source_row": 7,
+              "cells": {
+                "0": "",
+                "1": "Ratio of middle leaflets length to width",
+                "2": "RatioML",
+                "3": "QN"
+              }
+            },
+            {
+              "source_row": 8,
+              "cells": {
+                "0": "",
+                "1": "Lateral leaflet length  (mm)",
+                "2": "LLL",
+                "3": "QN"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Table S3",
+          "source_xml": "xl/worksheets/sheet3.xml",
+          "csv": "Table_1_sheet3.csv",
+          "nonempty_rows": 739,
+          "columns": 16,
+          "merge_ranges": [
+            "A1:P1"
+          ],
+          "formula_cells": [],
+          "preview": [
+            {
+              "source_row": 1,
+              "cells": {
+                "0": "Table S3 Qualitative(QL) and quantitative (QN) data of vegetative characters in the morphometric analyses",
+                "1": "",
+                "2": "",
+                "3": "",
+                "4": "",
+                "5": "",
+                "6": "",
+                "7": "",
+                "8": "",
+                "9": "",
+                "10": "",
+                "11": "",
+                "12": "",
+                "13": "",
+                "14": "",
+                "15": ""
+              }
+            },
+            {
+              "source_row": 2,
+              "cells": {
+                "0": "Series",
+                "1": "Species",
+                "2": "Locality",
+                "3": "Voucher",
+                "4": "Herbarium",
+                "5": "LeafT",
+                "6": "MLL",
+                "7": "MLW",
+                "8": "RatioML",
+                "9": "MLLL",
+                "10": "SawtoothD",
+                "11": "PetioleL",
+                "12": "LLL",
+                "13": "LLW",
+                "14": "LonglobeL",
+                "15": "ShortlobeL"
+              }
+            },
+            {
+              "source_row": 3,
+              "cells": {
+                "0": "Dolichocerae",
+                "1": "E. acuminatum",
+                "2": "Sichuan, Emeishan",
+                "3": "C.  Zhang Zhang233",
+                "4": "BNU",
+                "5": "1",
+                "6": "118.9",
+                "7": "40.6",
+                "8": "2.9",
+                "9": "6.1",
+                "10": "6.7",
+                "11": "108.8",
+                "12": "113.4",
+                "13": "40.8",
+                "14": "6.9",
+                "15": "24.7"
+              }
+            },
+            {
+              "source_row": 4,
+              "cells": {
+                "0": "Dolichocerae",
+                "1": "E. acuminatum",
+                "2": "Sichuan, Emeishan",
+                "3": "C.  Zhang Zhang233",
+                "4": "BNU",
+                "5": "1",
+                "6": "119.3",
+                "7": "38.3",
+                "8": "3.1",
+                "9": "5.3",
+                "10": "4.8",
+                "11": "113",
+                "12": "93.9",
+                "13": "34.8",
+                "14": "5.3",
+                "15": "22.9"
+              }
+            },
+            {
+              "source_row": 5,
+              "cells": {
+                "0": "Dolichocerae",
+                "1": "E. acuminatum",
+                "2": "Sichuan, Emeishan",
+                "3": "C.  Zhang Zhang233",
+                "4": "BNU",
+                "5": "1",
+                "6": "86.8",
+                "7": "34.6",
+                "8": "2.5",
+                "9": "2.6",
+                "10": "6.6",
+                "11": "87.3",
+                "12": "82.9",
+                "13": "38.2",
+                "14": "5.7",
+                "15": "18.6"
+              }
+            },
+            {
+              "source_row": 6,
+              "cells": {
+                "0": "Dolichocerae",
+                "1": "E. acuminatum",
+                "2": "Sichuan, Emeishan",
+                "3": "C.  Zhang Zhang233",
+                "4": "BNU",
+                "5": "1",
+                "6": "103",
+                "7": "36",
+                "8": "2.9",
+                "9": "4",
+                "10": "5.7",
+                "11": "98.2",
+                "12": "87.5",
+                "13": "43.7",
+                "14": "10.1",
+                "15": "19.5"
+              }
+            },
+            {
+              "source_row": 7,
+              "cells": {
+                "0": "Dolichocerae",
+                "1": "E. acuminatum",
+                "2": "Sichuan, Emeishan",
+                "3": "C.  Zhang Zhang233",
+                "4": "BNU",
+                "5": "1",
+                "6": "99.7",
+                "7": "41.8",
+                "8": "2.4",
+                "9": "3.1",
+                "10": "5.9",
+                "11": "76.1",
+                "12": "92",
+                "13": "43.2",
+                "14": "4.4",
+                "15": "20.4"
+              }
+            },
+            {
+              "source_row": 8,
+              "cells": {
+                "0": "Dolichocerae",
+                "1": "E. acuminatum",
+                "2": "Sichuan, Emeishan",
+                "3": "C.  Zhang Zhang233",
+                "4": "BNU",
+                "5": "1",
+                "6": "102.7",
+                "7": "41.4",
+                "8": "2.5",
+                "9": "5.7",
+                "10": "5.8",
+                "11": "71.9",
+                "12": "103.7",
+                "13": "43",
+                "14": "8.3",
+                "15": "20.9"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Table S4",
+          "source_xml": "xl/worksheets/sheet4.xml",
+          "csv": "Table_1_sheet4.csv",
+          "nonempty_rows": 701,
+          "columns": 16,
+          "merge_ranges": [
+            "A1:P1"
+          ],
+          "formula_cells": [],
+          "preview": [
+            {
+              "source_row": 1,
+              "cells": {
+                "0": "Table S4 Qualitative (QL) and quantitative (QN) data of reproductive characters in the morphometric analyses",
+                "1": "",
+                "2": "",
+                "3": "",
+                "4": "",
+                "5": "",
+                "6": "",
+                "7": "",
+                "8": "",
+                "9": "",
+                "10": "",
+                "11": "",
+                "12": "",
+                "13": "",
+                "14": "",
+                "15": ""
+              }
+            },
+            {
+              "source_row": 2,
+              "cells": {
+                "0": "Series",
+                "1": "Species",
+                "2": "Locality",
+                "3": "Voucher",
+                "4": "Herbarium ",
+                "5": "SpurR",
+                "6": "SepalC",
+                "7": "SpurC",
+                "8": "Lamina",
+                "9": "SepalL",
+                "10": "SepalW",
+                "11": "SpurL",
+                "12": "SpurML",
+                "13": "SpurMW",
+                "14": "StamenL",
+                "15": "PistilL"
+              }
+            },
+            {
+              "source_row": 3,
+              "cells": {
+                "0": "Dolichocerae",
+                "1": "E. acuminatum",
+                "2": "Emeishan, Sichuan",
+                "3": "C. Zhang Zhang233",
+                "4": "BNU",
+                "5": "0",
+                "6": "3",
+                "7": "3",
+                "8": "0",
+                "9": "13.17",
+                "10": "6.6",
+                "11": "27.6",
+                "12": "4.49",
+                "13": "2.43",
+                "14": "3.88",
+                "15": "6.33"
+              }
+            },
+            {
+              "source_row": 4,
+              "cells": {
+                "0": "Dolichocerae",
+                "1": "E. acuminatum",
+                "2": "Emeishan, Sichuan",
+                "3": "C. Zhang Zhang233",
+                "4": "BNU",
+                "5": "0",
+                "6": "3",
+                "7": "3",
+                "8": "0",
+                "9": "12.7",
+                "10": "6.88",
+                "11": "28.5",
+                "12": "4.62",
+                "13": "2.66",
+                "14": "3.88",
+                "15": "6.33"
+              }
+            },
+            {
+              "source_row": 5,
+              "cells": {
+                "0": "Dolichocerae",
+                "1": "E. acuminatum",
+                "2": "Emeishan, Sichuan",
+                "3": "C. Zhang Zhang233",
+                "4": "BNU",
+                "5": "0",
+                "6": "3",
+                "7": "3",
+                "8": "0",
+                "9": "13.55",
+                "10": "6.08",
+                "11": "29.8",
+                "12": "4.38",
+                "13": "2.5",
+                "14": "3.88",
+                "15": "6.33"
+              }
+            },
+            {
+              "source_row": 6,
+              "cells": {
+                "0": "Dolichocerae",
+                "1": "E. acuminatum",
+                "2": "Emeishan, Sichuan",
+                "3": "C. Zhang Zhang233",
+                "4": "BNU",
+                "5": "0",
+                "6": "3",
+                "7": "3",
+                "8": "0",
+                "9": "13.67",
+                "10": "5.97",
+                "11": "29.8",
+                "12": "4.36",
+                "13": "2.63",
+                "14": "3.88",
+                "15": "6.33"
+              }
+            },
+            {
+              "source_row": 7,
+              "cells": {
+                "0": "Dolichocerae",
+                "1": "E. acuminatum",
+                "2": "Emeishan, Sichuan",
+                "3": "C. Zhang Zhang233",
+                "4": "BNU",
+                "5": "0",
+                "6": "3",
+                "7": "3",
+                "8": "0",
+                "9": "13.13",
+                "10": "5.33",
+                "11": "28.6",
+                "12": "4.67",
+                "13": "2.34",
+                "14": "3.33",
+                "15": "5.71"
+              }
+            },
+            {
+              "source_row": 8,
+              "cells": {
+                "0": "Dolichocerae",
+                "1": "E. acuminatum",
+                "2": "Emeishan, Sichuan",
+                "3": "C. Zhang Zhang233",
+                "4": "BNU",
+                "5": "0",
+                "6": "3",
+                "7": "3",
+                "8": "0",
+                "9": "13.14",
+                "10": "6.33",
+                "11": "28.7",
+                "12": "4.12",
+                "13": "2.15",
+                "14": "3.33",
+                "15": "5.71"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Table S5",
+          "source_xml": "xl/worksheets/sheet5.xml",
+          "csv": "Table_1_sheet5.csv",
+          "nonempty_rows": 13,
+          "columns": 4,
+          "merge_ranges": [
+            "A1:D1"
+          ],
+          "formula_cells": [],
+          "preview": [
+            {
+              "source_row": 1,
+              "cells": {
+                "0": "Table S5 Regression coefficients from the discriminant function analysis of vegetative  traits.",
+                "1": "",
+                "2": "",
+                "3": ""
+              }
+            },
+            {
+              "source_row": 2,
+              "cells": {
+                "0": "Character",
+                "1": "LD1",
+                "2": "LD2",
+                "3": "LD3"
+              }
+            },
+            {
+              "source_row": 3,
+              "cells": {
+                "0": "LeafT",
+                "1": "-2.634600536",
+                "2": "0.05114018",
+                "3": "0.699115649"
+              }
+            },
+            {
+              "source_row": 4,
+              "cells": {
+                "0": "MLL",
+                "1": "0.046247761",
+                "2": "0.01829528",
+                "3": "0.003933967"
+              }
+            },
+            {
+              "source_row": 5,
+              "cells": {
+                "0": "MLW",
+                "1": "-0.087823991",
+                "2": "0.02773245",
+                "3": "-0.021458909"
+              }
+            },
+            {
+              "source_row": 6,
+              "cells": {
+                "0": "MLLL",
+                "1": "-0.716466023",
+                "2": "1.50705126",
+                "3": "-2.27917345"
+              }
+            },
+            {
+              "source_row": 7,
+              "cells": {
+                "0": "RatioML",
+                "1": "-0.020296502",
+                "2": "-0.08995394",
+                "3": "0.044591478"
+              }
+            },
+            {
+              "source_row": 8,
+              "cells": {
+                "0": "LLL",
+                "1": "-0.022283058",
+                "2": "-0.01715064",
+                "3": "0.060333502"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Table S6",
+          "source_xml": "xl/worksheets/sheet6.xml",
+          "csv": "Table_1_sheet6.csv",
+          "nonempty_rows": 13,
+          "columns": 4,
+          "merge_ranges": [
+            "A1:D1"
+          ],
+          "formula_cells": [],
+          "preview": [
+            {
+              "source_row": 1,
+              "cells": {
+                "0": "Table S6 Regression coefficients from the discriminant function analysis of reproductive traits.",
+                "1": "",
+                "2": "",
+                "3": ""
+              }
+            },
+            {
+              "source_row": 2,
+              "cells": {
+                "0": "Character",
+                "1": "LD1",
+                "2": "LD2",
+                "3": "LD3"
+              }
+            },
+            {
+              "source_row": 3,
+              "cells": {
+                "0": "SpurR",
+                "1": "-0.5153173",
+                "2": "0.9516458",
+                "3": "-1.6434021"
+              }
+            },
+            {
+              "source_row": 4,
+              "cells": {
+                "0": "SepalC",
+                "1": "1.655223",
+                "2": "-0.03766216",
+                "3": "2.1604253"
+              }
+            },
+            {
+              "source_row": 5,
+              "cells": {
+                "0": "SpurC",
+                "1": "-1.4621612",
+                "2": "0.08363806",
+                "3": "-1.6023091"
+              }
+            },
+            {
+              "source_row": 6,
+              "cells": {
+                "0": "Lamina",
+                "1": "1.2146236",
+                "2": "-4.29966071",
+                "3": "-3.1842067"
+              }
+            },
+            {
+              "source_row": 7,
+              "cells": {
+                "0": "SepalL",
+                "1": "-0.034624",
+                "2": "-0.03937091",
+                "3": "0.1135252"
+              }
+            },
+            {
+              "source_row": 8,
+              "cells": {
+                "0": "SepalW",
+                "1": "0.1753467",
+                "2": "-0.02975175",
+                "3": "-0.116712"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Table S7",
+          "source_xml": "xl/worksheets/sheet7.xml",
+          "csv": "Table_1_sheet7.csv",
+          "nonempty_rows": 37,
+          "columns": 12,
+          "merge_ranges": [
+            "A1:L1"
+          ],
+          "formula_cells": [],
+          "preview": [
+            {
+              "source_row": 1,
+              "cells": {
+                "0": "Table S7 Mean value of vegetative traits for analyses of phylomorphospace.",
+                "1": "",
+                "2": "",
+                "3": "",
+                "4": "",
+                "5": "",
+                "6": "",
+                "7": "",
+                "8": "",
+                "9": "",
+                "10": "",
+                "11": ""
+              }
+            },
+            {
+              "source_row": 2,
+              "cells": {
+                "0": "Species",
+                "1": "LeafT ",
+                "2": "MLL ",
+                "3": "MLW ",
+                "4": "MLLL",
+                "5": "RatioML ",
+                "6": "LLL ",
+                "7": "LLW",
+                "8": "SawtoothD ",
+                "9": "LonglobeL ",
+                "10": "ShortlobeL ",
+                "11": "PetioleL "
+              }
+            },
+            {
+              "source_row": 3,
+              "cells": {
+                "0": "E.  daiguii JS44",
+                "1": "1",
+                "2": "59.5",
+                "3": "33.5",
+                "4": "6.6",
+                "5": "1.8",
+                "6": "52.7",
+                "7": "32.4",
+                "8": "5.3",
+                "9": "16.3",
+                "10": "5.9",
+                "11": "77.4"
+              }
+            },
+            {
+              "source_row": 4,
+              "cells": {
+                "0": "E.  myrianthum JS36",
+                "1": "1",
+                "2": "118.1",
+                "3": "49.5",
+                "4": "3.6",
+                "5": "2.4",
+                "6": "104",
+                "7": "42",
+                "8": "4.9",
+                "9": "20.1",
+                "10": "3.5",
+                "11": "151.8"
+              }
+            },
+            {
+              "source_row": 5,
+              "cells": {
+                "0": "E.  truncatum JS32",
+                "1": "2",
+                "2": "84.7",
+                "3": "52.8",
+                "4": "0",
+                "5": "1.6",
+                "6": "70.7",
+                "7": "46.6",
+                "8": "2.3",
+                "9": "5.3",
+                "10": "-2.4",
+                "11": "123.2"
+              }
+            },
+            {
+              "source_row": 6,
+              "cells": {
+                "0": "E.  mikinorii JS30",
+                "1": "1",
+                "2": "100",
+                "3": "43.5",
+                "4": "4.5",
+                "5": "2.3",
+                "6": "99.8",
+                "7": "42.8",
+                "8": "4.4",
+                "9": "22.4",
+                "10": "4.6",
+                "11": "98.3"
+              }
+            },
+            {
+              "source_row": 7,
+              "cells": {
+                "0": "E.  hunanense JS28",
+                "1": "1",
+                "2": "104.3",
+                "3": "47.6",
+                "4": "5.2",
+                "5": "2.2",
+                "6": "98.2",
+                "7": "42.7",
+                "8": "4.5",
+                "9": "23.2",
+                "10": "5.3",
+                "11": "105.4"
+              }
+            },
+            {
+              "source_row": 8,
+              "cells": {
+                "0": "E.  elachyphyllum JS31",
+                "1": "1",
+                "2": "42",
+                "3": "34.5",
+                "4": "9.6",
+                "5": "1.2",
+                "6": "42",
+                "7": "34.5",
+                "8": "5.8",
+                "9": "9.6",
+                "10": "9.6",
+                "11": "22.3"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Table S8",
+          "source_xml": "xl/worksheets/sheet8.xml",
+          "csv": "Table_1_sheet8.csv",
+          "nonempty_rows": 13,
+          "columns": 12,
+          "merge_ranges": [
+            "A1:L1"
+          ],
+          "formula_cells": [],
+          "preview": [
+            {
+              "source_row": 1,
+              "cells": {
+                "0": "Table S8 Regression coefficients from the principal component analysis of vegetative traits.",
+                "1": "",
+                "2": "",
+                "3": "",
+                "4": "",
+                "5": "",
+                "6": "",
+                "7": "",
+                "8": "",
+                "9": "",
+                "10": "",
+                "11": ""
+              }
+            },
+            {
+              "source_row": 2,
+              "cells": {
+                "0": "Character",
+                "1": "PC1",
+                "2": "PC2",
+                "3": "PC3",
+                "4": "PC4",
+                "5": "PC5",
+                "6": "PC6",
+                "7": "PC7",
+                "8": "PC8",
+                "9": "PC9",
+                "10": "PC10",
+                "11": "PC11"
+              }
+            },
+            {
+              "source_row": 3,
+              "cells": {
+                "0": "LeafT",
+                "1": "-0.32",
+                "2": "-0.06",
+                "3": "0.13",
+                "4": "0.28",
+                "5": "-0.67",
+                "6": "0.53",
+                "7": "0.25",
+                "8": "-0.02",
+                "9": "0.11",
+                "10": "-0.02",
+                "11": "0"
+              }
+            },
+            {
+              "source_row": 4,
+              "cells": {
+                "0": "MLL",
+                "1": "-0.39",
+                "2": "-0.06",
+                "3": "0.13",
+                "4": "-0.12",
+                "5": "0.04",
+                "6": "-0.16",
+                "7": "-0.2",
+                "8": "-0.24",
+                "9": "0.34",
+                "10": "-0.25",
+                "11": "-0.72"
+              }
+            },
+            {
+              "source_row": 5,
+              "cells": {
+                "0": "MLW",
+                "1": "-0.34",
+                "2": "0.1",
+                "3": "-0.44",
+                "4": "-0.07",
+                "5": "-0.21",
+                "6": "-0.34",
+                "7": "-0.14",
+                "8": "-0.25",
+                "9": "0.45",
+                "10": "0.26",
+                "11": "0.41"
+              }
+            },
+            {
+              "source_row": 6,
+              "cells": {
+                "0": "MLLL",
+                "1": "-0.12",
+                "2": "0.59",
+                "3": "0.06",
+                "4": "0.34",
+                "5": "0.18",
+                "6": "-0.21",
+                "7": "0.53",
+                "8": "-0.35",
+                "9": "-0.16",
+                "10": "0.01",
+                "11": "-0.09"
+              }
+            },
+            {
+              "source_row": 7,
+              "cells": {
+                "0": "RatioML",
+                "1": "-0.31",
+                "2": "-0.17",
+                "3": "0.54",
+                "4": "-0.1",
+                "5": "0.17",
+                "6": "0.1",
+                "7": "-0.22",
+                "8": "-0.41",
+                "9": "-0.27",
+                "10": "0.44",
+                "11": "0.2"
+              }
+            },
+            {
+              "source_row": 8,
+              "cells": {
+                "0": "LLL",
+                "1": "-0.38",
+                "2": "-0.07",
+                "3": "0.2",
+                "4": "-0.07",
+                "5": "0.03",
+                "6": "-0.22",
+                "7": "0.02",
+                "8": "0.1",
+                "9": "-0.16",
+                "10": "-0.72",
+                "11": "0.44"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Table S9 ",
+          "source_xml": "xl/worksheets/sheet9.xml",
+          "csv": "Table_1_sheet9.csv",
+          "nonempty_rows": 37,
+          "columns": 13,
+          "merge_ranges": [
+            "A1:L1"
+          ],
+          "formula_cells": [],
+          "preview": [
+            {
+              "source_row": 1,
+              "cells": {
+                "0": "Table S9 Mean value of reproductive traits for analyses of phylomorphospace.",
+                "1": "",
+                "2": "",
+                "3": "",
+                "4": "",
+                "5": "",
+                "6": "",
+                "7": "",
+                "8": "",
+                "9": "",
+                "10": "",
+                "11": ""
+              }
+            },
+            {
+              "source_row": 2,
+              "cells": {
+                "0": "Species",
+                "1": "SpurR",
+                "2": "SepalC",
+                "3": "SpurC",
+                "4": "Lamina",
+                "5": "SepalL",
+                "6": "SepalW",
+                "7": "SpurL",
+                "8": "SpurML",
+                "9": "SpurMW",
+                "10": "StamenL",
+                "11": "PistilL"
+              }
+            },
+            {
+              "source_row": 3,
+              "cells": {
+                "0": "E.  daiguii JS44",
+                "1": "0",
+                "2": "2",
+                "3": "4",
+                "4": "0",
+                "5": "4.11",
+                "6": "2.18",
+                "7": "2.1",
+                "8": "1.66",
+                "9": "1.82",
+                "10": "3.08",
+                "11": "3.82"
+              }
+            },
+            {
+              "source_row": 4,
+              "cells": {
+                "0": "E.  myrianthum JS36",
+                "1": "0",
+                "2": "0",
+                "3": "1",
+                "4": "0",
+                "5": "4.13",
+                "6": "1.56",
+                "7": "2.43",
+                "8": "1.78",
+                "9": "1.44",
+                "10": "4.27",
+                "11": "4.54",
+                "12": ""
+              }
+            },
+            {
+              "source_row": 5,
+              "cells": {
+                "0": "E.  truncatum JS32",
+                "1": "0",
+                "2": "0",
+                "3": "1",
+                "4": "0",
+                "5": "4.37",
+                "6": "2.43",
+                "7": "3.11",
+                "8": "1.96",
+                "9": "1.97",
+                "10": "2.36",
+                "11": "2.58",
+                "12": ""
+              }
+            },
+            {
+              "source_row": 6,
+              "cells": {
+                "0": "E.  mikinorii JS30",
+                "1": "0",
+                "2": "3",
+                "3": "3",
+                "4": "1",
+                "5": "11.43",
+                "6": "6.8",
+                "7": "17.11",
+                "8": "5.24",
+                "9": "3.39",
+                "10": "3.76",
+                "11": "5.48",
+                "12": ""
+              }
+            },
+            {
+              "source_row": 7,
+              "cells": {
+                "0": "E.  hunanense JS28",
+                "1": "0",
+                "2": "2",
+                "3": "1",
+                "4": "1",
+                "5": "5.23",
+                "6": "2.75",
+                "7": "16.02",
+                "8": "7.08",
+                "9": "5.94",
+                "10": "4.03",
+                "11": "5.8",
+                "12": ""
+              }
+            },
+            {
+              "source_row": 8,
+              "cells": {
+                "0": "E.  elachyphyllum JS31",
+                "1": "0",
+                "2": "2",
+                "3": "4",
+                "4": "0",
+                "5": "4.11",
+                "6": "1.78",
+                "7": "1.4",
+                "8": "1.47",
+                "9": "1.49",
+                "10": "2.61",
+                "11": "3.96",
+                "12": ""
+              }
+            }
+          ]
+        },
+        {
+          "name": "Table S10",
+          "source_xml": "xl/worksheets/sheet10.xml",
+          "csv": "Table_1_sheet10.csv",
+          "nonempty_rows": 13,
+          "columns": 12,
+          "merge_ranges": [
+            "A1:L1"
+          ],
+          "formula_cells": [],
+          "preview": [
+            {
+              "source_row": 1,
+              "cells": {
+                "0": "Table S10 Regression coefficients from the principal component analysis of reproductive traits.",
+                "1": "",
+                "2": "",
+                "3": "",
+                "4": "",
+                "5": "",
+                "6": "",
+                "7": "",
+                "8": "",
+                "9": "",
+                "10": "",
+                "11": ""
+              }
+            },
+            {
+              "source_row": 2,
+              "cells": {
+                "0": "Character",
+                "1": "PC1",
+                "2": "PC2",
+                "3": "PC3",
+                "4": "PC4",
+                "5": "PC5",
+                "6": "PC6",
+                "7": "PC7",
+                "8": "PC8",
+                "9": "PC9",
+                "10": "PC10",
+                "11": "PC11"
+              }
+            },
+            {
+              "source_row": 3,
+              "cells": {
+                "0": "SpurR",
+                "1": "0.15",
+                "2": "0.33",
+                "3": "-0.35",
+                "4": "-0.28",
+                "5": "-0.07",
+                "6": "0.79",
+                "7": "-0.03",
+                "8": "0.06",
+                "9": "-0.13",
+                "10": "0.11",
+                "11": "0.06"
+              }
+            },
+            {
+              "source_row": 4,
+              "cells": {
+                "0": "SepalC",
+                "1": "0.35",
+                "2": "0.11",
+                "3": "-0.15",
+                "4": "0.61",
+                "5": "-0.1",
+                "6": "0.17",
+                "7": "-0.17",
+                "8": "-0.38",
+                "9": "0.43",
+                "10": "-0.28",
+                "11": "-0.05"
+              }
+            },
+            {
+              "source_row": 5,
+              "cells": {
+                "0": "SpurC",
+                "1": "0.18",
+                "2": "0.34",
+                "3": "0.14",
+                "4": "0.61",
+                "5": "0.08",
+                "6": "-0.03",
+                "7": "0.15",
+                "8": "0.42",
+                "9": "-0.42",
+                "10": "0.23",
+                "11": "0.16"
+              }
+            },
+            {
+              "source_row": 6,
+              "cells": {
+                "0": "Lamina",
+                "1": "0",
+                "2": "-0.38",
+                "3": "-0.36",
+                "4": "0.16",
+                "5": "0.68",
+                "6": "0.05",
+                "7": "-0.21",
+                "8": "-0.25",
+                "9": "-0.31",
+                "10": "0.17",
+                "11": "-0.05"
+              }
+            },
+            {
+              "source_row": 7,
+              "cells": {
+                "0": "SepalL",
+                "1": "0.41",
+                "2": "-0.02",
+                "3": "0.38",
+                "4": "-0.19",
+                "5": "0.21",
+                "6": "0.02",
+                "7": "-0.68",
+                "8": "0.35",
+                "9": "0.09",
+                "10": "-0.08",
+                "11": "-0.07"
+              }
+            },
+            {
+              "source_row": 8,
+              "cells": {
+                "0": "SepalW",
+                "1": "0.39",
+                "2": "-0.1",
+                "3": "0.38",
+                "4": "-0.13",
+                "5": "0.41",
+                "6": "0.21",
+                "7": "0.63",
+                "8": "-0.07",
+                "9": "0.09",
+                "10": "-0.19",
+                "11": "-0.12"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Table S11",
+          "source_xml": "xl/worksheets/sheet11.xml",
+          "csv": "Table_1_sheet11.csv",
+          "nonempty_rows": 19,
+          "columns": 12,
+          "merge_ranges": [
+            "A1:L1",
+            "A2:B2",
+            "F2:H2",
+            "I2:L2",
+            "A4:A7",
+            "A8:A11",
+            "A12:A15",
+            "A16:A19",
+            "C2:C3",
+            "D2:D3",
+            "E2:E3"
+          ],
+          "formula_cells": [],
+          "preview": [
+            {
+              "source_row": 1,
+              "cells": {
+                "0": "Table S11 Tree statistics ",
+                "1": "",
+                "2": "",
+                "3": "",
+                "4": "",
+                "5": "",
+                "6": "",
+                "7": "",
+                "8": "",
+                "9": "",
+                "10": "",
+                "11": ""
+              }
+            },
+            {
+              "source_row": 2,
+              "cells": {
+                "0": "",
+                "1": "",
+                "2": "W",
+                "3": "E",
+                "4": "E. brevicornu",
+                "5": "W clade",
+                "6": "",
+                "7": "",
+                "8": "E clade",
+                "9": "",
+                "10": "",
+                "11": ""
+              }
+            },
+            {
+              "source_row": 3,
+              "cells": {
+                "0": "Dataset",
+                "1": "Methods",
+                "2": "",
+                "3": "",
+                "4": "",
+                "5": "W1",
+                "6": "W2",
+                "7": "W3",
+                "8": "E1",
+                "9": "E2",
+                "10": "E3",
+                "11": "E4"
+              }
+            },
+            {
+              "source_row": 4,
+              "cells": {
+                "0": "denovo",
+                "1": "RAxML",
+                "2": "99",
+                "3": "99",
+                "4": "base",
+                "5": "99",
+                "6": "100",
+                "7": "100",
+                "8": "100",
+                "9": "100",
+                "10": "34",
+                "11": "100"
+              }
+            },
+            {
+              "source_row": 5,
+              "cells": {
+                "0": "",
+                "1": "IQ-TREE",
+                "2": "100",
+                "3": "100",
+                "4": "base",
+                "5": "100",
+                "6": "100",
+                "7": "100",
+                "8": "100",
+                "9": "100",
+                "10": "90",
+                "11": "100"
+              }
+            },
+            {
+              "source_row": 6,
+              "cells": {
+                "0": "",
+                "1": "ExaBayes",
+                "2": "1",
+                "3": "1",
+                "4": "west 1",
+                "5": "1",
+                "6": "1",
+                "7": "1",
+                "8": "1",
+                "9": "1",
+                "10": "1",
+                "11": "1"
+              }
+            },
+            {
+              "source_row": 7,
+              "cells": {
+                "0": "",
+                "1": "SVDquartets",
+                "2": "55",
+                "3": "97",
+                "4": "east 0.97",
+                "5": "97",
+                "6": "100",
+                "7": "100",
+                "8": "100",
+                "9": "100",
+                "10": "95",
+                "11": "49 (-E. leptorrhizum JS63)"
+              }
+            },
+            {
+              "source_row": 8,
+              "cells": {
+                "0": "denovo_SNP",
+                "1": "RAxML",
+                "2": "95",
+                "3": "96",
+                "4": "west 78",
+                "5": "95",
+                "6": "100",
+                "7": "100",
+                "8": "100",
+                "9": "100",
+                "10": "45",
+                "11": "96 (-E. leptorrhizum JS63)"
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "biological_interpretation_gate": "NOT_DECODED_NO_ASR",
+  "paper1_science_changed": false
+}
