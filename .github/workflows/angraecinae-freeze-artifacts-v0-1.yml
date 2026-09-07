@@ -74,6 +74,8 @@ jobs:
           if git diff --cached --quiet; then
             echo 'Frozen inputs already present.'
           else
+            BRANCH='${{ github.event.pull_request.head.ref || github.ref_name }}'
             git commit -m 'Freeze executed Angraecinae inputs and tree-reconstruction sensitivity'
-            git push origin HEAD:${{ github.event.pull_request.head.ref || github.ref_name }}
+            git pull --rebase origin "$BRANCH"
+            git push origin HEAD:"$BRANCH"
           fi
