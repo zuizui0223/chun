@@ -16,7 +16,6 @@ def hydrangea(path: Path):
     primary=x['primary_fits']
     eq_ard=[r for r in primary if r['model']=='ARD' and r['root_prior']=='equal']
     if len(eq_ard)!=2: raise ValueError('Hydrangea primary equal-root ARD set changed')
-    # A strong direction would need both a profile excluding 1 and >=2 AIC gain.
     strong=[]
     for ard in eq_ard:
         er=next(r for r in primary if r['alignment']==ard['alignment'] and r['model']=='ER' and r['root_prior']=='equal')
@@ -86,8 +85,6 @@ def build(hyd:Path,lino:Path,ang:Path):
     robust_white=[c for c in clades if c['robust_white_root']]
     nested=[c for c in clades if c['fine_state_conditional_test']!='NOT_TESTABLE_WITH_CURRENT_INGROUP_BINARY_WHITE_RED_CODING']
     nested_supported=[c for c in nested if c['fine_state_conditional_test']=='SUPPORTED']
-    # A direct sufficiency test exists because Angraecinae has robust WHITE ancestry
-    # while failing the pre-frozen direction gate.
     white_sufficient=all(c['strong_direction_supported'] for c in robust_white) if robust_white else None
     out={
       'version':'v0.1',
@@ -114,7 +111,7 @@ def build(hyd:Path,lino:Path,ang:Path):
         'law_status':'NOT_YET_A_UNIVERSAL_LAW',
         'next_gate':'Test at least one additional independent radiation with a nested fine-state representation under the same conditional-null logic.'},
       'paper1_science_changed':False,
-      'claim_boundary':'Sensitivity trees, alignments, source codings and reconstruction repeats are not counted as independent radiations. The replicated fine-state result currently comes from Linoideae and Angraecinae only; Hydrangea lacks a comparable nested fine-state ingroup test in the current coding.'}
+      'claim_boundary':'Sensitivity trees, alignments, source codings and reconstruction repeats are not counted as independent radiations. The replicated fine-state result currently comes from Linoideae and Angraecinae only; Hydrangea lacks a comparable nested fine-state ingroup test in the current coding.'
     }
     return out
 
