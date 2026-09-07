@@ -1,0 +1,41 @@
+{
+  "claim_boundary": "This is an executable constraint synthesis over source-backed published/repository evidence, not a pooled cross-clade transition-rate estimate.",
+  "common_reestimated_transition_posterior_systems": 0,
+  "constraint_tests": {
+    "module_reuse_is_white_specific": {
+      "reason": "Three independent Chilean Mimulus gains from a yellow ancestral context all map to the pathway-specific regulatory module.",
+      "status": "NOT_SUPPORTED_AS_WHITE_SPECIFIC"
+    },
+    "single_whole_flower_ancestral_colour": {
+      "reason": "Epimedium has a white ancestral inner-sepal state but a yellow ancestral petal/spur state.",
+      "status": "REJECTED_AS_CROSS_CLADE_CODING_RULE"
+    },
+    "universal_white_to_colour_direction": {
+      "reason": "Published Hydrangea stochastic maps report substantially more coloured-to-white than white-to-coloured transitions.",
+      "status": "REJECTED_BY_PUBLISHED_HYDRANGEA_QC"
+    }
+  },
+  "hydrangea_published_direction_qc": {
+    "coloured_to_white_mean": 22.691,
+    "return_gain_ratio": 3.3806615017878427,
+    "return_to_white_share": 0.7717239737441758,
+    "white_to_coloured_mean": 6.712
+  },
+  "next_raw_gate": "INGEST_AND_REESTIMATE_HYDRANGEA_OR_LINOIDEAE_TERMINAL_STATES_UNDER_COMMON_MODEL",
+  "pooled_common_rate_model_ready": false,
+  "retained_candidate_rule": "ANCESTRAL_BASELINE_CONSTRAINS_TRANSITION_ARCHITECTURE_WITHOUT_FIXING_DIRECTION; REPEATABILITY_IS_HIERARCHICAL_AND_DISPLAY_COMPARTMENT_SPECIFIC",
+  "systems_represented": [
+    "CAMELLIA",
+    "EPIMEDIUM",
+    "HYDRANGEA_CORNIDIA",
+    "LINOIDEAE",
+    "MIMULUS_CHILEAN"
+  ],
+  "version": "v0.1",
+  "white_like_systems_represented": [
+    "CAMELLIA",
+    "EPIMEDIUM",
+    "HYDRANGEA_CORNIDIA",
+    "LINOIDEAE"
+  ]
+}
