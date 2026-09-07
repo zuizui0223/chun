@@ -1,0 +1,9 @@
+taxon_normalized,in_gbs_sampling_s1,in_reproductive_s4,in_summary_s9,exact_molecular_individual_match,historical_transition_direction,independent_event_count,external_colour_variation_warning,variation_source_doi
+Epimedium acuminatum,True,True,True,NOT_ESTABLISHED,NOT_ESTABLISHED,NOT_ESTIMATED,True,10.3897/phytokeys.118.30268
+Epimedium leptorrhizum,True,True,True,NOT_ESTABLISHED,NOT_ESTABLISHED,NOT_ESTIMATED,True,10.3897/phytokeys.118.30268
+Epimedium epsteinii,False,False,False,NOT_ESTABLISHED,NOT_ESTABLISHED,NOT_ESTIMATED,False,
+Epimedium zhushanense,True,True,True,NOT_ESTABLISHED,NOT_ESTABLISHED,NOT_ESTIMATED,False,
+Epimedium franchetii,True,True,True,NOT_ESTABLISHED,NOT_ESTABLISHED,NOT_ESTIMATED,False,
+Epimedium sagittatum,True,False,False,NOT_ESTABLISHED,NOT_ESTABLISHED,NOT_ESTIMATED,False,
+Epimedium lishihchenii,True,True,False,NOT_ESTABLISHED,NOT_ESTABLISHED,NOT_ESTIMATED,False,
+Epimedium wushanense,True,True,True,NOT_ESTABLISHED,NOT_ESTABLISHED,NOT_ESTIMATED,False,
