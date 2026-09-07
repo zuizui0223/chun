@@ -1,0 +1,19 @@
+{
+  "short_3161": {
+    "draws": 20,
+    "usable_ARD_draws": 20,
+    "scale_unidentified_draws": [],
+    "usable_ratio_min_median_max": [1.9982077541848475, 2.505931671134195, 3.4872220025824103],
+    "ratio_gt_one_usable": 20
+  },
+  "long_3167": {
+    "draws": 20,
+    "usable_ARD_draws": 18,
+    "scale_unidentified_draws": [0, 11],
+    "usable_ratio_min_median_max": [1.95753781594565, 2.422931129919502, 3.4258712609013444],
+    "ratio_gt_one_usable": 18
+  },
+  "criterion": "abs(logL(Q)-logL(1000*Q))<1e-6; retain ratio but hold out speed-unidentified fits from robustness count",
+  "all_primary_scale_identified": true,
+  "supersedes": "The 39-interior-fit numerical-box summary in the original frozen_results.json is archival. The current usable robustness count is 38 after a likelihood-plateau diagnostic."
+}
