@@ -1,0 +1,37 @@
+name: Hydrangea direction robustness v0.1
+
+on:
+  pull_request:
+    paths:
+      - 'data/hydrangea_cornidia_published_transition_summary_v0_1.csv'
+      - 'data/hydrangea_direction_robustness_summary_v0_1.json'
+      - 'docs/HYDRANGEA_DIRECTION_ROBUSTNESS_V0_1.md'
+      - 'scripts/audit_hydrangea_direction_robustness_v0_1.py'
+      - '.github/workflows/hydrangea-direction-robustness-v0-1.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Recompute direction robustness audit
+        run: |
+          mkdir -p build/hydrangea_direction_robustness_v0_1
+          python scripts/audit_hydrangea_direction_robustness_v0_1.py \
+            --transitions data/hydrangea_cornidia_published_transition_summary_v0_1.csv \
+            --out build/hydrangea_direction_robustness_v0_1/summary.json
+      - name: Check frozen summary is reproducible
+        run: |
+          diff -u \
+            data/hydrangea_direction_robustness_summary_v0_1.json \
+            build/hydrangea_direction_robustness_v0_1/summary.json
+      - name: Report
+        run: cat build/hydrangea_direction_robustness_v0_1/summary.json >> "$GITHUB_STEP_SUMMARY"
