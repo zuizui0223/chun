@@ -1,0 +1,101 @@
+name: Hydrangea source reanalysis v0.2
+on:
+  pull_request:
+    paths:
+      - 'scripts/*hydrangea*v0_2.py'
+      - 'tests/*hydrangea*v0_2.py'
+      - 'data/hydrangea_source_reanalysis_v0_2/**'
+      - '.github/workflows/hydrangea-source-reanalysis-v0-2.yml'
+  workflow_dispatch:
+    inputs:
+      rebuild_sources:
+        description: Reacquire the original files and rerun IQ-TREE plus bootstrap audit
+        required: true
+        default: false
+        type: boolean
+permissions:
+  contents: read
+env:
+  OPENBLAS_NUM_THREADS: '1'
+  OMP_NUM_THREADS: '2'
+jobs:
+  replay:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install pinned numerical dependencies
+        run: python -m pip install 'numpy==2.5.3' 'biopython==1.85' 'scipy==1.16.1'
+      - name: Validate likelihood and integrated histories
+        run: python -m unittest discover -s tests -p 'test_hydrangea_mk_v0_2.py' -v
+      - name: Refit all primary and balanced models and profile intervals offline
+        run: |
+          python scripts/verify_hydrangea_snapshot_v0_2.py \
+            --inputs data/hydrangea_source_reanalysis_v0_2/frozen_inputs.json \
+            --expected data/hydrangea_source_reanalysis_v0_2/frozen_results.json \
+            --out build/hydrangea_replay_v0_2
+          cat build/hydrangea_replay_v0_2/replay_audit.json >> "$GITHUB_STEP_SUMMARY"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: hydrangea-offline-replay-v0-2
+          path: build/hydrangea_replay_v0_2/
+          if-no-files-found: error
+          retention-days: 90
+  source:
+    if: github.event_name == 'workflow_dispatch' && inputs.rebuild_sources
+    runs-on: ubuntu-24.04
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install source readers and tree engine
+        run: |
+          python -m pip install 'PyMuPDF==1.26.4' 'numpy==2.5.3' 'biopython==1.85' 'scipy==1.16.1'
+          sudo apt-get update -qq
+          sudo apt-get install -y 'iqtree=2.0.7+dfsg-1build2'
+          iqtree2 --version
+      - name: Retrieve actual source files
+        run: python scripts/ingest_hydrangea_sources_v0_2.py --out-dir build/hydrangea_source_reanalysis_v0_2
+      - name: Rebuild all source terminals and audit alignments
+        run: |
+          python scripts/prepare_hydrangea_analysis_v0_2.py \
+            --source build/hydrangea_source_reanalysis_v0_2 \
+            --out build/hydrangea_source_reanalysis_v0_2/prepared
+      - name: Independently infer both nuclear backbones
+        run: |
+          mkdir -p build/hydrangea_source_reanalysis_v0_2/trees
+          for tag in short_3161 long_3167; do
+            iqtree2 -s build/hydrangea_source_reanalysis_v0_2/prepared/${tag}.fasta \
+              -m GTR+G4 -nt 2 -seed 20260907 -o HY098 -B 1000 -bnni \
+              --prefix build/hydrangea_source_reanalysis_v0_2/trees/${tag}
+          done
+      - name: Fit ingroup models and taxon-balanced sensitivity
+        run: |
+          python scripts/analyze_hydrangea_mk_v0_2.py \
+            --trees build/hydrangea_source_reanalysis_v0_2/trees \
+            --traits build/hydrangea_source_reanalysis_v0_2/prepared/terminal_states.csv \
+            --out build/hydrangea_source_reanalysis_v0_2/analysis --balanced 20
+          python scripts/audit_hydrangea_inference_v0_2.py \
+            --base build/hydrangea_source_reanalysis_v0_2 \
+            --out build/hydrangea_source_reanalysis_v0_2/robustness --bootstrap-fits 20
+      - name: Preserve exact executable source and versions
+        if: always()
+        run: |
+          mkdir -p build/hydrangea_source_reanalysis_v0_2/repro_scripts
+          cp scripts/*hydrangea*v0_2.py scripts/ingest_epimedium_source_v0_1.py tests/test_hydrangea_mk_v0_2.py build/hydrangea_source_reanalysis_v0_2/repro_scripts/
+          git rev-parse HEAD > build/hydrangea_source_reanalysis_v0_2/ci_checkout_sha.txt
+          python -m pip freeze > build/hydrangea_source_reanalysis_v0_2/python_packages.txt
+          iqtree2 --version > build/hydrangea_source_reanalysis_v0_2/iqtree_version.txt
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: hydrangea-source-reanalysis-v0-2
+          path: build/hydrangea_source_reanalysis_v0_2/
+          if-no-files-found: error
+          retention-days: 90
