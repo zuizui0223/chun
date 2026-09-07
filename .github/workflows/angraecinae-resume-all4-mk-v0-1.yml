@@ -1,0 +1,81 @@
+name: Angraecinae resume all4 and Mk v0.1
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/angraecinae-resume-all4-mk-v0-1.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: read
+env:
+  OMP_NUM_THREADS: '2'
+  OPENBLAS_NUM_THREADS: '1'
+jobs:
+  resume:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install pinned inference dependencies
+        run: |
+          python -m pip install 'numpy==2.2.6' 'biopython==1.85' 'scipy==1.15.3'
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq iqtree
+      - name: Verify and recover interrupted source artifact
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          digest=$(gh api repos/$GITHUB_REPOSITORY/actions/artifacts/10023130972 --jq .digest)
+          test "$digest" = 'sha256:fc4378cf687df5d0e78572c65f680f9fe4462f1e5f3c0f950523da8acd9af6b3'
+          mkdir -p build/angraecinae_fast
+          gh run download 34131340471 --repo "$GITHUB_REPOSITORY" --name angraecinae-fast-mk-v0-1 --dir build/angraecinae_fast
+          test -s build/angraecinae_fast/trees/plastid_full.treefile
+          test -s build/angraecinae_fast/trees/plastid50.treefile
+          test -s build/angraecinae_fast/trees/all4_full.ckp.gz
+          test -s build/angraecinae_fast/alignments/all4_full.fasta
+      - name: Resume exact interrupted all4 ML search from checkpoint
+        run: |
+          IQ=$(command -v iqtree2 || command -v iqtree)
+          OUTGROUPS=$(python - <<'PY'
+          import json
+          d=json.load(open('build/angraecinae_fast/sequences/sequence_manifest.json'))
+          print(','.join(d['outgroup_tips']))
+          PY
+          )
+          "$IQ" -s build/angraecinae_fast/alignments/all4_full.fasta \
+            -p build/angraecinae_fast/alignments/all4_full.nex \
+            -m GTR+G4 -o "$OUTGROUPS" -seed 20260907 -T 2 \
+            --prefix build/angraecinae_fast/trees/all4_full
+          test -s build/angraecinae_fast/trees/all4_full.iqtree
+          test -s build/angraecinae_fast/trees/all4_full.treefile
+      - name: Execute three-tree organ-specific Mk and conditional state-space tests
+        run: |
+          python scripts/analyze_angraecinae_mk_v0_1.py \
+            --trees-dir build/angraecinae_fast/trees \
+            --sample-manifest build/angraecinae_fast/sequences/source_sample_manifest.csv \
+            --traits build/angraecinae_fast/traits/terminal_organ_states.csv \
+            --out-dir build/angraecinae_fast/analysis
+          python scripts/audit_angraecinae_organ_signal_v0_1.py \
+            --trees-dir build/angraecinae_fast/trees \
+            --sample-manifest build/angraecinae_fast/sequences/source_sample_manifest.csv \
+            --traits build/angraecinae_fast/traits/terminal_organ_states.csv \
+            --out build/angraecinae_fast/analysis/conditional_organ_state_results.json \
+            --permutations 9999
+          cat build/angraecinae_fast/analysis/analysis_results.json >> "$GITHUB_STEP_SUMMARY"
+          cat build/angraecinae_fast/analysis/conditional_organ_state_results.json >> "$GITHUB_STEP_SUMMARY"
+      - name: Preserve execution provenance
+        if: always()
+        run: |
+          git rev-parse HEAD > build/angraecinae_fast/final_checkout_sha.txt
+          printf '%s\n' 'source_run=34131340471' 'source_artifact=10023130972' 'source_digest=sha256:fc4378cf687df5d0e78572c65f680f9fe4462f1e5f3c0f950523da8acd9af6b3' > build/angraecinae_fast/resume_provenance.txt
+          python -m pip freeze > build/angraecinae_fast/final_python_packages.txt
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: angraecinae-resumed-final-v0-1
+          path: build/angraecinae_fast/
+          if-no-files-found: error
+          retention-days: 90
