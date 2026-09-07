@@ -12,17 +12,34 @@ permissions:
 jobs:
   source:
     runs-on: ubuntu-latest
-    timeout-minutes: 15
+    timeout-minutes: 25
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
-      - name: Install source readers
-        run: python -m pip install 'PyMuPDF==1.26.4' 'biopython==1.85' 'scipy==1.16.1'
+      - name: Install source readers and tree engine
+        run: |
+          python -m pip install 'PyMuPDF==1.26.4' 'biopython==1.85' 'scipy==1.16.1'
+          sudo apt-get update -qq
+          sudo apt-get install -y iqtree
+          iqtree2 --version
       - name: Retrieve actual source files
         run: python scripts/ingest_hydrangea_sources_v0_2.py --out-dir build/hydrangea_source_reanalysis_v0_2
-      - name: Preserve source files and manifest
+      - name: Rebuild all source terminals and audit alignments
+        run: |
+          python scripts/prepare_hydrangea_analysis_v0_2.py \
+            --source build/hydrangea_source_reanalysis_v0_2 \
+            --out build/hydrangea_source_reanalysis_v0_2/prepared
+      - name: Independently infer both nuclear backbones
+        run: |
+          mkdir -p build/hydrangea_source_reanalysis_v0_2/trees
+          for tag in short_3161 long_3167; do
+            iqtree2 -s build/hydrangea_source_reanalysis_v0_2/prepared/${tag}.fasta \
+              -m GTR+G4 -nt 2 -seed 20260907 -o HY098 -B 1000 -bnni \
+              --prefix build/hydrangea_source_reanalysis_v0_2/trees/${tag}
+          done
+      - name: Preserve original files and independently estimated backbones
         if: always()
         uses: actions/upload-artifact@v4
         with:
