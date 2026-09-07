@@ -28,6 +28,7 @@ HASHES = {
     'files/Data_Sheet_1/Supplementary Material S2_phylogenetic inference.FASTA': '0f810741a1a2a5706fc083d0e2eeb04903b407e8de2d08285355a5e92fd8c0c0',
 }
 FIGURE_SHA = 'd27ec6621e55dd432148cb7c7ef13355c096cd487d36ca5c954d983c29e2d357'
+CENTER_X = 1338  # circle bounds approximately 1330..1347; avoid the black rim
 
 
 def colour(rgb):
@@ -62,12 +63,11 @@ def run(source: Path, out: Path):
     states, medians = [], []
     for y in centers:
         yi = round(y)
-        median = np.median(rgb[yi-2:yi+3, 1332:1337], axis=(0, 1))
+        median = np.median(rgb[yi-2:yi+3, CENTER_X-2:CENTER_X+3], axis=(0, 1))
         state = colour(median)
-        # The inference must not depend on one pixel or JPEG edge.
         for dy in (-2, 0, 2):
             for dx in (-2, 0, 2):
-                other = np.median(rgb[yi+dy-1:yi+dy+2, 1334+dx-1:1334+dx+2], axis=(0, 1))
+                other = np.median(rgb[yi+dy-1:yi+dy+2, CENTER_X+dx-1:CENTER_X+dx+2], axis=(0, 1))
                 if colour(other) != state:
                     raise ValueError('terminal transect sensitivity failed')
         states.append(state)
@@ -106,7 +106,7 @@ def run(source: Path, out: Path):
     rows = []
     for i, (accession, state, y, median) in enumerate(zip(ids, states, centers, medians), 1):
         rows.append(dict(figure_row=i, accession=accession, **samples[accession], visible_state=state,
-                         figure_center_x=1334, figure_center_y=y, median_r=median[0],
+                         figure_center_x=CENTER_X, figure_center_y=y, median_r=median[0],
                          median_g=median[1], median_b=median[2], alignment_tip=long[accession].id,
                          display_organ='SOURCE_TYPED_DISPLAY_PERIANTH', source_doi=DOI))
     with (out / 'terminal_states.csv').open('w', newline='', encoding='utf-8') as f:
