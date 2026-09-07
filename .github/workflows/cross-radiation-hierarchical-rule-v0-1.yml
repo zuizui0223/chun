@@ -1,0 +1,34 @@
+name: Cross-radiation hierarchical rule v0.1
+on:
+  pull_request:
+    paths:
+      - 'data/cross_radiation_hierarchical_rule_v0_1.json'
+      - 'docs/CROSS_RADIATION_HIERARCHICAL_RULE_V0_1.md'
+      - 'scripts/summarize_cross_radiation_hierarchical_rule_v0_1.py'
+      - 'data/hydrangea_source_reanalysis_v0_2/frozen_results.json'
+      - 'data/linoideae_source_reanalysis_v0_2/analysis_summary.json'
+      - 'data/angraecinae_source_reanalysis_v0_1/analysis_summary.json'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  validate:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Regenerate the cross-radiation decision layer
+        run: |
+          python scripts/summarize_cross_radiation_hierarchical_rule_v0_1.py \
+            --out build/cross_radiation_hierarchical_rule_v0_1.json \
+            --expected data/cross_radiation_hierarchical_rule_v0_1.json
+          cat build/cross_radiation_hierarchical_rule_v0_1.json >> "$GITHUB_STEP_SUMMARY"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: cross-radiation-hierarchical-rule-v0-1
+          path: build/cross_radiation_hierarchical_rule_v0_1.json
+          if-no-files-found: error
+          retention-days: 90
