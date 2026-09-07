@@ -1,0 +1,30 @@
+name: Chilean Mimulus gain benchmark v0.1
+
+on:
+  pull_request:
+    paths:
+      - 'data/chilean_mimulus_anthocyanin_gain_events_v0_1.csv'
+      - 'docs/CHILEAN_MIMULUS_ANTHOCYANIN_GAIN_BENCHMARK_V0_1.md'
+      - 'scripts/validate_chilean_mimulus_gain_benchmark_v0_1.py'
+      - '.github/workflows/chilean-mimulus-gain-benchmark-v0-1.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Validate three independent gains and recurrence hierarchy
+        run: |
+          mkdir -p build/chilean_mimulus_gain_v0_1
+          python scripts/validate_chilean_mimulus_gain_benchmark_v0_1.py \
+            --events data/chilean_mimulus_anthocyanin_gain_events_v0_1.csv \
+            --out build/chilean_mimulus_gain_v0_1/summary.json
+      - name: Report
+        run: cat build/chilean_mimulus_gain_v0_1/summary.json >> "$GITHUB_STEP_SUMMARY"
