@@ -26,7 +26,9 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
-      - name: Retrieve and checksum the real CC0 source bundle
+      - name: Install legacy spreadsheet reader
+        run: python -m pip install --disable-pip-version-check xlrd==2.0.1
+      - name: Retrieve real article supplement and export source rows
         run: |
           python scripts/ingest_antirrhineae_source_v0_1.py --out-dir data/atlas_antirrhineae_ingested_v0_1
       - name: Analyze extracted trait/tree content when implemented
