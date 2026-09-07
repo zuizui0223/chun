@@ -1,0 +1,28 @@
+{
+  "atlas_reestimate": false,
+  "interpretation": "RETURN_TO_WHITE_ASYMMETRY_IS_AGGREGATE_AND_STATE_DEPENDENT_NOT_UNIVERSALLY_PAIRWISE",
+  "marginal_hpd_box_sensitivity": {
+    "aggregate_direction_survives": true,
+    "coloured_to_white_min": 13.0,
+    "minimum_return_gain_ratio": 1.0833333333333333,
+    "minimum_return_share": 0.52,
+    "purple_white_pair_survives": false,
+    "red_white_pair_survives": true,
+    "white_to_coloured_max": 12.0
+  },
+  "nominal_direction": {
+    "coloured_to_white_mean": 22.691,
+    "return_gain_ratio": 3.3806615017878427,
+    "return_share": 0.7717239737441758,
+    "white_to_coloured_mean": 6.712
+  },
+  "paper1_science_changed": false,
+  "published_mean_internal_consistency": {
+    "paper_reported_rounded_total": 29.4,
+    "rounded_match": true,
+    "summed_transition_mean": 29.403
+  },
+  "source_doi": "10.3389/fpls.2021.661522",
+  "statistical_boundary": "Marginal HPD endpoints are combined as a conservative rectangular sensitivity check only; they are not a joint posterior interval and do not provide a posterior probability for the aggregate ratio.",
+  "version": "v0.1"
+}
