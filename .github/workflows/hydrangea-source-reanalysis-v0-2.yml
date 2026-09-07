@@ -9,6 +9,9 @@ on:
   workflow_dispatch:
 permissions:
   contents: read
+env:
+  OPENBLAS_NUM_THREADS: '1'
+  OMP_NUM_THREADS: '2'
 jobs:
   source:
     runs-on: ubuntu-latest
@@ -24,6 +27,8 @@ jobs:
           sudo apt-get update -qq
           sudo apt-get install -y iqtree
           iqtree2 --version
+      - name: Test likelihood and integrated-history calculations
+        run: python -m unittest discover -s tests -p 'test_hydrangea_mk_v0_2.py' -v
       - name: Retrieve actual source files
         run: python scripts/ingest_hydrangea_sources_v0_2.py --out-dir build/hydrangea_source_reanalysis_v0_2
       - name: Rebuild all source terminals and audit alignments
@@ -39,7 +44,22 @@ jobs:
               -m GTR+G4 -nt 2 -seed 20260907 -o HY098 -B 1000 -bnni \
               --prefix build/hydrangea_source_reanalysis_v0_2/trees/${tag}
           done
-      - name: Preserve original files and independently estimated backbones
+      - name: Fit ingroup models and taxon-balanced sensitivity
+        run: |
+          python scripts/analyze_hydrangea_mk_v0_2.py \
+            --trees build/hydrangea_source_reanalysis_v0_2/trees \
+            --traits build/hydrangea_source_reanalysis_v0_2/prepared/terminal_states.csv \
+            --out build/hydrangea_source_reanalysis_v0_2/analysis --balanced 20
+          cat build/hydrangea_source_reanalysis_v0_2/analysis/analysis_summary.json >> "$GITHUB_STEP_SUMMARY"
+      - name: Preserve exact executable source and versions
+        if: always()
+        run: |
+          mkdir -p build/hydrangea_source_reanalysis_v0_2/repro_scripts
+          cp scripts/*hydrangea*v0_2.py scripts/ingest_epimedium_source_v0_1.py tests/test_hydrangea_mk_v0_2.py build/hydrangea_source_reanalysis_v0_2/repro_scripts/
+          git rev-parse HEAD > build/hydrangea_source_reanalysis_v0_2/ci_checkout_sha.txt
+          python -m pip freeze > build/hydrangea_source_reanalysis_v0_2/python_packages.txt
+          iqtree2 --version > build/hydrangea_source_reanalysis_v0_2/iqtree_version.txt
+      - name: Preserve original files and independently estimated results
         if: always()
         uses: actions/upload-artifact@v4
         with:
