@@ -1,8 +1,5 @@
 name: Angraecinae resume all4 and Mk v0.1
 on:
-  pull_request:
-    paths:
-      - '.github/workflows/angraecinae-resume-all4-mk-v0-1.yml'
   workflow_dispatch:
 permissions:
   contents: read
