@@ -1,0 +1,99 @@
+{
+  "version": "v0.1",
+  "status": "THREE_RADIATION_DIRECTION_AUDIT_TWO_RADIATION_FINE_STATE_REPLICATION",
+  "external_radiations_evaluated": 3,
+  "clades": [
+    {
+      "id": "HYDRANGEA_CORNIDIA",
+      "source_to_tree_reanalysis": true,
+      "robust_white_root": false,
+      "minimum_root_probability_white": 0.4661146993808587,
+      "strong_direction_supported": false,
+      "regular_equal_root_rate_ratio_range": [
+        2.10339580779752,
+        2.2098053590568054
+      ],
+      "point_direction": "COLOURED_TO_WHITE_FASTER_POINT_ESTIMATE",
+      "fine_state_conditional_test": "NOT_TESTABLE_WITH_CURRENT_INGROUP_BINARY_WHITE_RED_CODING",
+      "fine_state_dimension": null,
+      "claim_boundary": "Two nuclear-tree treatments are one radiation; profile intervals are conditional on fixed trees."
+    },
+    {
+      "id": "LINOIDEAE",
+      "source_to_tree_reanalysis": true,
+      "robust_white_root": false,
+      "minimum_root_probability_white": null,
+      "strong_direction_supported": false,
+      "regular_union_rate_ratio_range": [
+        0.106535,
+        0.128219
+      ],
+      "point_direction": "WHITE_TO_NONWHITE_FASTER_IN_REGULAR_UNION_POINT_ESTIMATES",
+      "fine_state_conditional_test": "SUPPORTED",
+      "fine_state_dimension": "HUE",
+      "fine_state_tests": 54,
+      "fine_state_p_range": [
+        0.0001,
+        0.0001
+      ],
+      "fine_state_observed_over_null_range": [
+        0.262729,
+        0.610739
+      ],
+      "claim_boundary": "Tree/source-coding sensitivities are correlated settings within one radiation; hue signal does not identify ecological or molecular cause."
+    },
+    {
+      "id": "ANGRAECINAE",
+      "source_to_tree_reanalysis": true,
+      "robust_white_root": true,
+      "minimum_root_probability_white": 0.87497184,
+      "strong_direction_supported": false,
+      "point_direction": "WHITE_TO_GREEN_FASTER_POINT_ESTIMATES_BUT_GATE_FAILS",
+      "tree_reconstruction_sets": 2,
+      "fine_state_conditional_test": "SUPPORTED",
+      "fine_state_dimension": "FLORAL_ORGAN_CONFIGURATION",
+      "fine_state_tests": 6,
+      "fine_state_p_range": [
+        0.0001,
+        0.0001
+      ],
+      "fine_state_observed_over_null_range": [
+        0.51301258,
+        0.54856171
+      ],
+      "claim_boundary": "Two executed ML reconstruction sets are sensitivities within one radiation; organ signal does not identify ecological or molecular cause."
+    }
+  ],
+  "direction_rule": {
+    "strong_direction_pass_count": 0,
+    "universal_white_transition_direction": "NOT_SUPPORTED",
+    "point_estimates_are_not_used_as_law": true,
+    "interpretation": "The three source-to-tree reanalyses do not yield a shared supported transition-rate direction."
+  },
+  "ancestry_direction_decoupling": {
+    "robust_white_root_radiations": [
+      "ANGRAECINAE"
+    ],
+    "robust_white_root_sufficient_for_supported_direction": false,
+    "direct_counterexample": "ANGRAECINAE",
+    "interpretation": "A robust WHITE ancestral state can coexist with failure to support directional rate asymmetry."
+  },
+  "hierarchical_fine_state_rule": {
+    "testable_external_radiations": 2,
+    "supporting_external_radiations": 2,
+    "supporting_ids": [
+      "LINOIDEAE",
+      "ANGRAECINAE"
+    ],
+    "dimensions": [
+      "HUE",
+      "FLORAL_ORGAN_CONFIGURATION"
+    ],
+    "status": "REPLICATED_CANDIDATE_2_OF_2_TESTABLE_EXTERNAL_RADIATIONS",
+    "candidate_rule": "Coarse ancestral/display state constrains the evolutionary state space without fixing a universal transition direction; phylogenetic organization can persist at finer hue or organ levels after conditioning on the coarse colour class.",
+    "law_status": "NOT_YET_A_UNIVERSAL_LAW",
+    "next_gate": "Test at least one additional independent radiation with a nested fine-state representation under the same conditional-null logic."
+  },
+  "paper1_science_changed": false,
+  "claim_boundary": "Sensitivity trees, alignments, source codings and reconstruction repeats are not counted as independent radiations. The replicated fine-state result currently comes from Linoideae and Angraecinae only; Hydrangea lacks a comparable nested fine-state ingroup test in the current coding."
+}
