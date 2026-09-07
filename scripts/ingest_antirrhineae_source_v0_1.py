@@ -1,101 +1,83 @@
 #!/usr/bin/env python3
-"""Retrieve and inventory the frozen Antirrhineae flower-colour source bundle.
+"""Retrieve real Antirrhineae flower-colour source material.
 
-Source: Ellis & Field 2016 data object, DOI 10.15479/AT:ISTA:34 (CC0).
-The published repository checksum is treated as the admission gate.  The script
-fails closed if the downloaded bytes do not match that checksum.
+Primary execution path uses the documented Europe PMC supplementaryFiles API
+for the Ellis & Field (2016) article and exports legacy XLS sheets positionally.
+The separate ISTA data-object identity remains frozen in project provenance;
+this script does not pretend an inaccessible repository endpoint was verified.
 """
 from __future__ import annotations
 
 import argparse
+import csv
 import hashlib
-import html.parser
+import io
 import json
-import shutil
-import urllib.parse
 import urllib.request
+import xml.etree.ElementTree as ET
 import zipfile
 from pathlib import Path
 
-DOI = "10.15479/AT:ISTA:34"
-RECORD_ID = "5550"
-FILENAME = "IST-2016-34-v1+1_tellis_flower_colour_data.zip"
-EXPECTED_MD5 = "950f85b80427d357bfeff09608ba02e9"
-RECORD_URLS = (
-    "https://research-explorer.ista.ac.at/record/5550",
-    "https://research-explorer-playground.test.ista.ac.at/record/5550",
-)
+import xlrd
+
+ARTICLE_DOI = "10.1093/aob/mcw043"
+DATA_DOI = "10.15479/AT:ISTA:34"
+PMCID = "PMC4904171"
+API = "https://www.ebi.ac.uk/europepmc/webservices/rest"
+ISTA_FILENAME = "IST-2016-34-v1+1_tellis_flower_colour_data.zip"
+ISTA_MD5 = "950f85b80427d357bfeff09608ba02e9"
+MAX_BYTES = 80_000_000
 
 
-class LinkParser(html.parser.HTMLParser):
-    def __init__(self) -> None:
-        super().__init__()
-        self.hrefs: list[str] = []
-
-    def handle_starttag(self, tag: str, attrs) -> None:
-        if tag.lower() != "a":
-            return
-        for k, v in attrs:
-            if k.lower() == "href" and v:
-                self.hrefs.append(v)
+def sha256(data: bytes) -> str:
+    return hashlib.sha256(data).hexdigest()
 
 
-def request_bytes(url: str) -> tuple[bytes, str]:
+def retrieve(url: str) -> tuple[bytes, str]:
     req = urllib.request.Request(
         url,
-        headers={"User-Agent": "chun-antirrhineae-ingestion/0.1 (+https://github.com/zuizui0223/chun)"},
+        headers={"User-Agent": "CHUN-Antirrhineae-open-data-audit/0.2 (+https://github.com/zuizui0223/chun)"},
     )
-    with urllib.request.urlopen(req, timeout=60) as resp:
-        return resp.read(), resp.geturl()
+    with urllib.request.urlopen(req, timeout=90) as response:
+        payload = response.read(MAX_BYTES + 1)
+        resolved = response.url
+    if len(payload) > MAX_BYTES:
+        raise ValueError("source exceeds download size limit")
+    return payload, resolved
 
 
-def candidate_urls() -> list[str]:
-    candidates: list[str] = []
-    quoted = urllib.parse.quote(FILENAME, safe="+._-")
-    for record in RECORD_URLS:
-        try:
-            html, resolved = request_bytes(record)
-        except Exception:
-            continue
-        parser = LinkParser()
-        parser.feed(html.decode("utf-8", errors="replace"))
-        for href in parser.hrefs:
-            absolute = urllib.parse.urljoin(resolved, href)
-            low = urllib.parse.unquote(absolute).lower()
-            if FILENAME.lower() in low or ("/record/5550/" in low and ("download" in low or low.endswith(".zip"))):
-                candidates.append(absolute)
-        base = resolved.split("/record/")[0]
-        candidates.extend(
-            [
-                f"{base}/record/{RECORD_ID}/files/{quoted}?download=1",
-                f"{base}/record/{RECORD_ID}/files/{quoted}",
-                f"{base}/records/{RECORD_ID}/files/{quoted}?download=1",
-                f"{base}/records/{RECORD_ID}/files/{quoted}/content",
-            ]
-        )
-    # Stable de-duplication.
-    return list(dict.fromkeys(candidates))
+def cell_text(value) -> str:
+    if isinstance(value, float) and value.is_integer():
+        return str(int(value))
+    return "" if value is None else str(value)
 
 
-def retrieve_bundle() -> tuple[bytes, str, list[dict]]:
-    attempts: list[dict] = []
-    for url in candidate_urls():
-        try:
-            raw, resolved = request_bytes(url)
-            md5 = hashlib.md5(raw).hexdigest()
-            attempts.append({"url": url, "resolved_url": resolved, "bytes": len(raw), "md5": md5})
-            if md5 == EXPECTED_MD5:
-                return raw, resolved, attempts
-        except Exception as exc:
-            attempts.append({"url": url, "error": type(exc).__name__, "message": str(exc)[:300]})
-    raise RuntimeError(
-        "no retrieved candidate matched the published MD5; attempts=" + json.dumps(attempts, ensure_ascii=False)
-    )
-
-
-def safe_member(name: str) -> bool:
-    p = Path(name)
-    return not p.is_absolute() and ".." not in p.parts
+def export_xls(raw: bytes, out_dir: Path, basename: str) -> list[dict]:
+    book = xlrd.open_workbook(file_contents=raw, formatting_info=False)
+    sheets: list[dict] = []
+    stem = Path(basename).stem
+    for index in range(book.nsheets):
+        sheet = book.sheet_by_index(index)
+        csv_name = f"{stem}_sheet{index + 1}.csv"
+        with (out_dir / csv_name).open("w", newline="", encoding="utf-8") as fh:
+            writer = csv.writer(fh)
+            writer.writerow(["source_row"] + [f"col_{i + 1}" for i in range(sheet.ncols)])
+            for r in range(sheet.nrows):
+                writer.writerow([r + 1] + [cell_text(sheet.cell_value(r, c)) for c in range(sheet.ncols)])
+        preview = []
+        for r in range(min(sheet.nrows, 10)):
+            preview.append({
+                "source_row": r + 1,
+                "cells": {str(c): cell_text(sheet.cell_value(r, c)) for c in range(sheet.ncols)},
+            })
+        sheets.append({
+            "name": sheet.name,
+            "csv": csv_name,
+            "rows": sheet.nrows,
+            "columns": sheet.ncols,
+            "preview": preview,
+        })
+    return sheets
 
 
 def main() -> int:
@@ -105,58 +87,76 @@ def main() -> int:
     out = args.out_dir
     out.mkdir(parents=True, exist_ok=True)
 
-    raw, resolved, attempts = retrieve_bundle()
-    bundle = out / FILENAME
-    bundle.write_bytes(raw)
-    if hashlib.md5(raw).hexdigest() != EXPECTED_MD5:
-        raise RuntimeError("published MD5 gate drift")
+    xml_url = f"{API}/{PMCID}/fullTextXML"
+    supplement_url = f"{API}/{PMCID}/supplementaryFiles"
+    xml, xml_resolved = retrieve(xml_url)
+    article = ET.fromstring(xml)
+    dois = [n.text for n in article.findall(".//article-id") if n.attrib.get("pub-id-type") == "doi"]
+    if ARTICLE_DOI not in dois:
+        raise ValueError(f"article DOI mismatch: {dois}")
+    licenses = [" ".join(n.itertext()).strip() for n in article.findall(".//license")]
+    if not licenses:
+        raise ValueError("article license not found")
 
-    extracted = out / "extracted"
-    if extracted.exists():
-        shutil.rmtree(extracted)
-    extracted.mkdir()
+    payload, supplement_resolved = retrieve(supplement_url)
+    archive_members: list[dict] = []
+    workbooks: list[dict] = []
+    preserved_files: list[dict] = []
+    with zipfile.ZipFile(io.BytesIO(payload)) as archive:
+        total_uncompressed = sum(x.file_size for x in archive.infolist())
+        if total_uncompressed > MAX_BYTES:
+            raise ValueError("uncompressed supplement exceeds size limit")
+        for entry in archive.infolist():
+            if entry.is_dir():
+                continue
+            name = Path(entry.filename).name
+            raw = archive.read(entry)
+            archive_members.append({"name": entry.filename, "bytes": len(raw), "sha256": sha256(raw)})
+            lower = name.lower()
+            if lower.endswith((".xls", ".xlsx", ".csv", ".tsv", ".nex", ".nexus", ".tre", ".tree", ".txt")):
+                (out / name).write_bytes(raw)
+                preserved_files.append({"name": name, "bytes": len(raw), "sha256": sha256(raw)})
+            if lower.endswith(".xls"):
+                workbooks.append({
+                    "source_filename": entry.filename,
+                    "basename": name,
+                    "sha256": sha256(raw),
+                    "bytes": len(raw),
+                    "sheets": export_xls(raw, out, name),
+                })
 
-    members: list[dict] = []
-    with zipfile.ZipFile(bundle) as zf:
-        for info in zf.infolist():
-            if not safe_member(info.filename):
-                raise RuntimeError(f"unsafe archive member: {info.filename}")
-            members.append(
-                {
-                    "name": info.filename,
-                    "bytes": info.file_size,
-                    "crc32": f"{info.CRC:08x}",
-                    "is_dir": info.is_dir(),
-                }
-            )
-            zf.extract(info, extracted)
-
-    files = [m for m in members if not m["is_dir"]]
-    lower_names = [m["name"].lower() for m in files]
-    colour_candidates = [m["name"] for m in files if any(x in m["name"].lower() for x in ("colour", "color", "trait", "phenotype"))]
-    tree_candidates = [m["name"] for m in files if m["name"].lower().endswith((".nex", ".nexus", ".tre", ".tree", ".trees")) or "phylo" in m["name"].lower()]
+    if not workbooks:
+        raise ValueError("no legacy XLS workbook found in real article supplement")
 
     manifest = {
-        "version": "v0.1",
-        "source_doi": DOI,
-        "record_id": RECORD_ID,
-        "license": "CC0-1.0",
-        "filename": FILENAME,
-        "published_md5": EXPECTED_MD5,
-        "observed_md5": hashlib.md5(raw).hexdigest(),
-        "sha256": hashlib.sha256(raw).hexdigest(),
-        "bytes": len(raw),
-        "resolved_download_url": resolved,
-        "retrieval_attempts": attempts,
-        "archive_members": members,
-        "colour_candidate_files": colour_candidates,
-        "tree_candidate_files": tree_candidates,
-        "has_colour_candidate": bool(colour_candidates),
-        "has_tree_candidate": bool(tree_candidates),
-        "admission_status": "INGESTED_CHECKSUM_VERIFIED" if colour_candidates and tree_candidates else "INGESTED_NEEDS_CONTENT_MAPPING",
+        "version": "v0.2",
+        "article_doi": ARTICLE_DOI,
+        "article_pmcid": PMCID,
+        "article_license_statements": licenses,
+        "article_xml_url": xml_url,
+        "article_xml_resolved_url": xml_resolved,
+        "article_xml_sha256": sha256(xml),
+        "supplement_url": supplement_url,
+        "supplement_resolved_url": supplement_resolved,
+        "supplement_sha256": sha256(payload),
+        "supplement_bytes": len(payload),
+        "archive_members": archive_members,
+        "preserved_files": preserved_files,
+        "workbooks": workbooks,
+        "independent_data_object": {
+            "doi": DATA_DOI,
+            "expected_filename": ISTA_FILENAME,
+            "published_md5": ISTA_MD5,
+            "status": "REMOTE_IDENTITY_VERIFIED_BINARY_NOT_USED_IN_THIS_RUN",
+        },
+        "admission_status": "ARTICLE_SUPPLEMENT_INGESTED_REAL_ROWS",
+        "phylogeny_status": "NOT_YET_MAPPED_FROM_ISTA_BUNDLE",
+        "historical_transition_analysis": "NOT_RUN",
         "paper1_science_changed": False,
     }
-    (out / "source_manifest.json").write_text(json.dumps(manifest, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
+    (out / "source_manifest.json").write_text(
+        json.dumps(manifest, indent=2, ensure_ascii=False) + "\n", encoding="utf-8"
+    )
     print(json.dumps(manifest, indent=2, ensure_ascii=False))
     return 0
 
