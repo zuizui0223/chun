@@ -1,10 +1,10 @@
 #!/usr/bin/env python3
 """Retrieve real Antirrhineae flower-colour source material.
 
-The script verifies the Ellis & Field (2016) article through Europe PMC, then
-retrieves supplementary files through two official routes: Europe PMC's
-`supplementaryFiles` endpoint when it is a ZIP, otherwise NCBI's OA package
-index and the linked OA tarball. Legacy XLS sheets are exported positionally.
+For this 2016 article the Europe PMC fullTextXML route currently returns 404 in
+hosted CI.  The script therefore uses NCBI's official OA-package index, verifies
+the article DOI from the package NXML, and positionally exports the legacy XLS
+supplement.  The separate ISTA data-object identity remains frozen provenance.
 """
 from __future__ import annotations
 
@@ -16,7 +16,6 @@ import json
 import tarfile
 import urllib.request
 import xml.etree.ElementTree as ET
-import zipfile
 from pathlib import Path
 
 import xlrd
@@ -24,7 +23,6 @@ import xlrd
 ARTICLE_DOI = "10.1093/aob/mcw043"
 DATA_DOI = "10.15479/AT:ISTA:34"
 PMCID = "PMC4904171"
-EPMC = "https://www.ebi.ac.uk/europepmc/webservices/rest"
 NCBI_OA = f"https://www.ncbi.nlm.nih.gov/pmc/utils/oa/oa.fcgi?id={PMCID}"
 ISTA_FILENAME = "IST-2016-34-v1+1_tellis_flower_colour_data.zip"
 ISTA_MD5 = "950f85b80427d357bfeff09608ba02e9"
@@ -38,7 +36,7 @@ def sha256(data: bytes) -> str:
 def retrieve(url: str) -> tuple[bytes, str, dict]:
     req = urllib.request.Request(
         url,
-        headers={"User-Agent": "CHUN-Antirrhineae-open-data-audit/0.3 (+https://github.com/zuizui0223/chun)"},
+        headers={"User-Agent": "CHUN-Antirrhineae-open-data-audit/0.4 (+https://github.com/zuizui0223/chun)"},
     )
     with urllib.request.urlopen(req, timeout=90) as response:
         payload = response.read(MAX_BYTES + 1)
@@ -73,74 +71,12 @@ def export_xls(raw: bytes, out_dir: Path, basename: str) -> list[dict]:
             "rows": sheet.nrows,
             "columns": sheet.ncols,
             "preview": [
-                {
-                    "source_row": r + 1,
-                    "cells": {str(c): cell_text(sheet.cell_value(r, c)) for c in range(sheet.ncols)},
-                }
+                {"source_row": r + 1,
+                 "cells": {str(c): cell_text(sheet.cell_value(r, c)) for c in range(sheet.ncols)}}
                 for r in range(min(sheet.nrows, 10))
             ],
         })
     return sheets
-
-
-def collect_member(name: str, raw: bytes, out: Path, members: list[dict], workbooks: list[dict]) -> None:
-    basename = Path(name).name
-    if not basename:
-        return
-    lower = basename.lower()
-    members.append({"name": name, "bytes": len(raw), "sha256": sha256(raw)})
-    if lower.endswith((".xls", ".xlsx", ".csv", ".tsv", ".nex", ".nexus", ".tre", ".tree", ".txt")):
-        (out / basename).write_bytes(raw)
-    if lower.endswith(".xls"):
-        workbooks.append({
-            "source_filename": name,
-            "basename": basename,
-            "sha256": sha256(raw),
-            "bytes": len(raw),
-            "sheets": export_xls(raw, out, basename),
-        })
-
-
-def extract_epmc_zip(payload: bytes, out: Path, members: list[dict], workbooks: list[dict]) -> bool:
-    if not zipfile.is_zipfile(io.BytesIO(payload)):
-        return False
-    with zipfile.ZipFile(io.BytesIO(payload)) as archive:
-        if sum(x.file_size for x in archive.infolist()) > MAX_BYTES:
-            raise ValueError("uncompressed Europe PMC supplement exceeds size limit")
-        for entry in archive.infolist():
-            if not entry.is_dir():
-                collect_member(entry.filename, archive.read(entry), out, members, workbooks)
-    return True
-
-
-def extract_ncbi_oa(out: Path, members: list[dict], workbooks: list[dict]) -> dict:
-    oa_xml, oa_resolved, _ = retrieve(NCBI_OA)
-    root = ET.fromstring(oa_xml)
-    links = root.findall(".//link")
-    tgz = next((x.attrib.get("href", "") for x in links if x.attrib.get("format") == "tgz"), "")
-    if not tgz:
-        raise ValueError("NCBI OA index contains no tgz link")
-    if tgz.startswith("ftp://"):
-        tgz = "https://" + tgz[len("ftp://"):]
-    payload, resolved, headers = retrieve(tgz)
-    with tarfile.open(fileobj=io.BytesIO(payload), mode="r:gz") as archive:
-        safe_files = [m for m in archive.getmembers() if m.isfile() and not Path(m.name).is_absolute() and ".." not in Path(m.name).parts]
-        if sum(m.size for m in safe_files) > MAX_BYTES:
-            raise ValueError("uncompressed NCBI OA package exceeds size limit")
-        for member in safe_files:
-            fh = archive.extractfile(member)
-            if fh is not None:
-                collect_member(member.name, fh.read(), out, members, workbooks)
-    return {
-        "oa_index_url": NCBI_OA,
-        "oa_index_resolved_url": oa_resolved,
-        "oa_index_sha256": sha256(oa_xml),
-        "tgz_url": tgz,
-        "tgz_resolved_url": resolved,
-        "tgz_sha256": sha256(payload),
-        "tgz_bytes": len(payload),
-        "tgz_content_type": headers.get("content-type", ""),
-    }
 
 
 def main() -> int:
@@ -150,49 +86,72 @@ def main() -> int:
     out = args.out_dir
     out.mkdir(parents=True, exist_ok=True)
 
-    xml_url = f"{EPMC}/{PMCID}/fullTextXML"
-    xml, xml_resolved, _ = retrieve(xml_url)
-    article = ET.fromstring(xml)
-    dois = [n.text for n in article.findall(".//article-id") if n.attrib.get("pub-id-type") == "doi"]
-    if ARTICLE_DOI not in dois:
-        raise ValueError(f"article DOI mismatch: {dois}")
-    licenses = [" ".join(n.itertext()).strip() for n in article.findall(".//license")]
-    if not licenses:
-        raise ValueError("article license not found")
+    oa_xml, oa_resolved, _ = retrieve(NCBI_OA)
+    oa_root = ET.fromstring(oa_xml)
+    tgz_url = next((x.attrib.get("href", "") for x in oa_root.findall(".//link") if x.attrib.get("format") == "tgz"), "")
+    if not tgz_url:
+        raise ValueError("NCBI OA index contains no tgz link")
+    if tgz_url.startswith("ftp://"):
+        tgz_url = "https://" + tgz_url[len("ftp://"):]
+    tgz, tgz_resolved, tgz_headers = retrieve(tgz_url)
 
     members: list[dict] = []
     workbooks: list[dict] = []
-    supplement_url = f"{EPMC}/{PMCID}/supplementaryFiles"
-    supplement_payload, supplement_resolved, supplement_headers = retrieve(supplement_url)
-    epmc_zip = extract_epmc_zip(supplement_payload, out, members, workbooks)
-    ncbi_meta = None
+    nxml_docs: list[dict] = []
+    article_dois: set[str] = set()
+    licenses: list[str] = []
+
+    with tarfile.open(fileobj=io.BytesIO(tgz), mode="r:gz") as archive:
+        files = [m for m in archive.getmembers() if m.isfile()]
+        if any(Path(m.name).is_absolute() or ".." in Path(m.name).parts for m in files):
+            raise ValueError("unsafe OA archive member")
+        if sum(m.size for m in files) > MAX_BYTES:
+            raise ValueError("uncompressed NCBI OA package exceeds size limit")
+        for member in files:
+            fh = archive.extractfile(member)
+            if fh is None:
+                continue
+            raw = fh.read()
+            basename = Path(member.name).name
+            lower = basename.lower()
+            members.append({"name": member.name, "bytes": len(raw), "sha256": sha256(raw)})
+            if lower.endswith(".nxml"):
+                root = ET.fromstring(raw)
+                dois = [n.text for n in root.findall(".//article-id") if n.attrib.get("pub-id-type") == "doi" and n.text]
+                article_dois.update(dois)
+                licenses.extend(" ".join(n.itertext()).strip() for n in root.findall(".//license"))
+                nxml_docs.append({"name": member.name, "sha256": sha256(raw), "dois": dois})
+            if lower.endswith((".xls", ".xlsx", ".csv", ".tsv", ".nex", ".nexus", ".tre", ".tree", ".txt")):
+                (out / basename).write_bytes(raw)
+            if lower.endswith(".xls"):
+                workbooks.append({
+                    "source_filename": member.name,
+                    "basename": basename,
+                    "sha256": sha256(raw),
+                    "bytes": len(raw),
+                    "sheets": export_xls(raw, out, basename),
+                })
+
+    if ARTICLE_DOI not in article_dois:
+        raise ValueError(f"OA package DOI mismatch: {sorted(article_dois)}")
     if not workbooks:
-        ncbi_meta = extract_ncbi_oa(out, members, workbooks)
-    if not workbooks:
-        diagnostic = {
-            "epmc_supplement_bytes": len(supplement_payload),
-            "epmc_supplement_sha256": sha256(supplement_payload),
-            "epmc_content_type": supplement_headers.get("content-type", ""),
-            "epmc_was_zip": epmc_zip,
-            "members_seen": members,
-        }
-        (out / "diagnostic.json").write_text(json.dumps(diagnostic, indent=2) + "\n", encoding="utf-8")
-        raise ValueError("no legacy XLS workbook found through Europe PMC or NCBI OA package")
+        raise ValueError("no legacy XLS workbook found in NCBI OA package")
 
     manifest = {
-        "version": "v0.3",
+        "version": "v0.4",
         "article_doi": ARTICLE_DOI,
         "article_pmcid": PMCID,
+        "article_dois_in_nxml": sorted(article_dois),
         "article_license_statements": licenses,
-        "article_xml_url": xml_url,
-        "article_xml_resolved_url": xml_resolved,
-        "article_xml_sha256": sha256(xml),
-        "epmc_supplement_url": supplement_url,
-        "epmc_supplement_resolved_url": supplement_resolved,
-        "epmc_supplement_sha256": sha256(supplement_payload),
-        "epmc_supplement_bytes": len(supplement_payload),
-        "epmc_supplement_was_zip": epmc_zip,
-        "ncbi_oa_fallback": ncbi_meta,
+        "ncbi_oa_index_url": NCBI_OA,
+        "ncbi_oa_index_resolved_url": oa_resolved,
+        "ncbi_oa_index_sha256": sha256(oa_xml),
+        "oa_tgz_url": tgz_url,
+        "oa_tgz_resolved_url": tgz_resolved,
+        "oa_tgz_sha256": sha256(tgz),
+        "oa_tgz_bytes": len(tgz),
+        "oa_tgz_content_type": tgz_headers.get("content-type", ""),
+        "nxml_documents": nxml_docs,
         "archive_members": members,
         "workbooks": workbooks,
         "independent_data_object": {
