@@ -1,8 +1,5 @@
 name: Linoideae nuclear ITS sensitivity v0.2
 on:
-  pull_request:
-    paths:
-      - '.github/workflows/linoideae-nuclear-sensitivity-v0-2.yml'
   workflow_dispatch:
 permissions:
   contents: read
