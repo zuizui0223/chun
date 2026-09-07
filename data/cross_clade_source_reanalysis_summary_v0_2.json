@@ -1,0 +1,25 @@
+{
+  "version": "v0.2",
+  "common_estimator_source_to_tree_radiations": 2,
+  "common_estimator_systems": [
+    "HYDRANGEA_CORNIDIA",
+    "LINOIDEAE"
+  ],
+  "supported_directional_asymmetry_systems": 0,
+  "hydrangea_linoideae_point_directions_opposite": true,
+  "universal_white_direction_current_status": "NOT_SUPPORTED",
+  "pooled_common_rate_model_ready": false,
+  "pooled_gate_required_radiations": 3,
+  "third_radiation_gate": "ANGRAECINAE_TREE_TO_ORGAN_MK_PENDING",
+  "finer_state_positive_results": {
+    "LINOIDEAE": "HUE_ORGANIZATION_CONDITIONAL_ON_WHITE_STATUS",
+    "EPIMEDIUM_DIPHYLLON": "JOINT_ORGAN_STATE_NONREDUNDANCY",
+    "ANGRAECINAE": "SOURCE_LEVEL_ORGAN_DISCORDANCE_46_OF_170_FULLY_BINARY_ROWS"
+  },
+  "display_scalarization_failure_replicated_systems": [
+    "EPIMEDIUM_DIPHYLLON",
+    "ANGRAECINAE"
+  ],
+  "retained_candidate_rule": "ANCESTRAL_OR_DISPLAY_STATE_CONSTRAINS_ACCESSIBLE_TRANSITION_ARCHITECTURE_WITHOUT_FIXING_ONE_UNIVERSAL_DIRECTION; INFORMATIVE_STRUCTURE_CAN_RESIDE_AT FINER HUE, ORGAN, OR FUNCTIONAL-MODULE LEVELS",
+  "claim_boundary": "Two radiations currently have common source-to-tree binary reanalysis. Angraecinae has source-level organ evidence but is not counted as the third Mk radiation until its tree/model gate closes. No pooled white-ancestry effect is estimated."
+}
