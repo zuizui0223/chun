@@ -23,9 +23,9 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
-      - name: Install pinned source and tree dependencies
+      - name: Install pinned source, tree and inference dependencies
         run: |
-          python -m pip install 'numpy==2.2.6' 'biopython==1.85'
+          python -m pip install 'numpy==2.2.6' 'biopython==1.85' 'scipy==1.15.3'
           sudo apt-get update -qq
           sudo apt-get install -y -qq mafft iqtree
       - name: Acquire PLOS/PMC supplementary trait sources
@@ -66,7 +66,15 @@ jobs:
               -m GTR+G4 -o "$OUTGROUPS" -seed 20260907 -T 2 -B 1000 --bnni \
               --prefix "build/angraecinae_source_v0_1/trees/${variant}"
           done
-      - name: Preserve exact source acquisition and tree code
+      - name: Fit the common organ-specific GREEN-WHITE Mk models
+        run: |
+          python scripts/analyze_angraecinae_mk_v0_1.py \
+            --trees-dir build/angraecinae_source_v0_1/trees \
+            --sample-manifest build/angraecinae_source_v0_1/sequences/source_sample_manifest.csv \
+            --traits build/angraecinae_source_v0_1/traits/terminal_organ_states.csv \
+            --out-dir build/angraecinae_source_v0_1/analysis
+          cat build/angraecinae_source_v0_1/analysis/analysis_results.json >> "$GITHUB_STEP_SUMMARY"
+      - name: Preserve exact executable code and versions
         if: always()
         run: |
           mkdir -p build/angraecinae_source_v0_1/repro_scripts
