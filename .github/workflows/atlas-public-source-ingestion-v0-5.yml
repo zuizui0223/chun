@@ -3,6 +3,7 @@ on:
   pull_request:
     paths:
       - 'scripts/ingest_atlas_public_sources_v0_5.py'
+      - 'scripts/resolve_atlas_source_payloads_v0_5.py'
       - 'scripts/analyze_atlas_ingested_sources_v0_5.py'
       - 'docs/ATLAS_ACTUAL_INGESTION_V0_5_RESULT.md'
       - '.github/workflows/atlas-public-source-ingestion-v0-5.yml'
@@ -23,7 +24,7 @@ jobs:
       - name: Test read-only source parser
         run: python scripts/ingest_atlas_public_sources_v0_5.py --self-test
       - name: Download, checksum and inventory real external files
-        run: python scripts/ingest_atlas_public_sources_v0_5.py --out build/atlas_source_ingestion_v0_5
+        run: python scripts/resolve_atlas_source_payloads_v0_5.py --out build/atlas_source_ingestion_v0_5
       - name: Report actual source status
         if: always()
         run: |
