@@ -1,0 +1,37 @@
+name: Angraecinae source reanalysis v0.1
+
+on:
+  pull_request:
+    paths:
+      - 'scripts/*angraecinae*v0_1.py'
+      - '.github/workflows/angraecinae-source-reanalysis-v0-1.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  source:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Acquire PLOS/PMC supplementary trait sources
+        run: python scripts/ingest_angraecinae_sources_v0_1.py --out-dir build/angraecinae_source_v0_1
+      - name: Preserve exact source acquisition code and environment
+        if: always()
+        run: |
+          mkdir -p build/angraecinae_source_v0_1/repro_scripts
+          cp scripts/*angraecinae*v0_1.py build/angraecinae_source_v0_1/repro_scripts/
+          git rev-parse HEAD > build/angraecinae_source_v0_1/ci_checkout_sha.txt
+          python -m pip freeze > build/angraecinae_source_v0_1/python_packages.txt
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: angraecinae-source-v0-1
+          path: build/angraecinae_source_v0_1/
+          if-no-files-found: error
+          retention-days: 90
