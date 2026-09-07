@@ -1,10 +1,6 @@
 name: Angraecinae source reanalysis v0.1
 
 on:
-  pull_request:
-    paths:
-      - 'scripts/*angraecinae*v0_1.py'
-      - '.github/workflows/angraecinae-source-reanalysis-v0-1.yml'
   workflow_dispatch:
 
 permissions:
@@ -46,7 +42,7 @@ jobs:
           python scripts/align_angraecinae_sequences_v0_1.py \
             --sequence-dir build/angraecinae_source_v0_1/sequences \
             --out-dir build/angraecinae_source_v0_1/alignments
-      - name: Independently infer three ML topologies
+      - name: Independently infer three ML topologies with bootstrap
         run: |
           mkdir -p build/angraecinae_source_v0_1/trees
           IQ=$(command -v iqtree2 || command -v iqtree)
@@ -73,7 +69,13 @@ jobs:
             --sample-manifest build/angraecinae_source_v0_1/sequences/source_sample_manifest.csv \
             --traits build/angraecinae_source_v0_1/traits/terminal_organ_states.csv \
             --out-dir build/angraecinae_source_v0_1/analysis
+          python scripts/audit_angraecinae_organ_signal_v0_1.py \
+            --trees-dir build/angraecinae_source_v0_1/trees \
+            --sample-manifest build/angraecinae_source_v0_1/sequences/source_sample_manifest.csv \
+            --traits build/angraecinae_source_v0_1/traits/terminal_organ_states.csv \
+            --out build/angraecinae_source_v0_1/analysis/conditional_organ_signal.json --permutations 9999
           cat build/angraecinae_source_v0_1/analysis/analysis_results.json >> "$GITHUB_STEP_SUMMARY"
+          cat build/angraecinae_source_v0_1/analysis/conditional_organ_signal.json >> "$GITHUB_STEP_SUMMARY"
       - name: Preserve exact executable code and versions
         if: always()
         run: |
