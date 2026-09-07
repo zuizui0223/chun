@@ -1,0 +1,51 @@
+name: Epimedium real source ingestion v0.1
+on:
+  pull_request:
+    paths:
+      - 'scripts/ingest_epimedium_source_v0_1.py'
+      - 'scripts/analyze_epimedium_organ_states_v0_1.py'
+      - 'tests/test_epimedium_organ_states_v0_1.py'
+      - '.github/workflows/epimedium-real-ingestion-v0-1.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  ingest:
+    if: github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository && github.event.pull_request.head.ref == 'atlas/epimedium-real-ingestion-v0-1'
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Retrieve actual open source and preserve original cells
+        run: |
+          python scripts/ingest_epimedium_source_v0_1.py --out-dir data/atlas_epimedium_ingested_v0_1
+      - name: Analyze decoded organ states when implemented
+        run: |
+          if test -f scripts/analyze_epimedium_organ_states_v0_1.py; then
+            python scripts/analyze_epimedium_organ_states_v0_1.py --source-dir data/atlas_epimedium_ingested_v0_1 --out-dir data/atlas_epimedium_ingested_v0_1/analysis
+            python -m unittest discover -s tests -p 'test_epimedium_organ_states_v0_1.py'
+          fi
+      - name: Preserve only generated source snapshots on the analysis branch
+        env:
+          HEAD_BRANCH: ${{ github.event.pull_request.head.ref }}
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add data/atlas_epimedium_ingested_v0_1/
+          if ! git diff --cached --quiet; then
+            git commit -m 'Preserve actual Epimedium source cells and reproducible audit outputs'
+            git push origin "HEAD:refs/heads/$HEAD_BRANCH"
+          fi
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: epimedium-real-source-ingestion-v0-1
+          path: data/atlas_epimedium_ingested_v0_1/
+          if-no-files-found: warn
