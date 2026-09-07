@@ -1,0 +1,17 @@
+{
+  "atlas_asr_status": "NOT_RUN",
+  "clade_A_explicit_white_taxa": 3,
+  "clade_I_explicit_white_taxa": 7,
+  "conflicting_source_sentence_excluded": true,
+  "coverage_denominator_status": "UNRESOLVED_UNTIL_SUPPLEMENT_OR_TREE_TIP_LIST",
+  "exact_tip_mapping_status": "PENDING",
+  "macro_rows_ready": 0,
+  "minimum_provenance_coverage": 0.8,
+  "paper1_science_changed": false,
+  "source_backed_terminal_taxa": 10,
+  "terminal_matrix_status": "PARTIAL_SOURCE_RECOVERY",
+  "version": "v0.1",
+  "visible_states": {
+    "WHITE": 10
+  }
+}
