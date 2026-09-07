@@ -8,6 +8,7 @@ from __future__ import annotations
 import argparse,copy,csv,json,math
 from pathlib import Path
 from Bio import Phylo
+from Bio.Phylo.BaseTree import Tree
 from scipy.optimize import minimize_scalar,brentq
 from scipy.stats import chi2
 from analyze_hydrangea_mk_v0_2 import BinaryMk
@@ -15,13 +16,17 @@ from analyze_hydrangea_mk_v0_2 import BinaryMk
 POLICIES=('sepal_binary','petal_binary','labellum_binary','spur_binary','display_perianth_concordant','all4_concordant')
 PRIMARY={'sepal_binary','petal_binary'}
 
-def root_and_prune(tree,keep,outgroups):
-    t=copy.deepcopy(tree);targets=[x for x in outgroups if x in {q.name for q in t.get_terminals()}]
-    if len(targets)<2:raise ValueError('insufficient explicit outgroups in tree')
-    t.root_with_outgroup(*targets)
+def extract_ingroup_and_prune(tree,full_ingroup,keep):
+    t=copy.deepcopy(tree);names={q.name for q in t.get_terminals()}
+    full=set(full_ingroup)&names
+    if len(full)<180:raise ValueError(f'insufficient full Angraecinae tips in tree: {len(full)}')
+    m=t.common_ancestor(sorted(full));desc={q.name for q in m.get_terminals()}
+    if desc!=full:raise ValueError(f'Angraecinae source tips are not monophyletic: extra={sorted(desc-full)[:8]} missing={sorted(full-desc)[:8]}')
+    t=Tree(root=copy.deepcopy(m),rooted=True);t.root.branch_length=0.0
     for tip in list(t.get_terminals()):
         if tip.name not in keep:t.prune(tip)
     t.root.branch_length=0.0
+    if {q.name for q in t.get_terminals()}!=set(keep):raise ValueError('policy pruning changed tip identity')
     return t
 
 def relabel(fit,tag,policy):
@@ -63,20 +68,21 @@ def profile(mk,fit):
 def main():
     ap=argparse.ArgumentParser();ap.add_argument('--trees-dir',type=Path,required=True);ap.add_argument('--sample-manifest',type=Path,required=True);ap.add_argument('--traits',type=Path,required=True);ap.add_argument('--out-dir',type=Path,required=True);a=ap.parse_args();a.out_dir.mkdir(parents=True,exist_ok=True)
     samples=list(csv.DictReader(a.sample_manifest.open()));traitrows=list(csv.DictReader(a.traits.open()));traits={r['source_taxon']:r for r in traitrows}
-    outgroups=[r['tip_id'] for r in samples if r['source_group']=='OUTGROUP'];mapped={r['tip_id']:traits[r['source_taxon']] for r in samples if r['trait_join_status']=='EXACT_UNIQUE' and r['source_taxon'] in traits and r['source_group']=='ANGRAECINAE'}
+    full_ingroup={r['tip_id'] for r in samples if r['source_group']=='ANGRAECINAE'}
+    mapped={r['tip_id']:traits[r['source_taxon']] for r in samples if r['trait_join_status']=='EXACT_UNIQUE' and r['source_taxon'] in traits and r['source_group']=='ANGRAECINAE'}
     fits=[];profiles=[];coverage=[]
     for tag in ('plastid_full','plastid50','all4_full'):
         tree=Phylo.read(a.trees_dir/f'{tag}.treefile','newick');tree_names={x.name for x in tree.get_terminals()}
         for policy in POLICIES:
             state={'WHITE':0,'GREEN':1};states={tip:state[row[policy]] for tip,row in mapped.items() if tip in tree_names and row[policy] in state}
             if set(states.values())!={0,1}:raise ValueError(f'{tag}/{policy} lacks both GREEN and WHITE')
-            t=root_and_prune(tree,set(states),outgroups);coverage.append({'tree':tag,'policy':policy,'n_tips':len(states),'white':sum(v==0 for v in states.values()),'green':sum(v==1 for v in states.values()),'outside_binary_or_unjoined':189-len(states)})
+            t=extract_ingroup_and_prune(tree,full_ingroup,set(states));coverage.append({'tree':tag,'policy':policy,'n_tips':len(states),'white':sum(v==0 for v in states.values()),'green':sum(v==1 for v in states.values()),'outside_binary_or_unjoined':len(full_ingroup)-len(states)})
             mk=BinaryMk(t,states)
             for prior in ('equal','stationary'):
                 for model in ('ER','ARD'):
                     raw=mk.fit(model,prior);fit=relabel(raw,tag,policy);delta,flat=plateau(mk,fit);fit['rate_times_1000_delta_logL']=delta;fit['high_rate_plateau']=flat;fit['inference_status']='BOUNDARY_OR_RATE_PLATEAU_DIAGNOSTIC_ONLY' if fit['optimization_bound_hit'] or flat else 'NUMERICAL_INTERIOR_CONDITIONAL_FIT';fits.append(fit)
                     if model=='ARD' and prior=='equal' and not fit['optimization_bound_hit'] and not flat:
                         p=profile(mk,fit);p.update(tree=tag,policy=policy);profiles.append(p)
-    result={'version':'v0.1','status':'EXECUTED_ORGAN_SPECIFIC_BINARY_MK','fits':fits,'profiles':profiles,'coverage':coverage,'primary_policies':sorted(PRIMARY),'sensitivity_policies':[p for p in POLICIES if p not in PRIMARY],'source_tip_join':'Only S1 sample rows with unique exact S3 taxon names are eligible. Other-colour organ states are pruned, never recoded to GREEN/WHITE.','rate_units':'sequence substitutions/site, not years','ancestral_white_imposed':False,'paper1_science_changed':False}
+    result={'version':'v0.1','status':'EXECUTED_ORGAN_SPECIFIC_BINARY_MK','fits':fits,'profiles':profiles,'coverage':coverage,'primary_policies':sorted(PRIMARY),'sensitivity_policies':[p for p in POLICIES if p not in PRIMARY],'source_tip_join':'Only S1 sample rows with unique exact S3 taxon names are eligible. Other-colour organ states are pruned, never recoded to GREEN/WHITE.','ingroup_definition':'Full source Angraecinae sample set must be monophyletic before any organ-policy pruning.','rate_units':'sequence substitutions/site, not years','ancestral_white_imposed':False,'paper1_science_changed':False}
     (a.out_dir/'analysis_results.json').write_text(json.dumps(result,indent=2)+'\n');print(json.dumps({'fits':len(fits),'profiles':len(profiles),'coverage':coverage},indent=2))
 if __name__=='__main__':main()
