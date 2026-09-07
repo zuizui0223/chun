@@ -1,8 +1,5 @@
 name: Angraecinae fast ML-Mk v0.1
 on:
-  pull_request:
-    paths:
-      - '.github/workflows/angraecinae-fast-mk-v0-1.yml'
   workflow_dispatch:
 permissions:
   contents: read
