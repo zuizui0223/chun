@@ -25,12 +25,18 @@ jobs:
         run: python scripts/ingest_atlas_public_sources_v0_5.py --self-test
       - name: Download, checksum and inventory real external files
         run: python scripts/resolve_atlas_source_payloads_v0_5.py --out build/atlas_source_ingestion_v0_5
-      - name: Report actual source status
+      - name: Analyze source rows and reconcile voucher crosswalk
+        run: |
+          python scripts/analyze_atlas_ingested_sources_v0_5.py \
+            --source-dir build/atlas_source_ingestion_v0_5/epimedium \
+            --out build/atlas_source_ingestion_v0_5/results \
+            --fetch-source-figure
+      - name: Report actual source status and empirical audit
         if: always()
         run: |
-          if [ -f build/atlas_source_ingestion_v0_5/source_inventory.json ]; then
-            cat build/atlas_source_ingestion_v0_5/source_inventory.json >> "$GITHUB_STEP_SUMMARY"
-          fi
+          for p in build/atlas_source_ingestion_v0_5/source_inventory.json build/atlas_source_ingestion_v0_5/results/epimedium_empirical_audit_v0_5.json; do
+            if [ -f "$p" ]; then cat "$p" >> "$GITHUB_STEP_SUMMARY"; fi
+          done
       - uses: actions/upload-artifact@v4
         if: always()
         with:
