@@ -22,6 +22,7 @@
       "provenance": "Fresh full rerun of all three no-bootstrap GTR+G4 ML searches under the same source inputs and seed."
     }
   },
+  "freeze_materialization_commit": "b3d6f73543585c284fba0c6634e268d6118b4841",
   "frozen_files_sha256": {
     "terminal_organ_states.csv": "ffff2a373e12c935104711dc82571e7f73caa72474b98ee761b937c89ad5dc74",
     "source_sample_manifest.csv": "f6e1a1fc054dcf25753a742c1c5499eac3f00bdce23e0cb1f6a37394b338f3c4",
