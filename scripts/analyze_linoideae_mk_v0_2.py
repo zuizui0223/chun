@@ -131,7 +131,7 @@ def fit_six_er(tree,states):
         ll,post,_,_=obj.pruning(p,np.ones(6)/6)
         return (ll,post) if details else -ll
     grid=np.linspace(-12,12,49);vals=[calc(x) for x in grid];j=int(np.argmin(vals))
-    opt=minimize_scalar(calc,bounds=(grid[max(0,j-1)],grid[min(48,j+1)]]),method='bounded',options={'xatol':1e-8})
+    opt=minimize_scalar(calc,bounds=(grid[max(0,j-1)],grid[min(48,j+1)]),method='bounded',options={'xatol':1e-8})
     ll,post=calc(opt.x,True)
     return {'model':'SIX_STATE_ER','log_likelihood':ll,'AIC':2-2*ll,'rate_per_substitution':math.exp(float(opt.x))/obj.scale,'root_probabilities':dict(zip(COLORS,map(float,post))),'root_prior':'equal_six_states','optimization_bound_hit':bool(abs(opt.x)>11.99),'ambiguous_tips':sum(len(s)>1 for s in states.values()),'claim_boundary':'ER-only observation-space sensitivity; not a full identifiable 30-rate ARD model'}
 
@@ -155,7 +155,7 @@ def parsimony_scores(tree,tip_sets,k,permutations=9999,seed=SEED,conditional_whi
         n=min(500,permutations+1-start);indices=np.array([np.arange(nt) if start+j==0 else permutation_indices(rng,nt,groups) for j in range(n)])
         d=np.zeros((obj.n,n,k),dtype=np.int16)
         for pos,i in enumerate(leafids):d[i]=patterns[indices[:,pos]]
-        for i in range(obj.n):
+        for i in range(self.n if False else obj.n):
             for c in obj.children[i]:d[i]+=np.minimum(d[c],d[c].min(axis=1)[:,None]+1)
         scores.extend(d[-1].min(axis=1).tolist())
     observed=scores[0];null=np.asarray(scores[1:]);p=(1+int((null<=observed).sum()))/(len(null)+1)
