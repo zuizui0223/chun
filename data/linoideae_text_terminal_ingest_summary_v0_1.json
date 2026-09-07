@@ -1,0 +1,17 @@
+{
+  "atlas_asr_status": "NOT_RUN",
+  "exact_tip_mapping_status": "PENDING",
+  "full_matrix_needed_for_common_model": true,
+  "macro_rows_ready": 0,
+  "minimum_provenance_coverage": 0.8,
+  "paper1_science_changed": false,
+  "published_terminal_matrix_size": 112,
+  "source_backed_terminal_taxa": 4,
+  "source_text_coverage_fraction": 0.03571428571428571,
+  "terminal_matrix_status": "PARTIAL_SOURCE_RECOVERY",
+  "version": "v0.1",
+  "visible_states": {
+    "PINK": 2,
+    "RED": 2
+  }
+}
