@@ -1,0 +1,37 @@
+name: Cross-clade transition constraints v0.1
+
+on:
+  pull_request:
+    paths:
+      - 'data/cross_clade_transition_constraints_v0_1.csv'
+      - 'data/cross_clade_transition_constraints_summary_v0_1.json'
+      - 'docs/CROSS_CLADE_TRANSITION_CONSTRAINTS_V0_1.md'
+      - 'scripts/summarize_cross_clade_transition_constraints_v0_1.py'
+      - '.github/workflows/cross-clade-transition-constraints-v0-1.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Recompute cross-clade constraints
+        run: |
+          mkdir -p build/cross_clade_transition_constraints_v0_1
+          python scripts/summarize_cross_clade_transition_constraints_v0_1.py \
+            --data data/cross_clade_transition_constraints_v0_1.csv \
+            --out build/cross_clade_transition_constraints_v0_1/summary.json
+      - name: Check frozen summary is reproducible
+        run: |
+          diff -u \
+            data/cross_clade_transition_constraints_summary_v0_1.json \
+            build/cross_clade_transition_constraints_v0_1/summary.json
+      - name: Report
+        run: cat build/cross_clade_transition_constraints_v0_1/summary.json >> "$GITHUB_STEP_SUMMARY"
