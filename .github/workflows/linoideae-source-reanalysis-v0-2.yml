@@ -1,11 +1,5 @@
 name: Linoideae source reanalysis v0.2
 on:
-  pull_request:
-    paths:
-      - 'scripts/*linoideae*v0_2.py'
-      - 'data/linoideae_source_reanalysis_v0_2/**'
-      - 'tests/*linoideae*v0_2.py'
-      - '.github/workflows/linoideae-source-reanalysis-v0-2.yml'
   workflow_dispatch:
 permissions:
   contents: read
