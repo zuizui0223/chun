@@ -65,6 +65,7 @@ def tnrs(names: list[str]):
                         "matched_name": m.get("taxon", {}).get("name", ""),
                         "ott_id": m.get("taxon", {}).get("ott_id"),
                         "is_synonym": bool(m.get("is_synonym", False)),
+                        "score": float(m.get("score", 1.0)),
                     }
                     for m in exact
                 ],
@@ -96,6 +97,15 @@ def main():
         if row["query"] in collision_queries:
             row["status"] = "REJECT_OTT_COLLISION"
 
+    rejected = [
+        {
+            "query": r["query"],
+            "status": r["status"],
+            "candidate_exact_matches": r.get("candidate_exact_matches", []),
+        }
+        for r in matches if r["status"] != "EXACT"
+    ]
+
     admitted = [r for r in matches if r["status"] == "EXACT" and r["ott_id"] is not None]
     ids = sorted(int(r["ott_id"]) for r in admitted)
     ott_to_query = {int(r["ott_id"]): r["query"] for r in admitted}
@@ -118,7 +128,6 @@ def main():
     overlap_ids = admitted_set & tree_ott_set
     coverage = len(overlap_ids) / len(names)
 
-    # Preserve an immutable source-taxon-labeled topology for the endpoint.
     for tip in tree.get_terminals():
         label = str(tip.name).strip("'")
         m = re.search(r"(?:ott)?(\d+)$", label)
@@ -139,6 +148,7 @@ def main():
         "source_doi": "10.1093/aob/mcv048",
         "eligible_trait_taxa": len(names),
         "tnrs_status_counts": dict(Counter(r["status"] for r in matches)),
+        "rejected_queries": rejected,
         "n_ott_collision_groups": len(collisions),
         "ott_collision_groups": {
             str(oid): [
