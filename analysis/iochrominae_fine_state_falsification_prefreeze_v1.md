@@ -2,6 +2,8 @@
 
 Freeze status: **FROZEN BEFORE COMPUTATION OR INTERPRETATION OF THE IOCHROMINAE CONDITIONAL FINE-STATE ENDPOINT**.
 
+Outcome note (added after source-only execution, without changing any frozen rule): **HOLD_TRAIT_SOURCE**. The biological endpoint was never opened. Frozen result: `analysis/iochrominae_fine_state_falsification_result_v1.json`.
+
 ## Role of this test
 
 Test unit: **Iochrominae**.
