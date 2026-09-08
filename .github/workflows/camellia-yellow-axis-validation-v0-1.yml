@@ -1,0 +1,72 @@
+name: Camellia yellow-axis validation v0.1
+on:
+  pull_request:
+    paths:
+      - 'docs/CAMELLIA_YELLOW_AXIS_PRE_RESULT_GATE_V0_1.md'
+      - 'scripts/audit_camellia_yellow_axis_v0_1.py'
+      - 'data/camellia_yellow_axis_validation_v0_1.json'
+      - '.github/workflows/camellia-yellow-axis-validation-v0-1.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: read
+jobs:
+  validate:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install pinned dependencies
+        run: python -m pip install 'numpy==2.2.6' 'biopython==1.85'
+      - name: Recover frozen Camellia accepted-species inputs
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          test "$(gh api repos/$GITHUB_REPOSITORY/actions/artifacts/9432146191 --jq .digest)" = 'sha256:b5c067450332fd9b590c37c95325029a059a7368b1f20b390068565c8f807725'
+          test "$(gh api repos/$GITHUB_REPOSITORY/actions/artifacts/9470344149 --jq .digest)" = 'sha256:548eaaa16d3418fa2dc22e63631b56d388dea55fe39621fb53a4d0d5b477731f'
+          test "$(gh api repos/$GITHUB_REPOSITORY/actions/artifacts/9470509744 --jq .digest)" = 'sha256:e9d3a9f88dbbda7b8fa3bbe4d210c5665a2125b289b62639ea51c64614de9ed9'
+          mkdir -p build/fast build/colour build/ufboot
+          gh run download 32440138207 --repo "$GITHUB_REPOSITORY" --name wfo55-accepted-species-rooted-astral4 --dir build/fast
+          gh run download 32552102861 --repo "$GITHUB_REPOSITORY" --name wfo55-wild-colour-audit --dir build/colour
+          gh run download 32552618223 --repo "$GITHUB_REPOSITORY" --name wfo53-ufboot-topology-sensitivity --dir build/ufboot
+          test -s build/fast/wfo55_rooted_astral4.nwk
+          test -s build/ufboot/wfo53_ufboot_astral4.nwk
+          test -s build/colour/wfo55_wild_colour_strict_seed.csv
+          test -s build/colour/wfo55_wild_colour_dominant_seed.csv
+      - name: Execute prospective yellow-axis test
+        run: |
+          mkdir -p build/yellow_axis
+          python scripts/audit_camellia_yellow_axis_v0_1.py \
+            --fasttree build/fast/wfo55_rooted_astral4.nwk \
+            --ufboot build/ufboot/wfo53_ufboot_astral4.nwk \
+            --strict build/colour/wfo55_wild_colour_strict_seed.csv \
+            --dominant build/colour/wfo55_wild_colour_dominant_seed.csv \
+            --out build/yellow_axis/result.json --permutations 9999
+          if test -s data/camellia_yellow_axis_validation_v0_1.json; then
+            python - <<'PY'
+          import json,math
+          a=json.load(open('build/yellow_axis/result.json'));e=json.load(open('data/camellia_yellow_axis_validation_v0_1.json'))
+          def cmp(x,y,p='root'):
+            if type(x) is not type(y): raise AssertionError(p+': type')
+            if isinstance(x,dict):
+              if set(x)!=set(y): raise AssertionError(p+': keys')
+              for k in x:cmp(x[k],y[k],p+'.'+k)
+            elif isinstance(x,list):
+              if len(x)!=len(y):raise AssertionError(p+': len')
+              for i,(u,v) in enumerate(zip(x,y)):cmp(u,v,f'{p}[{i}]')
+            elif isinstance(x,float):
+              if not math.isclose(x,y,rel_tol=1e-10,abs_tol=1e-12):raise AssertionError(f'{p}: {x}!={y}')
+            elif x!=y:raise AssertionError(f'{p}: {x!r}!={y!r}')
+          cmp(a,e)
+          PY
+          fi
+          cat build/yellow_axis/result.json >> "$GITHUB_STEP_SUMMARY"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: camellia-yellow-axis-validation-v0-1
+          path: build/yellow_axis/result.json
+          if-no-files-found: error
+          retention-days: 90
