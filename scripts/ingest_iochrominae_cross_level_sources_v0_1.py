@@ -6,7 +6,7 @@ claim is made here. Public Dryad DOI endpoints are resolved through API v2 and
 all downloaded bytes/member hashes are preserved.
 """
 from __future__ import annotations
-import argparse,hashlib,json,urllib.parse,urllib.request,zipfile,io
+import argparse,hashlib,json,urllib.parse,urllib.request,urllib.error,zipfile,io
 from pathlib import Path
 
 DATASETS={
@@ -44,9 +44,7 @@ def normalize(url:str):
     return url
 
 def latest_version(meta,api):
-    # Prefer advertised HAL links. Fall back to the public versions collection.
     h=choose_href(meta,'versions')
-    candidates=[]
     for url in ([normalize(h)] if h else [])+[api+'/versions']:
         try:
             obj,resolved,_=json_get(url)
@@ -71,8 +69,7 @@ def latest_version(meta,api):
             return max(vals,key=rank),resolved
         if isinstance(obj,dict) and any(k in obj for k in ('versionNumber','version')):
             return obj,resolved
-    # Some Dryad dataset metadata directly exposes the latest version links.
-    return meta,meta.get('_links',{}).get('self',{}).get('href',api) if isinstance(meta.get('_links'),dict) else api
+    return meta,api
 
 def file_records(version):
     h=choose_href(version,'files')
@@ -89,11 +86,41 @@ def file_records(version):
                     if isinstance(vv,list): vals.extend(vv)
     return vals,resolved
 
+def file_id(f):
+    for k in ('id','fileId','file_id'):
+        if f.get(k) is not None: return str(f[k])
+    for h in hrefs(f):
+        parts=[p for p in urllib.parse.urlparse(h).path.split('/') if p]
+        for j,p in enumerate(parts):
+            if p=='files' and j+1<len(parts) and parts[j+1].isdigit(): return parts[j+1]
+    return None
+
+def download_file(f,name):
+    attempts=[]
+    dl=choose_href(f,'download') or choose_href(f,'files')
+    if dl: attempts.append(normalize(dl))
+    fid=file_id(f)
+    if fid:
+        attempts.extend([
+            f'https://datadryad.org/stash/downloads/file_stream/{fid}',
+            f'https://datadryad.org/api/v2/files/{fid}/download',
+        ])
+    last=None
+    for url in dict.fromkeys(attempts):
+        try:
+            raw,resolved,_=get(url,'application/octet-stream,*/*')
+            if raw: return raw,resolved,url
+        except urllib.error.HTTPError as e:
+            last=e
+            if e.code not in (401,403,404): raise
+        except Exception as e:
+            last=e
+    raise ValueError(f'no public download route succeeded for {name!r}; file_id={fid}; last={last}')
+
 def download_public_files(meta,api,ddir):
     version,vresolved=latest_version(meta,api)
     files,fresolved=file_records(version)
     if files is None:
-        # Last-resort conventional latest-version endpoint.
         vid=version.get('id') or version.get('versionNumber')
         if vid is None: raise ValueError('Dryad metadata has no discoverable public files link/version id')
         files,fresolved,_=json_get(f'https://datadryad.org/api/v2/versions/{vid}/files')
@@ -105,18 +132,14 @@ def download_public_files(meta,api,ddir):
     if not files: raise ValueError('Dryad public file collection is empty')
     extracted=ddir/'extracted';extracted.mkdir(parents=True,exist_ok=True)
     members=[]
+    (ddir/'file_collection.json').write_text(json.dumps(files,indent=2)+'\n')
     for i,f in enumerate(files):
         name=str(f.get('path') or f.get('filename') or f.get('name') or f'file_{i:03d}')
-        dl=choose_href(f,'download') or choose_href(f,'files')
-        if not dl:
-            # File metadata commonly has a direct download link whose href does not contain the word download.
-            hs=hrefs(f); dl=hs[-1] if hs else None
-        if not dl: raise ValueError(f'no public download href for Dryad file {name!r}')
-        raw,resolved,_=get(normalize(dl),'application/octet-stream,*/*')
+        raw,resolved,route=download_file(f,name)
         target=(extracted/name).resolve()
         if not target.is_relative_to(extracted.resolve()): raise ValueError('unsafe Dryad file path '+name)
         target.parent.mkdir(parents=True,exist_ok=True);target.write_bytes(raw)
-        members.append({'name':name,'bytes':len(raw),'sha256':hashlib.sha256(raw).hexdigest(),'suffix':target.suffix.lower(),'download_resolved':resolved})
+        members.append({'name':name,'bytes':len(raw),'sha256':hashlib.sha256(raw).hexdigest(),'suffix':target.suffix.lower(),'file_id':file_id(f),'download_route':route,'download_resolved':resolved})
     return members,vresolved,fresolved
 
 def main():
@@ -131,9 +154,7 @@ def main():
         ddir=a.out_dir/key.lower();ddir.mkdir(parents=True,exist_ok=True)
         (ddir/'dataset_metadata.json').write_text(json.dumps(meta,indent=2)+'\n')
         members,vresolved,fresolved=download_public_files(meta,api,ddir)
-        suffix_counts={}
-        total_bytes=0
-        bundle_hash=hashlib.sha256()
+        suffix_counts={};total_bytes=0;bundle_hash=hashlib.sha256()
         for m in sorted(members,key=lambda x:x['name']):
             suffix_counts[m['suffix']]=suffix_counts.get(m['suffix'],0)+1
             raw=(ddir/'extracted'/m['name']).read_bytes();total_bytes+=len(raw)
@@ -141,15 +162,11 @@ def main():
         result={
           'dataset_id':key,'doi':doi,'title_expected':title,'identifier':meta.get('identifier'),
           'api_requested':api,'metadata_resolved':meta_resolved,'version_resolved':vresolved,'files_resolved':fresolved,
-          'license':meta.get('license'),'versionNumber':meta.get('versionNumber'),
-          'storageSize':meta.get('storageSize'),'bundle_bytes':total_bytes,
-          'bundle_sha256':bundle_hash.hexdigest(),'member_count':len(members),
+          'license':meta.get('license'),'versionNumber':meta.get('versionNumber'),'storageSize':meta.get('storageSize'),
+          'bundle_bytes':total_bytes,'bundle_sha256':bundle_hash.hexdigest(),'member_count':len(members),
           'suffix_counts':suffix_counts,'members':members}
-        (ddir/'source_manifest.json').write_text(json.dumps(result,indent=2)+'\n')
-        results.append(result)
-    summary={
-      'version':'v0.1','datasets':results,
-      'all_three_acquired':len(results)==3,
+        (ddir/'source_manifest.json').write_text(json.dumps(result,indent=2)+'\n');results.append(result)
+    summary={'version':'v0.1','datasets':results,'all_three_acquired':len(results)==3,
       'analysis_status':'SOURCE_BYTES_ACQUIRED_NOT_YET_TRAIT_MECHANISM_JOINED',
       'claim_boundary':'Acquisition/inventory only. No taxon overlap, phenotype hierarchy, molecular recurrence or causal alignment is inferred.',
       'paper1_science_changed':False}
