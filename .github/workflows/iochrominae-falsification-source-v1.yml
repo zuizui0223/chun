@@ -1,0 +1,53 @@
+name: Iochrominae falsification source v1
+
+on:
+  push:
+    branches:
+      - analysis/falsification-audit-v1
+    paths:
+      - 'scripts/inspect_iochrominae_falsification_sources_v1.py'
+      - 'analysis/iochrominae_fine_state_falsification_prefreeze_v1.md'
+      - '.github/workflows/iochrominae-falsification-source-v1.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  source-audit:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install source-audit dependencies
+        run: python -m pip install --disable-pip-version-check requests openpyxl
+      - name: Inspect Iochrominae source objects without opening endpoint
+        run: python scripts/inspect_iochrominae_falsification_sources_v1.py | tee build_source.log
+      - name: Assert source-only boundary
+        run: |
+          python - <<'PY'
+          import json
+          p='analysis/_generated/iochrominae_falsification_source_v1/source_audit.json'
+          x=json.load(open(p))
+          assert x['source_only'] is True
+          assert x['endpoint_computed'] is False
+          assert x['figure_terminal_colours_read'] is False
+          print(json.dumps({
+            'trait_source_admission':x['trait_source_admission'],
+            'next_status_if_no_explicit_mapping':x['next_status_if_no_explicit_mapping'],
+            'tree_candidates':x['tree_candidates'],
+            'schema_candidates':x['schema_candidates'],
+          },indent=2))
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: iochrominae-falsification-source-v1
+          path: |
+            analysis/_generated/iochrominae_falsification_source_v1
+            build_source.log
+          if-no-files-found: warn
+          retention-days: 90
