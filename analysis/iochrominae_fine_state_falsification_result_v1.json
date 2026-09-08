@@ -1,0 +1,87 @@
+{
+  "version": "v1",
+  "test_unit": "Iochrominae",
+  "prefreeze": "analysis/iochrominae_fine_state_falsification_prefreeze_v1.md",
+  "issue": 217,
+  "classification": "HOLD_TRAIT_SOURCE",
+  "final_evidence_status": "HOLD_TRAIT_SOURCE",
+  "biological_endpoint_computed": false,
+  "observed_assignment_scored": false,
+  "conditional_null_computed": false,
+  "counts_as_biological_support": false,
+  "counts_as_biological_refutation": false,
+  "cross_radiation_count_effect": "NONE",
+  "frozen_representation": {
+    "fine_states": ["DELPHINIDIN", "CYANIDIN", "PELARGONIDIN", "NONE"],
+    "coarse_states": {
+      "PIGMENTED": ["DELPHINIDIN", "CYANIDIN", "PELARGONIDIN"],
+      "UNPIGMENTED": ["NONE"]
+    },
+    "trait_source_doi": "10.1093/molbev/msy117"
+  },
+  "source_acquisition": {
+    "canonical_run": 34235323463,
+    "canonical_job": 102091415419,
+    "artifact_id": 10059691657,
+    "artifact_name": "iochrominae-falsification-sources-v1",
+    "tree_2018_dryad": {
+      "doi": "10.5061/dryad.5jn7b",
+      "file_inventory_recovered": true,
+      "files": [
+        {"name": "README_for_Smith_and_Kriebel_2018.txt", "file_id": 76311, "bytes_recovered": false, "api_download_status": 401, "file_stream_status": 403},
+        {"name": "Smith_and_Kriebel_2018.zip", "file_id": 76310, "bytes_recovered": false, "api_download_status": 401, "file_stream_status": 403}
+      ],
+      "machine_readable_tree_bytes_recovered": false
+    },
+    "trait_mechanism_dryad": {
+      "doi": "10.5061/dryad.p5dq84v",
+      "file_inventory_recovered": true,
+      "files": [
+        {"name": "Larter et al 2019 Dvdy Iochrominae development evolution DATA.rar", "file_id": 108456, "bytes_recovered": false, "api_download_status": 401, "file_stream_status": 403},
+        {"name": "README_for_Larter et al 2019 Dvdy Iochrominae development evolution DATA.txt", "file_id": 108458, "bytes_recovered": false, "api_download_status": 401, "file_stream_status": 403}
+      ],
+      "machine_readable_trait_bytes_recovered": false
+    },
+    "tempo_colour_dryad": {
+      "doi": "10.5061/dryad.0732g",
+      "file_inventory_recovered": true,
+      "files": [
+        {"name": "ModeandTempoFlColor.zip", "file_id": 21811, "bytes_recovered": false, "api_download_status": 401, "file_stream_status": 403}
+      ],
+      "machine_readable_trait_bytes_recovered": false
+    },
+    "treebase_s1553": {
+      "machine_readable_tree_recovered": false,
+      "https_nexus": "TIMEOUT",
+      "https_nexml": 502,
+      "http_nexus": 404
+    },
+    "larter_article": {
+      "publisher_or_mirror_pdf_recovered": true,
+      "pdf_sha256": "c34c4a3ef77399caff48b0d3a7003ff376a627739933e013a7c93bada91ed704",
+      "pmcid": null,
+      "machine_readable_article_source_recovered": false,
+      "publisher_supplement_is_pdf": true,
+      "publisher_supplement_name": "msy117_supp.pdf"
+    }
+  },
+  "frozen_trait_admission": {
+    "required": "machine-readable table/spreadsheet/source-data object explicitly mapping source terminal taxon to primary anthocyanidin class",
+    "admitted": false,
+    "reason": "No admissible row-level terminal taxon-to-primary-anthocyanidin mapping was recovered in the execution environment. The article and publisher supplement expose the information in prose/figures/PDF form, but the prefreeze explicitly prohibits completing the 28-row matrix by reading plotted tip colours or inferring states from hue/prose.",
+    "figure_or_pdf_manual_transcription_used": false,
+    "posthoc_state_inference_used": false
+  },
+  "tree_admission": {
+    "evaluated_for_endpoint": false,
+    "reason": "The trait-source gate failed first; additionally no source-native machine-readable tree bytes were recovered from the frozen source hierarchy in the execution environment."
+  },
+  "identifiability_gate": {
+    "evaluated": false,
+    "reason": "No trait-tree admitted set exists; the observed endpoint and conditional null remain unopened."
+  },
+  "interpretation": "This is a source/observation-regime HOLD, not evidence against fine-state phylogenetic organization. The existing retrospective Iochrominae phenotype-to-molecular bridge remains separate and is not converted into a prospective macro replication.",
+  "current_counted_biological_evidence": "3 SUPPORTIVE + 1 MIXED prospective radiation; 0 admissible biological refutations",
+  "paper1_science_changed": false,
+  "claim_boundary": "Do not report an Iochrominae Sankoff value, p-value, support result or refutation from this attempt. Reopening requires a machine-readable terminal pigment table that satisfies the frozen source gate, plus an informative source topology and non-degenerate conditional null."
+}
