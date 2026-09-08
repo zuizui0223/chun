@@ -1,6 +1,6 @@
 # Falsification audit v1
 
-Status: **first prospective fourth-radiation test completed; outcome MIXED**.
+Status: **Iris prospective test completed as MIXED; Nicotiana fifth-radiation attempt completed as HOLD_OBSERVATION_REGIME before endpoint opening**.
 
 ## Already falsified / superseded
 
@@ -11,7 +11,7 @@ The earlier stronger cross-radiation interpretation is no longer the target. `CR
 
 Therefore the earlier wording that a coarse ancestral/display or pigment state generally constrains flower-colour evolutionary state space is superseded/refuted at the tested cross-radiation level.
 
-## Surviving positive object before the prospective test
+## Surviving positive object before prospective stress tests
 
 Fine-state phylogenetic organization persisted after conditioning on an a priori coarse state in 3/3 independent testable radiations:
 
@@ -33,20 +33,50 @@ Frozen endpoint results:
 
 The predeclared classifier therefore returns **MIXED**.
 
-This is not a fourth clean replication and not a refutation. Fine-state organization is clearly detectable in Iris under the primary and binary coarse-conditioning representations, but the signal weakens below the frozen significance gate when taxa spanning multiple pigment classes are removed. The fourth radiation therefore shows that the recurrence itself is representation/sample-composition dependent at a finer level than the earlier 3/3 summary implied.
+This is not a fourth clean replication and not a refutation. Fine-state organization is clearly detectable in Iris under the primary and binary coarse-conditioning representations, but the signal weakens below the frozen significance gate when taxa spanning multiple pigment classes are removed.
+
+Frozen Iris result: `analysis/iris_fine_state_falsification_result_v1.json`.
+
+## Prospective fifth-radiation attempt: Nicotiana
+
+A second prospective test was frozen in `analysis/nicotiana_fine_state_falsification_prefreeze_v1.md` before supplement inspection or endpoint computation. The test unit was source-defined non-hybrid diploid Nicotiana, with eight spectral categories as the fine alphabet and explicit petal chlorophyll/chloroplast presence/absence as the primary coarse layer.
+
+Source and trait admission succeeded:
+
+- stable publisher supplement `.doc` SHA-256 `45bbedb8a1ef419cf0128a3a6df63fd364d61a50402f610dcd196c70f8c14959`;
+- S1/S2 each contain 62 source rows and S4 contains 26 hybrid-origin rows;
+- all eight source spectral categories are recoverable;
+- 21 non-hybrid diploid taxon units have a joint fine/coarse observation regime;
+- definite coarse classes contain 5 chlorophyll-absent and 16 chlorophyll-present taxa;
+- the pre-tree diversity/size gates therefore pass.
+
+The topology gate did not pass completely. The article supplement supplies the final plastid majority-rule tree only as a document figure, not as machine-readable Newick/NEXUS, so the predeclared exact OpenTree fallback was used. It admitted 17/21 taxa (80.95% coverage), satisfying the >=80% coverage gate but failing the separately frozen **minimum n >=20** gate.
+
+The four exact-TNRS exclusions are not safely recoverable under the frozen rules:
+
+- `Nicotiana attenuata` returns two score-1 exact hits pointing to different OTT ids (`N. attenuata` OTT 882065 and a synonym hit resolving to `N. tabacum` OTT 222787);
+- `Nicotiana undulata` returns two score-1 exact hits pointing to different OTT ids (`N. undulata` OTT 210478 and a synonym hit resolving to `N. suaveolens` OTT 806473);
+- `Nicotiana obtusifolia var. obtusifolia` has zero exact hits;
+- `Nicotiana obtusifolia var. palmeri` has zero exact hits.
+
+Relaxing exactness, discarding explicit infraspecific rank, or choosing among distinct exact OTTs would violate the prefreeze. Therefore the biological Sankoff/permutation endpoint was **not run**.
+
+Final Nicotiana classification: **HOLD_OBSERVATION_REGIME**. This is an observation-regime failure, not a counterexample and not support.
+
+Frozen Nicotiana result: `analysis/nicotiana_fine_state_falsification_result_v1.json`.
 
 ## Current cross-radiation state
 
 The correct current statement is:
 
-> Fine-state phylogenetic organization is robustly supported in three independent radiations and is present but sensitivity-dependent in a prospectively tested fourth radiation. No tested coarse coding is universally privileged, and no universal transition direction is supported.
+> Fine-state phylogenetic organization is robustly supported in three independent radiations and is present but sensitivity-dependent in a prospectively tested fourth radiation. A fifth prospective candidate reached source/trait admission but remained unadjudicated because its frozen minimum tree-sample gate failed. No tested coarse coding is universally privileged, and no universal transition direction is supported.
 
-Do **not** report `4/4`, and do **not** report Iris as a counterexample. The clean 3/3 recurrence has been stress-tested and becomes **3 supportive + 1 mixed prospective radiation**.
+Counted biological evidence remains **3 supportive + 1 mixed prospective radiation**. Nicotiana is a prospective HOLD and is not added to either numerator or denominator of the biological recurrence claim.
+
+Do **not** report `4/4`; do **not** report Iris as a counterexample; do **not** report Nicotiana as a negative biological result.
 
 Aquilegia remains a cross-level mechanistic admission HOLD. It is not evidence against the macro fine-state result because the required matched radiation-wide molecular observation regime is absent.
 
 ## Next falsification target
 
-A further independent radiation should be frozen before endpoint computation and should count as a genuine counterexample only if a matched coarse-conditioned fine-state test fails with adequate observation coverage and all predeclared admitted sensitivities also fail. Iris itself should not be re-partitioned post hoc to force a cleaner answer.
-
-Frozen Iris result: `analysis/iris_fine_state_falsification_result_v1.json`.
+The next independent radiation should be selected for a machine-readable source topology and a sufficiently large matched fine/coarse trait intersection **before** endpoint computation. It should count as a genuine counterexample only if the matched coarse-conditioned fine-state test fails with adequate predeclared observation coverage and all admitted sensitivities also fail. Iris and Nicotiana should not be re-partitioned or have their admission rules relaxed post hoc to force cleaner answers.
