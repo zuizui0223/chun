@@ -36,34 +36,42 @@ def get_species_rows():
 
 
 def canonical_query(source_name: str) -> tuple[str, str]:
-    """Return colour-blind TNRS query and any deterministic source-format normalization tag."""
-    normalized = source_name.replace("×", "x")
-    normalization = "NONE"
+    """Return colour-blind TNRS query and deterministic source-format normalization tags."""
+    raw = re.sub(r"\s+", " ", source_name.strip())
+    tags: list[str] = []
+    epithet = None
+    rest = ""
 
-    # Publisher row `Irisxgermanica L.` lacks spaces around the hybrid marker.
-    # The frozen TNRS contract is genus + epithet, so x/× is treated as a
-    # nomenclatural marker rather than part of the epithet and removed here.
-    m = re.match(r"^Irisx([A-Za-z][A-Za-z-]*)(\s+.*)?$", normalized)
+    # Attached publisher hybrid notation, e.g. `Irisxgermanica L.`.
+    m = re.match(r"(?i)^iris[x×]([a-z][a-z-]*)(?:\s+(.*))?$", raw)
     if m:
-        normalized = "Iris " + m.group(1) + (m.group(2) or "")
-        normalization = "ATTACHED_HYBRID_MARKER_REMOVED"
+        epithet = m.group(1)
+        rest = m.group(2) or ""
+        tags.append("ATTACHED_HYBRID_MARKER_REMOVED")
+    else:
+        # Separated hybrid notation, e.g. `Iris x germanica ...`.
+        m = re.match(r"(?i)^iris\s+[x×]\s+([a-z][a-z-]*)(?:\s+(.*))?$", raw)
+        if m:
+            epithet = m.group(1)
+            rest = m.group(2) or ""
+            tags.append("SEPARATED_HYBRID_MARKER_REMOVED")
+        else:
+            # Ordinary binomial. This deliberately requires whitespace so an
+            # epithet beginning with x (e.g. Iris xiphium) is not misread as a hybrid marker.
+            m = re.match(r"(?i)^iris\s+([a-z][a-z-]*)(?:\s+(.*))?$", raw)
+            if not m:
+                raise ValueError("NO_IRIS_BINOMIAL_PATTERN")
+            epithet = m.group(1)
+            rest = m.group(2) or ""
 
-    toks = normalized.split()
-    if len(toks) < 2 or toks[0] != "Iris":
-        raise ValueError(f"not a parsable Iris source name: {source_name}")
+    if not raw.startswith("Iris"):
+        tags.append("GENUS_CASE_NORMALIZED")
 
-    # The same source-only rule applies if an x/× marker is already separated.
-    if toks[1].lower() == "x":
-        if len(toks) < 3:
-            raise ValueError(source_name)
-        toks = [toks[0]] + toks[2:]
-        normalization = "SEPARATED_HYBRID_MARKER_REMOVED"
-
-    base = toks[:2]
-    j = 2
-    if len(toks) >= j + 2 and toks[j].lower() in RANKS:
-        base.extend(toks[j:j+2])
-    return " ".join(base), normalization
+    base = ["Iris", epithet.lower()]
+    tail = rest.split()
+    if len(tail) >= 2 and tail[0].lower() in RANKS:
+        base.extend([tail[0].lower(), tail[1].lower()])
+    return " ".join(base), "+".join(tags) if tags else "NONE"
 
 
 def post(path, payload):
@@ -111,15 +119,38 @@ def tnrs(names):
 def main():
     OUT_DIR.mkdir(parents=True, exist_ok=True)
     source_names = get_species_rows()
-    parsed = [canonical_query(x) for x in source_names]
-    canonical = [x[0] for x in parsed]
-    normalizations = [x[1] for x in parsed]
+
+    parsed = []
+    parse_errors = []
+    for source in source_names:
+        try:
+            query, normalization = canonical_query(source)
+            parsed.append((source, query, normalization))
+        except Exception as e:
+            parse_errors.append({"source_species": source, "error": f"{type(e).__name__}: {e}"})
+
+    parser_summary = {
+        "n_source_rows": len(source_names),
+        "n_parsed": len(parsed),
+        "n_parse_errors": len(parse_errors),
+        "parse_errors": parse_errors,
+        "normalization_counts": dict(Counter(x[2] for x in parsed)),
+    }
+    (OUT_DIR / "source_name_parser_audit.json").write_text(
+        json.dumps(parser_summary, indent=2, ensure_ascii=False) + "\n", encoding="utf-8"
+    )
+    if parse_errors:
+        print("IRIS_SOURCE_NAME_PARSER_AUDIT=" + json.dumps(parser_summary, ensure_ascii=False))
+        raise SystemExit(f"source-name parser unresolved for {len(parse_errors)} rows; TNRS not opened")
+
+    canonical = [x[1] for x in parsed]
+    normalizations = [x[2] for x in parsed]
     canonical_dups = {q: n for q, n in Counter(canonical).items() if n > 1}
 
     matches = tnrs(canonical)
     rows = []
     by_ott = defaultdict(list)
-    for source, query, normalization, m in zip(source_names, canonical, normalizations, matches):
+    for (source, query, normalization), m in zip(parsed, matches):
         row = {
             "source_species": source,
             "query": query,
