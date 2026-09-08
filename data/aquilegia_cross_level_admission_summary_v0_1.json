@@ -1,0 +1,12 @@
+{
+  "version": "v0.1",
+  "same_radiation": "NORTH_AMERICAN_AQUILEGIA",
+  "required_axes": 2,
+  "direct_cross_species_axes": 1,
+  "pigment_depletion_axis": "PASS_DIRECT_CROSS_SPECIES_EXPRESSION_LATE_PATHWAY",
+  "hue_branch_axis": "HOLD_LIMITED_PAIRWISE_AND_PATHWAY_PREDICTION",
+  "admission_result": "FAIL_HOLD_NOT_MATCHED_RADIATION_WIDE_DIRECT_TWO_AXIS_BRIDGE",
+  "prospective_replication_admitted": false,
+  "claim_boundary": "Aquilegia strongly supports late-pathway convergence for anthocyanin loss, but the blue-red hue axis is not measured under a matched radiation-wide cross-species molecular observation regime. Do not count this as a third phenotype-axis-to-molecular-subspace bridge.",
+  "paper1_science_changed": false
+}
