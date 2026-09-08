@@ -50,10 +50,11 @@ Taxon matching is fixed before signal computation:
 
 1. Use each source `Species` string as the immutable source identifier.
 2. Construct the TNRS query as the canonical Iris name: genus plus specific epithet, retaining an immediately following explicit infraspecific rank (`subsp.`, `ssp.`, `var.`, `f.`) and its epithet when present; author strings are discarded deterministically.
-3. Query OpenTree TNRS with `do_approximate_matching=false` and `include_suppressed=false`.
-4. Admit only one unambiguous exact TNRS match (`score >= 0.999999`, not approximate).
-5. Require a one-to-one source-taxon ↔ OTT-id mapping. If multiple source rows collapse onto the same OTT id, all members of that collision are marked topology-unresolved and excluded before scoring; none is chosen using colour information.
-6. Build one induced subtree from the admitted unique OTT ids with `label_format=id`; rename tips back to their immutable source identifiers before attaching traits.
+3. Publisher hybrid markers are formatting/nomenclatural markers rather than epithet characters for this query. Both attached `Irisx<epithet>` / `Iris×<epithet>` and separated `Iris x <epithet>` / `Iris × <epithet>` forms are normalized to the same genus-plus-epithet TNRS query `Iris <epithet>`, while the original source string remains the immutable identifier. This rule was added after the source-only parser encountered `Irisxgermanica L.` and **before any colour-signal endpoint was computed**.
+4. Query OpenTree TNRS with `do_approximate_matching=false` and `include_suppressed=false`.
+5. Admit only one unambiguous exact TNRS match (`score >= 0.999999`, not approximate).
+6. Require a one-to-one source-taxon ↔ OTT-id mapping. If multiple source rows collapse onto the same OTT id, all members of that collision are marked topology-unresolved and excluded before scoring; none is chosen using colour information.
+7. Build one induced subtree from the admitted unique OTT ids with `label_format=id`; rename tips back to their immutable source identifiers before attaching traits.
 
 Sankoff scoring uses topology only, so branch lengths are irrelevant. Any alternative source topology discovered later is sensitivity-only and cannot replace the frozen primary topology because of the observed colour result.
 
