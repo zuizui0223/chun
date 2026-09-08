@@ -3,9 +3,12 @@
 from __future__ import annotations
 
 import json
+import math
 from pathlib import Path
 
 RESULT = Path("analysis/nicotiana_fine_state_falsification_result_v1.json")
+GENERATED_TRAIT = Path("analysis/_generated/nicotiana_source_v1/trait_audit.json")
+GENERATED_TREE = Path("analysis/_generated/nicotiana_opentree_v1/summary.json")
 
 
 def main():
@@ -49,10 +52,30 @@ def main():
     assert rejected["Nicotiana obtusifolia var. obtusifolia"]["candidate_exact_matches"] == []
     assert rejected["Nicotiana obtusifolia var. palmeri"]["candidate_exact_matches"] == []
 
-    # The frozen endpoint may be implemented in the repository, but no generated
-    # biological result is admissible while endpoint_allowed=false.
-    generated = Path("analysis/_generated/nicotiana_falsification_v1/result.json")
-    assert not generated.exists(), "Nicotiana biological endpoint was opened despite frozen HOLD gate"
+    if GENERATED_TRAIT.exists():
+        g = json.loads(GENERATED_TRAIT.read_text(encoding="utf-8"))["summary"]
+        assert g["eligible_taxon_units"] == trait["eligible_taxon_units"]
+        assert g["definite_coarse_taxon_counts"] == trait["definite_coarse_taxon_counts"]
+        assert all(g["pre_tree_admission_checks"].values())
+
+    if GENERATED_TREE.exists():
+        g = json.loads(GENERATED_TREE.read_text(encoding="utf-8"))
+        assert g["eligible_trait_taxa"] == tree["eligible_trait_taxa"]
+        assert g["tnrs_status_counts"] == tree["tnrs_status_counts"]
+        assert g["n_admitted_unique_ott"] == tree["n_admitted_unique_ott"]
+        assert g["n_tree_overlap"] == tree["n_tree_overlap"]
+        assert math.isclose(g["coverage_fraction_of_eligible"], tree["coverage_fraction_of_eligible"], rel_tol=0, abs_tol=1e-15)
+        assert g["frozen_coverage_gate_80pct"] is True
+        assert g["frozen_minimum_n_20_gate"] is False
+        assert g["endpoint_allowed"] is False
+        generated_rejected = {x["query"]: x for x in g.get("rejected_queries", [])}
+        if generated_rejected:
+            assert generated_rejected == rejected
+
+    # The endpoint implementation may exist, but no generated biological result
+    # is admissible while endpoint_allowed=false.
+    generated_endpoint = Path("analysis/_generated/nicotiana_falsification_v1/result.json")
+    assert not generated_endpoint.exists(), "Nicotiana biological endpoint was opened despite frozen HOLD gate"
 
     print("validated Nicotiana fifth-radiation HOLD_OBSERVATION_REGIME: 17/21 exact tree tips, endpoint unopened")
 
