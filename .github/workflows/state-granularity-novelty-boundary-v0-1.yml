@@ -1,0 +1,22 @@
+name: State-granularity novelty boundary v0.1
+on:
+  pull_request:
+    paths:
+      - 'data/state_granularity_novelty_boundary_v0_1.csv'
+      - 'docs/STATE_GRANULARITY_NOVELTY_BOUNDARY_V0_1.md'
+      - 'scripts/validate_state_granularity_novelty_boundary_v0_1.py'
+      - '.github/workflows/state-granularity-novelty-boundary-v0-1.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  validate:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Validate evidence and claim boundary
+        run: python scripts/validate_state_granularity_novelty_boundary_v0_1.py
