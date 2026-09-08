@@ -1,0 +1,24 @@
+name: Cross-level state granularity v0.4
+on:
+  pull_request:
+    paths:
+      - 'data/cross_radiation_state_granularity_v0_3.json'
+      - 'data/iochrominae_cross_level_bridge_summary_v0_1.json'
+      - 'data/epimedium_cross_level_endpoint_bridge_summary_v0_1.json'
+      - 'data/cross_level_state_granularity_v0_4.json'
+      - 'scripts/summarize_cross_level_state_granularity_v0_4.py'
+      - 'docs/CROSS_LEVEL_STATE_GRANULARITY_V0_4.md'
+      - '.github/workflows/cross-level-state-granularity-v0-4.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  validate:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Rebuild cross-level decision
+        run: python scripts/summarize_cross_level_state_granularity_v0_4.py
