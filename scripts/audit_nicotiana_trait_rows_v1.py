@@ -35,6 +35,34 @@ def normalize_hybrid_marker(s: str) -> str:
     return s.replace("×", "x").replace("✕", "x")
 
 
+def reconcile_s1_s2_label(s1_label: str, s2_label: str):
+    """Allow only source-footnote removal when reconciling positional S1/S2 labels.
+
+    The legacy Word supplement encodes footnote b by attaching the literal
+    character `b` to several final colour-morph labels in S1, and marks a few
+    accessions with trailing `**`; S2 prints the same row identifiers without
+    those footnote markers. No taxonomic token, accession number or morph word
+    may otherwise change.
+    """
+    a = clean(s1_label)
+    b = clean(s2_label)
+    if a == b:
+        return b, "NONE"
+    candidate = a
+    edits = []
+    if candidate.endswith("**"):
+        candidate = candidate[:-2].rstrip()
+        edits.append("TRAILING_DOUBLE_ASTERISK_FOOTNOTE")
+    # Footnote b is attached to the final morph word (e.g. whiteb, pinkb).
+    candidate2 = re.sub(r"(?<=[A-Za-z])b$", "", candidate)
+    if candidate2 != candidate:
+        candidate = candidate2
+        edits.append("TRAILING_B_FOOTNOTE")
+    if candidate == b and edits:
+        return b, "+".join(edits)
+    raise ValueError(f"non-footnote S1/S2 label mismatch: {a!r} != {b!r}; normalized S1={candidate!r}")
+
+
 def canonical_taxon(label: str) -> str:
     s = clean(normalize_hybrid_marker(label))
     low = s.lower()
@@ -85,13 +113,22 @@ def main():
     r4 = [row for row in s4[1:] if any(row)]
     if len(r1) != len(r2):
         raise SystemExit(f"S1/S2 row count mismatch: {len(r1)} vs {len(r2)}")
-    labels1 = [r[0] for r in r1]
-    labels2 = [r[0] for r in r2]
-    if labels1 != labels2:
-        mismatches = [(i + 2, a, b) for i, (a, b) in enumerate(zip(labels1, labels2)) if a != b]
-        raise SystemExit(f"S1/S2 positional identity mismatch: {mismatches[:10]}")
-    if len(labels1) != len(set(labels1)):
-        raise SystemExit("duplicate accession/morph labels in S1")
+
+    reconciled = []
+    reconciliation_counts = Counter()
+    reconciliation_examples = []
+    for excel_row, (a, b) in enumerate(zip(r1, r2), start=2):
+        try:
+            label, mode = reconcile_s1_s2_label(a[0], b[0])
+        except ValueError as e:
+            raise SystemExit(f"S1/S2 positional identity failure at row {excel_row}: {e}")
+        reconciled.append(label)
+        reconciliation_counts[mode] += 1
+        if mode != "NONE":
+            reconciliation_examples.append({"row": excel_row, "S1": a[0], "S2": b[0], "mode": mode})
+    if len(reconciled) != len(set(reconciled)):
+        dup = [x for x, n in Counter(reconciled).items() if n > 1]
+        raise SystemExit(f"duplicate accession/morph labels after footnote-only reconciliation: {dup}")
 
     hybrid_raw = [r[0] for r in r4]
     hybrid_taxa = {canonical_taxon(x) for x in hybrid_raw}
@@ -106,8 +143,7 @@ def main():
 
     rows = []
     by_taxon = defaultdict(lambda: {"fine": set(), "coarse": set(), "source_labels": [], "sections": set(), "ploidies": set()})
-    for a, b in zip(r1, r2):
-        label = a[0]
+    for a, b, label in zip(r1, r2, reconciled):
         taxon = canonical_taxon(label)
         ploidy = clean(a[2]).lower()
         fine_key = clean(b[1]).lower().replace("–", "-").replace("—", "-")
@@ -119,7 +155,9 @@ def main():
         in_hybrid_table = taxon in hybrid_taxa
         eligible = ploidy == "diploid" and not in_hybrid_table
         row = {
-            "source_label": label,
+            "source_label_S1": a[0],
+            "source_label_S2": b[0],
+            "reconciled_source_label": label,
             "canonical_taxon": taxon,
             "section": a[1],
             "ploidy": ploidy,
@@ -169,7 +207,9 @@ def main():
             "S2": {"table_index": 1, "rows_excluding_header": len(r2), "header": h2},
             "S4": {"table_index": 3, "rows_excluding_header": len(r4), "header": h4},
         },
-        "s1_s2_positional_identity": True,
+        "s1_s2_positional_identity_after_source_footnote_normalization": True,
+        "s1_s2_label_reconciliation_counts": dict(reconciliation_counts),
+        "s1_s2_label_reconciliation_examples": reconciliation_examples,
         "ploidy_counts_accession_rows": dict(Counter(r["ploidy"] for r in rows)),
         "hybrid_table_raw_labels": hybrid_raw,
         "hybrid_table_canonical_taxa": sorted(hybrid_taxa),
@@ -190,6 +230,7 @@ def main():
             "one_definite_coarse_class_ge_10_and_ge_3_fine": any(definite_coarse_n[c] >= 10 and len(fine_by_definite_coarse[c]) >= 3 for c in definite_coarse_n),
         },
         "field_terminology_note": "Supplement S2 header is 'Presence of chloroplasts in petals'; article Methods/Fig. S6 describe the analysed biological axis as presence/absence of chlorophyll in corolla tissue. No state is inferred from visible colour.",
+        "identity_normalization_boundary": "Only S1 trailing ** and attached final footnote b are removed, and only when the resulting S1 string exactly equals the positional S2 identifier. No taxon/accession/morph token is otherwise altered.",
     }
     OUT.write_text(json.dumps({"summary": summary, "accession_rows": rows}, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
     print("NICOTIANA_TRAIT_AUDIT=" + json.dumps(summary, ensure_ascii=False))
