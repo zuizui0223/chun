@@ -4,6 +4,7 @@ import csv,json
 from pathlib import Path
 
 P=Path('data/iochrominae_cross_level_bridge_v0_1.csv')
+EXPECTED=Path('data/iochrominae_cross_level_bridge_summary_v0_1.json')
 rows=list(csv.DictReader(P.open()))
 by={r['evidence_id']:r for r in rows}
 expected={'INTENSITY_MODULE','HUE_BRANCH','UPSTREAM_CONSERVATION','REGAIN_MODULE'}
@@ -14,9 +15,7 @@ assert by['HUE_BRANCH']['molecular_targets']=="F3'H|F3'5'H"
 assert by['UPSTREAM_CONSERVATION']['molecular_targets']=='CHS|CHI|F3H'
 assert by['REGAIN_MODULE']['evidence_status']=='SOURCE_SUPPORTED_LIMITED'
 summary={
- 'version':'v0.1',
- 'same_radiation':'IOCHROMINAE',
- 'source_species_scope':28,
+ 'version':'v0.1','same_radiation':'IOCHROMINAE','source_species_scope':28,
  'phenotype_to_molecular_mappings':3,
  'intensity_maps_to':'LATE_PATHWAY_COEXPRESSION_MODULE',
  'hue_maps_to':'BRANCHING_ENZYME_SUBSPACE',
@@ -26,5 +25,6 @@ summary={
  'does_not_establish':['universal_gene_mapping','single_causal_mutation','same_mapping_across_clades','ecological_causality'],
  'paper1_science_changed':False
 }
+frozen=json.loads(EXPECTED.read_text())
+assert summary==frozen,(summary,frozen)
 print(json.dumps(summary,indent=2))
-Path('data/iochrominae_cross_level_bridge_summary_v0_1.json').write_text(json.dumps(summary,indent=2)+'\n') if False else None
