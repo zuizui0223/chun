@@ -1,0 +1,39 @@
+name: Iochrominae cross-level source acquisition v0.1
+on:
+  pull_request:
+    paths:
+      - 'scripts/ingest_iochrominae_cross_level_sources_v0_1.py'
+      - '.github/workflows/iochrominae-cross-level-sources-v0-1.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  acquire:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Acquire three Dryad datasets
+        run: |
+          mkdir -p build/iochrominae_cross_level_sources
+          python scripts/ingest_iochrominae_cross_level_sources_v0_1.py --out-dir build/iochrominae_cross_level_sources
+          python - <<'PY'
+          import json
+          x=json.load(open('build/iochrominae_cross_level_sources/source_summary.json'))
+          assert x['all_three_acquired'] is True
+          assert len(x['datasets']) == 3
+          print(json.dumps([{k:d[k] for k in ('dataset_id','doi','bundle_bytes','bundle_sha256','member_count','suffix_counts')} for d in x['datasets']],indent=2))
+          PY
+      - name: Preserve provenance
+        run: |
+          git rev-parse HEAD > build/iochrominae_cross_level_sources/ci_checkout_sha.txt
+          python -V > build/iochrominae_cross_level_sources/python_version.txt
+      - uses: actions/upload-artifact@v4
+        with:
+          name: iochrominae-cross-level-sources-v0-1
+          path: build/iochrominae_cross_level_sources
+          if-no-files-found: error
+          retention-days: 90
