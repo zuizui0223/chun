@@ -1,0 +1,22 @@
+name: Aquilegia cross-level admission v0.1
+on:
+  pull_request:
+    paths:
+      - 'data/aquilegia_cross_level_admission_v0_1.csv'
+      - 'data/aquilegia_cross_level_admission_summary_v0_1.json'
+      - 'scripts/validate_aquilegia_cross_level_admission_v0_1.py'
+      - 'docs/AQUILEGIA_CROSS_LEVEL_ADMISSION_V0_1.md'
+      - '.github/workflows/aquilegia-cross-level-admission-v0-1.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  validate:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Validate admission boundary
+        run: python scripts/validate_aquilegia_cross_level_admission_v0_1.py
