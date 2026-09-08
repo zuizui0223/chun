@@ -1,0 +1,25 @@
+name: Iochrominae cross-level source acquisition v0.1
+on:
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  acquire:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Acquire three Dryad datasets
+        run: |
+          mkdir -p build/iochrominae_cross_level_sources
+          python scripts/ingest_iochrominae_cross_level_sources_v0_1.py --out-dir build/iochrominae_cross_level_sources
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: iochrominae-cross-level-sources-v0-1
+          path: build/iochrominae_cross_level_sources
+          if-no-files-found: warn
+          retention-days: 90

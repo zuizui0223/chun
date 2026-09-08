@@ -1,0 +1,18 @@
+{
+  "version": "v0.1",
+  "same_radiation": "IOCHROMINAE",
+  "source_species_scope": 28,
+  "phenotype_to_molecular_mappings": 3,
+  "intensity_maps_to": "LATE_PATHWAY_COEXPRESSION_MODULE",
+  "hue_maps_to": "BRANCHING_ENZYME_SUBSPACE",
+  "early_pathway_status": "COMPARATIVELY_CONSERVED_ACROSS_PIGMENT_STATES",
+  "regain_status": "ONE_EXTANT_REGAIN_TIP_LIMITED",
+  "cross_level_result": "PHENOTYPE_DIMENSIONS_MAP_TO_DIFFERENT_MOLECULAR_SUBSPACES_WITHIN_ONE_RADIATION",
+  "does_not_establish": [
+    "universal_gene_mapping",
+    "single_causal_mutation",
+    "same_mapping_across_clades",
+    "ecological_causality"
+  ],
+  "paper1_science_changed": false
+}
