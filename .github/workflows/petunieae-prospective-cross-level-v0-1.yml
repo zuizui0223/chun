@@ -15,42 +15,78 @@ env:
   OPENBLAS_NUM_THREADS: '1'
   OMP_NUM_THREADS: '1'
 jobs:
-  acquire:
+  analyze:
     runs-on: ubuntu-24.04
-    timeout-minutes: 25
+    timeout-minutes: 20
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
-      - name: Verify gate predates acquisition implementation
+      - name: Install pinned analysis dependencies
+        run: python -m pip install 'numpy==2.2.6' 'pandas==2.2.3' 'scipy==1.15.3' 'biopython==1.85'
+      - name: Verify gate predates source acquisition and analysis
         run: |
           test -s docs/PETUNIEAE_PROSPECTIVE_CROSS_LEVEL_GATE_V0_1.md
           git log --format='%H %ct' -- docs/PETUNIEAE_PROSPECTIVE_CROSS_LEVEL_GATE_V0_1.md | tail -1 > gate_commit.txt
           git log --format='%H %ct' -- scripts/ingest_petunieae_osf_v0_1.py | tail -1 > acquisition_commit.txt
+          git log --format='%H %ct' -- scripts/analyze_petunieae_prospective_bridge_v0_1.py | tail -1 > analysis_commit.txt
           python - <<'PY'
-          g=open('gate_commit.txt').read().split(); a=open('acquisition_commit.txt').read().split()
-          assert g and a and int(g[1]) <= int(a[1]), (g,a)
-          print({'gate_commit':g[0],'acquisition_commit':a[0]})
+          g=open('gate_commit.txt').read().split();a=open('acquisition_commit.txt').read().split();m=open('analysis_commit.txt').read().split()
+          assert g and a and m and int(g[1]) <= int(a[1]) and int(g[1]) <= int(m[1]), (g,a,m)
+          print({'gate_commit':g[0],'acquisition_commit':a[0],'analysis_commit':m[0]})
           PY
-      - name: Acquire processed OSF sources
+      - name: Acquire minimal processed OSF inputs
         run: |
           mkdir -p build/petunieae_osf
           python scripts/ingest_petunieae_osf_v0_1.py --out-dir build/petunieae_osf
+      - name: Execute pre-frozen PGLS/AICc gate
+        run: |
+          mkdir -p build/petunieae_analysis
+          python scripts/analyze_petunieae_prospective_bridge_v0_1.py --source build/petunieae_osf --out build/petunieae_analysis/result.json | tee build/petunieae_analysis/stdout.txt
           python - <<'PY' >> "$GITHUB_STEP_SUMMARY"
           import json
-          x=json.load(open('build/petunieae_osf/source_manifest.json'))
-          print('## Petunieae OSF source inventory')
-          print('target inventory:',x['target_inventory_count'])
-          print('downloaded:',x['downloaded_count'])
-          print('duplicate identity:',x['required_duplicate_identity'])
-          for f in x['downloaded']:
-              print('-',f['path'],f['size'])
+          x=json.load(open('build/petunieae_analysis/result.json'))
+          print('## Petunieae prospective result')
+          print('classification:',x['pre_frozen_gate'])
+          print('Petunieae taxa:',x['petunieae_taxa'],'hue taxa:',x['anthocyanin_positive_hue_taxa'])
+          for axis in ('amount_axis','hue_axis'):
+              a=x[axis];print(axis,'best=',a['best_subspace'],'margin=',a['best_margin_AICc'],'ranking=',a['ranking'])
+          s=x['source_method_sensitivity_log_amount']['fit'];print('source-method log amount sensitivity best=',s['best_subspace'],'margin=',s['best_margin_AICc'])
           PY
+      - name: Verify frozen result when present
+        run: |
+          if test -s data/petunieae_prospective_cross_level_v0_1.json; then
+            python - <<'PY'
+          import json,math
+          observed=json.load(open('build/petunieae_analysis/result.json'))
+          expected=json.load(open('data/petunieae_prospective_cross_level_v0_1.json'))
+          def same(a,b,path='root'):
+              if isinstance(a,dict) and isinstance(b,dict):
+                  assert set(a)==set(b),(path,set(a)^set(b))
+                  for k in a:same(a[k],b[k],path+'.'+k)
+              elif isinstance(a,list) and isinstance(b,list):
+                  assert len(a)==len(b),(path,len(a),len(b))
+                  for i,(x,y) in enumerate(zip(a,b)):same(x,y,f'{path}[{i}]')
+              elif isinstance(a,(int,float)) and isinstance(b,(int,float)) and not isinstance(a,bool) and not isinstance(b,bool):
+                  assert math.isclose(float(a),float(b),rel_tol=1e-7,abs_tol=1e-7),(path,a,b)
+              else: assert a==b,(path,a,b)
+          same(observed,expected)
+          print('frozen result replay PASS')
+          PY
+          fi
       - name: Preserve provenance
         run: |
-          git rev-parse HEAD > build/petunieae_osf/ci_checkout_sha.txt
-          python -V > build/petunieae_osf/python_version.txt
+          git rev-parse HEAD > build/petunieae_analysis/ci_checkout_sha.txt
+          python -V > build/petunieae_analysis/python_version.txt
+          python -m pip freeze > build/petunieae_analysis/python_packages.txt
+          cp build/petunieae_osf/source_manifest.json build/petunieae_analysis/source_manifest.json
+      - uses: actions/upload-artifact@v4
+        with:
+          name: petunieae-prospective-analysis-v0-1
+          path: build/petunieae_analysis
+          if-no-files-found: error
+          retention-days: 90
       - uses: actions/upload-artifact@v4
         with:
           name: petunieae-prospective-osf-v0-1
