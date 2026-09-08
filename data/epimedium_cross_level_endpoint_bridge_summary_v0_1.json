@@ -1,0 +1,25 @@
+{
+  "version": "v0.1",
+  "same_radiation": "EPIMEDIUM_SECT_DIPHYLLON",
+  "molecular_panel_taxa": 8,
+  "macro_molecular_overlap_taxa": 6,
+  "overlap_A_plus": 3,
+  "overlap_A_minus": 3,
+  "A_minus_shared_source_joint_code": "1:1",
+  "A_minus_ANS_low": "3/3",
+  "A_minus_DFR_low": "2/3",
+  "A_minus_CHS_implementations": [
+    "NO_A_MINUS_SPECIFIC_CHANGE",
+    "CHS1_LOW",
+    "CHS2_LOW"
+  ],
+  "A_plus_source_joint_codes": [
+    "2:2",
+    "3:3"
+  ],
+  "source_code_to_hue": "UNRESOLVED_CODEBOOK_NO_HUE_IMPUTATION",
+  "historical_event_independence": "FAIL_HOLD_NOT_ESTIMATED",
+  "cross_level_result": "SAME_SOURCE_ENDPOINT_CODE_WITH_RECURRENT_CORE_AND_HETEROGENEOUS_MOLECULAR_IMPLEMENTATION",
+  "claim_boundary": "Endpoint/taxon bridge only; not an estimate of independent transition recurrence, exact molecular-individual matching, or visible hue identity.",
+  "paper1_science_changed": false
+}
