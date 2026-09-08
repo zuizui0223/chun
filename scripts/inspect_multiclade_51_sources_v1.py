@@ -1,10 +1,10 @@
 #!/usr/bin/env python3
 """Source/admission audit for the prospectively frozen 51-clade panel.
 
-This script deliberately does NOT compute Sankoff scores, permutation p-values,
-or any other phylogenetic-signal endpoint. It retrieves the public Dryad dataset,
-audits schema, associates source clades to machine-readable trees using species-ID
-overlap only, and applies the pre-frozen observation gates.
+No Sankoff score, transition count, observed/null ratio, lability result, or
+permutation p-value is computed here. This layer only retrieves the public
+Dryad files, audits schema/tree identity, and applies the pre-frozen admission
+gates.
 """
 from __future__ import annotations
 
@@ -14,18 +14,19 @@ import io
 import json
 import re
 import shutil
-import sys
 import zipfile
 from collections import Counter, defaultdict
 from pathlib import Path
+from urllib.parse import urljoin
 
 import requests
 from Bio import Phylo
 
 DOI = "10.5061/dryad.r4xgxd2sc"
 ENCODED = "doi%3A10.5061%2Fdryad.r4xgxd2sc"
-DOWNLOAD = f"https://datadryad.org/api/v2/datasets/{ENCODED}/download"
-UA = "chun-multiclade-falsification-source-audit/1.0"
+BASE = "https://datadryad.org"
+API = f"{BASE}/api/v2"
+UA = "chun-multiclade-falsification-source-audit/1.1"
 OUT = Path("analysis/_generated/multiclade_51_source_v1")
 
 FINE = {
@@ -38,10 +39,6 @@ FINE = {
     "white": "WHITE",
     "yellow": "YELLOW",
 }
-
-
-def sha256_bytes(b: bytes) -> str:
-    return hashlib.sha256(b).hexdigest()
 
 
 def sha256_file(p: Path) -> str:
@@ -57,44 +54,132 @@ def clean(x: str) -> str:
 
 
 def norm_species(x: str) -> str:
-    # Frozen syntactic/lossless comparison boundary: quotes, underscores/spaces,
-    # repeated whitespace and case only. Do not drop taxonomic tokens.
-    s = clean(x).strip("'\"")
-    s = s.replace("_", " ")
-    s = clean(s)
-    return s.casefold()
+    # Frozen syntactic comparison boundary only: quotes, underscores/spaces,
+    # repeated whitespace and case. Taxonomic tokens are never discarded.
+    s = clean(x).strip("'\"").replace("_", " ")
+    return clean(s).casefold()
 
 
 def norm_color(x: str) -> str:
-    s = clean(x).casefold().replace("_", " ").replace("–", "-").replace("—", "-")
-    return s
+    s = clean(x).casefold().replace("_", " ")
+    return s.replace("–", "-").replace("—", "-")
 
 
-def locate_unique(root: Path, name: str) -> Path:
-    hits = [p for p in root.rglob("*") if p.is_file() and p.name.casefold() == name.casefold()]
-    if len(hits) != 1:
-        raise SystemExit(f"expected exactly one {name!r}, found {len(hits)}: {[str(x) for x in hits]}")
-    return hits[0]
-
-
-def download_dataset() -> tuple[Path, dict]:
-    OUT.mkdir(parents=True, exist_ok=True)
-    archive = OUT / "dryad_latest.zip"
-    r = requests.get(DOWNLOAD, headers={"User-Agent": UA, "Accept": "application/zip,application/octet-stream,*/*"}, timeout=180, allow_redirects=True)
+def get_json(url: str) -> dict:
+    r = requests.get(
+        url,
+        headers={"User-Agent": UA, "Accept": "application/json", "X-API-Version": "2.1.0"},
+        timeout=120,
+    )
     r.raise_for_status()
-    archive.write_bytes(r.content)
-    if not zipfile.is_zipfile(archive):
-        preview = r.content[:200]
-        raise SystemExit(f"Dryad /download did not return a ZIP; status={r.status_code} content_type={r.headers.get('content-type')} preview={preview!r}")
-    meta = {
-        "requested_url": DOWNLOAD,
-        "final_url": r.url,
-        "status_code": r.status_code,
-        "content_type": r.headers.get("content-type", ""),
-        "content_length": len(r.content),
-        "sha256": sha256_bytes(r.content),
-    }
-    return archive, meta
+    return r.json()
+
+
+def embedded_list(data: dict, preferred_suffix: str) -> list:
+    emb = data.get("_embedded") or {}
+    preferred = [v for k, v in emb.items() if k.endswith(preferred_suffix) and isinstance(v, list)]
+    if len(preferred) == 1:
+        return preferred[0]
+    lists = [v for v in emb.values() if isinstance(v, list)]
+    if len(lists) == 1:
+        return lists[0]
+    raise SystemExit(f"Dryad HAL schema not uniquely interpretable for {preferred_suffix}: keys={list(emb)}")
+
+
+def extract_id(record: dict, kind: str) -> int:
+    if record.get("id") is not None:
+        return int(record["id"])
+    href = ((record.get("_links") or {}).get("self") or {}).get("href", "")
+    m = re.search(rf"/{re.escape(kind)}/(\d+)(?:$|[/?#])", href)
+    if not m:
+        raise SystemExit(f"cannot extract {kind} id from record: {record}")
+    return int(m.group(1))
+
+
+def latest_version() -> tuple[dict, dict, list[dict]]:
+    dataset_url = f"{API}/datasets/{ENCODED}"
+    dataset = get_json(dataset_url)
+    versions_data = get_json(f"{dataset_url}/versions")
+    versions = embedded_list(versions_data, "versions")
+    if not versions:
+        raise SystemExit("Dryad returned no dataset versions")
+
+    def vkey(v: dict):
+        try:
+            vn = int(v.get("versionNumber"))
+        except (TypeError, ValueError):
+            vn = -1
+        try:
+            vid = extract_id(v, "versions")
+        except SystemExit:
+            vid = -1
+        return (vn, vid)
+
+    latest = max(versions, key=vkey)
+    version_id = extract_id(latest, "versions")
+    files_data = get_json(f"{API}/versions/{version_id}/files")
+    files = embedded_list(files_data, "files")
+    return dataset, latest, files
+
+
+def public_file_download(file_record: dict, dest: Path) -> dict:
+    file_id = extract_id(file_record, "files")
+    links = file_record.get("_links") or {}
+    href = ((links.get("stash:download") or {}).get("href")) or f"/api/v2/files/{file_id}/download"
+    urls = [
+        urljoin(BASE, href),
+        f"{BASE}/stash/downloads/file_stream/{file_id}",
+        f"{BASE}/downloads/file_stream/{file_id}",
+    ]
+    attempts = []
+    for url in urls:
+        r = requests.get(
+            url,
+            headers={"User-Agent": UA, "Accept": "*/*", "X-API-Version": "2.1.0"},
+            timeout=180,
+            allow_redirects=True,
+        )
+        attempts.append({
+            "requested_url": url,
+            "final_url": r.url,
+            "status": r.status_code,
+            "content_type": r.headers.get("content-type", ""),
+            "bytes": len(r.content),
+        })
+        if not r.ok or not r.content:
+            continue
+        dest.write_bytes(r.content)
+        expected_size = file_record.get("size")
+        if expected_size not in (None, "") and int(expected_size) != dest.stat().st_size:
+            raise SystemExit(
+                f"Dryad file size mismatch for {file_record.get('path')}: expected={expected_size}, got={dest.stat().st_size} via {url}"
+            )
+        expected_digest = clean(file_record.get("digest", ""))
+        actual = sha256_file(dest)
+        if expected_digest and clean(file_record.get("digestType", "")).casefold() in {"sha-256", "sha256"}:
+            if actual.casefold() != expected_digest.casefold():
+                raise SystemExit(
+                    f"Dryad SHA-256 mismatch for {file_record.get('path')}: expected={expected_digest}, got={actual}"
+                )
+        return {
+            "file_id": file_id,
+            "path": file_record.get("path", ""),
+            "size_metadata": expected_size,
+            "digest_metadata": expected_digest,
+            "digest_type": file_record.get("digestType", ""),
+            "download_attempts": attempts,
+            "selected_download_url": url,
+            "sha256": actual,
+            "bytes": dest.stat().st_size,
+        }
+    raise SystemExit(f"all public Dryad file-download routes failed for id={file_id}: {attempts}")
+
+
+def choose_named_file(files: list[dict], basename: str) -> dict:
+    hits = [f for f in files if Path(str(f.get("path", ""))).name.casefold() == basename.casefold()]
+    if len(hits) != 1:
+        raise SystemExit(f"expected one Dryad file named {basename}, found {len(hits)}: {[x.get('path') for x in hits]}")
+    return hits[0]
 
 
 def parse_tree_file(path: Path):
@@ -102,7 +187,7 @@ def parse_tree_file(path: Path):
     if not raw:
         return None, "EMPTY"
     text = None
-    for enc in ("utf-8", "utf-8-sig", "latin-1"):
+    for enc in ("utf-8-sig", "utf-8", "latin-1"):
         try:
             text = raw.decode(enc)
             break
@@ -110,7 +195,6 @@ def parse_tree_file(path: Path):
             pass
     if text is None:
         return None, "NON_TEXT"
-    # Try formats without using file extension as a scientific choice.
     successes = []
     for fmt in ("newick", "nexus"):
         try:
@@ -121,79 +205,99 @@ def parse_tree_file(path: Path):
             continue
     if not successes:
         return None, "UNPARSEABLE_OR_NOT_SINGLE_TREE"
-    # If the same text parses both ways, prefer Newick deterministically. This is
-    # a parser choice only; tip identity is audited below.
-    successes.sort(key=lambda x: (0 if x[0] == "newick" else 1))
+    successes.sort(key=lambda x: 0 if x[0] == "newick" else 1)
     fmt, tree = successes[0]
-    tips = [str(t.name or "") for t in tree.get_terminals()]
-    return {"format": fmt, "tree": tree, "tips_raw": tips, "tips_norm": [norm_species(x) for x in tips]}, "OK"
+    tips_raw = [str(t.name or "") for t in tree.get_terminals()]
+    return {
+        "format": fmt,
+        "tip_count": len(tips_raw),
+        "tips_norm": [norm_species(x) for x in tips_raw],
+    }, "OK"
+
+
+def normalized_header_map(header: list[str]) -> dict[str, str]:
+    out = {}
+    for h in header:
+        k = clean(h).casefold().replace(" ", "_").replace("-", "_")
+        out[k] = h
+    return out
 
 
 def main():
     if OUT.exists():
-        # Generated only; clearing prevents stale files from a previous CI run.
         shutil.rmtree(OUT)
     OUT.mkdir(parents=True)
+    source_dir = OUT / "source"
+    source_dir.mkdir()
 
-    archive, dlmeta = download_dataset()
-    extracted = OUT / "dataset"
-    extracted.mkdir()
-    with zipfile.ZipFile(archive) as z:
-        z.extractall(extracted)
-        members = sorted(z.namelist())
-
-    csv_path = locate_unique(extracted, "final_dataset.csv")
-    trees_zip = locate_unique(extracted, "trees.zip")
+    dataset_meta, version_meta, files = latest_version()
+    version_id = extract_id(version_meta, "versions")
+    csv_rec = choose_named_file(files, "final_dataset.csv")
+    trees_rec = choose_named_file(files, "trees.zip")
+    csv_path = source_dir / "final_dataset.csv"
+    trees_zip = source_dir / "trees.zip"
+    csv_dl = public_file_download(csv_rec, csv_path)
+    trees_dl = public_file_download(trees_rec, trees_zip)
+    if not zipfile.is_zipfile(trees_zip):
+        raise SystemExit("downloaded trees.zip is not a ZIP archive")
 
     source_files = {
-        "dataset_archive": dlmeta,
-        "final_dataset_csv": {"path": str(csv_path.relative_to(extracted)), "bytes": csv_path.stat().st_size, "sha256": sha256_file(csv_path)},
-        "trees_zip": {"path": str(trees_zip.relative_to(extracted)), "bytes": trees_zip.stat().st_size, "sha256": sha256_file(trees_zip)},
-        "outer_members": members,
+        "dataset_doi": DOI,
+        "version_id": version_id,
+        "version_number": version_meta.get("versionNumber"),
+        "published": version_meta.get("publicationDate") or version_meta.get("lastModificationDate"),
+        "file_count_in_version": len(files),
+        "final_dataset_csv": csv_dl,
+        "trees_zip": trees_dl,
+        "dataset_self": ((dataset_meta.get("_links") or {}).get("self") or {}).get("href", ""),
     }
 
-    # Trait layer.
     with csv_path.open(encoding="utf-8-sig", newline="") as f:
         reader = csv.DictReader(f)
         header = reader.fieldnames or []
+        hmap = normalized_header_map(header)
         required = {"clade", "species", "flower_color", "fruit_color"}
-        if not required.issubset(header):
-            raise SystemExit(f"CSV schema drift: header={header}")
-        raw_rows = [dict(r) for r in reader]
-    if not raw_rows:
+        if not required.issubset(hmap):
+            raise SystemExit(f"CSV schema drift: normalized_header={sorted(hmap)} raw_header={header}")
+        rows0 = [dict(r) for r in reader]
+    if not rows0:
         raise SystemExit("final_dataset.csv is empty")
 
-    unknown_colors = sorted({norm_color(r["flower_color"]) for r in raw_rows if clean(r["flower_color"]) and norm_color(r["flower_color"]) not in FINE})
-    missing_flower = sum(not clean(r["flower_color"]) for r in raw_rows)
+    def val(r: dict, key: str) -> str:
+        return r.get(hmap[key], "")
+
+    unknown_colors = sorted({
+        norm_color(val(r, "flower_color"))
+        for r in rows0
+        if clean(val(r, "flower_color")) and norm_color(val(r, "flower_color")) not in FINE
+    })
+    missing_flower = sum(not clean(val(r, "flower_color")) for r in rows0)
     if unknown_colors:
         raise SystemExit(f"HOLD_SCHEMA unknown flower colors: {unknown_colors}")
     if missing_flower:
         raise SystemExit(f"HOLD_SCHEMA missing flower colors: {missing_flower}")
 
     clade_rows = defaultdict(list)
-    for i, r in enumerate(raw_rows, start=2):
-        clade = clean(r["clade"])
-        species_raw = clean(r["species"])
+    for i, r in enumerate(rows0, start=2):
+        clade = clean(val(r, "clade"))
+        species_raw = clean(val(r, "species"))
         if not clade or not species_raw:
             raise SystemExit(f"missing clade/species at CSV row {i}")
         clade_rows[clade].append({
             "csv_row": i,
             "species_raw": species_raw,
             "species_norm": norm_species(species_raw),
-            "fine_state": FINE[norm_color(r["flower_color"])],
-            "fruit_color_raw": clean(r["fruit_color"]),
+            "fine_state": FINE[norm_color(val(r, "flower_color"))],
+            "fruit_color_raw": clean(val(r, "fruit_color")),
         })
 
-    # Collapse only exact duplicate normalized species with identical flower state.
     clade_traits = {}
     duplicate_report = {}
     for clade, rows in clade_rows.items():
         by_sp = defaultdict(list)
         for r in rows:
             by_sp[r["species_norm"]].append(r)
-        traits = {}
-        dups = []
-        conflicts = []
+        traits, dups, conflicts = {}, [], []
         for sp, rs in by_sp.items():
             states = sorted({x["fine_state"] for x in rs})
             if len(states) != 1:
@@ -205,29 +309,23 @@ def main():
         clade_traits[clade] = {"traits": traits, "conflicts": conflicts, "raw_n": len(rows)}
         duplicate_report[clade] = dups
 
-    # Tree layer.
     tree_dir = OUT / "trees"
     tree_dir.mkdir()
     with zipfile.ZipFile(trees_zip) as z:
-        z.extractall(tree_dir)
         inner_members = sorted(z.namelist())
+        z.extractall(tree_dir)
 
     tree_records = []
     for p in sorted(x for x in tree_dir.rglob("*") if x.is_file()):
         rec, status = parse_tree_file(p)
-        record = {
-            "path": str(p.relative_to(tree_dir)),
-            "bytes": p.stat().st_size,
-            "sha256": sha256_file(p),
-            "parse_status": status,
-        }
+        record = {"path": str(p.relative_to(tree_dir)), "bytes": p.stat().st_size, "sha256": sha256_file(p), "parse_status": status}
         if rec:
             norms = rec["tips_norm"]
             record.update({
                 "format": rec["format"],
-                "tip_count": len(norms),
+                "tip_count": rec["tip_count"],
                 "unique_tip_count": len(set(norms)),
-                "duplicate_normalized_tips": sorted([x for x, n in Counter(norms).items() if n > 1]),
+                "duplicate_normalized_tips": sorted(x for x, n in Counter(norms).items() if n > 1),
                 "tips_norm": norms,
             })
         tree_records.append(record)
@@ -236,21 +334,15 @@ def main():
     if not parsed_trees:
         raise SystemExit("no unique-tip machine-readable tree files parsed")
 
-    # Build overlap matrix; signal-free species identities only.
     pair = {}
     for clade, cdat in clade_traits.items():
         trait_set = set(cdat["traits"])
         for tr in parsed_trees:
             tree_set = set(tr["tips_norm"])
             inter = trait_set & tree_set
-            pair[(clade, tr["path"])] = {
-                "intersection_n": len(inter),
-                "coverage_smaller": len(inter) / min(len(trait_set), len(tree_set)) if trait_set and tree_set else 0.0,
-            }
+            denom = min(len(trait_set), len(tree_set))
+            pair[(clade, tr["path"])] = {"intersection_n": len(inter), "coverage_smaller": len(inter) / denom if denom else 0.0}
 
-    # Deterministic mutual-unique-best association by intersection count, then
-    # coverage. Ties at the scientific association level are rejected, not broken
-    # by downstream signal.
     clade_best = {}
     for clade in sorted(clade_traits):
         vals = [(pair[(clade, t["path"])]["intersection_n"], pair[(clade, t["path"])]["coverage_smaller"], t["path"]) for t in parsed_trees]
@@ -316,10 +408,9 @@ def main():
     admitted = [x for x in admissions if x["admitted_primary"]]
     summary = {
         "source_doi": DOI,
-        "download": dlmeta,
         "source_files": source_files,
         "csv_header": header,
-        "csv_rows": len(raw_rows),
+        "csv_rows": len(rows0),
         "source_clade_count": len(clade_traits),
         "trees_zip_member_count": len(inner_members),
         "tree_file_count": len(tree_records),
@@ -329,10 +420,9 @@ def main():
         "admitted_clades": [x["clade"] for x in admitted],
         "endpoint_computed": False,
         "signal_fields_computed": [],
-        "note": "No Sankoff score, transition count, observed/null ratio, lability class, or permutation p-value is computed by this audit.",
+        "note": "No Sankoff score, transition count, observed/null ratio, source lability class, or permutation p-value is computed by this audit.",
     }
 
-    # Save complete machine-readable source audit.
     (OUT / "source_inventory.json").write_text(json.dumps({"summary": summary, "tree_records": tree_records, "duplicate_trait_rows": duplicate_report}, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
     (OUT / "clade_admission.json").write_text(json.dumps(admissions, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
     with (OUT / "clade_admission.tsv").open("w", encoding="utf-8", newline="") as f:
@@ -356,17 +446,15 @@ def main():
             })
 
     print("MULTICLADE51_SOURCE_AUDIT=" + json.dumps({
+        "version_id": version_id,
         "source_clades": summary["source_clade_count"],
         "parsed_unique_tip_trees": summary["parsed_unique_tip_tree_count"],
         "admitted_primary_clades": summary["admitted_primary_clade_count"],
         "panel_minimum_10_clades_gate": summary["panel_minimum_10_clades_gate"],
         "admitted_clades": summary["admitted_clades"],
-        "csv_sha256": source_files["final_dataset_csv"]["sha256"],
-        "trees_zip_sha256": source_files["trees_zip"]["sha256"],
+        "csv_sha256": csv_dl["sha256"],
+        "trees_zip_sha256": trees_dl["sha256"],
     }, ensure_ascii=False))
-
-    # Source audit itself succeeds even if the biological panel would HOLD; a
-    # later validator interprets the frozen admission result.
 
 
 if __name__ == "__main__":
