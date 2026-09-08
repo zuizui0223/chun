@@ -4,26 +4,45 @@ import csv
 ROOT = Path(__file__).resolve().parents[1]
 ledger = ROOT / 'analysis' / 'falsification_candidates_v1.tsv'
 rule = ROOT / 'analysis' / 'falsification_decision_rule_v1.md'
+audit = ROOT / 'analysis' / 'falsification_audit_v1.md'
 
-assert ledger.exists(), ledger
-assert rule.exists(), rule
+for p in (ledger, rule, audit):
+    assert p.exists(), p
 
 rows = list(csv.DictReader(ledger.open(encoding='utf-8'), delimiter='\t'))
 assert rows, 'candidate ledger is empty'
-valid_status = {'HOLD', 'aligned', 'complementary', 'REFUTATION', 'ADVERSE_BUT_NOT_REFUTATION', 'SUPPORTIVE_ALIGNMENT'}
+required = {'test_unit', 'inference_level', 'claim', 'current_status', 'candidate_counterexample', 'reason'}
+assert required.issubset(rows[0]), rows[0].keys()
+valid_status = {
+    'HOLD', 'REFUTATION', 'ADVERSE_BUT_NOT_REFUTATION',
+    'SUPPORTIVE_ALIGNMENT', 'MIXED', 'SUPERSEDED_REFUTED', 'PREFROZEN_TEST'
+}
 for r in rows:
-    assert r['radiation'].strip()
-    assert r['phenotype_axis'].strip()
+    assert r['test_unit'].strip()
+    assert r['inference_level'].strip()
+    assert r['claim'].strip()
     assert r['current_status'].strip() in valid_status, r
-    assert r['candidate_counterexample'] in {'yes', 'no'}, r
+    assert r['candidate_counterexample'] in {'yes', 'no', 'pending'}, r
+    assert r['reason'].strip()
 
-# A HOLD cannot be silently counted as a counterexample.
 for r in rows:
     if r['current_status'] == 'HOLD':
         assert r['candidate_counterexample'] == 'no', r
+    if r['current_status'] == 'REFUTATION':
+        assert r['candidate_counterexample'] == 'yes', r
+    if r['current_status'] == 'PREFROZEN_TEST':
+        assert r['candidate_counterexample'] == 'pending', r
 
 text = rule.read_text(encoding='utf-8')
-for key in ['Matched phenotype level', 'Matched observation regime', 'Directional incompatibility', 'Mechanistic non-replication']:
+for key in [
+    'Already rejected stronger claim', 'Surviving claim under prospective falsification',
+    'Matched phenotype level', 'Matched statistic', 'Failure of the surviving prediction',
+    'Mechanistic non-replication'
+]:
     assert key in text, key
 
-print(f'validated {len(rows)} falsification-audit candidate rows')
+audit_text = audit.read_text(encoding='utf-8')
+for key in ['Already falsified / superseded', 'Surviving positive object', 'Current falsification target']:
+    assert key in audit_text, key
+
+print(f'validated {len(rows)} falsification-audit rows and matched decision rule')
