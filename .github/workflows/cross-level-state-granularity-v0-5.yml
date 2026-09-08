@@ -1,0 +1,25 @@
+name: Cross-level state granularity v0.5
+on:
+  pull_request:
+    paths:
+      - 'data/cross_level_state_granularity_v0_4.json'
+      - 'data/iochrominae_cross_level_bridge_summary_v0_1.json'
+      - 'data/erica_phenotype_axis_molecular_bridge_summary_v0_1.json'
+      - 'data/epimedium_cross_level_endpoint_bridge_summary_v0_1.json'
+      - 'data/cross_level_state_granularity_v0_5.json'
+      - 'scripts/summarize_cross_level_state_granularity_v0_5.py'
+      - 'docs/CROSS_LEVEL_STATE_GRANULARITY_V0_5.md'
+      - '.github/workflows/cross-level-state-granularity-v0-5.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  validate:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Rebuild v0.5 decision
+        run: python scripts/summarize_cross_level_state_granularity_v0_5.py
