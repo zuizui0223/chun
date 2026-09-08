@@ -1,0 +1,102 @@
+{
+  "version": "v1",
+  "test_unit": "Nicotiana_nonhybrid_diploids",
+  "source_doi": "10.1093/aob/mcv048",
+  "prefreeze": "analysis/nicotiana_fine_state_falsification_prefreeze_v1.md",
+  "source_supplement": {
+    "member": "supp_mcv048_mcv048_final-corrections-supp-data.doc",
+    "sha256": "45bbedb8a1ef419cf0128a3a6df63fd364d61a50402f610dcd196c70f8c14959",
+    "S1_rows": 62,
+    "S2_rows": 62,
+    "S4_rows": 26,
+    "spectral_categories_nonempty": [
+      "dark green",
+      "green",
+      "magenta",
+      "pink",
+      "red",
+      "uv-white",
+      "white",
+      "yellow"
+    ],
+    "petal_coarse_values_nonempty": ["no", "yes"],
+    "petal_coarse_missing_source_rows": 2
+  },
+  "trait_admission": {
+    "ploidy_accession_rows": {
+      "diploid": 27,
+      "polyploid": 27,
+      "homoploid": 8
+    },
+    "structurally_eligible_nonhybrid_diploid_taxa": 21,
+    "joint_trait_eligible_accession_rows": 25,
+    "eligible_taxon_units": 21,
+    "definite_coarse_taxon_counts": {
+      "CHLOROPHYLL_ABSENT": 5,
+      "CHLOROPHYLL_PRESENT": 16
+    },
+    "fine_states_within_definite_coarse": {
+      "CHLOROPHYLL_ABSENT": ["UV_WHITE", "WHITE"],
+      "CHLOROPHYLL_PRESENT": ["DARK_GREEN", "GREEN", "PINK", "RED", "UV_WHITE", "WHITE"]
+    },
+    "multi_fine_taxa": 1,
+    "multi_coarse_taxa": 0,
+    "pre_tree_gates": {
+      "eligible_taxa_ge_20": true,
+      "both_definite_coarse_classes_ge_5": true,
+      "one_definite_coarse_class_ge_10_and_ge_3_fine": true
+    },
+    "missingness_rule": "Only non-hybrid diploid source rows with both an explicit spectral category and explicit yes/no petal coarse state enter taxon-level allowed-state sets; missing coarse values are never inferred from visible colour."
+  },
+  "tree_admission": {
+    "topology_route": "OpenTree exact one-to-one TNRS fallback",
+    "source_machine_readable_tree_status": "NOT_RECOVERED_FROM_SUPPLEMENT; FIG_S6_ONLY_AS_DOCUMENT_FIGURE",
+    "eligible_trait_taxa": 21,
+    "tnrs_status_counts": {
+      "EXACT": 17,
+      "REJECT_2_EXACT_MATCHES": 2,
+      "REJECT_0_EXACT_MATCHES": 2
+    },
+    "rejected_queries": [
+      {
+        "query": "Nicotiana attenuata",
+        "status": "REJECT_2_EXACT_MATCHES",
+        "candidate_exact_matches": [
+          {"matched_name": "Nicotiana attenuata", "ott_id": 882065, "is_synonym": false, "score": 1.0},
+          {"matched_name": "Nicotiana tabacum", "ott_id": 222787, "is_synonym": true, "score": 1.0}
+        ]
+      },
+      {
+        "query": "Nicotiana obtusifolia var. obtusifolia",
+        "status": "REJECT_0_EXACT_MATCHES",
+        "candidate_exact_matches": []
+      },
+      {
+        "query": "Nicotiana obtusifolia var. palmeri",
+        "status": "REJECT_0_EXACT_MATCHES",
+        "candidate_exact_matches": []
+      },
+      {
+        "query": "Nicotiana undulata",
+        "status": "REJECT_2_EXACT_MATCHES",
+        "candidate_exact_matches": [
+          {"matched_name": "Nicotiana undulata", "ott_id": 210478, "is_synonym": false, "score": 1.0},
+          {"matched_name": "Nicotiana suaveolens", "ott_id": 806473, "is_synonym": true, "score": 1.0}
+        ]
+      }
+    ],
+    "n_ott_collision_groups": 0,
+    "n_admitted_unique_ott": 17,
+    "n_tree_overlap": 17,
+    "coverage_fraction_of_eligible": 0.8095238095238095,
+    "frozen_coverage_gate_80pct": true,
+    "frozen_minimum_n_20_gate": false,
+    "endpoint_allowed": false
+  },
+  "endpoint_computed": false,
+  "classification": "HOLD_OBSERVATION_REGIME",
+  "reason": "The source/trait schema passes and exact OpenTree coverage is 80.95%, but only 17 taxa are admitted, below the pre-frozen minimum n=20. The four rejected TNRS queries cannot be rescued without violating exact/unambiguous matching or explicit infraspecific-rank retention. No machine-readable final source tree is available in the recovered article supplement. Therefore the biological Sankoff/permutation endpoint remains unopened.",
+  "cross_radiation_update": "UNCHANGED_3_SUPPORTIVE_PLUS_1_MIXED; NICOTIANA_HOLD_NOT_COUNTED",
+  "claim_boundary": "HOLD is an observation-regime failure, not evidence for or against residual fine-state phylogenetic organization.",
+  "paper1_science_changed": false
+}
