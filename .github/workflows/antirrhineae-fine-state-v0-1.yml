@@ -1,0 +1,58 @@
+name: Antirrhineae fine-state v0.1
+on:
+  pull_request:
+    paths:
+      - 'scripts/analyze_antirrhineae_fine_state_v0_1.py'
+      - 'docs/ANTIRRHINEAE_PRE_RESULT_FINE_STATE_GATE_V0_1.md'
+      - '.github/workflows/antirrhineae-fine-state-v0-1.yml'
+      - 'data/antirrhineae_fine_state_result_v0_1.json'
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: read
+env:
+  OPENBLAS_NUM_THREADS: '1'
+  OMP_NUM_THREADS: '1'
+jobs:
+  analyze:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install pinned inference dependencies
+        run: python -m pip install 'numpy==2.2.6' 'biopython==1.85'
+      - name: Recover checksum-audited Antirrhineae source artifact
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          digest=$(gh api repos/$GITHUB_REPOSITORY/actions/artifacts/10035457456 --jq .digest)
+          test "$digest" = 'sha256:e0533bc349d87544b96346187ae58860f7e60e7267ac11252d922b2312c40d1f'
+          mkdir -p build/source
+          gh run download 34170228964 --repo "$GITHUB_REPOSITORY" --name antirrhineae-source-v0-1 --dir build/source
+          test -s build/source/source_manifest.json
+          test -s build/source/extracted/monomorphic_snapdragons.tree
+          test -s build/source/extracted/polymorphic_snapdragons.tree
+          test -s build/source/extracted/mm_face_phenotypes.csv
+          test -s build/source/extracted/face_phenotypes.csv
+      - name: Execute pre-frozen conditional fine-state test
+        run: |
+          mkdir -p build/result
+          args=(--source-dir build/source/extracted --source-manifest build/source/source_manifest.json --out build/result/antirrhineae_fine_state_result_v0_1.json)
+          if test -s data/antirrhineae_fine_state_result_v0_1.json; then
+            args+=(--expected data/antirrhineae_fine_state_result_v0_1.json)
+          fi
+          python scripts/analyze_antirrhineae_fine_state_v0_1.py "${args[@]}"
+          cat build/result/antirrhineae_fine_state_result_v0_1.json >> "$GITHUB_STEP_SUMMARY"
+      - name: Preserve provenance
+        run: |
+          git rev-parse HEAD > build/result/ci_checkout_sha.txt
+          python -m pip freeze > build/result/python_packages.txt
+      - uses: actions/upload-artifact@v4
+        with:
+          name: antirrhineae-fine-state-v0-1
+          path: build/result
+          if-no-files-found: error
+          retention-days: 90
