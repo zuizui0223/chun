@@ -25,12 +25,17 @@ text=DOC.read_text()
 for doi in REQUIRED_DOIS: assert doi in text,doi
 assert 'NOVELTY_BOUNDARY_SET_NO_PRIORITY_CLAIM' in text
 assert 'state-granularity' in text.lower() or 'state granularity' in text.lower()
-# Forbid affirmative priority formulas while allowing explicit negative examples such as
-# “Do not claim: the first ...” and “first ... remains unverified”.
+
+# Forbid affirmative priority formulas. Literal examples inside the explicit
+# "Wording not allowed" section are negative controls and must remain readable.
+in_forbidden_examples=False
 for line in text.splitlines():
-    low=line.lower().strip()
-    if 'first' not in low: continue
-    allowed=any(x in low for x in ('do **not** currently claim','do not currently claim','unverified','not evidence of priority','not the general observation'))
+    stripped=line.strip(); low=stripped.lower()
+    if stripped.startswith('## '):
+        in_forbidden_examples=(low=='## wording not allowed')
+    if 'first' not in low or in_forbidden_examples:
+        continue
+    allowed=any(x in low for x in ('unverified','not evidence of priority','not the general observation'))
     if not allowed and re.search(r'\b(first|first-ever|first demonstration)\b',low):
         raise AssertionError('unsupported priority wording: '+line)
 print({'rows':len(rows),'priority_claims':'FORBIDDEN','status':'PASS'})
