@@ -1,0 +1,81 @@
+{
+  "version": "v0.1",
+  "status": "YELLOW_AXIS_MIXED",
+  "seed": 20260908,
+  "permutations": 9999,
+  "settings": [
+    {
+      "setting": "FASTTREE|STRICT",
+      "tree": "FASTTREE",
+      "coding": "STRICT",
+      "n_tips": 24,
+      "state_counts": {"W": 19, "A": 1, "Y": 4},
+      "observed_minimum_changes": 3,
+      "unconditional_null_mean": 4.834383438343834,
+      "fine_organization_gap": 1.834383438343834,
+      "partitions": [
+        {"partition":"YELLOW_AXIS","side_a":["Y"],"side_b":["A","W"],"conditional_null_mean":2.9507950795079507,"capture_fraction":1.0268236833496893,"rank":1},
+        {"partition":"WHITE_AXIS","side_a":["W"],"side_b":["A","Y"],"conditional_null_mean":3.6047604760476046,"capture_fraction":0.6703194853342056,"rank":2},
+        {"partition":"ANTHOCYANIN_AXIS","side_a":["A"],"side_b":["W","Y"],"conditional_null_mean":4.833283328332834,"capture_fraction":0.0005997164976552778,"rank":3}
+      ],
+      "yellow_rank": 1,
+      "yellow_capture_fraction": 1.0268236833496893
+    },
+    {
+      "setting": "FASTTREE|DOMINANT",
+      "tree": "FASTTREE",
+      "coding": "DOMINANT",
+      "n_tips": 30,
+      "state_counts": {"W": 22, "A": 4, "Y": 4},
+      "observed_minimum_changes": 3,
+      "unconditional_null_mean": 7.697569756975698,
+      "fine_organization_gap": 4.697569756975698,
+      "partitions": [
+        {"partition":"ANTHOCYANIN_AXIS","side_a":["A"],"side_b":["W","Y"],"conditional_null_mean":4.8661866186618665,"capture_fraction":0.6027336015839561,"rank":1},
+        {"partition":"WHITE_AXIS","side_a":["W"],"side_b":["A","Y"],"conditional_null_mean":5.183618361836183,"capture_fraction":0.5351599923356966,"rank":2},
+        {"partition":"YELLOW_AXIS","side_a":["Y"],"side_b":["A","W"],"conditional_null_mean":5.845884588458846,"capture_fraction":0.39417938728151414,"rank":3}
+      ],
+      "yellow_rank": 3,
+      "yellow_capture_fraction": 0.39417938728151414
+    },
+    {
+      "setting": "UFBOOT|STRICT",
+      "tree": "UFBOOT",
+      "coding": "STRICT",
+      "n_tips": 23,
+      "state_counts": {"W": 19, "A": 1, "Y": 3},
+      "observed_minimum_changes": 3,
+      "unconditional_null_mean": 3.904690469046905,
+      "fine_organization_gap": 0.9046904690469049,
+      "partitions": [
+        {"partition":"YELLOW_AXIS","side_a":["Y"],"side_b":["A","W"],"conditional_null_mean":2.948894889488949,"capture_fraction":1.0564890559363256,"rank":1},
+        {"partition":"WHITE_AXIS","side_a":["W"],"side_b":["A","Y"],"conditional_null_mean":3.5025502550255028,"capture_fraction":0.4445058589431792,"rank":2},
+        {"partition":"ANTHOCYANIN_AXIS","side_a":["A"],"side_b":["W","Y"],"conditional_null_mean":3.915291529152915,"capture_fraction":-0.011717886358611153,"rank":3}
+      ],
+      "yellow_rank": 1,
+      "yellow_capture_fraction": 1.0564890559363256
+    },
+    {
+      "setting": "UFBOOT|DOMINANT",
+      "tree": "UFBOOT",
+      "coding": "DOMINANT",
+      "n_tips": 29,
+      "state_counts": {"W": 22, "A": 4, "Y": 3},
+      "observed_minimum_changes": 4,
+      "unconditional_null_mean": 6.762576257625763,
+      "fine_organization_gap": 2.7625762576257626,
+      "partitions": [
+        {"partition":"ANTHOCYANIN_AXIS","side_a":["A"],"side_b":["W","Y"],"conditional_null_mean":4.815381538153815,"capture_fraction":0.704847409767223,"rank":1},
+        {"partition":"WHITE_AXIS","side_a":["W"],"side_b":["A","Y"],"conditional_null_mean":5.434843484348435,"capture_fraction":0.4806139811027042,"rank":2},
+        {"partition":"YELLOW_AXIS","side_a":["Y"],"side_b":["A","W"],"conditional_null_mean":5.83028302830283,"capture_fraction":0.3374723961915796,"rank":3}
+      ],
+      "yellow_rank": 3,
+      "yellow_capture_fraction": 0.3374723961915796
+    }
+  ],
+  "yellow_best_settings": 2,
+  "yellow_positive_capture_settings": 4,
+  "pre_frozen_gate": "best rank in >=3/4 AND positive capture in 4/4",
+  "claim_boundary": "Prospective Camellia validation of an exploratory visible-state partition. A PASS does not establish a shared biochemical pathway, ecology, ancestry or transition direction.",
+  "paper1_science_changed": false
+}
