@@ -64,7 +64,7 @@ panel_json = json.loads(panel_result.read_text(encoding='utf-8'))
 assert panel_json['classification'] == 'HOLD_SOURCE_ACCESS'
 assert panel_json['row_level_flower_data_inspected'] is False
 assert panel_json['tree_files_opened'] is False
-assert panel_json['endpoint_computed'] is False
+assert panel_json['biological_endpoint_computed'] is False
 
 epi_json = json.loads(epimedium_result.read_text(encoding='utf-8'))
 assert epi_json['prospective_classifier_output'] == 'REFUTATION'
