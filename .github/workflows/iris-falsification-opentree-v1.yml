@@ -1,0 +1,38 @@
+name: iris-falsification-opentree-v1
+
+on:
+  push:
+    branches:
+      - analysis/falsification-audit-v1
+    paths:
+      - 'analysis/iris_fine_state_falsification_prefreeze_v1.md'
+      - 'scripts/inspect_iris_opentree_v1.py'
+      - '.github/workflows/iris-falsification-opentree-v1.yml'
+  pull_request:
+    paths:
+      - 'analysis/iris_fine_state_falsification_prefreeze_v1.md'
+      - 'scripts/inspect_iris_opentree_v1.py'
+      - '.github/workflows/iris-falsification-opentree-v1.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  audit-opentree:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install dependencies
+        run: python -m pip install --disable-pip-version-check requests openpyxl biopython
+      - name: Audit OpenTree admission
+        run: python scripts/inspect_iris_opentree_v1.py
+      - name: Upload OpenTree audit
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: iris-opentree-audit-v1
+          path: analysis/_generated/iris_opentree_v1/
+          if-no-files-found: warn
