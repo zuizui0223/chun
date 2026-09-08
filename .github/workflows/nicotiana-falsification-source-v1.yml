@@ -1,0 +1,37 @@
+name: nicotiana-falsification-source-v1
+
+on:
+  push:
+    branches:
+      - analysis/falsification-audit-v1
+    paths:
+      - 'analysis/nicotiana_fine_state_falsification_prefreeze_v1.md'
+      - 'scripts/inspect_nicotiana_falsification_sources_v1.py'
+      - '.github/workflows/nicotiana-falsification-source-v1.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  inspect-source:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install source-inspection dependencies
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y --no-install-recommends libreoffice-core libreoffice-writer
+          python -m pip install --disable-pip-version-check requests python-docx
+      - name: Inspect prefrozen Nicotiana source schema
+        run: python scripts/inspect_nicotiana_falsification_sources_v1.py
+      - name: Upload source inventory and table exports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: nicotiana-source-inventory-v1
+          path: analysis/_generated/nicotiana_source_v1/
+          if-no-files-found: warn
