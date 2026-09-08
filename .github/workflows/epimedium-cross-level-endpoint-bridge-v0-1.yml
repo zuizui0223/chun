@@ -1,0 +1,21 @@
+name: Epimedium cross-level endpoint bridge v0.1
+on:
+  pull_request:
+    paths:
+      - 'data/epimedium_cross_level_endpoint_bridge_summary_v0_1.json'
+      - 'scripts/validate_epimedium_cross_level_endpoint_bridge_v0_1.py'
+      - 'docs/EPIMEDIUM_CROSS_LEVEL_ENDPOINT_BRIDGE_V0_1.md'
+      - '.github/workflows/epimedium-cross-level-endpoint-bridge-v0-1.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  validate:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Validate taxon-level macro-molecular join
+        run: python scripts/validate_epimedium_cross_level_endpoint_bridge_v0_1.py
