@@ -1,0 +1,35 @@
+name: iris-falsification-endpoint-v1
+
+on:
+  push:
+    branches:
+      - analysis/falsification-audit-v1
+    paths:
+      - 'scripts/analyze_iris_fine_state_falsification_v1.py'
+      - 'scripts/inspect_iris_opentree_v1.py'
+      - 'analysis/iris_fine_state_falsification_prefreeze_v1.md'
+      - '.github/workflows/iris-falsification-endpoint-v1.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  run-endpoint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install dependencies
+        run: python -m pip install --disable-pip-version-check numpy requests openpyxl biopython
+      - name: Run prefrozen Iris falsification endpoint
+        run: python scripts/analyze_iris_fine_state_falsification_v1.py
+      - name: Upload frozen endpoint outputs
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: iris-falsification-endpoint-v1
+          path: analysis/_generated/iris_falsification_v1/
+          if-no-files-found: warn
