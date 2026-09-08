@@ -1,0 +1,41 @@
+name: phaidra-51-mirror-v1
+
+on:
+  push:
+    branches:
+      - analysis/falsification-audit-v1
+    paths:
+      - 'scripts/inspect_phaidra_51_mirror_v1.py'
+      - '.github/workflows/phaidra-51-mirror-v1.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  inventory:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install dependency
+        run: python -m pip install --disable-pip-version-check requests
+      - name: Inventory Phaidra collection metadata only
+        run: python scripts/inspect_phaidra_51_mirror_v1.py
+      - name: Assert no content/signal layer opened
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          x=json.loads(Path('analysis/_generated/phaidra_51_mirror_v1/inventory.json').read_text())
+          assert x['content_opened'] is False
+          assert x['signal_computed'] is False
+          print('metadata-only Phaidra audit preserved')
+          PY
+      - name: Upload inventory
+        uses: actions/upload-artifact@v4
+        with:
+          name: phaidra-51-mirror-v1
+          path: analysis/_generated/phaidra_51_mirror_v1/
