@@ -1,0 +1,54 @@
+name: Silene falsification source v1
+
+on:
+  push:
+    branches:
+      - analysis/falsification-audit-v1
+    paths:
+      - 'analysis/silene_fine_state_falsification_prefreeze_v1.md'
+      - 'scripts/acquire_silene_falsification_sources_v1.py'
+      - '.github/workflows/silene-falsification-source-v1.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  source-audit:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install source dependencies
+        run: python -m pip install --disable-pip-version-check requests openpyxl
+      - name: Acquire source bytes and inspect schemas only
+        run: |
+          mkdir -p build/silene_falsification_source_v1
+          python scripts/acquire_silene_falsification_sources_v1.py --out-dir build/silene_falsification_source_v1 | tee build/source.log
+      - name: Verify endpoint remains closed
+        run: |
+          python - <<'PY'
+          import json
+          x=json.load(open('build/silene_falsification_source_v1/source_summary.json'))
+          assert x['source_only'] is True
+          assert x['biological_endpoint_computed'] is False
+          assert x['observed_assignment_scored'] is False
+          print(json.dumps({
+            'trait_source_gate_candidate':x['trait_source_gate_candidate'],
+            'accession_source_gate_candidate':x['accession_source_gate_candidate'],
+            'trait_candidates':x['trait_candidates'],
+            'accession_candidates':x['accession_candidates'],
+          },indent=2))
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: silene-falsification-source-v1
+          path: |
+            build/silene_falsification_source_v1
+            build/source.log
+          if-no-files-found: error
+          retention-days: 90
