@@ -3,7 +3,8 @@
 
 The pre-result gate predates all OSF inspection. Root-only and one-level metadata diagnostics
 identified the exact processed-analysis folders below; no phenotype/expression values were
-inspected before this scope was fixed. Large raw/transcriptome hierarchies are never traversed.
+inspected before this scope was fixed. Large raw/transcriptome hierarchies and notebooks are
+not downloaded.
 """
 from __future__ import annotations
 import argparse, hashlib, json, re, urllib.request
@@ -11,10 +12,10 @@ from pathlib import Path
 
 NODE='zg9cu'
 BASE=f'https://api.osf.io/v2/nodes/{NODE}/files/osfstorage/'
-UA='chun-petunieae-prospective-source-audit/0.4'
-MAX_BYTES=5_000_000
+UA='chun-petunieae-prospective-source-audit/0.5'
+MAX_BYTES=500_000
 TARGET_ROOTS={'phyloCCA','phyloPCA','stochastic_mapping'}
-KEEP_SUFFIXES={'.csv','.tsv','.txt','.json','.xlsx','.xls','.rds','.rdata','.rda','.nwk','.newick','.tre','.tree','.nex','.nexus','.r','.py','.ipynb'}
+KEEP_SUFFIXES={'.csv','.tsv','.txt','.json','.xlsx','.xls','.rds','.rdata','.rda','.nwk','.newick','.tre','.tree','.nex','.nexus','.r','.py'}
 
 def get(url:str, accept='application/vnd.api+json,application/json,*/*'):
     req=urllib.request.Request(url,headers={'User-Agent':UA,'Accept':accept})
@@ -33,8 +34,7 @@ def list_one_level(url:str,prefix:str):
         obj,resolved,_=jget(url)
         for item in obj.get('data',[]):
             a=item.get('attributes',{}) or {};name=str(a.get('name') or item.get('id'));path=f'{prefix}/{name}'
-            if a.get('kind')!='file':
-                raise ValueError('unexpected nested folder in frozen analysis root: '+path)
+            if a.get('kind')!='file':raise ValueError('unexpected nested folder in frozen analysis root: '+path)
             links=item.get('links',{}) or {};hashes=((a.get('extra') or {}).get('hashes') or {})
             out.append({'id':item.get('id'),'path':path,'name':name,'size':int(a.get('size') or 0),'date_modified':a.get('date_modified'),'provider':'osfstorage','download_url':links.get('download'),'md5':hashes.get('md5'),'sha256_osf':hashes.get('sha256'),'api_source':resolved})
         nxt=(obj.get('links') or {}).get('next');url=nxt if isinstance(nxt,str) and nxt else None
@@ -77,11 +77,10 @@ def main():
     for tag in ('phyloCCA','phyloPCA'):
         names={x['name'] for x in selected if x['path'].startswith(tag+'/')}
         if not required_names <= names:raise ValueError(f'{tag} missing required processed source files: {sorted(required_names-names)}')
-    # Two independent OSF analysis folders must expose byte-identical data/tree before one copy is authoritative.
     for name in sorted(required_names):
         copies=[x for x in selected if x['name']==name and x['path'].split('/')[0] in {'phyloCCA','phyloPCA'}]
         if len(copies)!=2 or len({x['sha256'] for x in copies})!=1:raise ValueError('phyloCCA/phyloPCA duplicate drift: '+name)
-    manifest={'version':'v0.4','osf_node':NODE,'root_api_resolved':root_resolved,'target_roots':sorted(TARGET_ROOTS),'target_inventory_count':len(files),'downloaded_count':len(selected),'downloaded':selected,'required_duplicate_identity':'PASS_PHYLOCCA_PHYLOPCA_CSV_AND_TREE_BYTE_IDENTICAL','authoritative_prefix':'phyloCCA','max_download_bytes':MAX_BYTES,'analysis_status':'SOURCE_BYTES_ACQUIRED_READY_FOR_FROZEN_ANALYSIS','claim_boundary':'No phenotype-axis or molecular-subspace result is inferred by acquisition.','paper1_science_changed':False}
+    manifest={'version':'v0.5','osf_node':NODE,'root_api_resolved':root_resolved,'target_roots':sorted(TARGET_ROOTS),'target_inventory_count':len(files),'downloaded_count':len(selected),'downloaded':selected,'required_duplicate_identity':'PASS_PHYLOCCA_PHYLOPCA_CSV_AND_TREE_BYTE_IDENTICAL','authoritative_prefix':'phyloCCA','max_download_bytes':MAX_BYTES,'analysis_status':'SOURCE_BYTES_ACQUIRED_READY_FOR_FROZEN_ANALYSIS','claim_boundary':'No phenotype-axis or molecular-subspace result is inferred by acquisition.','paper1_science_changed':False}
     (a.out_dir/'source_manifest.json').write_text(json.dumps(manifest,indent=2)+'\n')
     print(json.dumps({'target_inventory_count':len(files),'downloaded_count':len(selected),'paths':[x['path'] for x in selected]},indent=2))
 if __name__=='__main__':main()
