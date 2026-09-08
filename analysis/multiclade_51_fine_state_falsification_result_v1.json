@@ -1,0 +1,39 @@
+{
+  "analysis_id": "multiclade_51_fine_state_falsification_v1",
+  "classification": "HOLD_SOURCE_ACCESS",
+  "biological_endpoint_computed": false,
+  "source_doi": "10.5061/dryad.r4xgxd2sc",
+  "article_doi": "10.1002/ajb2.70146",
+  "prefreeze": "analysis/multiclade_51_fine_state_falsification_prefreeze_v1.md",
+  "source_access_attempts": [
+    {
+      "run_id": 34193656023,
+      "route": "Dryad whole-dataset /download",
+      "result": "HTTP_401_BEFORE_SCHEMA_OR_ADMISSION"
+    },
+    {
+      "run_id": 34193963701,
+      "route": "Dryad public metadata -> file id -> API/stash/download file routes",
+      "result": "METADATA_RESOLVED_FILE_ID_4411881_BUT_FILE_ROUTES_HTTP_401_OR_403"
+    },
+    {
+      "run_id": 34194235179,
+      "route": "related Phaidra collection metadata, raw PID",
+      "result": "NON_JSON_RESPONSE_BEFORE_MEMBER_CONTENT"
+    },
+    {
+      "run_id": 34194327526,
+      "route": "related Phaidra collection metadata, URL-encoded PID and host fallback",
+      "result": "SERVICES_HOST_EMPTY_200_AND_UI_HOST_ANTI_BOT_HTML"
+    }
+  ],
+  "row_level_flower_data_inspected": false,
+  "tree_files_opened": false,
+  "admitted_clades_frozen": false,
+  "sankoff_computed": false,
+  "permutation_test_computed": false,
+  "counts_as_support": false,
+  "counts_as_refutation": false,
+  "paper1_science_changed": false,
+  "interpretation": "The public dataset is described in source metadata, but the current execution environment cannot retrieve the required binary/source files through the tested anonymous routes. The prospectively frozen biological endpoint therefore remains unopened. This is an access-regime HOLD, not a biological result. The source and admission gates must not be relaxed or replaced by a non-identical mirror post hoc."
+}
