@@ -1,0 +1,91 @@
+{
+  "version": "v1",
+  "test_unit": "Iris",
+  "source_doi": "10.3389/fpls.2020.569811",
+  "source_workbook_sha256": "183ef5231c48e782b0ea69a7aa5605d40c892dd91d9d9b2d259ed7b65d230072",
+  "frozen_source_rows": 226,
+  "fine_alphabet": ["MAROON", "ORANGE", "PINK", "PURPLE", "RED", "YELLOW", "WHITE"],
+  "primary_coarse_mapping": {"MAROON": "ANTHOCYANIN", "PINK": "ANTHOCYANIN", "PURPLE": "ANTHOCYANIN", "RED": "ANTHOCYANIN", "ORANGE": "CAROTENOID", "YELLOW": "CAROTENOID", "WHITE": "NO_MAJOR_PIGMENT"},
+  "permutations": 9999,
+  "seed": 20260908,
+  "tree": {
+    "synth_id": "",
+    "newick_sha256": "845ae646b8ab87e1d223fa1ef3deae515e5ad556c3b5e890fa05cd3dc26f59d9",
+    "n_exact_tnrs_before_collisions": 205,
+    "n_ott_collision_groups": 0,
+    "n_admitted_unique_ott": 205,
+    "n_tree_overlap": 205,
+    "coverage_fraction_of_226": 0.9070796460176991,
+    "missing_admitted_ott_ids_from_tree": [],
+    "tnrs_status_counts": {"EXACT": 205, "REJECT_0_EXACT_MATCHES": 6, "REJECT_2_EXACT_MATCHES": 14, "REJECT_3_EXACT_MATCHES": 1},
+    "source_format_normalization_counts": {"NONE": 217, "ATTACHED_HYBRID_MARKER_REMOVED": 1, "GENUS_CASE_NORMALIZED": 8}
+  },
+  "admission_gates": {
+    "coverage_ge_181_of_226": true,
+    "all_admitted_tips_have_fine_state": true,
+    "coarse_class_ge_30_tips_and_ge_3_fine_states": true,
+    "no_signal_based_taxon_exclusion": true
+  },
+  "coarse_class_admission_details": {
+    "ANTHOCYANIN": {"n_tips": 120, "distinct_fine_states": ["MAROON", "PINK", "PURPLE", "RED"]},
+    "CAROTENOID": {"n_tips": 27, "distinct_fine_states": ["ORANGE", "YELLOW"]},
+    "NO_MAJOR_PIGMENT": {"n_tips": 6, "distinct_fine_states": ["WHITE"]}
+  },
+  "admission_pass": true,
+  "topology_sensitivity": "NOT_AVAILABLE_SOURCE_SUPPLEMENT_NO_MACHINE_READABLE_FINAL_NEWICK",
+  "claim_boundary": "Prospective fourth-radiation matched test of residual fine-state phylogenetic organization after coarse conditioning; not a universal transition-direction or common-mechanism test.",
+  "paper1_science_changed": false,
+  "classification": "MIXED",
+  "primary": {
+    "label": "PRIMARY_SOURCE_PIGMENT_GROUPS",
+    "n_tips": 205,
+    "fine_state_tip_presence": {"MAROON": 35, "ORANGE": 1, "PINK": 12, "PURPLE": 126, "RED": 1, "YELLOW": 64, "WHITE": 23},
+    "conditional_group_sizes": {"ANTHOCYANIN|CAROTENOID": 35, "ANTHOCYANIN|CAROTENOID|NO_MAJOR_PIGMENT": 1, "ANTHOCYANIN|NO_MAJOR_PIGMENT": 14, "ANTHOCYANIN": 120, "CAROTENOID|NO_MAJOR_PIGMENT": 2, "CAROTENOID": 27, "NO_MAJOR_PIGMENT": 6},
+    "observed_minimum_changes": 63,
+    "null_mean": 70.69656965696569,
+    "null_quantiles": [64.0, 67.0, 71.0, 74.0, 74.0],
+    "observed_over_null_mean": 0.8911323463880775,
+    "p_lower": 0.0001,
+    "permutations": 9999,
+    "seed": 20260908,
+    "support_gate_p_le_0_01_and_ratio_lt_1": true
+  },
+  "sensitivities": {
+    "single_coarse_only": {
+      "status": "COMPUTED",
+      "result": {
+        "label": "SENSITIVITY_SINGLE_COARSE_ONLY",
+        "n_tips": 153,
+        "fine_state_tip_presence": {"MAROON": 14, "ORANGE": 1, "PINK": 12, "PURPLE": 94, "RED": 1, "YELLOW": 26, "WHITE": 6},
+        "conditional_group_sizes": {"ANTHOCYANIN": 120, "CAROTENOID": 27, "NO_MAJOR_PIGMENT": 6},
+        "observed_minimum_changes": 53,
+        "null_mean": 55.45214521452145,
+        "null_quantiles": [50.0, 53.0, 56.0, 57.0, 57.0],
+        "observed_over_null_mean": 0.9557790739197715,
+        "p_lower": 0.0308,
+        "permutations": 9999,
+        "seed": 20260908,
+        "support_gate_p_le_0_01_and_ratio_lt_1": false
+      }
+    },
+    "white_nonwhite": {
+      "status": "COMPUTED",
+      "result": {
+        "label": "SENSITIVITY_WHITE_NONWHITE",
+        "n_tips": 205,
+        "fine_state_tip_presence": {"MAROON": 35, "ORANGE": 1, "PINK": 12, "PURPLE": 126, "RED": 1, "YELLOW": 64, "WHITE": 23},
+        "conditional_group_sizes": {"NONWHITE|WHITE": 17, "NONWHITE": 182, "WHITE": 6},
+        "observed_minimum_changes": 63,
+        "null_mean": 74.15591559155915,
+        "null_quantiles": [65.0, 70.0, 74.0, 78.0, 79.0],
+        "observed_over_null_mean": 0.8495613532303419,
+        "p_lower": 0.0001,
+        "permutations": 9999,
+        "seed": 20260908,
+        "support_gate_p_le_0_01_and_ratio_lt_1": true
+      }
+    },
+    "source_topology": {"status": "NOT_AVAILABLE"}
+  },
+  "interpretation": "Iris gives materially different primary and frozen-sensitivity outcomes; the surviving recurrence claim is unresolved rather than cleanly replicated or refuted in this fourth radiation."
+}
