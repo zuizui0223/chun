@@ -1,0 +1,32 @@
+name: Cross-radiation state granularity v0.3
+on:
+  pull_request:
+    paths:
+      - 'scripts/summarize_cross_radiation_state_granularity_v0_3.py'
+      - 'data/cross_radiation_state_granularity_v0_3.json'
+      - 'docs/CROSS_RADIATION_STATE_GRANULARITY_V0_3.md'
+      - '.github/workflows/cross-radiation-state-granularity-v0-3.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  validate:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Regenerate v0.3 decision layer
+        run: |
+          python scripts/summarize_cross_radiation_state_granularity_v0_3.py \
+            --out build/cross_radiation_state_granularity_v0_3.json \
+            --expected data/cross_radiation_state_granularity_v0_3.json
+          cat build/cross_radiation_state_granularity_v0_3.json >> "$GITHUB_STEP_SUMMARY"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: cross-radiation-state-granularity-v0-3
+          path: build/cross_radiation_state_granularity_v0_3.json
+          if-no-files-found: error
+          retention-days: 90

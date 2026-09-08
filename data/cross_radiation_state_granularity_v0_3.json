@@ -1,0 +1,43 @@
+{
+  "version": "v0.3",
+  "status": "THREE_RADIATION_FINE_STATE_REPLICATION_WITHOUT_SHARED_PRIVILEGED_COARSE_BOUNDARY",
+  "inputs": {
+    "cross_radiation_v0_2": "data/cross_radiation_hierarchical_rule_v0_2.json",
+    "hierarchy_specificity_v0_1": "data/hierarchy_partition_specificity_summary_v0_1.json"
+  },
+  "direction_result": {
+    "testable_radiations": 3,
+    "strong_direction_pass_count": 0,
+    "universal_transition_direction": "NOT_SUPPORTED",
+    "retained_counterexample": "ANGRAECINAE"
+  },
+  "fine_state_replication": {
+    "testable_external_radiations": 3,
+    "supporting_external_radiations": 3,
+    "supporting_ids": ["LINOIDEAE", "ANGRAECINAE", "ANTIRRHINEAE"],
+    "dimensions": ["HUE", "FLORAL_ORGAN_CONFIGURATION", "PIGMENT_CLASS"],
+    "status": "SUPPORTED_3_OF_3_INDEPENDENT_EXTERNAL_RADIATIONS"
+  },
+  "coarse_partition_specificity": {
+    "status": "GENERIC_FINE_STATE_ORGANIZATION_MORE_LIKELY",
+    "radiation_classifications": {
+      "LINOIDEAE": "BIOLOGICAL_PARTITION_NOT_ENRICHED",
+      "ANGRAECINAE": "INTERMEDIATE_PARTITION_SPECIFICITY",
+      "ANTIRRHINEAE": "BIOLOGICAL_PARTITION_NOT_ENRICHED"
+    },
+    "enriched_radiations": [],
+    "not_enriched_radiations": ["LINOIDEAE", "ANTIRRHINEAE"],
+    "intermediate_radiations": ["ANGRAECINAE"],
+    "shared_privileged_biological_coarse_boundary": "NOT_SUPPORTED"
+  },
+  "revised_cross_radiation_inference": {
+    "state_representation_result": "FINE_STATE_ORGANIZATION_REPLICATED_BUT_PRESELECTED_COARSE_BOUNDARIES_NOT_PRIVILEGED",
+    "candidate_rule": "Flower-colour macroevolution is representation-dependent: fine-state phylogenetic organization recurs across independent radiations, but no tested biological coarse boundary is consistently privileged and coarse coding does not determine a universal transition direction.",
+    "superseded_stronger_wording": "Coarse ancestral/display or pigment state constrains the evolutionary state space.",
+    "supersession_reason": "Exhaustive alternative-partition controls classify Linoideae and Antirrhineae biological coarse partitions as NOT_ENRICHED and Angraecinae as INTERMEDIATE; none is ENRICHED.",
+    "law_status": "REPLICATED_REPRESENTATION_PATTERN_NOT_UNIVERSAL_CAUSAL_LAW",
+    "next_gate": "Test whether recurrent fine-state organization aligns with independently resolved molecular pathway or regulatory-module axes, and prospectively test any newly proposed coarse partition in an external radiation."
+  },
+  "paper1_science_changed": false,
+  "claim_boundary": "The 3/3 result concerns fine-state phylogenetic organization. It does not establish a privileged universal colour partition, transition direction, ancestral state, ecological cause, molecular mechanism, or dated rate."
+}
