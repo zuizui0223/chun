@@ -1,86 +1,76 @@
 #!/usr/bin/env python3
-"""Acquire only analysis-grade Wheeler 2023 Petunieae OSF files needed by the frozen gate.
+"""Acquire the minimal Wheeler 2023 Petunieae inputs needed by the frozen prospective gate.
 
-The pre-result gate predates all OSF inspection. Root-only and one-level metadata diagnostics
-identified the exact processed-analysis folders below; no phenotype/expression values were
-inspected before this scope was fixed. Large raw/transcriptome hierarchies and notebooks are
-not downloaded.
+The pre-result gate predates all OSF inspection. Metadata-only diagnostics identified the two
+processed analysis folders and their duplicate CSV/tree copies. We verify duplicate identity
+from OSF-provided size/hash metadata, then download only the authoritative phyloCCA CSV/tree/R
+script. No phenotype/expression values are interpreted here.
 """
 from __future__ import annotations
 import argparse, hashlib, json, re, urllib.request
 from pathlib import Path
 
-NODE='zg9cu'
-BASE=f'https://api.osf.io/v2/nodes/{NODE}/files/osfstorage/'
-UA='chun-petunieae-prospective-source-audit/0.5'
-MAX_BYTES=500_000
-TARGET_ROOTS={'phyloCCA','phyloPCA','stochastic_mapping'}
-KEEP_SUFFIXES={'.csv','.tsv','.txt','.json','.xlsx','.xls','.rds','.rdata','.rda','.nwk','.newick','.tre','.tree','.nex','.nexus','.r','.py'}
+NODE='zg9cu';BASE=f'https://api.osf.io/v2/nodes/{NODE}/files/osfstorage/';UA='chun-petunieae-prospective-source-audit/0.6'
+TARGET_ROOTS={'phyloCCA','phyloPCA'}
+AUTHORITATIVE_ROOT='phyloCCA'
+AUTHORITATIVE_NAMES={'tpm10k-mgg-combined-with-flavs.csv','11genestre_dated_pruned.tre','phyloCCA_expression_HPLC-with-flavs-final.r'}
+DUPLICATE_NAMES={'tpm10k-mgg-combined-with-flavs.csv','11genestre_dated_pruned.tre'}
 
-def get(url:str, accept='application/vnd.api+json,application/json,*/*'):
+def get(url:str,accept='application/vnd.api+json,application/json,*/*'):
     req=urllib.request.Request(url,headers={'User-Agent':UA,'Accept':accept})
-    with urllib.request.urlopen(req,timeout=120) as r:return r.read(),r.geturl(),dict(r.headers)
+    with urllib.request.urlopen(req,timeout=90) as r:return r.read(),r.geturl(),dict(r.headers)
 
-def jget(url:str):
-    raw,resolved,headers=get(url);return json.loads(raw),resolved,headers
+def jget(url:str):raw,resolved,h=get(url);return json.loads(raw),resolved,h
 
 def folder_href(item):
     rel=((item.get('relationships') or {}).get('files') or {}).get('links',{}).get('related',{})
     return rel.get('href') if isinstance(rel,dict) else rel
 
-def list_one_level(url:str,prefix:str):
+def list_one_level(url,prefix):
     out=[]
     while url:
         obj,resolved,_=jget(url)
         for item in obj.get('data',[]):
-            a=item.get('attributes',{}) or {};name=str(a.get('name') or item.get('id'));path=f'{prefix}/{name}'
-            if a.get('kind')!='file':raise ValueError('unexpected nested folder in frozen analysis root: '+path)
-            links=item.get('links',{}) or {};hashes=((a.get('extra') or {}).get('hashes') or {})
-            out.append({'id':item.get('id'),'path':path,'name':name,'size':int(a.get('size') or 0),'date_modified':a.get('date_modified'),'provider':'osfstorage','download_url':links.get('download'),'md5':hashes.get('md5'),'sha256_osf':hashes.get('sha256'),'api_source':resolved})
-        nxt=(obj.get('links') or {}).get('next');url=nxt if isinstance(nxt,str) and nxt else None
+            a=item.get('attributes') or {};name=str(a.get('name') or item.get('id'))
+            if a.get('kind')!='file':raise ValueError(f'unexpected nested item in {prefix}: {name}')
+            hashes=((a.get('extra') or {}).get('hashes') or {});links=item.get('links') or {}
+            out.append({'id':item.get('id'),'root':prefix,'name':name,'path':f'{prefix}/{name}','size':int(a.get('size') or 0),'md5':hashes.get('md5'),'sha256_osf':hashes.get('sha256'),'download_url':links.get('download'),'api_source':resolved})
+        url=(obj.get('links') or {}).get('next') or None
     return out
-
-def root_targets():
-    obj,resolved,_=jget(BASE+'?page[size]=100');rows=[];found={}
-    for item in obj.get('data',[]):
-        a=item.get('attributes',{}) or {};name=str(a.get('name') or item.get('id'));href=folder_href(item)
-        rows.append({'name':name,'kind':a.get('kind'),'id':item.get('id'),'files_href':href,'size':a.get('size')})
-        if a.get('kind')=='folder' and name in TARGET_ROOTS:found[name]=href
-    missing=TARGET_ROOTS-set(found)
-    if missing:raise ValueError('target OSF root folders missing: '+','.join(sorted(missing)))
-    if any(not found[x] for x in TARGET_ROOTS):raise ValueError('target root missing files href')
-    return rows,found,resolved
-
-def suffix(path:str):return Path(path.lower()).suffix
 
 def main():
     ap=argparse.ArgumentParser();ap.add_argument('--out-dir',type=Path,required=True);a=ap.parse_args();a.out_dir.mkdir(parents=True,exist_ok=True)
-    roots,found,root_resolved=root_targets();(a.out_dir/'osf_root_inventory.json').write_text(json.dumps(roots,indent=2)+'\n')
+    root_obj,root_resolved,_=jget(BASE+'?page[size]=100');found={};roots=[]
+    for item in root_obj.get('data',[]):
+        at=item.get('attributes') or {};name=str(at.get('name') or item.get('id'));href=folder_href(item)
+        roots.append({'name':name,'kind':at.get('kind'),'id':item.get('id'),'files_href':href,'size':at.get('size')})
+        if at.get('kind')=='folder' and name in TARGET_ROOTS:found[name]=href
+    if set(found)!=TARGET_ROOTS or any(not found[x] for x in TARGET_ROOTS):raise ValueError('missing required OSF analysis roots')
     files=[]
     for tag in sorted(TARGET_ROOTS):files.extend(list_one_level(found[tag],tag))
-    if not files:raise ValueError('targeted OSF inventory is empty')
+    (a.out_dir/'osf_root_inventory.json').write_text(json.dumps(roots,indent=2)+'\n')
     (a.out_dir/'osf_target_inventory.json').write_text(json.dumps(files,indent=2)+'\n')
-    selected=[];data_dir=a.out_dir/'processed';data_dir.mkdir(exist_ok=True)
-    for f in files:
-        s=suffix(f['path']);keep=s in KEEP_SUFFIXES and 0 < f['size'] <= MAX_BYTES
-        f['selected_for_download']=bool(keep)
-        if not keep:continue
-        if not f['download_url']:raise ValueError('selected OSF file lacks download URL: '+f['path'])
+    # Verify the two analysis folders expose the same processed data and dated tree before choosing one copy.
+    duplicate_audit={}
+    for name in sorted(DUPLICATE_NAMES):
+        copies=[x for x in files if x['name']==name and x['root'] in TARGET_ROOTS]
+        if len(copies)!=2:raise ValueError('missing duplicate copy: '+name)
+        sigs={(x['size'],x['sha256_osf'],x['md5']) for x in copies}
+        if len(sigs)!=1:raise ValueError('OSF metadata duplicate drift: '+name)
+        duplicate_audit[name]={'status':'PASS_OSF_METADATA_IDENTICAL','size':copies[0]['size'],'sha256_osf':copies[0]['sha256_osf'],'md5':copies[0]['md5']}
+    chosen=[x for x in files if x['root']==AUTHORITATIVE_ROOT and x['name'] in AUTHORITATIVE_NAMES]
+    if {x['name'] for x in chosen}!=AUTHORITATIVE_NAMES:raise ValueError('authoritative processed inputs incomplete')
+    data_dir=a.out_dir/'processed';data_dir.mkdir(exist_ok=True);downloaded=[]
+    for f in sorted(chosen,key=lambda x:x['name']):
+        if not f['download_url']:raise ValueError('missing download URL: '+f['path'])
         raw,resolved,_=get(f['download_url'],'application/octet-stream,*/*')
-        if len(raw)!=f['size']:raise ValueError(f"size mismatch {f['path']}: {len(raw)} != {f['size']}")
+        if len(raw)!=f['size']:raise ValueError('download size mismatch: '+f['path'])
         sha=hashlib.sha256(raw).hexdigest();md5=hashlib.md5(raw).hexdigest()
-        if f['sha256_osf'] and sha.lower()!=str(f['sha256_osf']).lower():raise ValueError('OSF sha256 mismatch: '+f['path'])
-        if f['md5'] and md5.lower()!=str(f['md5']).lower():raise ValueError('OSF md5 mismatch: '+f['path'])
+        if f['sha256_osf'] and sha.lower()!=str(f['sha256_osf']).lower():raise ValueError('download sha mismatch: '+f['path'])
+        if f['md5'] and md5.lower()!=str(f['md5']).lower():raise ValueError('download md5 mismatch: '+f['path'])
         safe=re.sub(r'[^A-Za-z0-9._-]+','__',f['path']);(data_dir/safe).write_bytes(raw)
-        selected.append({**f,'local_name':safe,'download_resolved':resolved,'sha256':sha,'md5_computed':md5})
-    required_names={'tpm10k-mgg-combined-with-flavs.csv','11genestre_dated_pruned.tre'}
-    for tag in ('phyloCCA','phyloPCA'):
-        names={x['name'] for x in selected if x['path'].startswith(tag+'/')}
-        if not required_names <= names:raise ValueError(f'{tag} missing required processed source files: {sorted(required_names-names)}')
-    for name in sorted(required_names):
-        copies=[x for x in selected if x['name']==name and x['path'].split('/')[0] in {'phyloCCA','phyloPCA'}]
-        if len(copies)!=2 or len({x['sha256'] for x in copies})!=1:raise ValueError('phyloCCA/phyloPCA duplicate drift: '+name)
-    manifest={'version':'v0.5','osf_node':NODE,'root_api_resolved':root_resolved,'target_roots':sorted(TARGET_ROOTS),'target_inventory_count':len(files),'downloaded_count':len(selected),'downloaded':selected,'required_duplicate_identity':'PASS_PHYLOCCA_PHYLOPCA_CSV_AND_TREE_BYTE_IDENTICAL','authoritative_prefix':'phyloCCA','max_download_bytes':MAX_BYTES,'analysis_status':'SOURCE_BYTES_ACQUIRED_READY_FOR_FROZEN_ANALYSIS','claim_boundary':'No phenotype-axis or molecular-subspace result is inferred by acquisition.','paper1_science_changed':False}
+        downloaded.append({**f,'local_name':safe,'download_resolved':resolved,'sha256':sha,'md5_computed':md5})
+    manifest={'version':'v0.6','osf_node':NODE,'root_api_resolved':root_resolved,'target_roots':sorted(TARGET_ROOTS),'target_inventory_count':len(files),'downloaded_count':len(downloaded),'downloaded':downloaded,'duplicate_audit':duplicate_audit,'required_duplicate_identity':'PASS_PHYLOCCA_PHYLOPCA_CSV_AND_TREE_OSF_METADATA_IDENTICAL','authoritative_prefix':AUTHORITATIVE_ROOT,'analysis_status':'SOURCE_BYTES_ACQUIRED_READY_FOR_FROZEN_ANALYSIS','claim_boundary':'Acquisition and source-identity audit only; no phenotype-axis or molecular-subspace result inferred.','paper1_science_changed':False}
     (a.out_dir/'source_manifest.json').write_text(json.dumps(manifest,indent=2)+'\n')
-    print(json.dumps({'target_inventory_count':len(files),'downloaded_count':len(selected),'paths':[x['path'] for x in selected]},indent=2))
+    print(json.dumps({'target_inventory_count':len(files),'downloaded_count':len(downloaded),'downloaded':[x['path'] for x in downloaded],'duplicate_audit':duplicate_audit},indent=2))
 if __name__=='__main__':main()
