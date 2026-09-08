@@ -41,8 +41,9 @@ jobs:
           import json
           x=json.load(open('build/petunieae_osf/source_manifest.json'))
           print('## Petunieae OSF source inventory')
-          print('inventory:',x['inventory_count'])
+          print('target inventory:',x['target_inventory_count'])
           print('downloaded:',x['downloaded_count'])
+          print('duplicate identity:',x['required_duplicate_identity'])
           for f in x['downloaded']:
               print('-',f['path'],f['size'])
           PY
