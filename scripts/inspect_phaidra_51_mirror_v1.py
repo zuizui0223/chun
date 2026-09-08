@@ -14,21 +14,41 @@ from urllib.parse import quote
 import requests
 
 PID = "o:2098641"
-BASE = "https://services.phaidra.univie.ac.at/api"
-UA = "chun-phaidra-51-source-audit/1.0"
+PID_URL = quote(PID, safe="")
+HOSTS = ["https://services.phaidra.univie.ac.at/api", "https://phaidra.univie.ac.at/api"]
+UA = "chun-phaidra-51-source-audit/1.1"
 OUT = Path("analysis/_generated/phaidra_51_mirror_v1")
 
 
 def get_json(url: str):
-    r = requests.get(url, headers={"User-Agent": UA, "Accept": "application/json"}, timeout=120)
+    r = requests.get(url, headers={"User-Agent": UA, "Accept": "application/json"}, timeout=120, allow_redirects=True)
     r.raise_for_status()
-    return r.json()
+    ctype = r.headers.get("content-type", "")
+    try:
+        return r.json(), {"url": url, "final_url": r.url, "status": r.status_code, "content_type": ctype}
+    except Exception as e:
+        raise RuntimeError(
+            f"non-JSON Phaidra response url={url} final={r.url} status={r.status_code} "
+            f"content_type={ctype!r} preview={r.text[:300]!r}"
+        ) from e
 
 
-def search(field: str):
+def first_json(path: str):
+    errors = []
+    for base in HOSTS:
+        try:
+            data, meta = get_json(f"{base}{path}")
+            meta["api_base"] = base
+            return data, meta
+        except Exception as e:
+            errors.append(repr(e))
+    raise RuntimeError(f"all Phaidra API hosts failed for {path}: {errors}")
+
+
+def search(base: str, field: str):
     q = f'{field}:"{PID}"'
-    url = f"{BASE}/search/select?q={quote(q, safe='')}&wt=json&rows=1000"
-    return get_json(url)
+    url = f"{base}/search/select?q={quote(q, safe='')}&wt=json&rows=1000"
+    return get_json(url)[0]
 
 
 def compact_doc(d: dict):
@@ -38,8 +58,6 @@ def compact_doc(d: dict):
         "created", "modified", "owner", "ispartof", "ismemberof",
     ]
     out = {k: d.get(k) for k in keys if k in d}
-    # Preserve all scalar fields with names useful for source discovery, without
-    # downloading or parsing object content.
     for k, v in d.items():
         kl = k.casefold()
         if any(x in kl for x in ("title", "file", "mime", "format", "size", "model", "type")):
@@ -52,14 +70,14 @@ def compact_doc(d: dict):
 
 def main():
     OUT.mkdir(parents=True, exist_ok=True)
-    info_url = f"{BASE}/object/{PID}/info"
-    info = get_json(info_url)
+    info, api_meta = first_json(f"/object/{PID_URL}/info")
+    base = api_meta["api_base"]
 
     searches = {}
     docs = {}
     for field in ("ismemberof", "ispartof"):
         try:
-            x = search(field)
+            x = search(base, field)
             searches[field] = x
             response = x.get("response", {}) if isinstance(x, dict) else {}
             for d in response.get("docs", []) or []:
@@ -68,7 +86,6 @@ def main():
         except Exception as e:
             searches[field] = {"error": repr(e)}
 
-    # The info endpoint may itself expose related/member index records.
     related = []
     if isinstance(info, dict):
         for key, value in info.items():
@@ -81,7 +98,7 @@ def main():
 
     inventory = {
         "target_pid": PID,
-        "info_url": info_url,
+        "api_meta": api_meta,
         "member_doc_count": len(docs),
         "member_docs": [docs[k] for k in sorted(docs)],
         "related_index": related,
@@ -90,12 +107,12 @@ def main():
         "note": "Metadata/search records only; no member download and no trait/tree content inspection.",
     }
     (OUT / "inventory.json").write_text(json.dumps(inventory, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
-    # Save raw API structures for schema/provenance audit.
     (OUT / "info.json").write_text(json.dumps(info, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
     (OUT / "searches.json").write_text(json.dumps(searches, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
 
     print("PHAIDRA51_MIRROR_AUDIT=" + json.dumps({
         "target_pid": PID,
+        "api_meta": api_meta,
         "member_doc_count": len(docs),
         "member_docs": inventory["member_docs"],
         "content_opened": False,
