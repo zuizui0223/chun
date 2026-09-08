@@ -26,24 +26,62 @@ def clean(v):
     return re.sub(r"\s+", " ", str(v)).strip()
 
 
+def nearby_snippets(html: str):
+    snippets = []
+    lower = html.lower()
+    for needle in ("supplementary table 1", "table_1.xlsx", "#ts1", 'id="ts1"', "downloadurl", "attachment"):
+        start = 0
+        while len(snippets) < 16:
+            i = lower.find(needle, start)
+            if i < 0:
+                break
+            lo = max(0, i - 500)
+            hi = min(len(html), i + 1000)
+            snippets.append({"needle": needle, "snippet": clean(html[lo:hi])})
+            start = i + len(needle)
+    return snippets
+
+
 def candidate_links(url: str, html: str):
     soup = BeautifulSoup(html, "html.parser")
     out = []
+
+    # Normal links plus any link/attribute around the TS1 supplementary-table block.
     for a in soup.find_all("a", href=True):
         href = urljoin(url, a["href"])
         text = clean(a.get_text(" ", strip=True)) or ""
         blob = (href + " " + text).lower()
-        if ".xlsx" in blob or "supplementary table 1" in blob or "supplementary-table-1" in blob:
+        if ".xlsx" in blob or "supplementary table 1" in blob or "supplementary-table-1" in blob or "table_1" in blob:
             out.append({"url": href, "anchor": text})
-    # Frontiers sometimes exposes attachment URLs only in JSON/script payloads.
-    for m in re.finditer(r'https?:[^"\'<>\\ ]+?\.xlsx(?:\?[^"\'<>\\ ]*)?', html, flags=re.I):
-        out.append({"url": m.group(0).replace("\\/", "/"), "anchor": "raw-html-xlsx"})
-    # Also collect relative xlsx-looking paths from raw markup.
+
+    for node in soup.find_all(id=re.compile(r"^TS1$", re.I)):
+        scope = node.parent or node
+        for tag in scope.find_all(True):
+            for key, value in tag.attrs.items():
+                vals = value if isinstance(value, list) else [value]
+                for v in vals:
+                    s = str(v)
+                    if any(k in s.lower() for k in ("xlsx", "supp", "attach", "download", "table_1")):
+                        out.append({"url": urljoin(url, s), "anchor": f"TS1-attr:{tag.name}:{key}"})
+
+    # Frontiers sometimes exposes attachments only inside serialized page data.
+    url_patterns = [
+        r'https?:[^"\'<>\\ ]+?\.xlsx(?:\?[^"\'<>\\ ]*)?',
+        r'https?:[^"\'<>\\ ]+?(?:supplementary|attachment|download)[^"\'<>\\ ]*',
+    ]
+    for pat in url_patterns:
+        for m in re.finditer(pat, html, flags=re.I):
+            raw = m.group(0).replace("\\/", "/").replace("&amp;", "&")
+            out.append({"url": raw, "anchor": "raw-html-url"})
+
     for m in re.finditer(r'["\']([^"\']+?\.xlsx(?:\?[^"\']*)?)["\']', html, flags=re.I):
         out.append({"url": urljoin(url, m.group(1).replace("\\/", "/")), "anchor": "raw-relative-xlsx"})
+
     dedup = []
     seen = set()
     for x in out:
+        if not x["url"].startswith("http"):
+            continue
         if x["url"] not in seen:
             seen.add(x["url"])
             dedup.append(x)
@@ -62,38 +100,45 @@ def inspect_xlsx(url: str):
     }
     if r.status_code != 200 or not info["xlsx_magic"]:
         return info
-    wb = load_workbook(io.BytesIO(r.content), read_only=True, data_only=True)
+    try:
+        wb = load_workbook(io.BytesIO(r.content), read_only=True, data_only=True)
+    except Exception as e:
+        info["workbook_error"] = f"{type(e).__name__}: {e}"
+        return info
     sheets = []
     for ws in wb.worksheets:
         preview = []
         for row in ws.iter_rows(min_row=1, max_row=min(ws.max_row, 5), values_only=True):
             preview.append([clean(v) for v in row])
-        sheets.append({
-            "title": ws.title,
-            "max_row": ws.max_row,
-            "max_column": ws.max_column,
-            "preview_first_5_rows": preview,
-        })
+        sheets.append({"title": ws.title, "max_row": ws.max_row, "max_column": ws.max_column, "preview_first_5_rows": preview})
     info["sheets"] = sheets
     return info
 
 
 def main():
-    inventory = {"article_pages": [], "xlsx_candidates": [], "selected_trait_candidate": None}
+    inventory = {"article_pages": [], "diagnostic_snippets": [], "xlsx_candidates": [], "selected_trait_candidate": None}
     candidates = []
     for url in ARTICLE_URLS:
         r = requests.get(url, headers=UA, timeout=60)
         page = {"url": url, "resolved_url": r.url, "status": r.status_code, "bytes": len(r.content)}
         inventory["article_pages"].append(page)
         if r.status_code == 200:
+            for snip in nearby_snippets(r.text):
+                snip["source_page"] = url
+                inventory["diagnostic_snippets"].append(snip)
             for c in candidate_links(r.url, r.text):
                 c["source_page"] = url
                 candidates.append(c)
+
     seen = set()
     for c in candidates:
         if c["url"] in seen:
             continue
         seen.add(c["url"])
+        # Only attempt plausible spreadsheet/file URLs; retain others as diagnostics.
+        plausible = any(k in c["url"].lower() for k in ("xlsx", "supplement", "attachment", "download"))
+        if not plausible:
+            continue
         try:
             info = inspect_xlsx(c["url"])
         except Exception as e:
@@ -102,7 +147,6 @@ def main():
         info["source_page"] = c.get("source_page")
         inventory["xlsx_candidates"].append(info)
 
-    # Select only by source-schema criteria, never by a phylogenetic result.
     viable = []
     for i, x in enumerate(inventory["xlsx_candidates"]):
         for s in x.get("sheets", []):
@@ -112,13 +156,7 @@ def main():
     if len(viable) == 1:
         i, sheet, rows, cols = viable[0]
         x = inventory["xlsx_candidates"][i]
-        inventory["selected_trait_candidate"] = {
-            "candidate_index": i,
-            "url": x.get("resolved_url") or x.get("requested_url"),
-            "sheet": sheet,
-            "rows": rows,
-            "columns": cols,
-        }
+        inventory["selected_trait_candidate"] = {"candidate_index": i, "url": x.get("resolved_url") or x.get("requested_url"), "sheet": sheet, "rows": rows, "columns": cols}
     elif viable:
         inventory["selection_status"] = "AMBIGUOUS_MULTIPLE_SCHEMA_MATCHES"
         inventory["viable_candidates"] = viable
@@ -132,17 +170,8 @@ def main():
         "n_candidates": len(inventory["xlsx_candidates"]),
         "selected": inventory.get("selected_trait_candidate"),
         "selection_status": inventory.get("selection_status", "SELECTED" if inventory.get("selected_trait_candidate") else None),
-        "candidate_schemas": [
-            {
-                "url": x.get("resolved_url") or x.get("requested_url"),
-                "status": x.get("status"),
-                "content_type": x.get("content_type"),
-                "bytes": x.get("bytes"),
-                "sheets": x.get("sheets"),
-                "error": x.get("error"),
-            }
-            for x in inventory["xlsx_candidates"]
-        ],
+        "candidate_schemas": inventory["xlsx_candidates"],
+        "diagnostic_snippets": inventory["diagnostic_snippets"][:12],
     }
     print("IRIS_SOURCE_INSPECTION=" + json.dumps(compact, ensure_ascii=False))
     if not inventory.get("selected_trait_candidate"):
