@@ -5,8 +5,9 @@ ROOT = Path(__file__).resolve().parents[1]
 ledger = ROOT / 'analysis' / 'falsification_candidates_v1.tsv'
 rule = ROOT / 'analysis' / 'falsification_decision_rule_v1.md'
 audit = ROOT / 'analysis' / 'falsification_audit_v1.md'
+result = ROOT / 'analysis' / 'iris_fine_state_falsification_result_v1.json'
 
-for p in (ledger, rule, audit):
+for p in (ledger, rule, audit, result):
     assert p.exists(), p
 
 rows = list(csv.DictReader(ledger.open(encoding='utf-8'), delimiter='\t'))
@@ -33,6 +34,11 @@ for r in rows:
     if r['current_status'] == 'PREFROZEN_TEST':
         assert r['candidate_counterexample'] == 'pending', r
 
+iris = [r for r in rows if r['test_unit'] == 'Iris']
+assert len(iris) == 1, iris
+assert iris[0]['current_status'] == 'MIXED', iris[0]
+assert iris[0]['candidate_counterexample'] == 'no', iris[0]
+
 text = rule.read_text(encoding='utf-8')
 for key in [
     'Already rejected stronger claim', 'Surviving claim under prospective falsification',
@@ -42,7 +48,13 @@ for key in [
     assert key in text, key
 
 audit_text = audit.read_text(encoding='utf-8')
-for key in ['Already falsified / superseded', 'Surviving positive object', 'Current falsification target']:
+for key in [
+    'Already falsified / superseded',
+    'Surviving positive object before the prospective test',
+    'Prospective fourth-radiation test: Iris',
+    'Current cross-radiation state',
+    'Next falsification target'
+]:
     assert key in audit_text, key
 
-print(f'validated {len(rows)} falsification-audit rows and matched decision rule')
+print(f'validated {len(rows)} falsification-audit rows, Iris MIXED status, and matched decision rule')
