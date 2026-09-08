@@ -8,6 +8,7 @@ on:
       - 'analysis/nicotiana_fine_state_falsification_prefreeze_v1.md'
       - 'scripts/inspect_nicotiana_falsification_sources_v1.py'
       - 'scripts/audit_nicotiana_trait_rows_v1.py'
+      - 'scripts/inspect_nicotiana_opentree_v1.py'
       - '.github/workflows/nicotiana-falsification-source-v1.yml'
   workflow_dispatch:
 
@@ -26,15 +27,19 @@ jobs:
         run: |
           sudo apt-get update -qq
           sudo apt-get install -y --no-install-recommends libreoffice-core libreoffice-writer
-          python -m pip install --disable-pip-version-check requests python-docx
+          python -m pip install --disable-pip-version-check requests python-docx biopython
       - name: Inspect prefrozen Nicotiana source schema
         run: python scripts/inspect_nicotiana_falsification_sources_v1.py
       - name: Audit frozen Nicotiana eligibility and trait rows
         run: python scripts/audit_nicotiana_trait_rows_v1.py
-      - name: Upload source inventory and table exports
+      - name: Audit exact OpenTree admission
+        run: python scripts/inspect_nicotiana_opentree_v1.py
+      - name: Upload source and admission inventories
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: nicotiana-source-inventory-v1
-          path: analysis/_generated/nicotiana_source_v1/
+          name: nicotiana-source-admission-v1
+          path: |
+            analysis/_generated/nicotiana_source_v1/
+            analysis/_generated/nicotiana_opentree_v1/
           if-no-files-found: warn
