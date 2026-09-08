@@ -1,0 +1,93 @@
+name: Hierarchy specificity controls v0.1
+on:
+  pull_request:
+    paths:
+      - 'docs/HIERARCHY_SPECIFICITY_PRE_RESULT_GATE_V0_1.md'
+      - 'docs/HIERARCHY_SPECIFICITY_RESULT_V0_1.md'
+      - 'scripts/audit_hierarchy_partition_specificity_v0_1.py'
+      - 'data/hierarchy_partition_specificity_summary_v0_1.json'
+      - '.github/workflows/hierarchy-specificity-controls-v0-1.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: read
+env:
+  OPENBLAS_NUM_THREADS: '1'
+  OMP_NUM_THREADS: '1'
+jobs:
+  audit:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install pinned analysis dependencies
+        run: python -m pip install 'numpy==2.2.6' 'biopython==1.85' 'scipy==1.15.3'
+      - name: Recover checksum-audited Antirrhineae source artifact
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          digest=$(gh api repos/$GITHUB_REPOSITORY/actions/artifacts/10035457456 --jq .digest)
+          test "$digest" = 'sha256:e0533bc349d87544b96346187ae58860f7e60e7267ac11252d922b2312c40d1f'
+          mkdir -p build/antirrhineae_source
+          gh run download 34170228964 --repo "$GITHUB_REPOSITORY" --name antirrhineae-source-v0-1 --dir build/antirrhineae_source
+          test -s build/antirrhineae_source/source_manifest.json
+          test -s build/antirrhineae_source/extracted/monomorphic_snapdragons.tree
+          test -s build/antirrhineae_source/extracted/polymorphic_snapdragons.tree
+      - name: Execute exhaustive alternative-partition controls
+        run: |
+          mkdir -p build/hierarchy_specificity
+          python scripts/audit_hierarchy_partition_specificity_v0_1.py \
+            --antirrhineae-source build/antirrhineae_source/extracted \
+            --antirrhineae-manifest build/antirrhineae_source/source_manifest.json \
+            --out build/hierarchy_specificity/result.json
+      - name: Verify frozen specificity conclusion
+        run: |
+          python - <<'PY'
+          import json, math
+          x=json.load(open('build/hierarchy_specificity/result.json'))
+          expected=json.load(open('data/hierarchy_partition_specificity_summary_v0_1.json'))
+          actual={
+            'version':x['version'],
+            'source_run':34175686900,
+            'source_artifact_id':10037174753,
+            'source_artifact_sha256':'baa9bd961dbbb7e230e1fa77abda8b3c9660939760df43e63a56a3daa291dca8',
+            'status':x['status'],
+            'control_permutations_per_partition':x['control_permutations_per_partition'],
+            'seed':x['seed'],
+            'radiations':[{k:r[k] for k in (
+              'radiation','settings','biological_percentile_min_median_max',
+              'biological_capture_min_median_max','top_quartile_settings',
+              'positive_capture_settings','classification')} for r in x['radiations']],
+            'cross_radiation':x['cross_radiation'],
+            'existing_three_of_three_fine_state_replication_changed':x['existing_three_of_three_fine_state_replication_changed'],
+            'claim_boundary':x['claim_boundary'],
+            'paper1_science_changed':x['paper1_science_changed']}
+          def compare(a,b,path='root'):
+            if type(a) is not type(b): raise AssertionError(f'{path}: type')
+            if isinstance(a,dict):
+              if set(a)!=set(b): raise AssertionError(f'{path}: keys')
+              for k in a: compare(a[k],b[k],f'{path}.{k}')
+            elif isinstance(a,list):
+              if len(a)!=len(b): raise AssertionError(f'{path}: length')
+              for i,(u,v) in enumerate(zip(a,b)): compare(u,v,f'{path}[{i}]')
+            elif isinstance(a,float):
+              if not math.isclose(a,b,rel_tol=1e-10,abs_tol=1e-12): raise AssertionError(f'{path}: {a} != {b}')
+            elif a!=b: raise AssertionError(f'{path}: {a!r} != {b!r}')
+          compare(actual,expected)
+          print(json.dumps(x['cross_radiation'],indent=2))
+          for r in x['radiations']:
+            print(json.dumps({k:r[k] for k in ('radiation','classification','biological_percentile_min_median_max','biological_capture_min_median_max','top_quartile_settings')},indent=2))
+          PY
+      - name: Preserve execution provenance
+        run: |
+          git rev-parse HEAD > build/hierarchy_specificity/ci_checkout_sha.txt
+          python -m pip freeze > build/hierarchy_specificity/python_packages.txt
+      - uses: actions/upload-artifact@v4
+        with:
+          name: hierarchy-specificity-controls-v0-1
+          path: build/hierarchy_specificity
+          if-no-files-found: error
+          retention-days: 90

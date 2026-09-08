@@ -1,0 +1,48 @@
+{
+  "version": "v0.1",
+  "source_run": 34175686900,
+  "source_artifact_id": 10037174753,
+  "source_artifact_sha256": "baa9bd961dbbb7e230e1fa77abda8b3c9660939760df43e63a56a3daa291dca8",
+  "status": "EXHAUSTIVE_ALTERNATIVE_PARTITION_CONTROL",
+  "control_permutations_per_partition": 999,
+  "seed": 20260907,
+  "radiations": [
+    {
+      "radiation": "LINOIDEAE",
+      "settings": 54,
+      "biological_percentile_min_median_max": [0.6666666666666666, 0.9, 1.0],
+      "biological_capture_min_median_max": [0.011318242343541863, 0.08822817083185047, 0.21313309376906894],
+      "top_quartile_settings": 0,
+      "positive_capture_settings": 54,
+      "classification": "BIOLOGICAL_PARTITION_NOT_ENRICHED"
+    },
+    {
+      "radiation": "ANGRAECINAE",
+      "settings": 6,
+      "biological_percentile_min_median_max": [0.07142857142857142, 0.4642857142857143, 0.5],
+      "biological_capture_min_median_max": [0.5074773092777788, 0.5210111732909373, 0.5450057254416099],
+      "top_quartile_settings": 2,
+      "positive_capture_settings": 6,
+      "classification": "INTERMEDIATE_PARTITION_SPECIFICITY"
+    },
+    {
+      "radiation": "ANTIRRHINEAE",
+      "settings": 40,
+      "biological_percentile_min_median_max": [0.5, 1.0, 1.0],
+      "biological_capture_min_median_max": [-0.011613691931539103, 0.17190126191265226, 0.34878693250060055],
+      "top_quartile_settings": 0,
+      "positive_capture_settings": 39,
+      "classification": "BIOLOGICAL_PARTITION_NOT_ENRICHED"
+    }
+  ],
+  "cross_radiation": {
+    "status": "GENERIC_FINE_STATE_ORGANIZATION_MORE_LIKELY",
+    "enriched_radiations": [],
+    "not_enriched_radiations": ["LINOIDEAE", "ANTIRRHINEAE"],
+    "intermediate_radiations": ["ANGRAECINAE"],
+    "claim_consequence": "Drop the cross-system claim that the selected coarse boundaries are the shared constraining layer; retain only the 3/3 fine-state organization result."
+  },
+  "existing_three_of_three_fine_state_replication_changed": false,
+  "claim_boundary": "This control tests whether the biologically selected coarse partitions capture fine-state organization unusually strongly relative to exhaustive alternative bipartitions. It does not create additional biological replications or re-estimate transition directions, ecology, molecular mechanisms, or dated rates.",
+  "paper1_science_changed": false
+}
