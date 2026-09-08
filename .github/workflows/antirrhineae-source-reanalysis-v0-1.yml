@@ -1,9 +1,5 @@
 name: Antirrhineae source reanalysis v0.1
 on:
-  pull_request:
-    paths:
-      - 'scripts/ingest_antirrhineae_sources_v0_1.py'
-      - '.github/workflows/antirrhineae-source-reanalysis-v0-1.yml'
   workflow_dispatch:
 permissions:
   contents: read
