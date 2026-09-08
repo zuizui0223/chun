@@ -1,0 +1,36 @@
+{
+  "version": "v0.1",
+  "same_radiation": "CAPE_ERICA",
+  "source_doi": "10.3389/fpls.2019.01565",
+  "derived_taxa": 8,
+  "phenotype_axes": {
+    "PIGMENT_DEPLETION_WHITE": {
+      "taxa": 6,
+      "focal_node_classes": [
+        "ANS",
+        "DFR",
+        "UDP_GST",
+        "bHLH"
+      ],
+      "unique_focal_node_classes": 4,
+      "branch_hydroxylation_F3_prime_H": "0/6"
+    },
+    "HUE_BRANCH_YELLOW": {
+      "taxa": 2,
+      "focal_node_classes": [
+        "F3_PRIME_H"
+      ],
+      "branch_hydroxylation_F3_prime_H": "2/2",
+      "implementation": [
+        "REGULATORY_MRE",
+        "CODING_LOSS"
+      ]
+    }
+  },
+  "cross_level_result": "HUE_BRANCH_CONCENTRATES_ON_F3_PRIME_H_WHILE_PIGMENT_DEPLETION_DISPERSES_ACROSS_LATE_AND_REGULATORY_NODES",
+  "alignment_to_iochrominae": "RETROSPECTIVE_INDEPENDENT_ALIGNMENT_AT_PHENOTYPE_AXIS_TO_MOLECULAR_SUBSPACE_LEVEL",
+  "prospective_status": "NOT_PROSPECTIVE_EXISTING_TABLE_PREVIOUSLY_INSPECTED",
+  "event_independence": "PUTATIVE_COMPARISON_SETS_NOT_USED_AS_EVENT_RATE_DENOMINATOR",
+  "claim_boundary": "Descriptive same-radiation axis mapping only; no pooled event rate, no exact mutation recurrence estimate, and no prospective validation claim.",
+  "paper1_science_changed": false
+}

@@ -1,0 +1,22 @@
+name: Erica phenotype-axis molecular bridge v0.1
+on:
+  pull_request:
+    paths:
+      - 'data/erica_white_yellow_mechanisms_v0_1.csv'
+      - 'data/erica_phenotype_axis_molecular_bridge_summary_v0_1.json'
+      - 'scripts/validate_erica_phenotype_axis_molecular_bridge_v0_1.py'
+      - 'docs/ERICA_PHENOTYPE_AXIS_MOLECULAR_BRIDGE_V0_1.md'
+      - '.github/workflows/erica-phenotype-axis-molecular-bridge-v0-1.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  validate:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Validate phenotype-axis molecular mapping
+        run: python scripts/validate_erica_phenotype_axis_molecular_bridge_v0_1.py
