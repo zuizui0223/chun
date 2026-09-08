@@ -7,11 +7,13 @@ on:
     paths:
       - 'analysis/iris_fine_state_falsification_prefreeze_v1.md'
       - 'scripts/inspect_iris_falsification_sources_v1.py'
+      - 'scripts/audit_iris_trait_rows_v1.py'
       - '.github/workflows/iris-falsification-source-v1.yml'
   pull_request:
     paths:
       - 'analysis/iris_fine_state_falsification_prefreeze_v1.md'
       - 'scripts/inspect_iris_falsification_sources_v1.py'
+      - 'scripts/audit_iris_trait_rows_v1.py'
       - '.github/workflows/iris-falsification-source-v1.yml'
 
 permissions:
@@ -29,10 +31,14 @@ jobs:
         run: python -m pip install --disable-pip-version-check requests beautifulsoup4 openpyxl
       - name: Inspect frozen Iris source schema
         run: python scripts/inspect_iris_falsification_sources_v1.py
-      - name: Upload source inventory
+      - name: Audit Iris trait row identity and coding
+        run: python scripts/audit_iris_trait_rows_v1.py
+      - name: Upload source inventories
         if: always()
         uses: actions/upload-artifact@v4
         with:
           name: iris-source-inventory-v1
-          path: analysis/_generated/iris_source_inventory_v1.json
+          path: |
+            analysis/_generated/iris_source_inventory_v1.json
+            analysis/_generated/iris_trait_row_audit_v1.json
           if-no-files-found: warn
