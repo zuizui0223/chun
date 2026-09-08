@@ -10,8 +10,9 @@ iris_result = ROOT / 'analysis' / 'iris_fine_state_falsification_result_v1.json'
 nicotiana_result = ROOT / 'analysis' / 'nicotiana_fine_state_falsification_result_v1.json'
 panel_result = ROOT / 'analysis' / 'multiclade_51_fine_state_falsification_result_v1.json'
 epimedium_result = ROOT / 'analysis' / 'epimedium_fine_state_falsification_result_v1.json'
+iochrominae_result = ROOT / 'analysis' / 'iochrominae_fine_state_falsification_result_v1.json'
 
-for p in (ledger, rule, audit, iris_result, nicotiana_result, panel_result, epimedium_result):
+for p in (ledger, rule, audit, iris_result, nicotiana_result, panel_result, epimedium_result, iochrominae_result):
     assert p.exists(), p
 
 rows = list(csv.DictReader(ledger.open(encoding='utf-8'), delimiter='\t'))
@@ -50,6 +51,13 @@ assert len(panel) == 1 and panel[0]['current_status'] == 'HOLD' and panel[0]['ca
 epi = [r for r in rows if r['test_unit'] == 'Epimedium']
 assert len(epi) == 1 and epi[0]['current_status'] == 'HOLD' and epi[0]['candidate_counterexample'] == 'no', epi
 
+ioch = [r for r in rows if r['test_unit'] == 'Iochrominae_macro_fine_state']
+assert len(ioch) == 1 and ioch[0]['current_status'] == 'HOLD' and ioch[0]['candidate_counterexample'] == 'no', ioch
+
+# The separate retrospective molecular row must remain distinct from the prospective macro HOLD.
+ioch_mol = [r for r in rows if r['test_unit'] == 'Iochrominae' and r['inference_level'] == 'cross-level molecular']
+assert len(ioch_mol) == 1 and ioch_mol[0]['current_status'] == 'SUPPORTIVE_ALIGNMENT', ioch_mol
+
 iris_json = json.loads(iris_result.read_text(encoding='utf-8'))
 assert iris_json['classification'] == 'MIXED'
 
@@ -75,6 +83,20 @@ assert epi_json['post_endpoint_identifiability_audit']['all_tested_deterministic
 assert epi_json['post_endpoint_identifiability_audit']['counts_as_biological_refutation'] is False
 assert epi_json['cross_radiation_count_effect'] == 'NONE'
 
+ioch_json = json.loads(iochrominae_result.read_text(encoding='utf-8'))
+assert ioch_json['classification'] == 'HOLD_TRAIT_SOURCE'
+assert ioch_json['biological_endpoint_computed'] is False
+assert ioch_json['observed_assignment_scored'] is False
+assert ioch_json['conditional_null_computed'] is False
+assert ioch_json['frozen_trait_admission']['admitted'] is False
+assert ioch_json['frozen_trait_admission']['figure_or_pdf_manual_transcription_used'] is False
+assert ioch_json['frozen_trait_admission']['posthoc_state_inference_used'] is False
+assert ioch_json['source_acquisition']['canonical_run'] == 34235323463
+assert ioch_json['source_acquisition']['tree_2018_dryad']['machine_readable_tree_bytes_recovered'] is False
+assert ioch_json['source_acquisition']['trait_mechanism_dryad']['machine_readable_trait_bytes_recovered'] is False
+assert ioch_json['counts_as_biological_refutation'] is False
+assert ioch_json['cross_radiation_count_effect'] == 'NONE'
+
 text = rule.read_text(encoding='utf-8')
 for key in [
     'Already rejected stronger claim', 'Surviving claim under prospective falsification',
@@ -92,9 +114,11 @@ for key in [
     'Broad 51-clade prospective panel: source-access HOLD',
     'Epimedium prospective test: formal REFUTATION, validity HOLD',
     'complete 36-tip star',
+    'Iochrominae prospective macro test: trait-source HOLD',
+    'HOLD_TRAIT_SOURCE',
     'Current cross-radiation state',
     'Next falsification target'
 ]:
     assert key in audit_text, key
 
-print(f'validated {len(rows)} falsification-audit rows: Iris MIXED; Nicotiana/panel/Epimedium HOLD; Epimedium formal REFUTATION blocked by identifiability')
+print(f'validated {len(rows)} falsification-audit rows: Iris MIXED; Nicotiana/panel/Epimedium/Iochrominae-macro HOLD; no admissible biological refutation')
