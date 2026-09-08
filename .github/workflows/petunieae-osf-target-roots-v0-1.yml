@@ -1,0 +1,47 @@
+name: Petunieae OSF target roots v0.1
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/petunieae-osf-target-roots-v0-1.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  list:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 4
+    steps:
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: List selected OSF folders one level deep
+        run: |
+          mkdir -p build/osf_targets
+          python - <<'PY'
+          import json,urllib.request
+          roots={
+            'additional_raw_data':'63af11aa202f170501a6c1fd',
+            'phyloCCA':'63adfde63312f1026c688990',
+            'phyloPCA':'63adfdeec8da860244df2839',
+            'dataset_summary_statistics':'63ae00a6e48ccc04b04fc952',
+            'stochastic_mapping':'63ae009e0b7198022e7c4ac2',
+            'SupplementalText':'63dc047b2781fc03b800a5b8'}
+          def get(u):
+              req=urllib.request.Request(u,headers={'User-Agent':'chun-petunieae-target-root/0.1','Accept':'application/vnd.api+json'})
+              with urllib.request.urlopen(req,timeout=30) as r:return json.load(r)
+          out={}
+          for tag,fid in roots.items():
+              u=f'https://api.osf.io/v2/nodes/zg9cu/files/osfstorage/{fid}/?page[size]=100'
+              o=get(u);rows=[]
+              for x in o.get('data',[]):
+                  a=x.get('attributes') or {};rel=((((x.get('relationships') or {}).get('files') or {}).get('links') or {}).get('related'))
+                  rows.append({'name':a.get('name'),'kind':a.get('kind'),'size':a.get('size'),'id':x.get('id'),'files_href':rel.get('href') if isinstance(rel,dict) else rel,'download':(x.get('links') or {}).get('download')})
+              out[tag]=rows
+          open('build/osf_targets/targets.json','w').write(json.dumps(out,indent=2)+'\n')
+          print(json.dumps(out,indent=2))
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: petunieae-osf-target-roots-v0-1
+          path: build/osf_targets
+          retention-days: 30
