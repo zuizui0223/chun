@@ -1,0 +1,22 @@
+name: Iochrominae cross-level bridge v0.1
+on:
+  pull_request:
+    paths:
+      - 'data/iochrominae_cross_level_bridge_v0_1.csv'
+      - 'data/iochrominae_cross_level_bridge_summary_v0_1.json'
+      - 'scripts/validate_iochrominae_cross_level_bridge_v0_1.py'
+      - 'docs/IOCHROMINAE_CROSS_LEVEL_BRIDGE_V0_1.md'
+      - '.github/workflows/iochrominae-cross-level-bridge-v0-1.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  validate:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Validate source-derived same-radiation bridge
+        run: python scripts/validate_iochrominae_cross_level_bridge_v0_1.py
