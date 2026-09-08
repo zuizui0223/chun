@@ -1,0 +1,58 @@
+name: Petunieae prospective cross-level v0.1
+on:
+  pull_request:
+    paths:
+      - 'docs/PETUNIEAE_PROSPECTIVE_CROSS_LEVEL_GATE_V0_1.md'
+      - 'scripts/ingest_petunieae_osf_v0_1.py'
+      - 'scripts/analyze_petunieae_prospective_bridge_v0_1.py'
+      - 'data/petunieae_prospective_cross_level_v0_1.json'
+      - 'docs/PETUNIEAE_PROSPECTIVE_CROSS_LEVEL_RESULT_V0_1.md'
+      - '.github/workflows/petunieae-prospective-cross-level-v0-1.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+env:
+  OPENBLAS_NUM_THREADS: '1'
+  OMP_NUM_THREADS: '1'
+jobs:
+  acquire:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Verify gate predates acquisition implementation
+        run: |
+          test -s docs/PETUNIEAE_PROSPECTIVE_CROSS_LEVEL_GATE_V0_1.md
+          git log --format='%H %ct' -- docs/PETUNIEAE_PROSPECTIVE_CROSS_LEVEL_GATE_V0_1.md | tail -1 > gate_commit.txt
+          git log --format='%H %ct' -- scripts/ingest_petunieae_osf_v0_1.py | tail -1 > acquisition_commit.txt
+          python - <<'PY'
+          g=open('gate_commit.txt').read().split(); a=open('acquisition_commit.txt').read().split()
+          assert g and a and int(g[1]) <= int(a[1]), (g,a)
+          print({'gate_commit':g[0],'acquisition_commit':a[0]})
+          PY
+      - name: Acquire processed OSF sources
+        run: |
+          mkdir -p build/petunieae_osf
+          python scripts/ingest_petunieae_osf_v0_1.py --out-dir build/petunieae_osf
+          python - <<'PY' >> "$GITHUB_STEP_SUMMARY"
+          import json
+          x=json.load(open('build/petunieae_osf/source_manifest.json'))
+          print('## Petunieae OSF source inventory')
+          print('inventory:',x['inventory_count'])
+          print('downloaded:',x['downloaded_count'])
+          for f in x['downloaded']:
+              print('-',f['path'],f['size'])
+          PY
+      - name: Preserve provenance
+        run: |
+          git rev-parse HEAD > build/petunieae_osf/ci_checkout_sha.txt
+          python -V > build/petunieae_osf/python_version.txt
+      - uses: actions/upload-artifact@v4
+        with:
+          name: petunieae-prospective-osf-v0-1
+          path: build/petunieae_osf
+          if-no-files-found: error
+          retention-days: 90
