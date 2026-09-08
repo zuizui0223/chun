@@ -1,5 +1,9 @@
-radiation	phenotype_axis	current_status	candidate_counterexample	why_not_yet_refutation
-Aquilegia	blue-red hue / anthocyanin loss	HOLD	no	matched radiation-wide direct molecular observation regime absent
-Iochrominae	phenotype-axis molecular alignment	aligned	no	retrospective alignment supports compatibility
-Cape Erica	yellow vs white pigment-depletion architecture	aligned	no	yellow concentrated on F3'H; white dispersed across late/regulatory nodes
-Epimedium	endpoint molecular bridge	complementary	no	bridge is complementary, not a directionally incompatible macro pattern
+test_unit	inference_level	claim	current_status	candidate_counterexample	reason
+Cross-radiation v0.2 stronger law	macro coarse/direction	privileged coarse-state constraint plus shared transition direction	SUPERSEDED_REFUTED	yes	0/3 comparable Mk systems pass the shared directional gate and no tested biological coarse boundary is ENRICHED under the frozen exhaustive-partition rule
+Linoideae	macro fine-state	fine hue organization persists after WHITE/non-WHITE conditioning	SUPPORTIVE_ALIGNMENT	no	conditional fine-state phylogenetic organization supported
+Angraecinae	macro fine-state	four-organ colour configuration persists after primary GREEN/WHITE conditioning	SUPPORTIVE_ALIGNMENT	no	conditional fine-state phylogenetic organization supported
+Antirrhineae	macro fine-state	pigment-class organization persists after pigment-presence conditioning	SUPPORTIVE_ALIGNMENT	no	conditional fine-state phylogenetic organization supported
+Aquilegia	cross-level molecular	third phenotype-axis molecular bridge	HOLD	no	strong anthocyanin-loss evidence exists but the blue-red hue axis lacks a matched radiation-wide direct molecular observation regime
+Iochrominae	cross-level molecular	phenotype-axis to molecular-subspace alignment	SUPPORTIVE_ALIGNMENT	no	retrospective within-radiation alignment is compatible with the representation-level result
+Cape Erica	cross-level molecular	yellow-hue versus white-depletion molecular architecture	SUPPORTIVE_ALIGNMENT	no	yellow derived taxa concentrate on F3'H while white depletion is distributed across late structural and regulatory nodes
+Iris	macro fine-state	residual fine-state phylogenetic organization after predeclared pigment-group conditioning	PREFROZEN_TEST	pending	independent multistate radiation selected before computing the matched conditional-permutation endpoint
