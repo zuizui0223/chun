@@ -1,6 +1,6 @@
 # Falsification audit v1
 
-Status: active prospective falsification of the surviving fine-state representation-dependence result.
+Status: **first prospective fourth-radiation test completed; outcome MIXED**.
 
 ## Already falsified / superseded
 
@@ -11,9 +11,9 @@ The earlier stronger cross-radiation interpretation is no longer the target. `CR
 
 Therefore the earlier wording that a coarse ancestral/display or pigment state generally constrains flower-colour evolutionary state space is superseded/refuted at the tested cross-radiation level.
 
-## Surviving positive object
+## Surviving positive object before the prospective test
 
-Fine-state phylogenetic organization persists after conditioning on an a priori coarse state in 3/3 independent testable radiations:
+Fine-state phylogenetic organization persisted after conditioning on an a priori coarse state in 3/3 independent testable radiations:
 
 - Linoideae — hue within WHITE/non-WHITE conditioning;
 - Angraecinae — four-organ colour configuration within primary GREEN/WHITE conditioning;
@@ -21,12 +21,32 @@ Fine-state phylogenetic organization persists after conditioning on an a priori 
 
 The surviving claim is representation dependence, not a universal direction, ancestral state, causal mechanism, or privileged binary coding.
 
-## Current falsification target
+## Prospective fourth-radiation test: Iris
 
-A new independent radiation is a genuine counterexample to the surviving result if a prospectively frozen, matched coarse-conditioned fine-state test shows no residual fine-state phylogenetic organization with adequate observation coverage and the failure is robust to the predeclared sensitivity set.
+The Iris endpoint was frozen before computation in `analysis/iris_fine_state_falsification_prefreeze_v1.md`. The publisher workbook contains 226 unique analysis taxa with no flower-colour missingness. Exact one-to-one OpenTree admission retained 205/226 taxa (90.7%), so the predeclared >=80% observation gate passed.
+
+Frozen endpoint results:
+
+- **Primary source-pigment grouping:** SUPPORT — observed minimum changes = 63, null mean = 70.6966, observed/null = 0.8911, `p_lower = 0.0001`.
+- **WHITE/non-WHITE sensitivity:** SUPPORT — observed/null = 0.8496, `p_lower = 0.0001`.
+- **Single-coarse-only sensitivity:** FAILS the frozen support gate — observed minimum changes = 53, null mean = 55.4521, observed/null = 0.9558, `p_lower = 0.0308`.
+
+The predeclared classifier therefore returns **MIXED**.
+
+This is not a fourth clean replication and not a refutation. Fine-state organization is clearly detectable in Iris under the primary and binary coarse-conditioning representations, but the signal weakens below the frozen significance gate when taxa spanning multiple pigment classes are removed. The fourth radiation therefore shows that the recurrence itself is representation/sample-composition dependent at a finer level than the earlier 3/3 summary implied.
+
+## Current cross-radiation state
+
+The correct current statement is:
+
+> Fine-state phylogenetic organization is robustly supported in three independent radiations and is present but sensitivity-dependent in a prospectively tested fourth radiation. No tested coarse coding is universally privileged, and no universal transition direction is supported.
+
+Do **not** report `4/4`, and do **not** report Iris as a counterexample. The clean 3/3 recurrence has been stress-tested and becomes **3 supportive + 1 mixed prospective radiation**.
 
 Aquilegia remains a cross-level mechanistic admission HOLD. It is not evidence against the macro fine-state result because the required matched radiation-wide molecular observation regime is absent.
 
-## Next test
+## Next falsification target
 
-Freeze the Iris endpoint before computation, then apply the same family of statistic used in the admitted radiations: observed fine-state Sankoff minimum-change score versus a 9,999-permutation null that shuffles fine states only within the predeclared coarse biological groups. Classify the new radiation as SUPPORT / MIXED / FAIL under the frozen rule before changing any cross-radiation wording.
+A further independent radiation should be frozen before endpoint computation and should count as a genuine counterexample only if a matched coarse-conditioned fine-state test fails with adequate observation coverage and all predeclared admitted sensitivities also fail. Iris itself should not be re-partitioned post hoc to force a cleaner answer.
+
+Frozen Iris result: `analysis/iris_fine_state_falsification_result_v1.json`.
