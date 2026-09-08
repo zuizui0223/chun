@@ -7,6 +7,7 @@ on:
     paths:
       - 'analysis/iochrominae_fine_state_falsification_prefreeze_v1.md'
       - 'scripts/acquire_iochrominae_falsification_sources_v1.py'
+      - 'scripts/acquire_iochrominae_larter_article_sources_v1.py'
       - '.github/workflows/iochrominae-falsification-source-acquisition-v1.yml'
   workflow_dispatch:
 
@@ -27,18 +28,26 @@ jobs:
           mkdir -p build/iochrominae_falsification_sources_v1
           python scripts/acquire_iochrominae_falsification_sources_v1.py \
             --out-dir build/iochrominae_falsification_sources_v1
+          mkdir -p build/iochrominae_falsification_sources_v1/larter_article
+          python scripts/acquire_iochrominae_larter_article_sources_v1.py \
+            --out-dir build/iochrominae_falsification_sources_v1/larter_article
       - name: Verify endpoint remains unopened
         run: |
           python - <<'PY'
           import json
           p='build/iochrominae_falsification_sources_v1/source_summary.json'
           x=json.load(open(p, encoding='utf-8'))
+          a=json.load(open('build/iochrominae_falsification_sources_v1/larter_article/article_source_summary.json', encoding='utf-8'))
           assert x['biological_endpoint_computed'] is False, x
+          assert a['biological_endpoint_computed'] is False, a
           print(json.dumps({
               'tree_2018_bytes': x['any_2018_tree_bytes'],
               'trait_source_bytes': x['any_trait_source_bytes'],
               'treebase_retrieved': x['treebase_retrieved'],
               'dryad_downloaded': {d['dataset_id']: d['downloaded_count'] for d in x['dryad']},
+              'larter_pmcid': a['pmcid'],
+              'machine_readable_article_source_recovered': a['machine_readable_article_source_recovered'],
+              'larter_pdf_recovered': a['pdf_recovered'],
           }, indent=2))
           PY
       - uses: actions/upload-artifact@v4
