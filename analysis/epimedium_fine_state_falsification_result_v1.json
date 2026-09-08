@@ -1,0 +1,61 @@
+{
+  "analysis_id": "epimedium_fine_state_falsification_v1",
+  "source_doi": "10.3389/fpls.2023.1234148",
+  "n": 36,
+  "fine_state": "SepalC:SpurC exact nominal source pair",
+  "topology_sha256": "7b5001b9787e97cd4ad39b60c3b57075e0ef2b1a78528a429894480641f444f7",
+  "state_rows_sha256": "63cc336c5748479afa10f66a6bd21961899ac3289a3dd5e56cc54fa048afefb6",
+  "prospective_classifier_output": "REFUTATION",
+  "primary": {
+    "sepal_conditioned": {
+      "observed_changes": 27,
+      "null_mean": 27.0,
+      "null_min": 27,
+      "null_max": 27,
+      "observed_over_null_mean": 1.0,
+      "p_lower": 1.0,
+      "support": false
+    },
+    "spur_conditioned": {
+      "observed_changes": 27,
+      "null_mean": 27.0,
+      "null_min": 27,
+      "null_max": 27,
+      "observed_over_null_mean": 1.0,
+      "p_lower": 1.0,
+      "support": false
+    }
+  },
+  "sensitivities": {
+    "S1_source_S9_ingroup": {
+      "n": 30,
+      "formal_classification": "REFUTATION",
+      "sepal_observed_null": [22, 22],
+      "spur_observed_null": [22, 22],
+      "both_p_lower": 1.0
+    },
+    "S2_delete_five_largest_source_row_taxa": {
+      "n": 31,
+      "formal_classification": "REFUTATION",
+      "sepal_observed_null": [23, 23],
+      "spur_observed_null": [23, 23],
+      "both_p_lower": 1.0
+    },
+    "S3_polytomy_resolution": "PROHIBITED_BY_PREFREEZE"
+  },
+  "post_endpoint_identifiability_audit": {
+    "run_id": 34195980857,
+    "tree_n_tips": 36,
+    "tree_n_internal_nodes": 1,
+    "tree_internal_child_count_distribution": {"36": 1},
+    "tree_is_complete_star_polytomy": true,
+    "all_six_endpoint_null_ranges_degenerate": true,
+    "all_tested_deterministic_conditional_rearrangements_score_invariant": true,
+    "validity_classification": "NON_IDENTIFIABLE_DEGENERATE_NULL",
+    "counts_as_biological_refutation": false
+  },
+  "final_evidence_status": "HOLD_IDENTIFIABILITY",
+  "reason": "The prospectively frozen classifier mechanically returns REFUTATION because both observed/null ratios equal 1.0. However, the frozen OpenTree topology is a 36-tip star with one internal node, making unordered Fitch/Sankoff invariant to every admissible label rearrangement. The conditional randomization null is therefore degenerate and the endpoint has zero discriminating power. The formal classifier is preserved as an audit artifact but is not promoted to a biological counterexample.",
+  "paper1_science_changed": false,
+  "cross_radiation_count_effect": "NONE"
+}
