@@ -11,12 +11,11 @@ import argparse
 import hashlib
 import json
 import re
-import urllib.error
 import urllib.parse
 import urllib.request
 from pathlib import Path
 
-UA = "chun-iochrominae-falsification-source-audit/1.0"
+UA = "chun-iochrominae-falsification-source-audit/1.1"
 
 DRYAD = {
     "TREE_2018": "10.5061/dryad.5jn7b",
@@ -152,10 +151,14 @@ def file_name(rec, i):
 
 
 def file_routes(rec):
+    """Return content routes only; never accept the JSON file-metadata self link."""
     routes = []
-    for h in hrefs(rec):
-        if "download" in h.lower() or "/files/" in h.lower():
-            routes.append(abs_dryad(h))
+    links = rec.get("_links") if isinstance(rec, dict) else None
+    if isinstance(links, dict):
+        for rel in ("stash:download", "download"):
+            obj = links.get(rel)
+            if isinstance(obj, dict) and isinstance(obj.get("href"), str):
+                routes.append(abs_dryad(obj["href"]))
     fid = numeric_file_id(rec)
     if fid:
         routes.extend([
@@ -163,6 +166,28 @@ def file_routes(rec):
             f"https://datadryad.org/api/v2/files/{fid}/download",
         ])
     return list(dict.fromkeys(routes))
+
+
+def validate_payload(raw: bytes, headers: dict, rec: dict, name: str):
+    if not raw:
+        raise ValueError("empty response")
+    ct = (headers.get("Content-Type") or "").lower()
+    if "json" in ct or (raw[:1] in (b"{", b"[") and len(raw) < 100_000):
+        raise ValueError(f"metadata/json response instead of source bytes: content_type={ct!r}")
+    expected = rec.get("size")
+    if expected is not None:
+        try:
+            expected = int(expected)
+        except Exception:
+            expected = None
+    if expected and len(raw) != expected:
+        raise ValueError(f"byte-size mismatch: expected={expected} got={len(raw)} content_type={ct!r}")
+    low = name.lower()
+    if low.endswith(".zip") and raw[:2] != b"PK":
+        raise ValueError(f"ZIP magic missing: prefix={raw[:16].hex()}")
+    if low.endswith(".rar") and not raw.startswith(b"Rar!\x1a\x07"):
+        raise ValueError(f"RAR magic missing: prefix={raw[:16].hex()}")
+    return ct, expected
 
 
 def acquire_dryad(key: str, doi: str, out: Path):
@@ -206,6 +231,8 @@ def acquire_dryad(key: str, doi: str, out: Path):
         entry = {
             "name": name,
             "file_id": fid,
+            "expected_size": rec.get("size"),
+            "expected_mime": rec.get("mimeType"),
             "routes": file_routes(rec),
             "downloaded": False,
             "attempts": [],
@@ -213,8 +240,7 @@ def acquire_dryad(key: str, doi: str, out: Path):
         for route in entry["routes"]:
             try:
                 raw, resolved, headers = req(route, "application/octet-stream,*/*")
-                if not raw:
-                    raise ValueError("empty response")
+                ct, expected = validate_payload(raw, headers, rec, name)
                 safe = re.sub(r"[^A-Za-z0-9._-]+", "_", Path(name).name) or f"file_{i:03d}"
                 target = extracted / f"{i:03d}_{safe}"
                 target.write_bytes(raw)
@@ -224,7 +250,8 @@ def acquire_dryad(key: str, doi: str, out: Path):
                     "bytes": len(raw),
                     "sha256": hashlib.sha256(raw).hexdigest(),
                     "saved_as": target.name,
-                    "content_type": headers.get("Content-Type"),
+                    "content_type": ct,
+                    "validated_expected_size": expected,
                 })
                 result["downloaded_count"] += 1
                 break
@@ -266,7 +293,7 @@ def main():
     args.out_dir.mkdir(parents=True, exist_ok=True)
 
     summary = {
-        "version": "v1",
+        "version": "v1.1",
         "scope": "SOURCE_ACQUISITION_ONLY_NO_TRAIT_TREE_JOIN_NO_ENDPOINT",
         "dryad": [],
         "treebase": None,
