@@ -10,15 +10,27 @@ Test unit: **Iris**.
 
 Primary source: Roguz K. et al. (2020), *All the Colors of the Rainbow: Diversification of Flower Color and Intraspecific Color Variation in the Genus Iris*, Frontiers in Plant Science 11:569811, DOI `10.3389/fpls.2020.569811`.
 
-The source reports flower-colour data for all 227 phylogeny taxa and excludes `Iris darwasica` from downstream analysis for a pre-existing topology conflict, leaving 226 analysis taxa. That exclusion is adopted here before signal computation.
+The article reports flower-colour data for all 227 phylogeny taxa and excludes `Iris darwasica` from downstream analysis for a pre-existing topology conflict, leaving 226 analysis taxa. Source retrieval was frozen and audited before any new phylogenetic signal calculation. Europe PMC `supplementaryFiles` returned the publisher supplement `Table_1.xlsx` (SHA-256 `183ef5231c48e782b0ea69a7aa5605d40c892dd91d9d9b2d259ed7b65d230072`). Its `Source of data` sheet contains exactly **226 non-empty, unique species rows**, with zero colour missingness and no `Iris darwasica` row; rows 228–996 are formatting-only empties. Therefore no additional trait row is removed for the published exclusion.
 
-## Frozen fine alphabet
+## Frozen fine alphabet and parser
 
 Use the seven visible colour categories defined by the source, without rebinning after looking at the result:
 
 `MAROON, ORANGE, PINK, PURPLE, RED, YELLOW, WHITE`.
 
-Blue/violet observations remain `PURPLE` because that is the source coding. Polymorphic and bi-coloured taxa retain their complete source-reported allowed fine-state set rather than being forced to one colour.
+The publisher workbook codes these as:
+
+- `mar` → `MAROON`;
+- `ora` → `ORANGE`;
+- `pin` → `PINK`;
+- `pur` → `PURPLE`;
+- `red` → `RED`;
+- `yel` → `YELLOW`;
+- `whi` → `WHITE`.
+
+Multi-colour source cells are split only on the publisher delimiter `&`; the complete resulting set is retained. Blue/violet observations remain `PURPLE` because that is the source coding. Polymorphic and bi-coloured taxa are never forced to one colour. Any non-empty colour token outside the seven frozen codes is a schema error and causes `HOLD_SCHEMA`, not a post-hoc recoding.
+
+The publisher `Pigment` column is retained only as a quality-control field. The primary coarse status is derived from the complete frozen colour vector using the source authors' published pigment grouping below, exactly as specified before source-table inspection; individual `Pigment` cells are not allowed to override a fine-state colour vector after the fact.
 
 ## Frozen primary coarse grouping
 
@@ -30,20 +42,26 @@ Use the source authors' own pigment grouping, not a partition selected by this a
 
 For a taxon with multiple allowed fine states, define its coarse status as the **set** of coarse groups implied by its complete fine-state vector. During conditional permutation, exchange whole fine-state vectors only among tips that have the identical allowed coarse-group set. This preserves coarse pigment status, polymorphism/bicolour ambiguity structure, fine-state frequencies, and uncertainty counts.
 
-## Frozen topology rule
+## Frozen topology and taxon-matching rule
 
-Primary topology priority:
+No machine-readable final Newick tree is supplied in the recovered Roguz et al. supplement; `Supplementary Material 3` is a PDF discussion/subtree document. Therefore the predeclared OpenTree fallback is the primary topology.
 
-1. machine-readable final Iris ML topology from the Roguz et al. source package, if retrievable without reconstructing choices;
-2. if no machine-readable final topology is supplied, use an OpenTree induced Iris subtree on the frozen included taxa as the designated fallback. Sankoff scoring uses topology only, so branch-length differences are irrelevant to the primary statistic.
+Taxon matching is fixed before signal computation:
 
-Do not choose between alternative topologies based on the flower-colour result. If both become available, the non-primary topology is a frozen sensitivity analysis.
+1. Use each source `Species` string as the immutable source identifier.
+2. Construct the TNRS query as the canonical Iris name: genus plus specific epithet, retaining an immediately following explicit infraspecific rank (`subsp.`, `ssp.`, `var.`, `f.`) and its epithet when present; author strings are discarded deterministically.
+3. Query OpenTree TNRS with `do_approximate_matching=false` and `include_suppressed=false`.
+4. Admit only one unambiguous exact TNRS match (`score >= 0.999999`, not approximate).
+5. Require a one-to-one source-taxon ↔ OTT-id mapping. If multiple source rows collapse onto the same OTT id, all members of that collision are marked topology-unresolved and excluded before scoring; none is chosen using colour information.
+6. Build one induced subtree from the admitted unique OTT ids with `label_format=id`; rename tips back to their immutable source identifiers before attaching traits.
+
+Sankoff scoring uses topology only, so branch lengths are irrelevant. Any alternative source topology discovered later is sensitivity-only and cannot replace the frozen primary topology because of the observed colour result.
 
 ## Frozen admission gate
 
 Proceed only if all are true:
 
-1. at least 80% of the 226 source analysis taxa are represented in the tree–trait intersection;
+1. at least 80% of the 226 source analysis taxa (>=181) are represented one-to-one in the OpenTree tree–trait intersection;
 2. every admitted tip has at least one source-coded fine colour;
 3. at least one coarse class contains >=3 distinct fine states and >=30 admitted tips;
 4. no taxon is excluded because of its contribution to the signal statistic.
@@ -70,20 +88,21 @@ Primary outputs:
 - `SUPPORTIVE_ALIGNMENT`: `p_lower <= 0.01` **and** `observed_over_null_mean < 1`.
 - `PRIMARY_FAIL`: either condition is not met.
 
-A `PRIMARY_FAIL` is **not automatically a cross-radiation refutation**. It becomes `REFUTATION` only if the admission gate passes and all predeclared sensitivity analyses also fail to recover stable support.
+A `PRIMARY_FAIL` is **not automatically a cross-radiation refutation**. It becomes `REFUTATION` only if the admission gate passes and all predeclared, admissible trait sensitivities also fail to recover stable support. If a required robustness check cannot be adjudicated, retain `ADVERSE_BUT_NOT_REFUTATION` rather than upgrading the result.
 
 ## Frozen sensitivities
 
-1. **Monomorphic/single-coarse only**: remove taxa whose allowed fine-state vector spans more than one coarse pigment class; retain within-class colour polymorphism when it remains inside one coarse class.
+1. **Single-coarse only**: remove taxa whose allowed fine-state vector spans more than one coarse pigment class; retain within-class colour polymorphism when it remains inside one coarse class. Repeat the same conditional test.
 2. **WHITE/non-WHITE coarse sensitivity**: repeat the same conditional test with coarse allowed sets defined only by WHITE presence versus non-WHITE presence, matching the binary-conditioning style used in Linoideae.
-3. **Topology sensitivity**: if both the source ML topology and OpenTree fallback are available, repeat on the alternate topology.
+3. **Topology sensitivity**: run only if a machine-readable final source topology is later recovered independently of the endpoint; otherwise record `NOT_AVAILABLE`, not a failed biological sensitivity.
 
 Classification after sensitivities:
 
-- primary support and no decisive contradictory sensitivity => `SUPPORTIVE_ALIGNMENT`;
-- primary fail and all admitted sensitivities fail => `REFUTATION` of the current 3/3 recurrence generalization by a matched fourth radiation;
-- material disagreement among primary/sensitivities => `MIXED`;
-- inadequate coverage or unavailable matched topology/traits => `HOLD`.
+- primary support with no material contradictory admitted sensitivity => `SUPPORTIVE_ALIGNMENT`;
+- primary fail and all admitted trait sensitivities fail => `REFUTATION` of the current 3/3 recurrence generalization by a matched fourth radiation;
+- material disagreement among primary/admitted sensitivities => `MIXED`;
+- primary adverse but robustness cannot be adjudicated => `ADVERSE_BUT_NOT_REFUTATION`;
+- inadequate primary coverage or unavailable matched traits/topology => `HOLD`.
 
 ## Prohibited post-hoc moves
 
@@ -94,6 +113,7 @@ After the first endpoint is computed, do not:
 - pick a different coarse partition because it gives a smaller p-value;
 - remove taxa based on influence on the statistic;
 - replace the support threshold;
+- relax exact TNRS matching because the primary result is inconvenient;
 - count multiple trees or sensitivity variants as independent radiations.
 
 This pre-freeze is the decision record for Issue #213.
