@@ -1,0 +1,50 @@
+name: Iochrominae falsification source acquisition v1
+
+on:
+  push:
+    branches:
+      - analysis/falsification-audit-v1
+    paths:
+      - 'analysis/iochrominae_fine_state_falsification_prefreeze_v1.md'
+      - 'scripts/acquire_iochrominae_falsification_sources_v1.py'
+      - '.github/workflows/iochrominae-falsification-source-acquisition-v1.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  acquire:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Acquire source bytes and inventories only
+        run: |
+          mkdir -p build/iochrominae_falsification_sources_v1
+          python scripts/acquire_iochrominae_falsification_sources_v1.py \
+            --out-dir build/iochrominae_falsification_sources_v1
+      - name: Verify endpoint remains unopened
+        run: |
+          python - <<'PY'
+          import json
+          p='build/iochrominae_falsification_sources_v1/source_summary.json'
+          x=json.load(open(p, encoding='utf-8'))
+          assert x['biological_endpoint_computed'] is False, x
+          print(json.dumps({
+              'tree_2018_bytes': x['any_2018_tree_bytes'],
+              'trait_source_bytes': x['any_trait_source_bytes'],
+              'treebase_retrieved': x['treebase_retrieved'],
+              'dryad_downloaded': {d['dataset_id']: d['downloaded_count'] for d in x['dryad']},
+          }, indent=2))
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: iochrominae-falsification-sources-v1
+          path: build/iochrominae_falsification_sources_v1
+          if-no-files-found: error
+          retention-days: 90
