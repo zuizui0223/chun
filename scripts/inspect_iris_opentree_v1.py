@@ -35,22 +35,35 @@ def get_species_rows():
     return species
 
 
-def canonical_query(source_name: str) -> str:
-    toks = source_name.replace("×", "x").split()
+def canonical_query(source_name: str) -> tuple[str, str]:
+    """Return colour-blind TNRS query and any deterministic source-format normalization tag."""
+    normalized = source_name.replace("×", "x")
+    normalization = "NONE"
+
+    # Publisher row `Irisxgermanica L.` lacks spaces around the hybrid marker.
+    # The frozen TNRS contract is genus + epithet, so x/× is treated as a
+    # nomenclatural marker rather than part of the epithet and removed here.
+    m = re.match(r"^Irisx([A-Za-z][A-Za-z-]*)(\s+.*)?$", normalized)
+    if m:
+        normalized = "Iris " + m.group(1) + (m.group(2) or "")
+        normalization = "ATTACHED_HYBRID_MARKER_REMOVED"
+
+    toks = normalized.split()
     if len(toks) < 2 or toks[0] != "Iris":
         raise ValueError(f"not a parsable Iris source name: {source_name}")
-    # A literal hybrid marker between genus and epithet, if encountered, is retained.
+
+    # The same source-only rule applies if an x/× marker is already separated.
     if toks[1].lower() == "x":
         if len(toks) < 3:
             raise ValueError(source_name)
-        base = toks[:3]
-        j = 3
-    else:
-        base = toks[:2]
-        j = 2
+        toks = [toks[0]] + toks[2:]
+        normalization = "SEPARATED_HYBRID_MARKER_REMOVED"
+
+    base = toks[:2]
+    j = 2
     if len(toks) >= j + 2 and toks[j].lower() in RANKS:
         base.extend(toks[j:j+2])
-    return " ".join(base)
+    return " ".join(base), normalization
 
 
 def post(path, payload):
@@ -98,14 +111,21 @@ def tnrs(names):
 def main():
     OUT_DIR.mkdir(parents=True, exist_ok=True)
     source_names = get_species_rows()
-    canonical = [canonical_query(x) for x in source_names]
+    parsed = [canonical_query(x) for x in source_names]
+    canonical = [x[0] for x in parsed]
+    normalizations = [x[1] for x in parsed]
     canonical_dups = {q: n for q, n in Counter(canonical).items() if n > 1}
 
     matches = tnrs(canonical)
     rows = []
     by_ott = defaultdict(list)
-    for source, query, m in zip(source_names, canonical, matches):
-        row = {"source_species": source, "query": query, **{k: v for k, v in m.items() if k != "query"}}
+    for source, query, normalization, m in zip(source_names, canonical, normalizations, matches):
+        row = {
+            "source_species": source,
+            "query": query,
+            "source_format_normalization": normalization,
+            **{k: v for k, v in m.items() if k != "query"},
+        }
         rows.append(row)
         if row["status"] == "EXACT" and row["ott_id"] is not None:
             by_ott[int(row["ott_id"])].append(row)
@@ -145,6 +165,7 @@ def main():
         "n_source_rows": len(source_names),
         "n_unique_source_rows": len(set(source_names)),
         "n_unique_canonical_queries": len(set(canonical)),
+        "source_format_normalization_counts": dict(Counter(normalizations)),
         "canonical_query_collisions": canonical_dups,
         "tnrs_status_counts": dict(Counter(r["status"] for r in rows)),
         "n_ott_collision_groups": len(collisions),
