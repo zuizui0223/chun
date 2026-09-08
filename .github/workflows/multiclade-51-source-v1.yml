@@ -1,0 +1,46 @@
+name: multiclade-51-source-v1
+
+on:
+  push:
+    branches:
+      - analysis/falsification-audit-v1
+    paths:
+      - 'analysis/multiclade_51_fine_state_falsification_prefreeze_v1.md'
+      - 'scripts/inspect_multiclade_51_sources_v1.py'
+      - '.github/workflows/multiclade-51-source-v1.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  source-admission:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install source-audit dependencies
+        run: python -m pip install --disable-pip-version-check requests biopython
+      - name: Audit 51-clade source and admission only
+        run: python scripts/inspect_multiclade_51_sources_v1.py
+      - name: Prove biological endpoint is absent
+        run: |
+          test ! -e analysis/_generated/multiclade_51_falsification_v1/result.json
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          p=Path('analysis/_generated/multiclade_51_source_v1/source_inventory.json')
+          x=json.loads(p.read_text())['summary']
+          assert x['endpoint_computed'] is False
+          assert x['signal_fields_computed'] == []
+          print('source-only gate preserved: endpoint unopened')
+          PY
+      - name: Upload source/admission inventory
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: multiclade-51-source-admission-v1
+          path: analysis/_generated/multiclade_51_source_v1/
+          if-no-files-found: warn
