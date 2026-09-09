@@ -7,8 +7,10 @@ selection_path = ROOT / 'analysis' / 'prospective_fourth_radiation_selection_v1.
 stage_a_prefreeze = ROOT / 'analysis' / 'iris_fine_state_falsification_prefreeze_v1.md'
 stage_a_result_path = ROOT / 'analysis' / 'iris_fine_state_falsification_result_v1.json'
 stage_b_prefreeze = ROOT / 'analysis' / 'iris_post_endpoint_mechanism_prefreeze_v1.md'
+stage_b_source_screen = ROOT / 'data' / 'iris_post_endpoint_mechanism_source_screen_v1.csv'
+stage_b_result_path = ROOT / 'analysis' / 'iris_post_endpoint_mechanism_result_v1.json'
 
-for p in (selection_path, stage_a_prefreeze, stage_a_result_path, stage_b_prefreeze):
+for p in (selection_path, stage_a_prefreeze, stage_a_result_path, stage_b_prefreeze, stage_b_source_screen, stage_b_result_path):
     assert p.exists(), p
 
 selection = json.loads(selection_path.read_text(encoding='utf-8'))
@@ -54,7 +56,27 @@ for marker in [
 ]:
     assert marker in stage_b_text, marker
 
-# Stage B has been frozen, but no canonical Stage-B result may exist yet at this boundary.
-assert not (ROOT / 'analysis' / 'iris_post_endpoint_mechanism_result_v1.json').exists()
+stage_b_result = json.loads(stage_b_result_path.read_text(encoding='utf-8'))
+assert stage_b_result['classification'] == 'HOLD_MECHANISM_OBSERVATION_REGIME'
+assert stage_b_result['stage_a_phenotype_classification'] == 'MIXED'
+assert stage_b_result['stage_a_changed'] is False
+assert stage_b_result['mechanism_search_started_only_after_prefreeze_commit'] is True
+assert stage_b_result['source_screen_outcome']['frozen_minimum_n_20_gate'] is False
+assert stage_b_result['source_screen_outcome']['comparable_observation_regime_gate'] is False
+assert stage_b_result['endpoint_execution']['B1_coarse_molecular_alignment_computed'] is False
+assert stage_b_result['endpoint_execution']['B2_residual_fine_state_alignment_computed'] is False
+assert stage_b_result['cross_radiation_count_effect'] == 'NONE'
+assert stage_b_result['paper1_science_changed'] is False
 
-print('validated: retrospective 3-radiation discovery -> canonical prospective Iris Stage A MIXED -> mechanism-blind Stage B prefreeze')
+source_text = stage_b_source_screen.read_text(encoding='utf-8')
+for doi in [
+    '10.1177/1934578X20937151',
+    '10.1016/S0305-1978(97)00008-2',
+    '10.1155/2023/7407772',
+    '10.1186/s12870-023-04642-9',
+    '10.1016/j.plaphy.2024.109355',
+    '10.1016/j.phytochem.2018.03.003'
+]:
+    assert doi in source_text, doi
+
+print('validated: retrospective 3-radiation discovery -> canonical prospective Iris Stage A MIXED -> mechanism-blind Stage B -> HOLD_MECHANISM_OBSERVATION_REGIME without endpoint opening')
