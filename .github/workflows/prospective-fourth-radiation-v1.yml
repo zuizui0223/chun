@@ -9,6 +9,8 @@ on:
       - 'analysis/iris_fine_state_falsification_prefreeze_v1.md'
       - 'analysis/iris_fine_state_falsification_result_v1.json'
       - 'analysis/iris_post_endpoint_mechanism_prefreeze_v1.md'
+      - 'analysis/iris_post_endpoint_mechanism_result_v1.json'
+      - 'data/iris_post_endpoint_mechanism_source_screen_v1.csv'
       - 'scripts/validate_prospective_fourth_radiation_v1.py'
       - '.github/workflows/prospective-fourth-radiation-v1.yml'
   workflow_dispatch:
@@ -21,5 +23,5 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
-      - name: Validate prospective fourth-radiation ordering
+      - name: Validate retrospective discovery to prospective falsification to mechanism ordering
         run: python scripts/validate_prospective_fourth_radiation_v1.py
