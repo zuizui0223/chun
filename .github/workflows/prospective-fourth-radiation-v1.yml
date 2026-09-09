@@ -1,0 +1,25 @@
+name: prospective-fourth-radiation-v1
+
+on:
+  push:
+    branches:
+      - analysis/falsification-audit-v1
+    paths:
+      - 'analysis/prospective_fourth_radiation_selection_v1.json'
+      - 'analysis/iris_fine_state_falsification_prefreeze_v1.md'
+      - 'analysis/iris_fine_state_falsification_result_v1.json'
+      - 'analysis/iris_post_endpoint_mechanism_prefreeze_v1.md'
+      - 'scripts/validate_prospective_fourth_radiation_v1.py'
+      - '.github/workflows/prospective-fourth-radiation-v1.yml'
+  workflow_dispatch:
+
+jobs:
+  validate-ordering:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Validate prospective fourth-radiation ordering
+        run: python scripts/validate_prospective_fourth_radiation_v1.py
