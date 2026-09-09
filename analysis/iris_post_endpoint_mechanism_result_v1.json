@@ -1,0 +1,37 @@
+{
+  "version": "v1",
+  "test_unit": "IRIS",
+  "stage": "POST_ENDPOINT_MECHANISM_STAGE_B",
+  "classification": "HOLD_MECHANISM_OBSERVATION_REGIME",
+  "stage_a_phenotype_classification": "MIXED",
+  "stage_a_changed": false,
+  "prefreeze": "analysis/iris_post_endpoint_mechanism_prefreeze_v1.md",
+  "source_screen": "data/iris_post_endpoint_mechanism_source_screen_v1.csv",
+  "mechanism_search_started_only_after_prefreeze_commit": true,
+  "frozen_gates": {
+    "minimum_direct_matched_iris_taxa": 20,
+    "minimum_fine_states_within_one_coarse_class": 2,
+    "minimum_direct_taxa_per_each_of_two_fine_states": 5,
+    "requires_comparable_molecular_observation_regime": true,
+    "requires_no_result_dependent_taxon_removal": true
+  },
+  "source_screen_outcome": {
+    "largest_direct_comparative_single_study_taxon_scope_found": 11,
+    "largest_cross_species_functional_metabolomic_study_scope_found": 4,
+    "review_compilation_total_iris_taxa_fragmentarily_surveyed_across_organs": 91,
+    "review_compilation_species_with_reported_flower_anthocyanins": 17,
+    "review_presence_records_form_complete_comparable_matrix": false,
+    "missing_report_can_be_coded_as_molecular_absence": false,
+    "frozen_minimum_n_20_gate": false,
+    "comparable_observation_regime_gate": false,
+    "fine_state_replication_gate": "NOT_ADJUDICATED_AFTER_EARLIER_GATE_FAILURE"
+  },
+  "endpoint_execution": {
+    "B1_coarse_molecular_alignment_computed": false,
+    "B2_residual_fine_state_alignment_computed": false,
+    "reason": "The frozen comparative observation-regime gate failed before any colour-concordance endpoint was computed."
+  },
+  "interpretation": "The prospective Iris phenotype test remains MIXED. Available Iris mechanism studies are informative within species or small species panels, but the frozen Stage-B requirement for a >=20-taxon directly measured comparable floral molecular regime was not met. This is an observation-regime HOLD, not evidence against phenotype state-granularity and not evidence for coarse-only mechanism.",
+  "cross_radiation_count_effect": "NONE",
+  "paper1_science_changed": false
+}
