@@ -1,0 +1,28 @@
+{
+  "version": "v1",
+  "status": "CANONICAL_PROSPECTIVE_FOURTH_RADIATION_FIXED",
+  "discovery_radiations": [
+    "LINOIDEAE",
+    "ANGRAECINAE",
+    "ANTIRRHINEAE"
+  ],
+  "prospective_fourth_radiation": "IRIS",
+  "historical_role": "prospective_fourth_radiation_endpoint_frozen_before_computation_and_before_iris_mechanism_stage",
+  "selection_basis": "MACRO_PHENOTYPE_TREE_SOURCE_ONLY",
+  "mechanism_used_for_selection": false,
+  "phenotype_endpoint_frozen_before_computation": true,
+  "phenotype_prefreeze_commit": "6cd82af7733e9dd2a0d8074fd9a7de4163424435",
+  "phenotype_prefreeze": "analysis/iris_fine_state_falsification_prefreeze_v1.md",
+  "phenotype_result": "analysis/iris_fine_state_falsification_result_v1.json",
+  "phenotype_classification": "MIXED",
+  "mechanism_stage_status_at_selection_freeze": "NOT_OPENED",
+  "excluded_from_canonical_prospective_role": {
+    "IOCHROMINAE": "mechanism inspected before macro endpoint selection; later macro endpoint was retrospectively selected and HOLD_TRAIT_SOURCE",
+    "ERICA": "mechanism inspected retrospectively before any prospective fourth-radiation role",
+    "EPIMEDIUM": "mechanism inspected before its later prospective endpoint; endpoint also ended HOLD_IDENTIFIABILITY",
+    "AQUILEGIA": "mechanistic evidence already inspected; cross-level admission HOLD",
+    "SILENE": "endpoint was frozen before computation but candidate selection is explicitly retrospective"
+  },
+  "counting_rule": "IRIS is the canonical prospective fourth-radiation phenotype test; mechanism evidence may be opened only in a separately frozen post-endpoint Stage B and cannot revise the Stage A phenotype classification.",
+  "paper1_science_changed": false
+}
