@@ -1,0 +1,28 @@
+name: Evolution second prospective candidate screen v0.1
+on:
+  pull_request:
+    paths:
+      - 'data/evolution_second_prospective_candidate_screen_v0_1.csv'
+      - 'docs/EVOLUTION_SECOND_PROSPECTIVE_CANDIDATE_SCREEN_V0_1.md'
+      - 'scripts/validate_evolution_second_prospective_candidate_screen_v0_1.py'
+      - '.github/workflows/evolution-second-prospective-candidate-screen-v0-1.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  validate:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Validate bounded screen and stop rule
+        run: python scripts/validate_evolution_second_prospective_candidate_screen_v0_1.py
+      - name: Confirm Paper 1 science bundle untouched by this screen
+        run: |
+          git diff --name-only origin/${{ github.base_ref || 'main' }}...HEAD > changed.txt || true
+          if grep -E '^(manuscript/|data/paper1_authoritative_results_|data/paper1_main_figure_manifest_|scripts/build_paper1_)' changed.txt; then
+            echo 'Paper 1 science/manuscript path changed unexpectedly' >&2
+            exit 1
+          fi
