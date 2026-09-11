@@ -1,0 +1,44 @@
+name: Paper 1 submission metadata gate v1.0
+
+on:
+  pull_request:
+    paths:
+      - 'submission/PAPER1_SUBMISSION_METADATA_V1_0.json'
+      - 'docs/PAPER1_SUBMISSION_METADATA_GATE_V1_0.md'
+      - 'scripts/validate_paper1_submission_metadata_v1_0.py'
+      - '.github/workflows/paper1-submission-metadata-gate-v1-0.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Validate phased submission metadata contract
+        run: |
+          python scripts/validate_paper1_submission_metadata_v1_0.py \
+            --input submission/PAPER1_SUBMISSION_METADATA_V1_0.json \
+            --summary build/paper1_submission_metadata_gate_v1_0.json
+      - name: Confirm current external-input state
+        run: |
+          python - <<'PY'
+          import json
+          x=json.load(open('build/paper1_submission_metadata_gate_v1_0.json'))
+          assert x['current_state']=='AWAITING_PHASE1_AUTHOR_IDENTITY', x
+          assert x['phase1_complete'] is False
+          assert x['ready_for_final_bundle'] is False
+          assert x['scientific_results_changed'] is False
+          print(x)
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: paper1-submission-metadata-gate-v1-0
+          path: build/paper1_submission_metadata_gate_v1_0.json
+          if-no-files-found: error
+          retention-days: 90
