@@ -1,0 +1,32 @@
+name: Petunia colour-regain benchmark v0.1
+
+on:
+  pull_request:
+    paths:
+      - 'data/petunia_colour_regain_events_v0_1.csv'
+      - 'data/petunia_regain_source_contract_v0_1.csv'
+      - 'docs/PETUNIA_COLOUR_REGAIN_BENCHMARK_V0_1.md'
+      - 'scripts/validate_petunia_colour_regain_benchmark_v0_1.py'
+      - '.github/workflows/petunia-colour-regain-benchmark-v0-1.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Validate Petunia regain events
+        run: |
+          mkdir -p build/petunia_regain_v0_1
+          python scripts/validate_petunia_colour_regain_benchmark_v0_1.py \
+            --events data/petunia_colour_regain_events_v0_1.csv \
+            --sources data/petunia_regain_source_contract_v0_1.csv \
+            --out build/petunia_regain_v0_1/summary.json
+      - name: Report
+        run: cat build/petunia_regain_v0_1/summary.json >> "$GITHUB_STEP_SUMMARY"
