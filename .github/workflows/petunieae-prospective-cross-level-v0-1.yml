@@ -20,6 +20,8 @@ jobs:
     timeout-minutes: 20
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
@@ -28,12 +30,14 @@ jobs:
       - name: Verify gate predates source acquisition and analysis
         run: |
           test -s docs/PETUNIEAE_PROSPECTIVE_CROSS_LEVEL_GATE_V0_1.md
-          git log --format='%H %ct' -- docs/PETUNIEAE_PROSPECTIVE_CROSS_LEVEL_GATE_V0_1.md | tail -1 > gate_commit.txt
-          git log --format='%H %ct' -- scripts/ingest_petunieae_osf_v0_1.py | tail -1 > acquisition_commit.txt
-          git log --format='%H %ct' -- scripts/analyze_petunieae_prospective_bridge_v0_1.py | tail -1 > analysis_commit.txt
+          git log --format='%H %ct' --reverse -- docs/PETUNIEAE_PROSPECTIVE_CROSS_LEVEL_GATE_V0_1.md | head -1 > gate_commit.txt
+          git log --format='%H %ct' --reverse -- scripts/ingest_petunieae_osf_v0_1.py | head -1 > acquisition_commit.txt
+          git log --format='%H %ct' --reverse -- scripts/analyze_petunieae_prospective_bridge_v0_1.py | head -1 > analysis_commit.txt
           python - <<'PY'
           g=open('gate_commit.txt').read().split();a=open('acquisition_commit.txt').read().split();m=open('analysis_commit.txt').read().split()
-          assert g and a and m and int(g[1]) <= int(a[1]) and int(g[1]) <= int(m[1]), (g,a,m)
+          assert g and a and m, (g,a,m)
+          assert int(g[1]) < int(a[1]) < int(m[1]), (g,a,m)
+          assert g[0].startswith('6b2f9b5'), g
           print({'gate_commit':g[0],'acquisition_commit':a[0],'analysis_commit':m[0]})
           PY
       - name: Acquire minimal processed OSF inputs
