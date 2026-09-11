@@ -1,0 +1,199 @@
+{
+  "claim_boundary": "Retrospective cross-radiation synthesis with one prospective hue component; not a prospective meta-analysis, not a universal causal-gene law, and not yet a journal-escalation verdict.",
+  "classification": "AXIS_LOCALIZATION_SUPPORTED",
+  "coverage": {
+    "amount_intensity_systems_admitted": 6,
+    "both_axes_system_ids": [
+      "ANTIRRHINUM",
+      "CAPE_ERICA",
+      "IOCHROMINAE",
+      "PETUNIEAE",
+      "PHLOX_DRUMMONDII",
+      "RUELLIA"
+    ],
+    "both_axes_systems": 6,
+    "hue_systems_admitted": 8,
+    "independent_systems": 8
+  },
+  "criteria": {
+    "at_least_3_both_axes": true,
+    "at_least_3_hue_and_3_amount": true,
+    "at_least_5_systems": true,
+    "leave_one_system_out_direction_stable": true,
+    "prospective_hue_component_support": true,
+    "risk_difference_ge_0_35": true
+  },
+  "leave_one_system_out": [
+    {
+      "amount_intensity_proportion": 0.0,
+      "excluded_system": "ANTIRRHINUM",
+      "hue_proportion": 1.0,
+      "risk_difference": 1.0
+    },
+    {
+      "amount_intensity_proportion": 0.0,
+      "excluded_system": "CAPE_ERICA",
+      "hue_proportion": 1.0,
+      "risk_difference": 1.0
+    },
+    {
+      "amount_intensity_proportion": 0.0,
+      "excluded_system": "IOCHROMINAE",
+      "hue_proportion": 1.0,
+      "risk_difference": 1.0
+    },
+    {
+      "amount_intensity_proportion": 0.0,
+      "excluded_system": "IPOMOEA",
+      "hue_proportion": 1.0,
+      "risk_difference": 1.0
+    },
+    {
+      "amount_intensity_proportion": 0.0,
+      "excluded_system": "PENSTEMON",
+      "hue_proportion": 1.0,
+      "risk_difference": 1.0
+    },
+    {
+      "amount_intensity_proportion": 0.0,
+      "excluded_system": "PETUNIEAE",
+      "hue_proportion": 1.0,
+      "risk_difference": 1.0
+    },
+    {
+      "amount_intensity_proportion": 0.0,
+      "excluded_system": "PHLOX_DRUMMONDII",
+      "hue_proportion": 1.0,
+      "risk_difference": 1.0
+    },
+    {
+      "amount_intensity_proportion": 0.0,
+      "excluded_system": "RUELLIA",
+      "hue_proportion": 1.0,
+      "risk_difference": 1.0
+    }
+  ],
+  "paired_matched_systems": {
+    "adverse_discordant": 0,
+    "concordant": 0,
+    "discordant_n": 5,
+    "exact_sign_one_sided_hue_greater": 0.03125,
+    "exact_sign_two_sided": 0.0625,
+    "favourable_discordant": 5,
+    "rows": [
+      {
+        "amount_intensity": 0,
+        "hue": 1,
+        "system_id": "ANTIRRHINUM"
+      },
+      {
+        "amount_intensity": 0,
+        "hue": 1,
+        "system_id": "CAPE_ERICA"
+      },
+      {
+        "amount_intensity": 0,
+        "hue": 1,
+        "system_id": "IOCHROMINAE"
+      },
+      {
+        "amount_intensity": 0,
+        "hue": 1,
+        "system_id": "PHLOX_DRUMMONDII"
+      },
+      {
+        "amount_intensity": 0,
+        "hue": 1,
+        "system_id": "RUELLIA"
+      }
+    ]
+  },
+  "paper1_science_changed": false,
+  "petunieae_full_bridge_status": "PETUNIEAE_PROSPECTIVE_BRIDGE_MIXED",
+  "primary": {
+    "amount_intensity": {
+      "branching_localized": 0,
+      "proportion": 0.0,
+      "resolved_rows": 5,
+      "systems": [
+        "ANTIRRHINUM",
+        "CAPE_ERICA",
+        "IOCHROMINAE",
+        "PHLOX_DRUMMONDII",
+        "RUELLIA"
+      ]
+    },
+    "fisher_secondary_one_sided_greater": 0.000777000777000777,
+    "fisher_secondary_two_sided": 0.000777000777000777,
+    "haldane_anscombe_odds_ratio": 187.0,
+    "hue": {
+      "branching_localized": 8,
+      "proportion": 1.0,
+      "resolved_rows": 8,
+      "systems": [
+        "ANTIRRHINUM",
+        "CAPE_ERICA",
+        "IOCHROMINAE",
+        "IPOMOEA",
+        "PENSTEMON",
+        "PETUNIEAE",
+        "PHLOX_DRUMMONDII",
+        "RUELLIA"
+      ]
+    },
+    "risk_difference": 1.0
+  },
+  "prospective_anchor_excluded": {
+    "amount_intensity": {
+      "branching_localized": 0,
+      "proportion": 0.0,
+      "resolved_rows": 5,
+      "systems": [
+        "ANTIRRHINUM",
+        "CAPE_ERICA",
+        "IOCHROMINAE",
+        "PHLOX_DRUMMONDII",
+        "RUELLIA"
+      ]
+    },
+    "hue": {
+      "branching_localized": 7,
+      "proportion": 1.0,
+      "resolved_rows": 7,
+      "systems": [
+        "ANTIRRHINUM",
+        "CAPE_ERICA",
+        "IOCHROMINAE",
+        "IPOMOEA",
+        "PENSTEMON",
+        "PHLOX_DRUMMONDII",
+        "RUELLIA"
+      ]
+    },
+    "risk_difference": 1.0
+  },
+  "tier_A_sensitivity": {
+    "amount_intensity": {
+      "branching_localized": 0,
+      "proportion": 0.0,
+      "resolved_rows": 2,
+      "systems": [
+        "ANTIRRHINUM",
+        "PHLOX_DRUMMONDII"
+      ]
+    },
+    "hue": {
+      "branching_localized": 4,
+      "proportion": 1.0,
+      "resolved_rows": 4,
+      "systems": [
+        "ANTIRRHINUM",
+        "IPOMOEA",
+        "PENSTEMON",
+        "PHLOX_DRUMMONDII"
+      ]
+    },
+    "risk_difference": 1.0
+  },
+  "version": "v0.1"
+}
