@@ -1,0 +1,36 @@
+name: Petunieae OSF root v0.1
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/petunieae-osf-root-v0-1.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  root:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 3
+    steps:
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Read OSF root only
+        run: |
+          mkdir -p build/osf_root
+          python - <<'PY'
+          import json,urllib.request
+          u='https://api.osf.io/v2/nodes/zg9cu/files/osfstorage/?page[size]=100'
+          req=urllib.request.Request(u,headers={'User-Agent':'chun-petunieae-root/0.1','Accept':'application/vnd.api+json'})
+          with urllib.request.urlopen(req,timeout=30) as r:o=json.load(r)
+          rows=[]
+          for x in o.get('data',[]):
+              a=x.get('attributes') or {}; rel=((((x.get('relationships') or {}).get('files') or {}).get('links') or {}).get('related'))
+              rows.append({'name':a.get('name'),'kind':a.get('kind'),'size':a.get('size'),'id':x.get('id'),'files_href':rel.get('href') if isinstance(rel,dict) else rel,'download':(x.get('links') or {}).get('download')})
+          open('build/osf_root/root.json','w').write(json.dumps(rows,indent=2)+'\n')
+          print(json.dumps(rows,indent=2))
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: petunieae-osf-root-v0-1
+          path: build/osf_root
+          retention-days: 30

@@ -1,0 +1,137 @@
+name: Petunieae prospective cross-level v0.1
+on:
+  pull_request:
+    paths:
+      - 'docs/PETUNIEAE_PROSPECTIVE_CROSS_LEVEL_GATE_V0_1.md'
+      - 'scripts/ingest_petunieae_osf_v0_1.py'
+      - 'scripts/analyze_petunieae_prospective_bridge_v0_1.py'
+      - 'data/petunieae_prospective_cross_level_v0_1.json'
+      - 'docs/PETUNIEAE_PROSPECTIVE_CROSS_LEVEL_RESULT_V0_1.md'
+      - 'docs/EVOLUTION_ESCALATION_POST_PETUNIEAE_V0_1.md'
+      - '.github/workflows/petunieae-prospective-cross-level-v0-1.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: read
+env:
+  OPENBLAS_NUM_THREADS: '1'
+  OMP_NUM_THREADS: '1'
+jobs:
+  analyze:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install pinned analysis dependencies
+        run: python -m pip install 'numpy==2.2.6' 'pandas==2.2.3' 'scipy==1.15.3' 'biopython==1.85'
+      - name: Verify gate predates source acquisition and analysis
+        run: |
+          test -s docs/PETUNIEAE_PROSPECTIVE_CROSS_LEVEL_GATE_V0_1.md
+          git log --format='%H %ct' --reverse -- docs/PETUNIEAE_PROSPECTIVE_CROSS_LEVEL_GATE_V0_1.md | head -1 > gate_commit.txt
+          git log --format='%H %ct' --reverse -- scripts/ingest_petunieae_osf_v0_1.py | head -1 > acquisition_commit.txt
+          git log --format='%H %ct' --reverse -- scripts/analyze_petunieae_prospective_bridge_v0_1.py | head -1 > analysis_commit.txt
+          python - <<'PY'
+          g=open('gate_commit.txt').read().split();a=open('acquisition_commit.txt').read().split();m=open('analysis_commit.txt').read().split()
+          assert g and a and m, (g,a,m)
+          assert int(g[1]) < int(a[1]) < int(m[1]), (g,a,m)
+          assert g[0].startswith('6b2f9b5'), g
+          print({'gate_commit':g[0],'acquisition_commit':a[0],'analysis_commit':m[0]})
+          PY
+      - name: Acquire live OSF inputs or recover frozen prospective source artifact
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          rm -rf build/petunieae_osf
+          mkdir -p build/petunieae_osf
+          source_mode=live_osf
+          if ! python scripts/ingest_petunieae_osf_v0_1.py --out-dir build/petunieae_osf; then
+            echo 'Live OSF file redirect failed; recovering the latest successful frozen source artifact.' >&2
+            source_mode=frozen_github_actions_artifact
+            rm -rf build/petunieae_osf
+            mkdir -p build/petunieae_osf
+            run_id=$(gh run list --repo "$GITHUB_REPOSITORY" --workflow 'Petunieae prospective cross-level v0.1' --status success --limit 20 --json databaseId,createdAt --jq 'sort_by(.createdAt) | reverse | .[0].databaseId')
+            test -n "$run_id"
+            echo "fallback_run_id=$run_id"
+            gh run download "$run_id" --repo "$GITHUB_REPOSITORY" --name petunieae-prospective-osf-v0-1 --dir build/petunieae_osf
+          fi
+          SOURCE_MODE="$source_mode" python - <<'PY'
+          import hashlib,json,os
+          from pathlib import Path
+          root=Path('build/petunieae_osf')
+          expected={
+            'processed/phyloCCA__11genestre_dated_pruned.tre':'95b4a688d3d71417b712b37a2b04cdc22a9431be3172d6509def4435f5fd8614',
+            'processed/phyloCCA__phyloCCA_expression_HPLC-with-flavs-final.r':'abbb43dbec756ca34e9f501b7eb9aaecb7330009b79739b8c1171d9cccce13b8',
+            'processed/phyloCCA__tpm10k-mgg-combined-with-flavs.csv':'5843d4cd4eb253046f97349fa6bd285ca77e43e7a9c3aaa0e78fae3e8e391edd',
+          }
+          for rel,want in expected.items():
+              p=root/rel
+              assert p.is_file(), rel
+              got=hashlib.sha256(p.read_bytes()).hexdigest()
+              assert got==want,(rel,got,want)
+          m=json.loads((root/'source_manifest.json').read_text())
+          assert m['osf_node']=='zg9cu'
+          assert m['downloaded_count']==3
+          mode=os.environ['SOURCE_MODE']
+          (root/'replay_source_mode.txt').write_text(mode+'\n')
+          print({'source_mode':mode,'source_sha256_check':'PASS','files':len(expected)})
+          PY
+      - name: Execute pre-frozen PGLS/AICc gate
+        run: |
+          mkdir -p build/petunieae_analysis
+          python scripts/analyze_petunieae_prospective_bridge_v0_1.py --source build/petunieae_osf --out build/petunieae_analysis/result.json | tee build/petunieae_analysis/stdout.txt
+          python - <<'PY' >> "$GITHUB_STEP_SUMMARY"
+          import json
+          x=json.load(open('build/petunieae_analysis/result.json'))
+          print('## Petunieae prospective result')
+          print('classification:',x['pre_frozen_gate'])
+          print('Petunieae taxa:',x['petunieae_taxa'],'hue taxa:',x['anthocyanin_positive_hue_taxa'])
+          for axis in ('amount_axis','hue_axis'):
+              a=x[axis];print(axis,'best=',a['best_subspace'],'margin=',a['best_margin_AICc'],'ranking=',a['ranking'])
+          s=x['source_method_sensitivity_log_amount']['fit'];print('source-method log amount sensitivity best=',s['best_subspace'],'margin=',s['best_margin_AICc'])
+          PY
+      - name: Verify frozen result exactly
+        run: |
+          python - <<'PY'
+          import json,math
+          observed=json.load(open('build/petunieae_analysis/result.json'))
+          expected=json.load(open('data/petunieae_prospective_cross_level_v0_1.json'))
+          def same(a,b,path='root'):
+              if isinstance(a,dict) and isinstance(b,dict):
+                  assert set(a)==set(b),(path,set(a)^set(b))
+                  for k in a:same(a[k],b[k],path+'.'+k)
+              elif isinstance(a,list) and isinstance(b,list):
+                  assert len(a)==len(b),(path,len(a),len(b))
+                  for i,(x,y) in enumerate(zip(a,b)):same(x,y,f'{path}[{i}]')
+              elif isinstance(a,(int,float)) and isinstance(b,(int,float)) and not isinstance(a,bool) and not isinstance(b,bool):
+                  assert math.isclose(float(a),float(b),rel_tol=1e-7,abs_tol=1e-7),(path,a,b)
+              else: assert a==b,(path,a,b)
+          same(observed,expected)
+          assert observed['pre_frozen_gate']=='PETUNIEAE_PROSPECTIVE_BRIDGE_MIXED'
+          assert observed['pre_frozen_gate_components']=={'coverage_pass':True,'hue_axis_pass':True,'amount_axis_pass':False}
+          print('frozen result replay PASS')
+          PY
+      - name: Preserve provenance
+        run: |
+          git rev-parse HEAD > build/petunieae_analysis/ci_checkout_sha.txt
+          python -V > build/petunieae_analysis/python_version.txt
+          python -m pip freeze > build/petunieae_analysis/python_packages.txt
+          cp build/petunieae_osf/source_manifest.json build/petunieae_analysis/source_manifest.json
+          cp build/petunieae_osf/replay_source_mode.txt build/petunieae_analysis/replay_source_mode.txt
+      - uses: actions/upload-artifact@v4
+        with:
+          name: petunieae-prospective-analysis-v0-1
+          path: build/petunieae_analysis
+          if-no-files-found: error
+          retention-days: 90
+      - uses: actions/upload-artifact@v4
+        with:
+          name: petunieae-prospective-osf-v0-1
+          path: build/petunieae_osf
+          if-no-files-found: error
+          retention-days: 90

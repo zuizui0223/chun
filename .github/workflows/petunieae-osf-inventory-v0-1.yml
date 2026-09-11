@@ -1,0 +1,54 @@
+name: Petunieae OSF inventory v0.1
+on:
+  pull_request:
+    paths:
+      - 'docs/PETUNIEAE_PROSPECTIVE_CROSS_LEVEL_GATE_V0_1.md'
+      - '.github/workflows/petunieae-osf-inventory-v0-1.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  inventory:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Inventory OSF without downloading file bytes
+        run: |
+          mkdir -p build/petunieae_inventory
+          python - <<'PY'
+          import json, urllib.request
+          UA='chun-petunieae-osf-inventory/0.1'
+          def get(url):
+              req=urllib.request.Request(url,headers={'User-Agent':UA,'Accept':'application/vnd.api+json,application/json'})
+              with urllib.request.urlopen(req,timeout=60) as r:return json.load(r)
+          def walk(url,prefix=''):
+              rows=[]
+              while url:
+                  o=get(url)
+                  for x in o.get('data',[]):
+                      a=x.get('attributes') or {}; name=str(a.get('name') or x.get('id')); path=(prefix+'/'+name).strip('/')
+                      if a.get('kind')=='folder':
+                          rel=((((x.get('relationships') or {}).get('files') or {}).get('links') or {}).get('related'))
+                          href=rel.get('href') if isinstance(rel,dict) else rel
+                          if href: rows.extend(walk(href,path))
+                      else:
+                          rows.append({'path':path,'size':a.get('size'),'id':x.get('id'),'download':(x.get('links') or {}).get('download')})
+                  url=(o.get('links') or {}).get('next') or None
+              return rows
+          rows=walk('https://api.osf.io/v2/nodes/zg9cu/files/osfstorage/')
+          open('build/petunieae_inventory/inventory.json','w').write(json.dumps(rows,indent=2)+'\n')
+          print('files',len(rows))
+          for r in rows:
+              print(r['path'],r['size'])
+          PY
+          git rev-parse HEAD > build/petunieae_inventory/ci_checkout_sha.txt
+      - uses: actions/upload-artifact@v4
+        with:
+          name: petunieae-osf-inventory-v0-1
+          path: build/petunieae_inventory
+          if-no-files-found: error
+          retention-days: 30
