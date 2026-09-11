@@ -6,7 +6,7 @@ Checked: 2026-09-11 after science v0.2.2, framing v0.3.4, the 2026-08-28 three-j
 
 **Primary submission: American Journal of Botany (AJB), v1.0 route.**
 
-The 2026-08-28 escalation gate retained AJB after comparing *Evolution Letters*, *Evolution*, and AJB. The later cross-radiation programme materially strengthened the general-evolution case, so that decision was reopened prospectively rather than assumed permanent. The reopen test still retains AJB.
+The 2026-08-28 escalation gate retained AJB after comparing *Evolution Letters*, *Evolution*, and AJB. The final escalation gate tested the importance of the existing empirical results against the journal criteria and prior art available at that stage. The later cross-radiation programme materially strengthened the general-evolution case, so that decision was reopened prospectively rather than assumed permanent. The reopen test still retains AJB.
 
 The active title and manuscript remain:
 
@@ -60,6 +60,8 @@ The strongest defensible synthesis is:
 
 The RNA-seq comparisons quantify developmental or petal-sector colour-state-generating transcript changes. They are not treated as direct observations of independent macroevolutionary origins, and they are not aligned event-for-event with reconstructed branches.
 
+The historical macro–mechanistic coverage boundary also remains unchanged: 5/53 accepted nuclear-tree tips overlap direct taxon-level mechanistic evidence, 3/53 have immediately standardizable raw-data coverage, and **0/53 have complete defensible A/F/C/P states**. The later cross-radiation programme does not fill those missing Camellia tip states.
+
 ## Why AJB is the best current fit
 
 AJB's scope spans ecology, evolution, biodiversity, systematics, genetics, and development from ecosystem to molecular scales. Paper 1 genuinely connects those levels in a botanical system while retaining their evidential boundaries. The paper's narrow empirical novelty—the same-system multivariate recurrence audit plus a separate pattern/event robustness gate—is legible to its plant-evolution readership without claiming a universal evolutionary law.
@@ -76,7 +78,7 @@ The main editorial risk is that the study is data-integrative and partly re-anal
 
 ## Why *Evolution Letters* and *Evolution* are not first targets
 
-The 2026-09-11 refresh uses stronger evidence than the original 8/28 comparison, but the general-journal threshold is still not met for **Paper 1 as currently constituted**.
+The 2026-09-11 refresh uses stronger evidence than the original 8/28 comparison. **The current contribution still does not meet the general-journal threshold** for Paper 1 as currently constituted.
 
 The current official *Evolution* guidance welcomes significant original empirical studies that broaden understanding of evolutionary processes, but explicitly warns that demonstrating a well-established phenomenon in another taxon or context may fall short for an Original Article. *Evolution Letters* sets a still higher bar: papers should be cutting-edge, broadly important, and substantially advance the field.
 
