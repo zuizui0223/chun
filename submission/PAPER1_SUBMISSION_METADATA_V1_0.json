@@ -1,0 +1,38 @@
+{
+  "schema_version": "v1.0",
+  "paper_title": "Hierarchical molecular repeatability coexists with local flower-colour conservatism in Camellia",
+  "phase1_author_identity": {
+    "authors": [],
+    "affiliations": [],
+    "corresponding_author": {
+      "author_name": null,
+      "email": null,
+      "postal_address": null,
+      "orcid": null
+    }
+  },
+  "phase2_declarations": {
+    "acknowledgments": null,
+    "funding_status": null,
+    "funding_sources": [],
+    "credit_roles": [],
+    "conflict_of_interest": null,
+    "originality_and_no_simultaneous_submission_confirmed": null,
+    "all_authors_approved_version_and_order": null,
+    "preprint_status": null,
+    "preprint_details": null,
+    "generative_ai_disclosure_after_policy_review": null
+  },
+  "phase3_archive": {
+    "archive_doi": null,
+    "archive_version": null,
+    "archive_url": null
+  },
+  "governance": {
+    "do_not_infer_missing_human_metadata": true,
+    "paper1_science_version": "v0.2.2",
+    "paper1_framing_version": "v0.3.4",
+    "submission_route": "AJB v1.0",
+    "current_state": "AWAITING_PHASE1_AUTHOR_IDENTITY"
+  }
+}
