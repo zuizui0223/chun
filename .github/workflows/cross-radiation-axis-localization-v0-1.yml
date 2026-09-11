@@ -1,0 +1,72 @@
+name: Cross-radiation axis localization v0.1
+on:
+  push:
+    branches:
+      - analysis/cross-radiation-axis-localization-v0-1
+    paths:
+      - docs/CROSS_RADIATION_AXIS_LOCALIZATION_GATE_V0_1.md
+      - docs/CROSS_RADIATION_AXIS_LOCALIZATION_SEARCH_PLAN_V0_1.md
+      - data/cross_radiation_axis_localization_ledger_v0_1.csv
+      - scripts/analyze_cross_radiation_axis_localization_v0_1.py
+      - .github/workflows/cross-radiation-axis-localization-v0-1.yml
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  analyze:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          ref: analysis/cross-radiation-axis-localization-v0-1
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Verify gate/search freeze predates evidence ledger and analysis
+        run: |
+          python - <<'PY'
+          import subprocess
+          paths={
+            'gate':'docs/CROSS_RADIATION_AXIS_LOCALIZATION_GATE_V0_1.md',
+            'search':'docs/CROSS_RADIATION_AXIS_LOCALIZATION_SEARCH_PLAN_V0_1.md',
+            'ledger':'data/cross_radiation_axis_localization_ledger_v0_1.csv',
+            'analysis':'scripts/analyze_cross_radiation_axis_localization_v0_1.py',
+          }
+          def first(path):
+              out=subprocess.check_output(['git','log','--format=%H %ct','--reverse','--',path],text=True).strip().splitlines()
+              assert out, path
+              sha,ts=out[0].split(); return sha,int(ts)
+          x={k:first(v) for k,v in paths.items()}
+          assert x['gate'][1] < x['ledger'][1], x
+          assert x['search'][1] < x['ledger'][1], x
+          assert x['gate'][1] < x['analysis'][1], x
+          print(x)
+          PY
+      - name: Execute frozen synthesis
+        run: python scripts/analyze_cross_radiation_axis_localization_v0_1.py | tee axis_localization_stdout.txt
+      - name: Verify result contract
+        run: |
+          python - <<'PY'
+          import json
+          x=json.load(open('data/cross_radiation_axis_localization_result_v0_1.json'))
+          assert x['classification']=='AXIS_LOCALIZATION_SUPPORTED', x['classification']
+          assert x['coverage']['independent_systems'] >= 5
+          assert x['coverage']['both_axes_systems'] >= 3
+          assert x['primary']['risk_difference'] >= 0.35
+          assert x['criteria']['leave_one_system_out_direction_stable'] is True
+          assert x['criteria']['prospective_hue_component_support'] is True
+          assert x['petunieae_full_bridge_status']=='PETUNIEAE_PROSPECTIVE_BRIDGE_MIXED'
+          assert x['paper1_science_changed'] is False
+          print({'classification':x['classification'],'primary':x['primary'],'paired':x['paired_matched_systems'],'tier_A':x['tier_A_sensitivity'],'retrospective_only':x['prospective_anchor_excluded']})
+          PY
+      - name: Commit result receipt
+        run: |
+          git diff --check
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add data/cross_radiation_axis_localization_result_v0_1.json docs/CROSS_RADIATION_AXIS_LOCALIZATION_RESULT_V0_1.md
+          if ! git diff --cached --quiet; then
+            git commit -m 'Freeze cross-radiation axis-localization result'
+            git push origin HEAD:analysis/cross-radiation-axis-localization-v0-1
+          fi
