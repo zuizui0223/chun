@@ -1,8 +1,33 @@
 {
   "version": "v0.1",
   "status": "CROSS_RADIATION_RESOLUTION_DEPENDENCE_SUPPORTED_WITH_ONE_PROSPECTIVE_HUE_COMPONENT",
-  "systems_in_evidence_ledger": 8,
-  "ledger_rows": 16,
+  "scope": {
+    "atlas_phase1_clades": 11,
+    "direct_resolution_ledger_systems": 8,
+    "direct_resolution_ledger_rows": 16,
+    "mechanistic_benchmark_systems": 7,
+    "mechanistic_recurrence_levels_observed": [
+      "EXACT_GENE_REGULATORY",
+      "FUNCTIONAL_REGULATOR_CLASS",
+      "HETEROGENEOUS_CAUSAL_NODES",
+      "PATHWAY_EXPRESSION_MODULE",
+      "PATHWAY_MODULE",
+      "RECURRENT_CORE_MODULE",
+      "TRANSITION_CLASS_DEPENDENT_MODULE"
+    ],
+    "atlas_phase1_status_counts": {
+      "PASS_ANCHOR": 1,
+      "PASS_TIER_A": 1,
+      "PASS_MACRO_ONLY": 1,
+      "PASS_MACRO_HOLD_MOLECULAR": 1,
+      "HOLD_RECHECK": 1,
+      "PASS_LOW_COMPLEXITY_CONTROL": 1,
+      "PASS_COMPLEX_CONTROL": 1,
+      "PASS_COLOURED_CONTROL": 2,
+      "PASS_TEMPORAL_SPATIAL_CONTROL": 1,
+      "PASS_INCIPIENT_CONTROL": 1
+    }
+  },
   "macro_level": {
     "fine_state_organization_support": "3/3 independent external radiations",
     "strong_universal_direction_support": "0/3 comparable radiations",
@@ -24,14 +49,28 @@
     "petunieae_primary_classification": "PETUNIEAE_PROSPECTIVE_BRIDGE_MIXED",
     "inference": "HUE_HYDROXYLATION_LOCALIZATION_IS_MORE_CROSS_SYSTEM_STABLE_THAN_PIGMENT_AMOUNT_OR_DEPLETION_LOCALIZATION"
   },
+  "hierarchical_mechanistic_benchmark": {
+    "systems": [
+      "IPOMOEA",
+      "IOCHROMINAE",
+      "AQUILEGIA",
+      "EPIMEDIUM",
+      "PETUNIA",
+      "CAPE_ERICA",
+      "CAMELLIA"
+    ],
+    "systems_whose_strongest_supported_recurrence_level_is_complete_programme": "0/7",
+    "interpretation": "RECURRENCE_OCCURS_AT_DIFFERENT_LEVELS_FROM_EXACT_REGULATION_TO_PATHWAY_MODULE_OR_REGULATOR_CLASS_WHILE_COMPLETE_IMPLEMENTATIONS_REMAIN_HETEROGENEOUS_OR_UNSUPPORTED",
+    "numeric_pooling": "FORBIDDEN_DIFFERENT_EVIDENCE_UNITS_AND_OBSERVATION_REGIMES"
+  },
   "complementary_endpoint_evidence": {
     "system": "EPIMEDIUM_SECT_DIPHYLLON",
     "result": "SAME_SOURCE_ENDPOINT_CODE_WITH_RECURRENT_CORE_AND_HETEROGENEOUS_MOLECULAR_IMPLEMENTATION",
     "role": "SUPPORTS_HIERARCHICAL_IMPLEMENTATION_HETEROGENEITY_BUT_USES_A_DIFFERENT_BRIDGE_DEFINITION"
   },
-  "integrated_candidate": "FLOWER_COLOUR_REPEATABILITY_IS_CONCENTRATED_IN_RESOLVED_PHENOTYPE_AND_MOLECULAR_DIMENSIONS_RATHER_THAN_ONE_SHARED_COARSE_STATE_DIRECTION_OR_COMPLETE_PROGRAMME",
+  "integrated_candidate": "FLOWER_COLOUR_PREDICTABILITY_IS_RESOLUTION_DEPENDENT_ACROSS_RADIATIONS:_FINE_PHENOTYPE_ORGANIZATION_AND_SOME_BIOCHEMICALLY_SPECIFIC_MOLECULAR_AXES_REPEAT_MORE_RELIABLY_THAN_SHARED_COARSE_BOUNDARIES_DIRECTIONS_OR_COMPLETE_PROGRAMMES",
   "prospective_status": "PARTIALLY_PROSPECTIVE_NOT_FULLY_PROSPECTIVELY_REPLICATED",
   "pooled_numeric_estimator": "FORBIDDEN_ACROSS_HETEROGENEOUS_MACRO_AND_MOLECULAR_UNITS",
-  "claim_boundary": "This synthesis combines replicated macro representation results with matched within-radiation molecular-axis results. It does not claim event-for-event micro-to-macro matching, universal causal genes, a universal colour direction, or a fully prospectively replicated law.",
+  "claim_boundary": "This synthesis combines replicated macro representation results, matched within-radiation molecular-axis results, and a heterogeneous-unit mechanistic benchmark. It does not claim event-for-event micro-to-macro matching, universal causal genes, a universal colour direction, or a fully prospectively replicated law.",
   "paper1_science_changed": false
 }
