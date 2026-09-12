@@ -1,0 +1,28 @@
+{
+  "version": "v0.1",
+  "audit_type": "TARGETED_REPRESENTATIVE_PRIOR_ART_AUDIT_NOT_SYSTEMATIC_REVIEW",
+  "prior_art_rows": 10,
+  "current_candidate_row": 1,
+  "generic_claims_preempted": [
+    "FLOWER_COLOUR_TRANSITION_TYPE_CHANGES_GENETIC_TARGETS",
+    "SAME_VISIBLE_FLOWER_COLOUR_CAN_USE_ALTERNATE_BIOCHEMICAL_OR_GENETIC_ROUTES",
+    "PATHWAY_STRUCTURE_CONSTRAINS_ACCESSIBLE_COLOUR_PHENOTYPES",
+    "HUE_AND_PIGMENT_AMOUNT_CAN_MAP_TO_DIFFERENT_PATHWAY_REGIONS_WITHIN_ONE_RADIATION",
+    "DISCRETE_STATE_CODING_AND_RECODING_CAN_CHANGE_PHYLOGENETIC_INFERENCE",
+    "INTEGRATING_MOLECULAR_AND_MACROEVOLUTIONARY_SCALES_IS_NOT_ITSELF_NOVEL"
+  ],
+  "direct_prior_match_to_integrated_candidate_found": false,
+  "novelty_candidate": "EMPIRICAL_CROSS_RADIATION_ALIGNMENT_OF_RESOLUTION_DEPENDENCE_ACROSS_MACRO_STATE_REPRESENTATION_MOLECULAR_AXIS_LOCALIZATION_AND_MECHANISTIC_RECURRENCE_LEVEL",
+  "priority_status": "NO_FIRST_CLAIM_TARGETED_AUDIT_ONLY",
+  "allowed_wording": "We test whether resolution-dependent evolutionary predictability aligns across independent flower-colour radiations at macroevolutionary state-representation, phenotype-axis-to-molecular-subspace, and mechanistic-recurrence levels.",
+  "forbidden_wording": [
+    "FIRST_TO_SHOW_THAT_FLOWER_COLOUR_EVOLUTION_IS_RESOLUTION_DEPENDENT",
+    "FIRST_TO_SHOW_THAT_CODING_MATTERS",
+    "FIRST_TO_SHOW_SAME_COLOUR_DIFFERENT_MECHANISM",
+    "FIRST_PATHWAY_LEVEL_PREDICTABILITY_TEST",
+    "UNIVERSAL_LAW_OF_FLOWER_COLOUR_PREDICTABILITY"
+  ],
+  "evidence_gap": "Only the Petunieae hue component is prospectively specified under the matched phenotype-axis bridge; broader external replication remains partly retrospective and observation regimes remain heterogeneous.",
+  "next_gate": "Expand independent hue/branching and pigment-amount/depletion systems under explicit tiered admission rules, keeping prospective and retrospective evidence separate, then rerun the novelty and journal gate.",
+  "paper1_science_changed": false
+}
