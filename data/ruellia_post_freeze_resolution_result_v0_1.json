@@ -1,0 +1,38 @@
+{
+  "version": "v0.1",
+  "source_doi": "10.1186/s12862-021-01955-x",
+  "validation_timing": "EXTERNAL_SOURCE_READ_AFTER_INTERMEDIATE_PATHWAY_REGION_RULE_WAS_FROZEN_ON_MAIN_BUT_RUELLIA_WAS_NOT_TARGET_PREREGISTERED",
+  "classification": "HUE_PASS_DEPLETION_MIXED",
+  "panel": {
+    "species": 10,
+    "purple": 4,
+    "red": 3,
+    "yellow": 3,
+    "formal_colour_ASR_by_source": false,
+    "source_transition_status": "POTENTIAL_TRANSITIONS_FROM_10_TIP_PHYLOGENY"
+  },
+  "hue_component": {
+    "classification": "SUPPORT_BRANCHING_HYDROXYLATION",
+    "source_mechanism": "F3_prime_5_prime_H coding/regulatory loss in purple-to-red context and putative reactivation in red-to-purple context",
+    "pathway_region": "BRANCHING_HYDROXYLATION",
+    "event_count_promoted": false
+  },
+  "depletion_component": {
+    "classification": "MIXED_EARLY_LATE_REGULATORY_COUNTEREXAMPLE_TO_OUTPUT_SIDE_ONLY",
+    "yellow_taxa": 3,
+    "F3H_downregulated_taxa": 2,
+    "ANS_downregulated_taxa": 3,
+    "source_interpretation": "coordinated structural-gene downregulation likely involving regulatory change",
+    "pathway_regions": ["EARLY_CORE", "LATE_OUTPUT", "REGULATORY"],
+    "event_count_promoted": false
+  },
+  "cross_system_update": {
+    "hue_branching_system_support_after_Ruellia": "5/5 systems",
+    "loss_depletion_output_side_support_after_Ruellia": "4/6 systems",
+    "loss_depletion_unresolved_after_Ruellia": "1/6 systems (Petunieae raw amount)",
+    "loss_depletion_mixed_early_late_counterexample_after_Ruellia": "1/6 systems (Ruellia)"
+  },
+  "interpretation": "The post-freeze external source strengthens the hue-to-branching pattern while falsifying an output-side-only formulation for pigment loss/depletion. Loss/depletion is better described as recurrently regulatory/downstream-biased but mechanistically broader than hue shifts.",
+  "prospective_status": "NOT_PROSPECTIVE_TARGET_SELECTION",
+  "paper1_science_changed": false
+}
