@@ -1,0 +1,35 @@
+{
+  "version": "v0.1",
+  "status": "INTERMEDIATE_PATHWAY_REGION_PREDICTABILITY_SUPPORTED_ACROSS_TIERED_EVIDENCE_WITH_ONE_PROSPECTIVE_HUE_COMPONENT",
+  "tier_design": {
+    "M1": "matched phenotype-axis to molecular-subspace evidence within a radiation",
+    "M2": "independent hue/branching functional stress tests with robust event units",
+    "M3": "independent pigment-loss/depletion functional or endpoint stress tests",
+    "numeric_pooling": "FORBIDDEN_ACROSS_TIERS"
+  },
+  "M1_matched_axis": {
+    "systems": ["IOCHROMINAE", "CAPE_ERICA", "PETUNIEAE"],
+    "hue_branching_support": "3/3 systems",
+    "amount_or_depletion_downstream_output_support": "2/3 systems",
+    "amount_or_depletion_unresolved": "1/3 systems (Petunieae raw amount)",
+    "prospective_components": "Petunieae hue PASS; Petunieae raw amount unresolved; full gate MIXED"
+  },
+  "expanded_hue_branching": {
+    "systems": ["IOCHROMINAE", "CAPE_ERICA", "PETUNIEAE", "IPOMOEA"],
+    "support": "4/4 systems across M1+M2",
+    "independent_functional_stress_test": "Ipomoea F3'H regulatory reduction in 3/3 robust red origins",
+    "interpretation": "BRANCHING_HYDROXYLATION_REGION_RECURRENT_ACROSS_MATCHED_AND_EVENT_SPECIFIC_REGIMES"
+  },
+  "expanded_loss_depletion": {
+    "systems": ["IOCHROMINAE", "CAPE_ERICA", "PETUNIEAE", "AQUILEGIA", "EPIMEDIUM"],
+    "downstream_output_or_regulatory_support": "4/5 systems across M1+M3",
+    "unresolved": "1/5 systems (Petunieae raw amount)",
+    "supported_counterexample_in_early_core_or_hue_branching_region": "0/5",
+    "erica_white_detail": "5/6 structural-late focal nodes and 1/6 trans-regulatory bHLH",
+    "interpretation": "LOSS_OR_DEPLETION_REPEATEDLY_INVOLVES_DOWNSTREAM_OUTPUT_OR_REGULATORY_REGIONS_BUT_EXACT_NODE_IMPLEMENTATION_IS_HETEROGENEOUS"
+  },
+  "resolution_inference": "PREDICTABILITY_CONCENTRATES_AT_INTERMEDIATE_BIOCHEMICAL_DIMENSIONS_AND_PATHWAY_REGIONS_RATHER_THAN_AT_SHARED_COARSE_VISIBLE_STATES_OR_COMPLETE_MOLECULAR_PROGRAMMES",
+  "critical_boundary": "The M2/M3 expansion is a retrospective hierarchical synthesis created after these source results were known. It is a hypothesis-generating generalization and must be prospectively tested in newly admitted systems before being called a replicated law.",
+  "prospective_status": "ONLY_PETUNIEAE_HUE_COMPONENT_PROSPECTIVE_FOR_THIS_ARCHITECTURE",
+  "paper1_science_changed": false
+}
