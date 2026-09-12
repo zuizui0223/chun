@@ -24,6 +24,8 @@ def main() -> int:
     args = ap.parse_args()
 
     ledger = load_csv("data/cross_radiation_resolution_evidence_v0_1.csv")
+    mechanistic = load_csv("data/cross_clade_mechanistic_recurrence_levels_v0_1.csv")
+    atlas = load_csv("data/white_baseline_cross_clade_atlas_v0_1.csv")
     macro = load_json("data/cross_radiation_state_granularity_v0_3.json")
     ioch = load_json("data/iochrominae_cross_level_bridge_summary_v0_1.json")
     erica = load_json("data/erica_phenotype_axis_molecular_bridge_summary_v0_1.json")
@@ -31,6 +33,10 @@ def main() -> int:
     epi = load_json("data/epimedium_cross_level_endpoint_bridge_summary_v0_1.json")
 
     assert len(ledger) == 16, len(ledger)
+    assert len(mechanistic) == 7, len(mechanistic)
+    assert len(atlas) == 11, len(atlas)
+    assert all(r["complete_programme_recurrence_supported"] == "FALSE" for r in mechanistic)
+
     assert macro["fine_state_replication"]["testable_external_radiations"] == 3
     assert macro["fine_state_replication"]["supporting_external_radiations"] == 3
     assert macro["direction_result"]["testable_radiations"] == 3
@@ -73,11 +79,22 @@ def main() -> int:
     assert sum(r["prospective_status"] == "PROSPECTIVE" for r in hue) == 1
     assert sum(r["evidence_status"] == "SUPPORT_FIXED_OUTPUT_SUBSPACE" for r in amount) == 1
 
+    recurrence_levels = sorted(set(r["strongest_supported_recurrence_level"] for r in mechanistic))
+    atlas_status_counts: dict[str, int] = {}
+    for row in atlas:
+        atlas_status_counts[row["phase1_status"]] = atlas_status_counts.get(row["phase1_status"], 0) + 1
+
     summary = {
         "version": "v0.1",
         "status": "CROSS_RADIATION_RESOLUTION_DEPENDENCE_SUPPORTED_WITH_ONE_PROSPECTIVE_HUE_COMPONENT",
-        "systems_in_evidence_ledger": len(set(r["system"] for r in ledger)),
-        "ledger_rows": len(ledger),
+        "scope": {
+            "atlas_phase1_clades": len(atlas),
+            "direct_resolution_ledger_systems": len(set(r["system"] for r in ledger)),
+            "direct_resolution_ledger_rows": len(ledger),
+            "mechanistic_benchmark_systems": len(mechanistic),
+            "mechanistic_recurrence_levels_observed": recurrence_levels,
+            "atlas_phase1_status_counts": atlas_status_counts,
+        },
         "macro_level": {
             "fine_state_organization_support": "3/3 independent external radiations",
             "strong_universal_direction_support": "0/3 comparable radiations",
@@ -95,15 +112,21 @@ def main() -> int:
             "petunieae_primary_classification": pet["pre_frozen_gate"],
             "inference": "HUE_HYDROXYLATION_LOCALIZATION_IS_MORE_CROSS_SYSTEM_STABLE_THAN_PIGMENT_AMOUNT_OR_DEPLETION_LOCALIZATION",
         },
+        "hierarchical_mechanistic_benchmark": {
+            "systems": [r["system"] for r in mechanistic],
+            "systems_whose_strongest_supported_recurrence_level_is_complete_programme": "0/7",
+            "interpretation": "RECURRENCE_OCCURS_AT_DIFFERENT_LEVELS_FROM_EXACT_REGULATION_TO_PATHWAY_MODULE_OR_REGULATOR_CLASS_WHILE_COMPLETE_IMPLEMENTATIONS_REMAIN_HETEROGENEOUS_OR_UNSUPPORTED",
+            "numeric_pooling": "FORBIDDEN_DIFFERENT_EVIDENCE_UNITS_AND_OBSERVATION_REGIMES",
+        },
         "complementary_endpoint_evidence": {
             "system": "EPIMEDIUM_SECT_DIPHYLLON",
             "result": epi["cross_level_result"],
             "role": "SUPPORTS_HIERARCHICAL_IMPLEMENTATION_HETEROGENEITY_BUT_USES_A_DIFFERENT_BRIDGE_DEFINITION",
         },
-        "integrated_candidate": "FLOWER_COLOUR_REPEATABILITY_IS_CONCENTRATED_IN_RESOLVED_PHENOTYPE_AND_MOLECULAR_DIMENSIONS_RATHER_THAN_ONE_SHARED_COARSE_STATE_DIRECTION_OR_COMPLETE_PROGRAMME",
+        "integrated_candidate": "FLOWER_COLOUR_PREDICTABILITY_IS_RESOLUTION_DEPENDENT_ACROSS_RADIATIONS:_FINE_PHENOTYPE_ORGANIZATION_AND_SOME_BIOCHEMICALLY_SPECIFIC_MOLECULAR_AXES_REPEAT_MORE_RELIABLY_THAN_SHARED_COARSE_BOUNDARIES_DIRECTIONS_OR_COMPLETE_PROGRAMMES",
         "prospective_status": "PARTIALLY_PROSPECTIVE_NOT_FULLY_PROSPECTIVELY_REPLICATED",
         "pooled_numeric_estimator": "FORBIDDEN_ACROSS_HETEROGENEOUS_MACRO_AND_MOLECULAR_UNITS",
-        "claim_boundary": "This synthesis combines replicated macro representation results with matched within-radiation molecular-axis results. It does not claim event-for-event micro-to-macro matching, universal causal genes, a universal colour direction, or a fully prospectively replicated law.",
+        "claim_boundary": "This synthesis combines replicated macro representation results, matched within-radiation molecular-axis results, and a heterogeneous-unit mechanistic benchmark. It does not claim event-for-event micro-to-macro matching, universal causal genes, a universal colour direction, or a fully prospectively replicated law.",
         "paper1_science_changed": False,
     }
 
