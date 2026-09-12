@@ -1,0 +1,49 @@
+name: Cross-radiation pathway-region tier expansion v0.1
+
+on:
+  pull_request:
+    paths:
+      - 'data/cross_radiation_pathway_region_tiers_v0_1.csv'
+      - 'data/cross_radiation_pathway_region_tier_summary_v0_1.json'
+      - 'data/cross_clade_mechanistic_recurrence_benchmark_v0_1.csv'
+      - 'data/erica_white_yellow_mechanisms_v0_1.csv'
+      - 'data/petunieae_prospective_cross_level_v0_1.json'
+      - 'data/iochrominae_cross_level_bridge_summary_v0_1.json'
+      - 'scripts/summarize_cross_radiation_pathway_region_tiers_v0_1.py'
+      - 'docs/CROSS_RADIATION_PATHWAY_REGION_TIER_EXPANSION_V0_1.md'
+      - '.github/workflows/cross-radiation-pathway-region-tier-expansion-v0-1.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Rebuild tier-expanded result
+        run: |
+          python scripts/summarize_cross_radiation_pathway_region_tiers_v0_1.py --out build/cross_radiation_pathway_region_tier_summary_v0_1.json
+      - name: Verify key result and post-hoc boundary
+        run: |
+          python - <<'PY'
+          import json
+          x=json.load(open('build/cross_radiation_pathway_region_tier_summary_v0_1.json'))
+          assert x['M1_matched_axis']['hue_branching_support']=='3/3 systems'
+          assert x['expanded_hue_branching']['support']=='4/4 systems across M1+M2'
+          assert x['expanded_loss_depletion']['downstream_output_or_regulatory_support']=='4/5 systems across M1+M3'
+          assert x['expanded_loss_depletion']['unresolved'].startswith('1/5')
+          assert x['expanded_loss_depletion']['supported_counterexample_in_early_core_or_hue_branching_region']=='0/5'
+          assert 'retrospective hierarchical synthesis' in x['critical_boundary']
+          assert x['paper1_science_changed'] is False
+          print(json.dumps(x,indent=2))
+          PY
+      - name: Confirm Paper 1 science firewall
+        run: |
+          git diff --exit-code ${{ github.event.pull_request.base.sha }}...HEAD -- manuscript data/paper1_authoritative_results_v0_2_2.csv data/paper1_main_figure_manifest_v0_2_2.csv
