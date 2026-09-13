@@ -1,4 +1,4 @@
-name: Iris source taxon label inspection v0.1
+name: Iris source taxon crosswalk v0.1
 
 on:
   pull_request:
@@ -14,7 +14,7 @@ permissions:
   contents: read
 
 jobs:
-  inspect:
+  validate:
     runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v4
@@ -24,8 +24,31 @@ jobs:
       - run: python -m pip install --disable-pip-version-check pandas openpyxl
       - name: Inspect source taxon labels only
         run: python scripts/inspect_iris_source_taxon_labels_v0_1.py
-      - name: Confirm no frozen statistic implementation in inspection script
+      - name: Validate frozen one-to-one source crosswalk
         run: |
-          ! grep -E 'roc_auc|9999|PASS.*MIXED|patristic' scripts/inspect_iris_source_taxon_labels_v0_1.py
+          python scripts/validate_iris_source_taxon_crosswalk_v0_1.py \
+            --out build/iris_source_taxon_crosswalk_v0_1.json
+      - name: Assert source-only closure and no outcome statistic
+        run: |
+          python - <<'PY'
+          import json
+          x=json.load(open('build/iris_source_taxon_crosswalk_v0_1.json'))
+          assert x['status']=='IRIS_SOURCE_TAXON_CROSSWALK_VALID'
+          assert x['mapped_trait_rows']==226
+          assert x['mapped_distinct_accession_rows']==226
+          assert x['unmatched_accession_rows']==['Iris_cedretii','Iris_darwasica']
+          assert x['trait_values_inspected'] is False
+          assert x['auc_computed'] is False
+          assert x['decision_computed'] is False
+          print(json.dumps(x,indent=2))
+          PY
+      - name: Confirm no frozen statistic implementation in source-label scripts
+        run: |
+          ! grep -E 'roc_auc|9999|patristic' scripts/inspect_iris_source_taxon_labels_v0_1.py scripts/validate_iris_source_taxon_crosswalk_v0_1.py
       - name: Confirm Paper 1 firewall
         run: git diff --exit-code ${{ github.event.pull_request.base.sha }}...HEAD -- manuscript data/paper1_authoritative_results_v0_2_2.csv data/paper1_main_figure_manifest_v0_2_2.csv
+      - uses: actions/upload-artifact@v4
+        with:
+          name: iris-source-taxon-crosswalk-v0-1
+          path: build/iris_source_taxon_crosswalk_v0_1.json
+          retention-days: 90
