@@ -9,11 +9,12 @@ on:
 
 permissions:
   contents: read
+  actions: read
 
 jobs:
   prospective-outcome:
     runs-on: ubuntu-24.04
-    timeout-minutes: 150
+    timeout-minutes: 30
     steps:
       - uses: actions/checkout@v4
         with: {fetch-depth: 0}
@@ -30,14 +31,8 @@ jobs:
             data/iris_source_taxon_crosswalk_v0_1.csv \
             data/iris_tree_record_semantics_v0_1.json
 
-      - name: Install frozen tree toolchain and analysis dependencies
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y mafft iqtree build-essential git
-          git clone --depth 1 --branch v1.5.1 https://github.com/inab/trimal.git /tmp/trimal
-          make -C /tmp/trimal/source
-          sudo install -m 0755 /tmp/trimal/source/trimal /usr/local/bin/trimal
-          python -m pip install --disable-pip-version-check biopython pandas openpyxl numpy scipy
+      - name: Install analysis dependencies
+        run: python -m pip install --disable-pip-version-check biopython pandas openpyxl numpy scipy
 
       - name: Revalidate pre-outcome contracts
         run: |
@@ -46,46 +41,40 @@ jobs:
           python scripts/validate_iris_tree_record_semantics_v0_1.py
           python scripts/validate_iris_source_taxon_crosswalk_v0_1.py --out /tmp/iris_crosswalk.json
 
-      - name: Rebuild frozen trait-blind six-locus primary tree inputs
-        run: |
-          python scripts/prepare_iris_primary_tree_inputs_v0_1.py --out-dir build/iris_tree_inputs
-          mkdir -p build/iris_trimmed
-          for locus in matK trnL ndhF trnK rbcL ITS; do
-            mafft --localpair --maxiterate 1000 --thread 2 \
-              build/iris_tree_inputs/${locus}.source_full_records.fasta \
-              > build/iris_trimmed/${locus}.aligned.fasta
-            trimal -in build/iris_trimmed/${locus}.aligned.fasta \
-              -out build/iris_trimmed/${locus}.trimmed.fasta -automated1
-          done
-          python scripts/concatenate_iris_primary_tree_alignments_v0_1.py \
-            --tree-input-dir build/iris_tree_inputs \
-            --trimmed-dir build/iris_trimmed \
-            --out-dir build/iris_primary_tree
+      - name: Download the already-frozen trait-blind primary tree artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: iris-primary-trait-blind-tree-v0-1
+          path: build/frozen_tree_artifact
+          repository: zuizui0223/chun
+          run-id: 34732460066
+          github-token: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Rebuild frozen trait-blind IQ-TREE2 primary tree
+      - name: Verify frozen tree provenance and hash before outcome exposure
         run: |
-          IQBIN=$(command -v iqtree2 || command -v iqtree)
-          "$IQBIN" \
-            -s build/iris_primary_tree/iris_primary_concatenated.fasta \
-            -p build/iris_primary_tree/iris_primary_partitions.nex \
-            -m MFP+MERGE \
-            -B 1000 \
-            --seed 20260913 \
-            -T AUTO \
-            --prefix build/iris_primary_tree/iris_primary
           python - <<'PY'
+          import hashlib, json, pathlib
           from Bio import Phylo
-          p='build/iris_primary_tree/iris_primary.treefile'
-          tree=Phylo.read(p,'newick')
+          root=pathlib.Path('build/frozen_tree_artifact/iris_primary_tree')
+          tree_path=root/'iris_primary.treefile'
+          receipt=json.loads((root/'primary_tree_receipt.json').read_text())
+          got=hashlib.sha256(tree_path.read_bytes()).hexdigest()
+          assert receipt['tree_status']=='IRIS_PRIMARY_TRAIT_BLIND_TREE_BUILT'
+          assert receipt['trait_values_used'] is False
+          assert receipt['auc_computed'] is False
+          assert receipt['decision_computed'] is False
+          assert receipt['tree_sha256']=='59cd03e42fbf477f71833778d000d1f1a900b291888f7e17829a65106bf8b469'
+          assert got==receipt['tree_sha256'], (got,receipt['tree_sha256'])
+          tree=Phylo.read(str(tree_path),'newick')
           tips=[t.name for t in tree.get_terminals()]
-          assert len(tips)==227 and len(set(tips))==227, (len(tips),len(set(tips)))
-          print({'tree_tips':len(tips),'auc_computed':False,'decision_computed':False})
+          assert len(tips)==227 and len(set(tips))==227
+          print({'tree_sha256':got,'tree_tips':len(tips),'trait_values_used':False,'auc_computed':False})
           PY
 
       - name: Open the preregistered Iris outcome exactly once
         run: |
           python scripts/run_iris_prospective_resolution_test_v0_1.py \
-            --tree build/iris_primary_tree/iris_primary.treefile \
+            --tree build/frozen_tree_artifact/iris_primary_tree/iris_primary.treefile \
             --out results/iris_intermediate_resolution_v0_1/iris_intermediate_resolution_result_v0_1.json
 
       - name: Assert terminal result is immutable-classified
@@ -108,8 +97,6 @@ jobs:
           name: iris-prospective-intermediate-resolution-outcome-v0-1
           path: |
             results/iris_intermediate_resolution_v0_1/iris_intermediate_resolution_result_v0_1.json
-            build/iris_primary_tree/iris_primary.treefile
-            build/iris_primary_tree/iris_primary.iqtree
-            build/iris_primary_tree/iris_primary.log
-            build/iris_primary_tree/iris_primary_partitions.nex
+            build/frozen_tree_artifact/iris_primary_tree/primary_tree_receipt.json
+            build/frozen_tree_artifact/iris_primary_tree/iris_primary.treefile
           retention-days: 90
