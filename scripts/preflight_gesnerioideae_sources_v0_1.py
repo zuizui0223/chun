@@ -20,6 +20,8 @@ HEADER_PATTERNS = {
 
 def sha256(b): return hashlib.sha256(b).hexdigest()
 def get(url):
+    if url.startswith('/'):
+        url='https://datadryad.org'+url
     r=requests.get(url,timeout=60); r.raise_for_status(); return r
 
 def norm_binomial(x):
