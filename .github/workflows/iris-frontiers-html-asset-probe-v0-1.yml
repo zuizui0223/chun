@@ -1,0 +1,39 @@
+name: Iris Frontiers HTML asset probe v0.1
+
+on:
+  pull_request:
+    paths:
+      - 'scripts/probe_frontiers_iris_html_assets_v0_1.py'
+      - '.github/workflows/iris-frontiers-html-asset-probe-v0-1.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  probe:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Extract publisher asset links from public article HTML
+        run: python scripts/probe_frontiers_iris_html_assets_v0_1.py --out build/iris_frontiers_html_asset_probe_v0_1.json
+      - name: Report asset-like strings only
+        run: |
+          python - <<'PY'
+          import json
+          x=json.load(open('build/iris_frontiers_html_asset_probe_v0_1.json'))
+          for p in x['probes']:
+              print(p.get('url'),p.get('error'))
+              for s in p.get('asset_like_strings',[]): print(s)
+          assert x['row_level_values_emitted'] is False and x['auc_computed'] is False
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: iris-frontiers-html-asset-probe-v0-1
+          path: build/iris_frontiers_html_asset_probe_v0_1.json
+          if-no-files-found: warn
+          retention-days: 90
