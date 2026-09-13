@@ -1,8 +1,8 @@
 {
   "version": "v0.1",
   "status": "GESNERIOIDEAE_SOURCE_PREFLIGHT_COMPLETE_OUTCOME_BLIND",
-  "generated_from_workflow_run": 34739684126,
-  "workflow_artifact_id": 10312277501,
+  "generated_from_workflow_run": 34739725383,
+  "workflow_artifact_id": 10312023052,
   "outcome_values_read": false,
   "auc_computed": false,
   "decision_computed": false,
@@ -10,14 +10,15 @@
   "supplementary_source": {
     "pmcid": "PMC7767864",
     "endpoint": "https://www.ebi.ac.uk/europepmc/webservices/rest/PMC7767864/supplementaryFiles",
-    "supplementary_zip_sha256": "01a9669569b3a08a6531a7ac76c93a96967bb368bef90710e0fd8f3337b49f33",
     "selected_href": "Table_1.xlsx",
     "sha256": "a84abf67da0afb8c0bafd4c1251dbcbb6dc48eb286dca788e6e88ce0176ccbc8",
     "sheet": "FINAL SAMPLE LIST",
     "max_row": 183,
     "max_column": 33,
     "header_row": 3,
-    "selection_basis": "workbook shape + whitelisted header-token matches only"
+    "selection_basis": "workbook shape + whitelisted header-token matches only",
+    "container_zip_digest_status": "NOT_CANONICAL_SERVER_REPACKAGING_VARIED_BETWEEN_RUNS",
+    "canonical_content_digest": "Table_1.xlsx sha256"
   },
   "species_identifier_only": {
     "source_rows_nonempty": 180,
