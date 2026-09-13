@@ -1,0 +1,76 @@
+name: Flower-clades-51 source preflight v0.1
+
+on:
+  pull_request:
+    paths:
+      - 'scripts/diagnose_flowerclades51_public_download_v0_1.py'
+      - 'data/flowerclades51_source_preflight_receipt_v0_1.json'
+      - 'docs/FLOWERCLADES51_SOURCE_PREFLIGHT_V0_1.md'
+      - '.github/workflows/flowerclades51-source-preflight-v0-1.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  preflight:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Assert outcome result remains absent
+        run: test ! -e results/flowerclades51_resolution_profile_v0_1
+      - name: Diagnose public Dryad response metadata only
+        run: python scripts/diagnose_flowerclades51_public_download_v0_1.py
+      - name: Validate source-access hold and outcome firewall
+        run: |
+          python - <<'PY'
+          import json
+          r=json.load(open('data/flowerclades51_source_preflight_receipt_v0_1.json'))
+          d=json.load(open('build/flowerclades51_public_download_diagnostic_v0_1.json'))
+          assert r['status']=='HOLD_SOURCE_ACCESS_OUTCOMES_UNOPENED', r['status']
+          assert r['dataset_version_id']==402189
+          assert r['api_files']['final_dataset.csv']=={
+            'file_id':4411881,'size':118867,'digest_type':'sha-256',
+            'digest':'a253308785e4cbd0e361b3ca04cdfdae29c523eefa843375cebf8030ee0874af'}
+          assert r['api_files']['trees.zip']=={
+            'file_id':4411880,'size':80326,'digest_type':'sha-256',
+            'digest':'ae5c82945e5bf9c29bcabc52d6029acd8d4f5be1fe9141fad95918eacb4f674d'}
+          assert r['identifier_projection_executed'] is False
+          assert r['tree_parse_executed'] is False
+          assert r['crosswalk_frozen'] is False
+          assert all(v is False for v in r['outcome_firewall'].values()), r['outcome_firewall']
+          assert r['paper1_science_changed'] is False
+          assert d['source_doi']=='10.5061/dryad.r4xgxd2sc'
+          assert d['outcome_values_emitted'] is False
+          by={x['path']:x for x in d['responses']}
+          assert set(by)=={'final_dataset.csv','trees.zip'}
+          for name in by:
+            x=by[name]
+            assert x['http_status']==200
+            assert x['digest_match'] is False
+            assert 'text/html' in (x['content_type'] or '').lower()
+            assert x['html_structure']['title']=='Validating...'
+            assert 'Anubis' in x['html_structure']['text_prefix']
+          print({'status':r['status'],'outcome_firewall':r['outcome_firewall']})
+          PY
+      - name: Confirm Paper 1 science firewall
+        if: github.event_name == 'pull_request'
+        run: |
+          git diff --exit-code ${{ github.event.pull_request.base.sha }}...HEAD -- manuscript data/paper1_authoritative_results_v0_2_2.csv data/paper1_main_figure_manifest_v0_2_2.csv || {
+            echo 'Paper 1 science/manuscript changed unexpectedly' >&2
+            exit 1
+          }
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: flowerclades51-source-preflight-v0-1
+          path: |
+            build/flowerclades51_public_download_diagnostic_v0_1.json
+            data/flowerclades51_source_preflight_receipt_v0_1.json
+          if-no-files-found: error
+          retention-days: 90
