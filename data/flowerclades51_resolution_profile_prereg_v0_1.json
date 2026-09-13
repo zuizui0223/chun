@@ -1,0 +1,102 @@
+{
+  "version": "v0.1",
+  "status": "FROZEN_BEFORE_FLOWERCLADES51_SPECIES_LEVEL_FLOWER_COLOR_INGESTION",
+  "source_article_doi": "10.1002/ajb2.70146",
+  "source_dataset_doi": "10.5061/dryad.r4xgxd2sc",
+  "source_dataset_known_pre_outcome": {
+    "reported_clades": 51,
+    "reported_species": 2960,
+    "flower_color_categories": [
+      "black/dark",
+      "blue/purple",
+      "green",
+      "orange",
+      "pink",
+      "red",
+      "white",
+      "yellow"
+    ],
+    "files": ["final_dataset.csv", "trees.zip"],
+    "species_level_flower_color_values_opened_by_chun_before_freeze": false
+  },
+  "programme_role": "RETROSPECTIVE_STANDARDIZED_TRAINING_BATCH_FOR_EXACT_RESOLUTION_PROFILE_ESTIMAND",
+  "prospective_label": "ANALYSIS_RULE_FROZEN_BEFORE_CHUN_ROW_LEVEL_OUTCOME_INGESTION_NOT_LITERATURE_BLINDED",
+  "phenotype_axis": "SOURCE_HUMAN_PERCEIVED_FLOWER_COLOR_ONLY",
+  "nested_resolutions": {
+    "coarse": "WHITE versus NONWHITE",
+    "intermediate": "WHITE / DARK / WARM / COOL perceptual families",
+    "fine": "exact source eight-category flower_color state",
+    "mapping_file": "data/flowerclades51_visible_colour_hierarchy_v0_1.csv",
+    "chemistry_inference_forbidden": true,
+    "fruit_color_use_forbidden": true
+  },
+  "source_preflight_before_outcome_opening": {
+    "allowed_fields": ["clade", "species"],
+    "allowed_tree_information": ["tree filenames", "tip labels", "branch lengths", "tip counts"],
+    "forbidden_fields": ["flower_color", "fruit_color"],
+    "freeze_before_outcomes": [
+      "dataset version and file hashes",
+      "clade-to-tree mapping",
+      "species-label normalization/crosswalk rule",
+      "duplicate handling",
+      "tree/data join diagnostics"
+    ]
+  },
+  "identifier_rules": {
+    "dataset_duplicate_species_within_clade": "retain first source row in source row order",
+    "tree_tip_normalization": "trim whitespace; replace underscores with spaces; collapse internal whitespace; lowercase for exact normalized comparison only",
+    "automatic_taxonomic_synonym_substitution": false,
+    "ambiguous_crosswalk": "HOLD_CLade_CROSSWALK rather than force-match"
+  },
+  "common_frame": {
+    "require_one_to_one_tree_crosswalk": true,
+    "exclude_missing_flower_color_from_all_three": true,
+    "fine_state_minimum_tips": 5,
+    "exclude_rare_fine_state_from_common_frame": true,
+    "same_retained_tips_all_resolutions": true,
+    "minimum_common_tips": 20,
+    "minimum_states_each_resolution": 2,
+    "outcome_improving_exclusions_forbidden": true,
+    "insufficient_replication_status": "HOLD_INSUFFICIENT_COMMON_FRAME_OR_STATE_VARIATION"
+  },
+  "primary_statistic": {
+    "score": "negative_patristic_distance_predicts_same_state_pair",
+    "metric": "ROC_AUC",
+    "permutations_per_clade": 9999,
+    "seed_each_clade": 20260913,
+    "permutation_unit": "jointly permute each species complete coarse/intermediate/fine state triplet across retained tips within clade",
+    "reported": [
+      "AUC_coarse",
+      "AUC_intermediate",
+      "AUC_fine",
+      "all_pairwise_AUC_differences",
+      "one_sided_p_each_AUC_above_0.5",
+      "one_sided_p_observed_winner_vs_runner_up"
+    ]
+  },
+  "decision_rule": {
+    "PROFILE_SIGNALLED_COARSE": "coarse AUC>0.5 with p<=0.05 and coarse exceeds both alternatives with winner-vs-runner-up joint-permutation p<=0.05",
+    "PROFILE_SIGNALLED_INTERMEDIATE": "intermediate satisfies the corresponding unique-winner rule",
+    "PROFILE_SIGNALLED_FINE": "fine satisfies the corresponding unique-winner rule",
+    "PROFILE_SIGNALLED_TIED": "at least one resolution has AUC>0.5 with p<=0.05 but no unique winner clears p<=0.05",
+    "PROFILE_NO_PHYLOGENETIC_SIGNAL": "no resolution has AUC>0.5 with p<=0.05",
+    "NO_POST_HOC_UPGRADE": true
+  },
+  "training_policy": {
+    "biological_replication_unit": "clade",
+    "one_outcome_per_clade": true,
+    "source_shared_method_dependence_must_be_reported": true,
+    "minimum_same_estimand_training_radiations_before_quantitative_moderator": 5,
+    "moderator_fitting_on_this_pr": false,
+    "future_moderator_max_predictors_at_n5": 1,
+    "future_moderator_requires_leave_one_radiation_out_improvement_over_intercept": true
+  },
+  "forbidden_pre_freeze_exposure": [
+    "species-level flower_color values",
+    "clade flower-color frequencies",
+    "clade coarse/intermediate/fine AUCs",
+    "clade profile winner classes",
+    "threshold or hierarchy changes using realized source colors"
+  ],
+  "paper1_science_changed": false
+}
