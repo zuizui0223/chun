@@ -1,0 +1,43 @@
+{
+  "version": "v0.1",
+  "status": "HOLD_SOURCE_ACCESS_OUTCOMES_UNOPENED",
+  "source_article_doi": "10.1002/ajb2.70146",
+  "source_dataset_doi": "10.5061/dryad.r4xgxd2sc",
+  "dataset_version_id": 402189,
+  "api_files": {
+    "final_dataset.csv": {
+      "file_id": 4411881,
+      "size": 118867,
+      "digest_type": "sha-256",
+      "digest": "a253308785e4cbd0e361b3ca04cdfdae29c523eefa843375cebf8030ee0874af"
+    },
+    "trees.zip": {
+      "file_id": 4411880,
+      "size": 80326,
+      "digest_type": "sha-256",
+      "digest": "ae5c82945e5bf9c29bcabc52d6029acd8d4f5be1fe9141fad95918eacb4f674d"
+    }
+  },
+  "download_probe": {
+    "public_file_stream_http_status": 200,
+    "returned_content": "ANUBIS_VALIDATING_HTML_NOT_SOURCE_BYTES",
+    "returned_bytes_each_probe": 4329,
+    "source_digest_match": false,
+    "interpretation": "machine-access gate only; not a source-data mismatch"
+  },
+  "identifier_projection_executed": false,
+  "tree_parse_executed": false,
+  "crosswalk_frozen": false,
+  "outcome_firewall": {
+    "flower_color_values_accessed_or_emitted": false,
+    "fruit_color_values_accessed_or_emitted": false,
+    "clade_color_frequencies_computed": false,
+    "coarse_intermediate_fine_states_materialized": false,
+    "AUC_computed": false,
+    "profile_winner_computed": false,
+    "result_directory_created": false
+  },
+  "required_external_input": "Exact source bytes matching the frozen Dryad SHA256 digests, or an authorized Dryad download path. Do not open flower_color before identifiers/tree crosswalk is frozen.",
+  "next_gate": "IDENTIFIERS_AND_TREE_ONLY_PREFLIGHT_AFTER_EXACT_BYTES_ARE_AVAILABLE",
+  "paper1_science_changed": false
+}
