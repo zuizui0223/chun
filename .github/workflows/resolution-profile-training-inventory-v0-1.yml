@@ -1,0 +1,47 @@
+name: Resolution profile training inventory v0.1
+
+on:
+  pull_request:
+    paths:
+      - 'data/resolution_profile_training_inventory_v0_1.csv'
+      - 'data/resolution_profile_training_inventory_summary_v0_1.json'
+      - 'scripts/validate_resolution_profile_training_inventory_v0_1.py'
+      - 'docs/RESOLUTION_PROFILE_TRAINING_INVENTORY_V0_1.md'
+      - '.github/workflows/resolution-profile-training-inventory-v0-1.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Validate exact-estimand training inventory
+        run: python scripts/validate_resolution_profile_training_inventory_v0_1.py
+      - name: Confirm no quantitative moderator was fitted
+        run: |
+          python - <<'PY'
+          import json
+          x=json.load(open('data/resolution_profile_training_inventory_summary_v0_1.json'))
+          assert x['same_estimand_training_n']==1
+          assert x['moderator_policy']['minimum_same_estimand_training_radiations']==5
+          assert x['moderator_policy']['fit_any_quantitative_moderator_now'] is False
+          assert x['issue_245_consequence'].startswith('DO_NOT_FIT_MODERATOR_YET')
+          print('MODERATOR_FIT_BLOCKED_AS_FROZEN')
+          PY
+      - name: Confirm Paper 1 science firewall
+        run: |
+          git diff --exit-code ${{ github.event.pull_request.base.sha }}...HEAD -- \
+            manuscript \
+            data/paper1_authoritative_results_v0_2_2.csv \
+            data/paper1_main_figure_manifest_v0_2_2.csv || {
+              echo 'Paper 1 science/manuscript changed unexpectedly' >&2
+              exit 1
+            }
