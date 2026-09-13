@@ -1,0 +1,11 @@
+{
+  "status":"OUTCOME_FIREWALL_CLOSED",
+  "row_level_HPLC_values_opened":false,
+  "compound_presence_patterns_materialized":false,
+  "branch_presence_patterns_materialized":false,
+  "state_frequencies_computed":false,
+  "AUCs_computed":false,
+  "permutations_run":false,
+  "winner_class_assigned":false,
+  "result_directory_allowed_before_preflight_merge":false
+}

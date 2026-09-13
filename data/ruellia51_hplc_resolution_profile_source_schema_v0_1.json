@@ -1,0 +1,14 @@
+{
+  "version":"v0.1",
+  "status":"SOURCE_SCHEMA_ONLY_OUTCOMES_UNOPENED",
+  "source_article_doi":"10.1002/ajb2.70149",
+  "source_data_doi":"10.6084/m9.figshare.30282448",
+  "source_code_commit":"38bb511da1390bdd525a15ea8738bcc3f016fb59",
+  "reported_species":51,
+  "compound_columns_semantics":["Pelargonidin","Cyanidin","Peonidin","Delphinidin","Petunidin","Malvidin"],
+  "author_branch_semantics":{"PEL":["Pelargonidin"],"CYA":["Cyanidin","Peonidin"],"DEL":["Delphinidin","Petunidin","Malvidin"]},
+  "row_level_values_read_by_CHUN_for_this_profile":false,
+  "state_frequencies_computed":false,
+  "AUC_computed":false,
+  "winner_computed":false
+}
