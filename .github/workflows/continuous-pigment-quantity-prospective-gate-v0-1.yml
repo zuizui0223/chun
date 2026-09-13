@@ -1,0 +1,62 @@
+name: Continuous pigment quantity prospective gate v0.1
+
+on:
+  pull_request:
+    paths:
+      - 'data/continuous_pigment_quantity_prospective_gate_v0_1.json'
+      - 'data/continuous_pigment_quantity_candidate_screen_v0_1.csv'
+      - 'data/continuous_pigment_quantity_prospective_gate_receipt_v0_1.json'
+      - 'scripts/validate_continuous_pigment_quantity_prospective_gate_v0_1.py'
+      - 'docs/CONTINUOUS_PIGMENT_QUANTITY_PROSPECTIVE_GATE_V0_1.md'
+      - '.github/workflows/continuous-pigment-quantity-prospective-gate-v0-1.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Validate gate and pre-screen state
+        run: |
+          python scripts/validate_continuous_pigment_quantity_prospective_gate_v0_1.py \
+            --gate data/continuous_pigment_quantity_prospective_gate_v0_1.json \
+            --screen data/continuous_pigment_quantity_candidate_screen_v0_1.csv \
+            --out build/continuous_pigment_quantity_prospective_gate_receipt_v0_1.json
+      - name: Verify frozen receipt exactly before candidate search
+        run: |
+          python - <<'PY'
+          import json
+          observed=json.load(open('build/continuous_pigment_quantity_prospective_gate_receipt_v0_1.json'))
+          expected=json.load(open('data/continuous_pigment_quantity_prospective_gate_receipt_v0_1.json'))
+          assert observed==expected, (observed, expected)
+          assert observed['current_state']=='FROZEN_NO_CANDIDATE_SCREENED'
+          assert observed['candidate_screen_rows']==0
+          assert observed['primary_dimension']=='PIGMENT_QUANTITY_CONTINUOUS'
+          assert observed['predicted_target_family']=='OUTPUT_CONTROL'
+          assert observed['raw_response_primary'] is True
+          assert observed['rank_sensitivity_can_upgrade'] is False
+          assert observed['paper1_science_changed'] is False
+          print(json.dumps(observed, indent=2))
+          PY
+      - name: Confirm candidate outcome values have not entered the gate branch
+        run: |
+          test "$(wc -l < data/continuous_pigment_quantity_candidate_screen_v0_1.csv)" -eq 1
+          ! grep -R -E 'best_target_class|target_class_AICc|target_class_effect_size' \
+            data/continuous_pigment_quantity_candidate_screen_v0_1.csv
+      - name: Confirm Paper 1 science firewall
+        run: |
+          git diff --exit-code ${{ github.event.pull_request.base.sha }}...HEAD -- \
+            manuscript \
+            data/paper1_authoritative_results_v0_2_2.csv \
+            data/paper1_main_figure_manifest_v0_2_2.csv || {
+              echo 'Paper 1 science/manuscript changed unexpectedly' >&2
+              exit 1
+            }
