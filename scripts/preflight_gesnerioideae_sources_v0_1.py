@@ -9,6 +9,15 @@ EPMC_SUPP = 'https://www.ebi.ac.uk/europepmc/webservices/rest/PMC7767864/supplem
 DRYAD_DATASET = 'https://datadryad.org/api/v2/datasets/doi:10.5061/dryad.m7589'
 TREE_NAME = 'Gesne_Ago8_simple_combined_CA.tre'
 OUT = Path('build/gesnerioideae_source_preflight_v0_1')
+HEADER_SCAN_ROWS = 20
+
+HEADER_PATTERNS = {
+    'species': re.compile(r'^(species|species\s*name|taxon|taxon\s*name)$', re.I),
+    'voucher': re.compile(r'voucher', re.I),
+    'sample': re.compile(r'(sample|accession|collection)', re.I),
+    'anthocyanin': re.compile(r'(anthocyan|pigment)', re.I),
+    'reflectance': re.compile(r'(reflect|colou?r|hue)', re.I),
+}
 
 
 def sha256(b):
@@ -31,8 +40,6 @@ def norm_binomial(x):
 
 
 def discover_supplementary_xlsx():
-    # Europe PMC officially serves all supplementary files for an OA article as one ZIP.
-    # We inspect file names, workbook shapes and headers only at this stage.
     zbytes = get(EPMC_SUPP).content
     rows=[]
     with zipfile.ZipFile(io.BytesIO(zbytes)) as z:
@@ -44,25 +51,62 @@ def discover_supplementary_xlsx():
     return rows, sha256(zbytes)
 
 
+def scan_header_tokens(ws):
+    # Outcome firewall: inspect strings only to test whether they match a small
+    # whitelist of header-like tokens. Nonmatching cell contents are neither
+    # retained nor printed.
+    hits=[]
+    max_c=min(ws.max_column, 100)
+    max_r=min(ws.max_row, HEADER_SCAN_ROWS)
+    for r in range(1, max_r+1):
+        row_hits=[]
+        for c in range(1, max_c+1):
+            v=ws.cell(r,c).value
+            if not isinstance(v, str):
+                continue
+            s=re.sub(r'\s+', ' ', v.strip())
+            kinds=[k for k,p in HEADER_PATTERNS.items() if p.search(s)]
+            if kinds:
+                row_hits.append({'col':c,'kinds':kinds,'token':s})
+        if row_hits:
+            hits.append({'row':r,'hits':row_hits})
+    return hits
+
+
 def choose_s1_without_outcomes(xlsx_rows):
     candidates=[]
+    diagnostics=[]
     for href,url,b in xlsx_rows:
         wb=load_workbook(io.BytesIO(b), read_only=True, data_only=False)
         for ws in wb.worksheets:
-            header=[ws.cell(1,c).value for c in range(1, min(ws.max_column,80)+1)]
-            header_s=[str(x).strip() if x is not None else '' for x in header]
-            lower=[x.lower() for x in header_s]
-            species_cols=[i+1 for i,x in enumerate(lower) if x in {'species','species name','species_name','taxon','taxon name'}]
-            score=0
-            if 170 <= ws.max_row <= 200: score += 3
-            if species_cols: score += 5
-            if any('voucher' in x for x in lower): score += 2
-            if any('anthocyan' in x or 'pigment' in x for x in lower): score += 1
-            if any('reflect' in x or 'color' in x or 'colour' in x for x in lower): score += 1
-            candidates.append({'score':score,'href':href,'url':url,'bytes':b,'sheet':ws.title,'rows':ws.max_row,'cols':ws.max_column,'header':header_s,'species_cols':species_cols})
-    candidates.sort(key=lambda x:(-x['score'], abs(x['rows']-181), x['href'], x['sheet']))
-    if not candidates or not candidates[0]['species_cols']:
-        raise RuntimeError('Could not identify Supplementary Table S1 from header/shape only')
+            scanned=scan_header_tokens(ws)
+            diagnostics.append({'file':href,'sheet':ws.title,'rows':ws.max_row,'cols':ws.max_column,'header_token_hits':scanned})
+            for item in scanned:
+                kinds=[k for h in item['hits'] for k in h['kinds']]
+                species_cols=[h['col'] for h in item['hits'] if 'species' in h['kinds']]
+                if not species_cols:
+                    continue
+                score=5
+                if 170 <= ws.max_row <= 220: score += 3
+                if 'voucher' in kinds: score += 2
+                if 'sample' in kinds: score += 1
+                if 'anthocyanin' in kinds: score += 1
+                if 'reflectance' in kinds: score += 1
+                candidates.append({
+                    'score':score,'href':href,'url':url,'bytes':b,'sheet':ws.title,
+                    'rows':ws.max_row,'cols':ws.max_column,'header_row':item['row'],
+                    'header_token_hits':item['hits'],'species_cols':species_cols
+                })
+    OUT.mkdir(parents=True, exist_ok=True)
+    (OUT/'header_structure_diagnostic.json').write_text(json.dumps({
+        'status':'OUTCOME_BLIND_HEADER_STRUCTURE_DIAGNOSTIC',
+        'outcome_values_retained':False,
+        'scan_rows':HEADER_SCAN_ROWS,
+        'sheets':diagnostics
+    },indent=2,ensure_ascii=False)+'\n')
+    candidates.sort(key=lambda x:(-x['score'], abs(x['rows']-181), x['href'], x['sheet'], x['header_row']))
+    if not candidates:
+        raise RuntimeError('Could not identify a species header within first 20 rows using header-token whitelist')
     top=candidates[0]
     if top['score'] < 8:
         raise RuntimeError(f'Ambiguous S1 structural identification: top score={top["score"]}')
@@ -74,7 +118,7 @@ def extract_species_only(s1):
     ws=wb[s1['sheet']]
     c=s1['species_cols'][0]
     vals=[]
-    for r in range(2,ws.max_row+1):
+    for r in range(s1['header_row']+1,ws.max_row+1):
         v=ws.cell(r,c).value
         if v is not None and str(v).strip():
             vals.append(str(v).strip())
@@ -86,7 +130,6 @@ def download_dryad_tree():
     meta=get(DRYAD_DATASET).json()
     files_href=(meta.get('_links',{}).get('files',{}) or {}).get('href')
     if not files_href:
-        # Dryad v2 records usually expose the version id in _links/stash:version.
         version_href=(meta.get('_links',{}).get('stash:version',{}) or meta.get('_links',{}).get('version',{})).get('href')
         if version_href:
             files_href=version_href.rstrip('/') + '/files'
@@ -121,8 +164,7 @@ def main():
     tree=Phylo.read(str(tree_path),'newick')
     tips=[t.name for t in tree.get_terminals() if t.name]
     tip_set={x for x in (norm_binomial(t) for t in tips) if x}
-    source_unique=[]; seen=set()
-    malformed=[]
+    source_unique=[]; seen=set(); malformed=[]
     for raw,key in zip(species_rows,species_keys):
         if key is None:
             malformed.append(raw); continue
@@ -132,14 +174,13 @@ def main():
     unmatched=[raw for raw,key in source_unique if key not in tip_set]
     receipt={
       'status':'GESNERIOIDEAE_SOURCE_PREFLIGHT_COMPLETE_OUTCOME_BLIND',
-      'outcome_values_read':False,
-      'auc_computed':False,
-      'decision_computed':False,
+      'outcome_values_read':False,'auc_computed':False,'decision_computed':False,
       'supplementary_source':{
         'pmcid':'PMC7767864','endpoint':EPMC_SUPP,'supplementary_zip_sha256':supp_zip_sha,
         'selected_href':s1['href'],'selected_url':s1['url'],'sha256':sha256(s1['bytes']),
-        'sheet':s1['sheet'],'max_row':s1['rows'],'max_column':s1['cols'],'header':s1['header'],
-        'selection_basis':'workbook shape + header names only'
+        'sheet':s1['sheet'],'max_row':s1['rows'],'max_column':s1['cols'],
+        'header_row':s1['header_row'],'header_token_hits':s1['header_token_hits'],
+        'selection_basis':'workbook shape + whitelisted header-token matches only'
       },
       'species_identifier_only':{
         'source_rows_nonempty':len(species_rows),'unique_normalized_binomials':len(source_unique),
@@ -156,7 +197,6 @@ def main():
     (OUT/'source_preflight_receipt.json').write_text(json.dumps(receipt,indent=2,ensure_ascii=False)+'\n')
     (OUT/'species_only_crosswalk_preflight.csv').write_text('source_species,normalized_key,in_tree\n'+''.join(f'"{raw}","{key[0]} {key[1]}",{str(key in tip_set).lower()}\n' for raw,key in source_unique))
     print(json.dumps(receipt,indent=2,ensure_ascii=False))
-    if receipt['hard_stop']!='PASS_CROSSWALK_PREFLIGHT':
-        sys.exit(2)
+    if receipt['hard_stop']!='PASS_CROSSWALK_PREFLIGHT': sys.exit(2)
 
 if __name__=='__main__': main()
