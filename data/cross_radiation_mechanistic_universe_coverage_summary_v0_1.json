@@ -1,0 +1,44 @@
+{
+  "version": "v0.1",
+  "status": "PREEXISTING_MECHANISTIC_UNIVERSE_FULLY_COVERED_BY_BENCHMARK",
+  "history": {
+    "v0_5_registry_first_commit": "1e69a6494ad9ec7e38b583158bb385ce8bd46296",
+    "v0_5_registry_commit_date_utc": "2026-09-06T04:35:37Z",
+    "mechanistic_benchmark_first_commit": "ac15ecfe1b1f390efbcead7683258671372b2bbe",
+    "mechanistic_benchmark_commit_date_utc": "2026-09-06T04:38:59Z",
+    "current_resolution_tier_expansion_date": "2026-09-13",
+    "interpretation": "SOURCE_UNIVERSE_AND_SEVEN_SYSTEM_BENCHMARK_PREDATE_CURRENT_RESOLUTION_SPECIFICITY_SYNTHESIS"
+  },
+  "v0_5_registry": {
+    "clades_total": 18,
+    "benchmark_eligible": 7,
+    "benchmark_included": 7,
+    "eligible_coverage": "7/7",
+    "eligible_ids": [
+      "AQUILEGIA",
+      "CAMELLIA",
+      "EPIMEDIUM_DIPHYLLON",
+      "ERICA_CAPE",
+      "IOCHROMINAE",
+      "IPOMOEA_ASTRIPOMOEINAE",
+      "PETUNIA_LONG_TUBE_CLADE"
+    ],
+    "excluded_total": 11,
+    "exclusion_counts": {
+      "DEPENDENCE_COLLAPSE": 1,
+      "INSUFFICIENT_MATCHED_MOLECULAR_LAYER": 9,
+      "NETWORK_CONFOUNDED_EVENT_COMPARISON": 1
+    },
+    "eligible_omissions": []
+  },
+  "post_registry_addition": {
+    "id": "PETUNIEAE",
+    "role": "PROSPECTIVELY_FROZEN_MATCHED_PHENOTYPE_AXIS_TEST",
+    "included_in_M1": true,
+    "included_in_v0_5_coverage_denominator": false
+  },
+  "selection_bias_result": "NO_ELIGIBLE_V0_5_MECHANISTIC_CLADE_OMITTED_FROM_BENCHMARK",
+  "remaining_selection_boundary": "THE_V0_5_REGISTRY_IS_A_CURATED_CROSS_CLADE_ATLAS_NOT_A_SYSTEMATIC_CENSUS_OF_ALL_FLOWER_COLOUR_LITERATURE",
+  "claim_boundary": "This audit addresses within-atlas cherry-picking. It does not prove that the atlas itself is globally exhaustive or free of literature-availability bias.",
+  "paper1_science_changed": false
+}
