@@ -1,0 +1,49 @@
+{
+  "version": "v0.1",
+  "status": "PAIRED_SPECIFICITY_ASYMMETRY_SURVIVES_EXTERNAL_TIER_STRESS",
+  "primary_paired_M1": {
+    "systems": [
+      "IOCHROMINAE",
+      "CAPE_ERICA",
+      "PETUNIEAE"
+    ],
+    "hue_branch_specific_or_finer": "3/3",
+    "amount_or_depletion_branch_specific_or_finer": "0/3",
+    "amount_or_depletion_module_or_core": "1/3",
+    "amount_or_depletion_diverse_or_primary_fail": "2/3",
+    "prospective_component": "PETUNIEAE_HUE_PASS_AMOUNT_FAIL",
+    "petunieae_hue_margin_AICc": 11.60282936,
+    "petunieae_amount_margin_AICc": 0.44436806
+  },
+  "external_stress": {
+    "M2_hue_branching": {
+      "system": "IPOMOEA",
+      "result": "EXACT_GENE_REGULATORY_F3_PRIME_H_IN_3_OF_3_ROBUST_RED_ORIGINS",
+      "alignment": "SUPPORTS_FINE_BRANCH_SPECIFIC_LOCALIZATION_OUTSIDE_M1"
+    },
+    "M3_depletion_or_loss": {
+      "systems": [
+        "AQUILEGIA",
+        "EPIMEDIUM"
+      ],
+      "results": [
+        "AQUILEGIA_LATE_PATHWAY_EXPRESSION_RECURRENCE_WITHOUT_UNIVERSAL_EXACT_REGULATOR",
+        "EPIMEDIUM_ANS_CORE_4_OF_4_WITH_BROADER_IMPLEMENTATION_HETEROGENEITY"
+      ],
+      "alignment": "SUPPORTS_RECURRENCE_AT_COARSER_MODULE_OR_CORE_LEVEL_OUTSIDE_M1"
+    },
+    "M4_regain": {
+      "system": "PETUNIA",
+      "result": "R2R3_MYB_REGULATOR_CLASS_2_OF_2_WITH_COMPLETE_IMPLEMENTATION_0_OF_2",
+      "alignment": "SUPPORTS_HIERARCHICAL_REPEATABILITY_NOT_AXIS_SPECIFICITY"
+    }
+  },
+  "revised_inference": "BOTH_HUE_AND_PIGMENT_LOSS_CAN_REPEAT_BUT_THEIR_MOST_STABLE_REPEATABILITY_OCCURS_AT_DIFFERENT_MECHANISTIC_RESOLUTIONS",
+  "specificity_candidate": "HUE_OR_HYDROXYLATION_CAN_RECUR_AT_BRANCHING_ENZYME_OR_EXACT_REGULATORY_LEVEL_WHEREAS_PIGMENT_DEPLETION_OR_LOSS_MORE_OFTEN_RECURS_AT_LATE_PATHWAY_OR_CORE_MODULE_LEVEL_WITH_HETEROGENEOUS_IMPLEMENTATION",
+  "superseded_binary_wording": "HUE_STABLE_WHILE_DEPLETION_UNSTABLE",
+  "prospective_status": "ONE_PAIRED_PROSPECTIVE_SYSTEM_ONLY",
+  "numeric_pooling": "FORBIDDEN_ACROSS_TIERS_AND_OBSERVATION_REGIMES",
+  "independence_boundary": "M1_PAIRED_SYSTEMS_ARE_PRIMARY; M2_M3_ARE_EXTERNAL_QUALITATIVE_STRESS_TESTS_AND_SYSTEM_REUSE_IS_NOT_COUNTED_AS_ADDITIONAL_INDEPENDENT_REPLICATION",
+  "claim_boundary": "The result is a resolution-specificity pattern, not a universal gene rule, not a pooled effect size, and not proof that depletion transitions cannot recur at fine resolution.",
+  "paper1_science_changed": false
+}
