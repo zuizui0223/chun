@@ -1,0 +1,39 @@
+name: Iris Frontiers asset resolver v0.3
+
+on:
+  pull_request:
+    paths:
+      - 'scripts/resolve_iris_frontiers_assets_v0_3.py'
+      - '.github/workflows/iris-frontiers-asset-resolver-v0-3.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  resolve:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Resolve frozen Iris source assets without reading row values
+        run: python scripts/resolve_iris_frontiers_assets_v0_3.py --out build/iris_frontiers_asset_resolver_v0_3.json
+      - name: Report exact publisher routes
+        run: |
+          python - <<'PY'
+          import json
+          x=json.load(open('build/iris_frontiers_asset_resolver_v0_3.json'))
+          assert x['all_resolved'] is True
+          assert x['row_level_values_emitted'] is False and x['auc_computed'] is False
+          for t in x['targets']:
+              print(t['kind'],t['xml_href'],t['resolved'])
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: iris-frontiers-asset-resolver-v0-3
+          path: build/iris_frontiers_asset_resolver_v0_3.json
+          if-no-files-found: warn
+          retention-days: 90
