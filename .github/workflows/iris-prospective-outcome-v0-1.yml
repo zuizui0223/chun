@@ -4,6 +4,8 @@ on:
   pull_request:
     paths:
       - 'scripts/run_iris_prospective_resolution_test_v0_1.py'
+      - 'scripts/run_iris_prospective_resolution_test_entry_v0_1.py'
+      - 'scripts/materialize_iris_frozen_taxon_map_v0_1.py'
       - '.github/workflows/iris-prospective-outcome-v0-1.yml'
   workflow_dispatch:
 
@@ -18,7 +20,6 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with: {fetch-depth: 0}
-
       - uses: actions/setup-python@v5
         with: {python-version: '3.12'}
 
@@ -64,17 +65,23 @@ jobs:
           assert receipt['auc_computed'] is False
           assert receipt['decision_computed'] is False
           assert receipt['tree_sha256']=='59cd03e42fbf477f71833778d000d1f1a900b291888f7e17829a65106bf8b469'
-          assert got==receipt['tree_sha256'], (got,receipt['tree_sha256'])
-          tree=Phylo.read(str(tree_path),'newick')
-          tips=[t.name for t in tree.get_terminals()]
+          assert got==receipt['tree_sha256']
+          tips=[t.name for t in Phylo.read(str(tree_path),'newick').get_terminals()]
           assert len(tips)==227 and len(set(tips))==227
           print({'tree_sha256':got,'tree_tips':len(tips),'trait_values_used':False,'auc_computed':False})
           PY
 
+      - name: Materialize the frozen outcome-independent 226-row taxon map
+        run: |
+          python scripts/materialize_iris_frozen_taxon_map_v0_1.py \
+            --tree build/frozen_tree_artifact/iris_primary_tree/iris_primary.treefile \
+            --out build/iris_frozen_full_taxon_map_v0_1.csv
+
       - name: Open the preregistered Iris outcome exactly once
         run: |
-          python scripts/run_iris_prospective_resolution_test_v0_1.py \
+          python scripts/run_iris_prospective_resolution_test_entry_v0_1.py \
             --tree build/frozen_tree_artifact/iris_primary_tree/iris_primary.treefile \
+            --crosswalk build/iris_frozen_full_taxon_map_v0_1.csv \
             --out results/iris_intermediate_resolution_v0_1/iris_intermediate_resolution_result_v0_1.json
 
       - name: Assert terminal result is immutable-classified
@@ -97,6 +104,7 @@ jobs:
           name: iris-prospective-intermediate-resolution-outcome-v0-1
           path: |
             results/iris_intermediate_resolution_v0_1/iris_intermediate_resolution_result_v0_1.json
+            build/iris_frozen_full_taxon_map_v0_1.csv
             build/frozen_tree_artifact/iris_primary_tree/primary_tree_receipt.json
             build/frozen_tree_artifact/iris_primary_tree/iris_primary.treefile
           retention-days: 90
