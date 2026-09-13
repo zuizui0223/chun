@@ -15,6 +15,33 @@
     "petunieae_hue_margin_AICc": 11.60282936,
     "petunieae_amount_margin_AICc": 0.44436806
   },
+  "expanded_descriptive_stress": {
+    "hue_or_hydroxylation_systems": [
+      "IOCHROMINAE",
+      "CAPE_ERICA",
+      "PETUNIEAE",
+      "IPOMOEA"
+    ],
+    "hue_branch_specific_or_finer": "4/4",
+    "hue_specificity_classes": {
+      "BRANCH_SPECIFIC_OR_FINER": 4
+    },
+    "amount_or_depletion_systems": [
+      "IOCHROMINAE",
+      "CAPE_ERICA",
+      "PETUNIEAE",
+      "AQUILEGIA",
+      "EPIMEDIUM"
+    ],
+    "amount_or_depletion_branch_specific_or_finer": "0/5",
+    "amount_or_depletion_module_or_core": "3/5",
+    "amount_or_depletion_diverse_or_primary_fail": "2/5",
+    "amount_or_depletion_specificity_classes": {
+      "DIVERSE_OR_PRIMARY_FAIL": 2,
+      "MODULE_OR_CORE": 3
+    },
+    "interpretation": "DESCRIPTIVE_SPECIFICITY_CONTRAST_ONLY_HETEROGENEOUS_OBSERVATION_REGIMES"
+  },
   "external_stress": {
     "M2_hue_branching": {
       "system": "IPOMOEA",
@@ -44,6 +71,6 @@
   "prospective_status": "ONE_PAIRED_PROSPECTIVE_SYSTEM_ONLY",
   "numeric_pooling": "FORBIDDEN_ACROSS_TIERS_AND_OBSERVATION_REGIMES",
   "independence_boundary": "M1_PAIRED_SYSTEMS_ARE_PRIMARY; M2_M3_ARE_EXTERNAL_QUALITATIVE_STRESS_TESTS_AND_SYSTEM_REUSE_IS_NOT_COUNTED_AS_ADDITIONAL_INDEPENDENT_REPLICATION",
-  "claim_boundary": "The result is a resolution-specificity pattern, not a universal gene rule, not a pooled effect size, and not proof that depletion transitions cannot recur at fine resolution.",
+  "claim_boundary": "The 4/4 versus 0/5 expanded counts are descriptive stress-test summaries across heterogeneous observation regimes, not a significance test or pooled effect size. The result is a resolution-specificity pattern, not a universal gene rule and not proof that depletion transitions cannot recur at fine resolution.",
   "paper1_science_changed": false
 }
