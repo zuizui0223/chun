@@ -29,24 +29,29 @@ jobs:
         run: python scripts/diagnose_ruellia51_figshare_metadata_v0_1.py
       - name: Download exact CSV bytes and inspect headers only
         run: python scripts/diagnose_ruellia51_csv_headers_v0_1.py
-      - name: Validate outcome firewall
+      - name: Validate terminal tree-source hold and outcome firewall
         run: |
           python - <<'PY'
           import json
           m=json.load(open('build/ruellia51_figshare_metadata_v0_1.json'))
           h=json.load(open('build/ruellia51_csv_headers_v0_1.json'))
+          r=json.load(open('data/ruellia51_source_preflight_receipt_v0_1.json'))
           assert m['status']=='FIGSHARE_METADATA_ONLY_OUTCOMES_UNOPENED'
-          assert m['article_id']==30282448
-          assert m['version']==2
-          assert m['row_level_HPLC_values_read'] is False
-          assert h['status']=='CSV_HEADERS_ONLY_OUTCOMES_UNOPENED'
-          assert h['data_rows_read']==0
-          assert h['row_level_HPLC_values_read'] is False
-          assert h['AUC_computed'] is False and h['winner_computed'] is False
-          by={x['name']:x for x in h['files']}
-          assert by['anthocyanins_spectra.csv']['md5']=='bb76b658952017e1c30bc5b488068f63'
-          assert by['raw_data.csv']['md5']=='0e3b9830abb1378f9546cd7d07ae1f97'
-          print({'metadata_version':m['version'],'headers':{k:v['header'] for k,v in by.items()}})
+          assert m['article_id']==30282448 and m['version']==2
+          assert h['status']=='CSV_HEADERS_ONLY_OUTCOMES_UNOPENED' and h['data_rows_read']==0
+          assert r['status']=='HOLD_TREE_SOURCE_OUTCOMES_UNOPENED'
+          assert r['figshare_doi_version']=='10.6084/m9.figshare.30282448.v2'
+          assert r['figshare_files']['raw_data.csv']['file_id']==58502635
+          assert r['figshare_files']['raw_data.csv']['md5']=='0e3b9830abb1378f9546cd7d07ae1f97'
+          assert r['figshare_files']['raw_data.csv']['role']=='PRIMARY_HPLC_SOURCE_FOR_FROZEN_CHUN_PROFILE'
+          assert r['header_only_verification']['data_rows_read']==0
+          assert r['author_code_tree_contract']['expected_tree_path']=='color data/color data/phylogeny/03-Ruellia_phylo.timed.tre'
+          assert r['author_code_tree_contract']['tree_present_in_figshare_v2_manifest'] is False
+          assert r['author_code_tree_contract']['tree_present_in_author_github_commit_tree'] is False
+          assert r['crosswalk']['executed'] is False and r['crosswalk']['frozen'] is False
+          assert all(v is False for v in r['outcome_firewall'].values()), r['outcome_firewall']
+          assert r['paper1_science_changed'] is False
+          print({'status':r['status'],'primary_source':r['figshare_files']['raw_data.csv'],'tree':r['author_code_tree_contract']['expected_tree_path']})
           PY
       - name: Confirm Paper 1 science firewall
         if: github.event_name == 'pull_request'
@@ -58,4 +63,5 @@ jobs:
           path: |
             build/ruellia51_figshare_metadata_v0_1.json
             build/ruellia51_csv_headers_v0_1.json
+            data/ruellia51_source_preflight_receipt_v0_1.json
           retention-days: 90
