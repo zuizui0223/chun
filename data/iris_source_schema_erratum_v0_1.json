@@ -1,0 +1,52 @@
+{
+  "version": "v0.1",
+  "status": "FROZEN_POST_ROW_INGEST_PRE_AUC_SOURCE_SCHEMA_ERRATUM",
+  "parent_preregistration": "data/intermediate_resolution_rule_prereg_v0_1.json",
+  "discovery_stage": "POST_FREEZE_ROW_LEVEL_INGESTION_DIAGNOSTIC",
+  "discovery_run": 34729493048,
+  "source_accession_header": [
+    "organism",
+    "matK",
+    "trnL",
+    "ndhF",
+    "trnK",
+    "rbcL",
+    "ITS"
+  ],
+  "preregistered_locus_token": "NADPH",
+  "corrected_source_locus_token": "ndhF",
+  "correction_type": "SOURCE_SCHEMA_NAME_CORRECTION_ONLY",
+  "rationale": "The frozen accession source has an ndhF column and no NADPH column. The preregistration token NADPH is therefore treated as a source-schema transcription error, not as a biological or outcome-driven model change.",
+  "effective_phylogeny_loci_after_erratum": [
+    "matK",
+    "trnL",
+    "ndhF",
+    "trnK",
+    "rbcL",
+    "ITS"
+  ],
+  "unchanged_contract": {
+    "trait_coding": true,
+    "eligible_tip_rule": true,
+    "rare_fine_state_rule": true,
+    "missingness_rule": true,
+    "alignment_method": true,
+    "trimming_method": true,
+    "tree_method": true,
+    "rooting_rule": true,
+    "source_specific_exclusion": true,
+    "primary_statistic": true,
+    "permutation_count": true,
+    "permutation_seed": true,
+    "decision_rule": true,
+    "sensitivity_cannot_upgrade": true
+  },
+  "outcome_exposure_at_erratum": {
+    "row_level_traits_ingested": true,
+    "auc_computed": false,
+    "resolution_delta_computed": false,
+    "pass_mixed_fail_decision_computed": false
+  },
+  "claim_boundary": "This erratum corrects only the source locus name. It does not alter any phenotype coding, eligible-tip criterion, phylogenetic statistic, permutation rule, threshold, or decision criterion and cannot be used to reinterpret later outcomes.",
+  "paper1_science_changed": false
+}

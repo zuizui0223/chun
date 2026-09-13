@@ -1,0 +1,40 @@
+name: Iris source-schema erratum v0.1
+
+on:
+  pull_request:
+    paths:
+      - 'data/iris_source_schema_erratum_v0_1.json'
+      - 'docs/IRIS_SOURCE_SCHEMA_ERRATUM_V0_1.md'
+      - 'scripts/validate_iris_source_schema_erratum_v0_1.py'
+      - '.github/workflows/iris-source-schema-erratum-v0-1.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install table readers
+        run: python -m pip install --disable-pip-version-check pandas openpyxl
+      - name: Re-run the post-freeze ingestion diagnostic without AUC
+        run: |
+          python scripts/ingest_iris_postfreeze_rows_v0_1.py \
+            --out build/iris_postfreeze_row_ingestion_v0_1.json
+      - name: Validate source-schema erratum
+        run: |
+          python scripts/validate_iris_source_schema_erratum_v0_1.py \
+            --ingest-receipt build/iris_postfreeze_row_ingestion_v0_1.json
+      - name: Confirm Paper 1 science firewall
+        run: |
+          git diff --exit-code ${{ github.event.pull_request.base.sha }}...HEAD -- \
+            manuscript \
+            data/paper1_authoritative_results_v0_2_2.csv \
+            data/paper1_main_figure_manifest_v0_2_2.csv
