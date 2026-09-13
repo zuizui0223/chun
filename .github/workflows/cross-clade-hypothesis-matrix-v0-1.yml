@@ -1,0 +1,55 @@
+name: Cross-clade hypothesis matrix v0.1
+
+on:
+  pull_request:
+    paths:
+      - 'data/cross_clade_hypothesis_evidence_v0_1.csv'
+      - 'data/cross_clade_hypothesis_summary_v0_1.json'
+      - 'data/cross_clade_evidence_tier_registry_v0_5.csv'
+      - 'scripts/summarize_cross_clade_hypothesis_matrix_v0_1.py'
+      - 'docs/CROSS_CLADE_HYPOTHESIS_MATRIX_V0_1.md'
+      - '.github/workflows/cross-clade-hypothesis-matrix-v0-1.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Rebuild H1-H6 summary
+        run: |
+          python scripts/summarize_cross_clade_hypothesis_matrix_v0_1.py \
+            --out build/cross_clade_hypothesis_summary_v0_1.json
+      - name: Verify frozen decisions exactly
+        run: |
+          python - <<'PY'
+          import json
+          o=json.load(open('build/cross_clade_hypothesis_summary_v0_1.json'))
+          e=json.load(open('data/cross_clade_hypothesis_summary_v0_1.json'))
+          assert o==e, (o,e)
+          assert o['paper_candidate']['primary']=='H4_REPRESENTATION_AND_OBSERVATION_RESOLUTION_DEPENDENCE'
+          assert o['paper_candidate']['secondary']=='H3_HIERARCHICAL_REPEATABILITY'
+          assert o['hypotheses']['H4']['flagship_ready'] is True
+          assert o['hypotheses']['H3']['flagship_ready'] is True
+          assert o['hypotheses']['H1']['flagship_ready'] is False
+          assert o['hypotheses']['H5']['flagship_ready'] is False
+          assert o['paper1_science_changed'] is False
+          print(json.dumps(o, indent=2))
+          PY
+      - name: Confirm Paper 1 science firewall
+        run: |
+          git diff --exit-code ${{ github.event.pull_request.base.sha }}...HEAD -- \
+            manuscript \
+            data/paper1_authoritative_results_v0_2_2.csv \
+            data/paper1_main_figure_manifest_v0_2_2.csv || {
+              echo 'Paper 1 science/manuscript changed unexpectedly' >&2
+              exit 1
+            }
