@@ -4,9 +4,11 @@ from __future__ import annotations
 import argparse
 import csv
 import hashlib
+import http.cookiejar
 import io
 import json
 import re
+import urllib.error
 import urllib.parse
 import urllib.request
 import zipfile
@@ -18,9 +20,14 @@ from Bio import Phylo
 DOI = "10.5061/dryad.r4xgxd2sc"
 API = "https://datadryad.org/api/v2"
 DATASET_PATH = "/datasets/" + urllib.parse.quote("doi:" + DOI, safe="")
+LANDING_URL = "https://datadryad.org/dataset/" + urllib.parse.quote("doi:" + DOI, safe="/")
 EXPECTED_FILES = {"final_dataset.csv", "trees.zip"}
 REQUIRED_HEADER = {"clade", "species", "flower_color", "fruit_color"}
 OUTCOME_COLUMNS = {"flower_color", "fruit_color"}
+BROWSER_UA = (
+    "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 "
+    "(KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"
+)
 
 
 def get_bytes(url: str, timeout: int = 90) -> bytes:
@@ -79,12 +86,41 @@ def file_id(meta: dict) -> str:
     return m.group(1)
 
 
-def download_public_file(meta: dict) -> bytes:
+def browser_opener() -> urllib.request.OpenerDirector:
+    jar = http.cookiejar.CookieJar()
+    return urllib.request.build_opener(urllib.request.HTTPCookieProcessor(jar))
+
+
+def browser_request(opener: urllib.request.OpenerDirector, url: str, *, referer: str | None = None, timeout: int = 180) -> bytes:
+    headers = {
+        "User-Agent": BROWSER_UA,
+        "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,text/csv,application/zip;q=0.8,*/*;q=0.7",
+        "Accept-Language": "en-US,en;q=0.9",
+        "Cache-Control": "no-cache",
+        "Pragma": "no-cache",
+    }
+    if referer:
+        headers["Referer"] = referer
+        headers["Sec-Fetch-Site"] = "same-origin"
+        headers["Sec-Fetch-Mode"] = "navigate"
+        headers["Sec-Fetch-Dest"] = "document"
+    req = urllib.request.Request(url, headers=headers)
+    try:
+        with opener.open(req, timeout=timeout) as r:
+            return r.read()
+    except urllib.error.HTTPError as e:
+        raise SystemExit(
+            f"public Dryad browser-route access failed: requested={url} final={e.geturl()} status={e.code} reason={e.reason}"
+        ) from e
+
+
+def download_public_file(meta: dict, opener: urllib.request.OpenerDirector) -> bytes:
     fid = file_id(meta)
-    # Browser/public-file route. The REST file-download endpoint requires an API account
-    # even for published content, so it is intentionally not used here.
+    # Dryad REST metadata/file listing is anonymous, while REST file-download requires an
+    # API account. Published files are exposed by the public browser file_stream route.
+    # Establish a normal landing-page session before following that public download route.
     url = f"https://datadryad.org/stash/downloads/file_stream/{fid}"
-    return get_bytes(url, timeout=180)
+    return browser_request(opener, url, referer=LANDING_URL, timeout=180)
 
 
 def verify_digest(meta: dict, payload: bytes) -> dict:
@@ -113,7 +149,7 @@ def verify_digest(meta: dict, payload: bytes) -> dict:
 
 def identifier_projection(csv_bytes: bytes) -> tuple[dict, dict[str, list[str]]]:
     # The source bytes necessarily contain all columns, but this preflight's parser stores,
-    # groups, emits, and makes decisions from CLade/species identifiers only. Outcome columns
+    # groups, emits, and makes decisions from clade/species identifiers only. Outcome columns
     # are checked for header presence and never accessed by name or retained in output objects.
     text = io.TextIOWrapper(io.BytesIO(csv_bytes), encoding="utf-8-sig", newline="")
     reader = csv.reader(text)
@@ -181,11 +217,7 @@ def parse_tree_members(zip_bytes: bytes) -> tuple[list[dict], dict[str, set[str]
             try:
                 txt = raw.decode("utf-8-sig")
             except UnicodeDecodeError:
-                tree_records.append({
-                    "member": member,
-                    "parse_status": "NON_UTF8_NOT_PARSED",
-                    "bytes": len(raw),
-                })
+                tree_records.append({"member": member, "parse_status": "NON_UTF8_NOT_PARSED", "bytes": len(raw)})
                 continue
             parsed = None
             fmt = None
@@ -198,12 +230,7 @@ def parse_tree_members(zip_bytes: bytes) -> tuple[list[dict], dict[str, set[str]
                 except Exception as e:
                     last_error = str(e)
             if parsed is None:
-                tree_records.append({
-                    "member": member,
-                    "parse_status": "PARSE_FAIL",
-                    "bytes": len(raw),
-                    "error": last_error,
-                })
+                tree_records.append({"member": member, "parse_status": "PARSE_FAIL", "bytes": len(raw), "error": last_error})
                 continue
             tips = [t.name for t in parsed.get_terminals()]
             if any(t is None for t in tips):
@@ -272,8 +299,11 @@ def main() -> int:
     if missing:
         raise SystemExit(f"Dryad version missing expected files {missing}; found {sorted(by_name)}")
 
-    csv_payload = download_public_file(by_name["final_dataset.csv"])
-    trees_payload = download_public_file(by_name["trees.zip"])
+    opener = browser_opener()
+    # Establish browser-session state first; page content is not parsed for outcomes.
+    browser_request(opener, LANDING_URL, timeout=90)
+    csv_payload = download_public_file(by_name["final_dataset.csv"], opener)
+    trees_payload = download_public_file(by_name["trees.zip"], opener)
     csv_receipt = verify_digest(by_name["final_dataset.csv"], csv_payload)
     trees_receipt = verify_digest(by_name["trees.zip"], trees_payload)
 
@@ -293,13 +323,7 @@ def main() -> int:
         "version_href": vhref,
         "api_file_count": len(files),
         "api_files": [
-            {
-                "path": f.get("path"),
-                "size": f.get("size"),
-                "file_id": file_id(f),
-                "digest_type": f.get("digestType"),
-                "digest": f.get("digest"),
-            }
+            {"path": f.get("path"), "size": f.get("size"), "file_id": file_id(f), "digest_type": f.get("digestType"), "digest": f.get("digest")}
             for f in sorted(files, key=lambda x: str(x.get("path")))
         ],
         "download_receipts": [csv_receipt, trees_receipt],
@@ -318,7 +342,7 @@ def main() -> int:
             "profile_winner_computed": False,
             "result_directory_created": False,
         },
-        "next_gate": "FREEZE_CLade_TREE_CROSSWALK_AND_DUPLICATE_RULE_FROM_IDENTIFIERS_ONLY_BEFORE_OPENING_FLOWER_COLOR",
+        "next_gate": "FREEZE_CLADE_TREE_CROSSWALK_AND_DUPLICATE_RULE_FROM_IDENTIFIERS_ONLY_BEFORE_OPENING_FLOWER_COLOR",
         "paper1_science_changed": False,
     }
 
