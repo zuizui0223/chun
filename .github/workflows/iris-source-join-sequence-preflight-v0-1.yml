@@ -1,0 +1,62 @@
+name: Iris source join and sequence preflight v0.1
+
+on:
+  pull_request:
+    paths:
+      - 'scripts/preflight_iris_source_join_sequences_v0_1.py'
+      - '.github/workflows/iris-source-join-sequence-preflight-v0-1.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  preflight:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install table readers
+        run: python -m pip install --disable-pip-version-check pandas openpyxl
+      - name: Confirm preregistration and source-schema erratum are frozen
+        run: |
+          python - <<'PY'
+          import json
+          p=json.load(open('data/intermediate_resolution_rule_prereg_v0_1.json'))
+          e=json.load(open('data/iris_source_schema_erratum_v0_1.json'))
+          assert p['status']=='FROZEN_BEFORE_CHUN_IRIS_ROW_LEVEL_OUTCOME_INGESTION'
+          assert e['status']=='FROZEN_POST_ROW_INGEST_PRE_AUC_SOURCE_SCHEMA_ERRATUM'
+          assert e['effective_phylogeny_loci_after_erratum']==['matK','trnL','ndhF','trnK','rbcL','ITS']
+          assert e['outcome_exposure_at_erratum']['auc_computed'] is False
+          PY
+      - name: Run outcome-independent taxon/locus preflight
+        run: |
+          python scripts/preflight_iris_source_join_sequences_v0_1.py \
+            --out build/iris_source_join_sequence_preflight_v0_1.json
+      - name: Assert no frozen statistic was opened
+        run: |
+          python - <<'PY'
+          import json
+          x=json.load(open('build/iris_source_join_sequence_preflight_v0_1.json'))
+          assert x['status']=='IRIS_SOURCE_JOIN_AND_SEQUENCE_PREFLIGHT_ONLY'
+          assert x['auc_computed'] is False
+          assert x['trait_state_used_for_tree'] is False
+          assert x['decision_computed'] is False
+          assert x['paper1_science_changed'] is False
+          print(json.dumps(x,indent=2,ensure_ascii=False))
+          PY
+      - name: Confirm Paper 1 science firewall
+        run: |
+          git diff --exit-code ${{ github.event.pull_request.base.sha }}...HEAD -- \
+            manuscript \
+            data/paper1_authoritative_results_v0_2_2.csv \
+            data/paper1_main_figure_manifest_v0_2_2.csv
+      - uses: actions/upload-artifact@v4
+        with:
+          name: iris-source-join-sequence-preflight-v0-1
+          path: build/iris_source_join_sequence_preflight_v0_1.json
+          retention-days: 90
