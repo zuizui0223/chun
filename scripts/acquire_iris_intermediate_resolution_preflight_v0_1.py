@@ -7,7 +7,6 @@ import hashlib
 import io
 import json
 import re
-import tarfile
 import urllib.parse
 import urllib.request
 import xml.etree.ElementTree as ET
@@ -17,9 +16,10 @@ from pathlib import Path
 PMC_ID = "PMC7588356"
 PMC_NUMERIC = "7588356"
 XML_URL = f"https://eutils.ncbi.nlm.nih.gov/entrez/eutils/efetch.fcgi?db=pmc&id={PMC_NUMERIC}&retmode=xml"
-OA_URL = f"https://www.ncbi.nlm.nih.gov/pmc/utils/oa/oa.fcgi?id={PMC_ID}"
+CLOUD_BUCKET = "pmc-oa-opendata"
+CLOUD_HTTPS = f"https://{CLOUD_BUCKET}.s3.amazonaws.com"
 XLINK = "{http://www.w3.org/1999/xlink}href"
-USER_AGENT = "chun-iris-preregistered-analysis/0.1"
+USER_AGENT = "chun-iris-preregistered-analysis/0.2"
 
 
 def fetch_with_meta(url: str) -> tuple[str, str, bytes]:
@@ -39,6 +39,12 @@ def text_content(el: ET.Element) -> str:
 
 
 def candidate_urls(href: str) -> list[str]:
+    """Legacy article-page candidates retained only as cheap first attempts.
+
+    PMC removed the legacy OA package service and legacy dataset distribution in
+    August 2026. These URLs may therefore 404; the authoritative fallback below
+    is the current PMC Article Datasets AWS structure.
+    """
     urls: list[str] = []
     if href.startswith("http://") or href.startswith("https://"):
         urls.append(href)
@@ -63,56 +69,147 @@ def looks_like_html(content_type: str, b: bytes) -> bool:
     )
 
 
-def oa_package_member(href: str) -> tuple[str, str, bytes, dict[str, object]]:
-    oa_final, oa_content_type, oa_bytes = fetch_with_meta(OA_URL)
-    root = ET.fromstring(oa_bytes)
-    links = root.findall(".//link")
-    tgz = [x.attrib.get("href", "") for x in links if x.attrib.get("format") == "tgz"]
-    if len(tgz) != 1:
-        raise RuntimeError(f"expected one PMC OA tgz link, found {tgz}")
-    package_url = tgz[0]
-    if package_url.startswith("ftp://ftp.ncbi.nlm.nih.gov/"):
-        package_url = "https://ftp.ncbi.nlm.nih.gov/" + package_url[len("ftp://ftp.ncbi.nlm.nih.gov/"):]
-    pkg_final, pkg_content_type, pkg_bytes = fetch_with_meta(package_url)
-    if looks_like_html(pkg_content_type, pkg_bytes):
-        raise RuntimeError(f"PMC OA package URL returned HTML: {pkg_final}")
+def _xml_local(el: ET.Element, name: str) -> list[ET.Element]:
+    return [x for x in el.iter() if x.tag.rsplit("}", 1)[-1] == name]
 
-    target = Path(urllib.parse.urlparse(href).path).name.lower()
-    with tarfile.open(fileobj=io.BytesIO(pkg_bytes), mode="r:gz") as tf:
-        members = [m for m in tf.getmembers() if m.isfile()]
-        exact = [m for m in members if Path(m.name).name.lower() == target]
-        if len(exact) != 1:
-            # Some PMC packages normalize punctuation/case. Use a strict stem fallback.
-            stem = Path(target).stem.lower()
-            ext = Path(target).suffix.lower()
-            stem_hits = [
-                m for m in members
-                if Path(m.name).suffix.lower() == ext and Path(m.name).stem.lower() == stem
-            ]
-            exact = stem_hits
-        if len(exact) != 1:
-            raise RuntimeError(
-                f"OA package did not uniquely contain {href!r}; candidates="
-                f"{[m.name for m in members if Path(m.name).suffix.lower() in {'.xlsx','.xls','.csv','.tsv','.txt'}][:100]}"
-            )
-        member = exact[0]
-        fh = tf.extractfile(member)
-        if fh is None:
-            raise RuntimeError(f"could not extract OA package member {member.name}")
-        payload = fh.read()
 
+def cloud_article_versions() -> tuple[list[str], dict[str, object]]:
+    """List current PMC AWS article-version prefixes without opening outcomes."""
+    query = urllib.parse.urlencode(
+        {"list-type": "2", "prefix": f"{PMC_ID}.", "delimiter": "/"}
+    )
+    list_url = f"{CLOUD_HTTPS}/?{query}"
+    final_url, content_type, payload = fetch_with_meta(list_url)
+    root = ET.fromstring(payload)
+    prefixes = [
+        (p.text or "").strip()
+        for cp in _xml_local(root, "CommonPrefixes")
+        for p in _xml_local(cp, "Prefix")
+        if (p.text or "").strip()
+    ]
+    rx = re.compile(rf"^{re.escape(PMC_ID)}\.(\d+)/$")
+    versioned: list[tuple[int, str]] = []
+    for prefix in prefixes:
+        m = rx.fullmatch(prefix)
+        if m:
+            versioned.append((int(m.group(1)), prefix))
+    versioned.sort()
+    versions = [p for _, p in versioned]
+    if not versions:
+        raise RuntimeError(
+            f"PMC Cloud Service returned no article-version prefix for {PMC_ID}: {prefixes}"
+        )
     meta = {
-        "oa_api_url": OA_URL,
-        "oa_api_final_url": oa_final,
-        "oa_api_content_type": oa_content_type,
-        "oa_api_sha256": sha256_bytes(oa_bytes),
-        "oa_package_url": pkg_final,
-        "oa_package_content_type": pkg_content_type,
-        "oa_package_bytes": len(pkg_bytes),
-        "oa_package_sha256": sha256_bytes(pkg_bytes),
-        "oa_package_member": member.name,
+        "cloud_bucket": CLOUD_BUCKET,
+        "cloud_list_url": final_url,
+        "cloud_list_content_type": content_type,
+        "cloud_list_sha256": sha256_bytes(payload),
+        "cloud_version_prefixes": versions,
+        "cloud_selected_version_prefix": versions[-1],
     }
-    return f"{pkg_final}#{member.name}", "application/octet-stream", payload, meta
+    return versions, meta
+
+
+def s3_url_to_https(s3_url: str) -> str:
+    parsed = urllib.parse.urlsplit(s3_url)
+    if parsed.scheme != "s3" or parsed.netloc != CLOUD_BUCKET:
+        raise RuntimeError(f"unexpected PMC media URL: {s3_url}")
+    key = parsed.path.lstrip("/")
+    # The metadata md5 query is a checksum annotation, not required for HTTP retrieval.
+    return f"{CLOUD_HTTPS}/{urllib.parse.quote(key, safe='/._-')}"
+
+
+def cloud_media_member(href: str) -> tuple[str, str, bytes, dict[str, object]]:
+    """Resolve one supplement through the post-Aug-2026 PMC Cloud Service."""
+    versions, list_meta = cloud_article_versions()
+    selected = versions[-1].rstrip("/")
+
+    metadata_candidates = [
+        f"{CLOUD_HTTPS}/metadata/{selected}.json",
+        f"{CLOUD_HTTPS}/{selected}/{selected}.json",
+    ]
+    metadata_attempts: list[dict[str, object]] = []
+    metadata: dict[str, object] | None = None
+    metadata_url = ""
+    metadata_bytes = b""
+    for url in metadata_candidates:
+        try:
+            final, ct, b = fetch_with_meta(url)
+            metadata_attempts.append(
+                {
+                    "requested_url": url,
+                    "final_url": final,
+                    "content_type": ct,
+                    "bytes": len(b),
+                    "sha256": sha256_bytes(b),
+                }
+            )
+            x = json.loads(b.decode("utf-8"))
+            if not isinstance(x, dict):
+                raise RuntimeError("metadata JSON is not an object")
+            metadata = x
+            metadata_url = final
+            metadata_bytes = b
+            break
+        except Exception as e:
+            metadata_attempts.append({"requested_url": url, "error": repr(e)})
+    if metadata is None:
+        raise RuntimeError(f"could not retrieve current PMC cloud metadata: {metadata_attempts}")
+
+    if metadata.get("pmcid") != PMC_ID:
+        raise RuntimeError(f"cloud metadata PMCID mismatch: {metadata.get('pmcid')!r}")
+    media_urls = metadata.get("media_urls")
+    if not isinstance(media_urls, list) or not media_urls:
+        raise RuntimeError("cloud metadata contains no media_urls")
+    media_urls = [str(x) for x in media_urls]
+
+    target = Path(urllib.parse.urlsplit(href).path).name.lower()
+    target_suffix = Path(target).suffix.lower()
+
+    def media_basename(u: str) -> str:
+        return Path(urllib.parse.urlsplit(u).path).name.lower()
+
+    exact = [u for u in media_urls if media_basename(u) == target]
+    candidates = exact
+    resolution = "EXACT_BASENAME"
+    if not candidates and target_suffix:
+        candidates = [u for u in media_urls if Path(media_basename(u)).suffix.lower() == target_suffix]
+        resolution = "UNIQUE_EXTENSION_FALLBACK"
+    if len(candidates) != 1:
+        raise RuntimeError(
+            f"cloud media did not uniquely resolve {href!r}; exact={exact}; "
+            f"extension_candidates={candidates}; available={[media_basename(u) for u in media_urls]}"
+        )
+
+    source_s3 = candidates[0]
+    https_url = s3_url_to_https(source_s3)
+    final, content_type, payload = fetch_with_meta(https_url)
+    if looks_like_html(content_type, payload) or len(payload) <= 100:
+        raise RuntimeError(
+            f"resolved cloud supplement invalid: {final} type={content_type} bytes={len(payload)}"
+        )
+
+    md5_expected = urllib.parse.parse_qs(urllib.parse.urlsplit(source_s3).query).get("md5", [None])[0]
+    md5_observed = hashlib.md5(payload).hexdigest()  # nosec B303 - source integrity check only
+    if md5_expected and md5_observed.lower() != md5_expected.lower():
+        raise RuntimeError(
+            f"PMC cloud md5 mismatch for {source_s3}: expected={md5_expected} observed={md5_observed}"
+        )
+
+    meta: dict[str, object] = {
+        **list_meta,
+        "cloud_metadata_url": metadata_url,
+        "cloud_metadata_sha256": sha256_bytes(metadata_bytes),
+        "cloud_metadata_attempts": metadata_attempts,
+        "cloud_media_count": len(media_urls),
+        "cloud_media_basenames": [media_basename(u) for u in media_urls],
+        "cloud_resolution": resolution,
+        "cloud_source_s3_url": source_s3,
+        "cloud_resolved_https_url": final,
+        "cloud_md5_expected": md5_expected,
+        "cloud_md5_observed": md5_observed,
+    }
+    return final, content_type, payload, meta
 
 
 def download_href(href: str) -> tuple[str, str, bytes, list[dict[str, object]]]:
@@ -135,14 +232,20 @@ def download_href(href: str) -> tuple[str, str, bytes, list[dict[str, object]]]:
         except Exception as e:
             attempts.append({"requested_url": url, "error": repr(e)})
 
+    # Authoritative post-Aug-2026 distribution path.
     try:
-        final_url, content_type, b, oa_meta = oa_package_member(href)
-        attempts.append({"oa_package_fallback": True, **oa_meta, "bytes": len(b), "magic_hex": b[:16].hex()})
-        if len(b) <= 100:
-            raise RuntimeError(f"OA package member too small: {len(b)} bytes")
+        final_url, content_type, b, cloud_meta = cloud_media_member(href)
+        attempts.append(
+            {
+                "pmc_cloud_service_fallback": True,
+                **cloud_meta,
+                "bytes": len(b),
+                "magic_hex": b[:16].hex(),
+            }
+        )
         return final_url, content_type, b, attempts
     except Exception as e:
-        attempts.append({"oa_package_fallback": True, "error": repr(e)})
+        attempts.append({"pmc_cloud_service_fallback": True, "error": repr(e)})
 
     raise RuntimeError(
         "could not download a non-HTML supplement for href %r\n%s"
@@ -278,7 +381,7 @@ def main() -> int:
         outputs.append(inspection)
 
     receipt = {
-        "version": "v0.1",
+        "version": "v0.2",
         "status": "POST_FREEZE_SOURCE_HEADER_PREFLIGHT_ONLY",
         "freeze_contract": "data/intermediate_resolution_rule_prereg_v0_1.json",
         "pmc_id": PMC_ID,
