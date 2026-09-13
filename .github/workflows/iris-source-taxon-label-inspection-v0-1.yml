@@ -1,0 +1,31 @@
+name: Iris source taxon label inspection v0.1
+
+on:
+  pull_request:
+    paths:
+      - 'scripts/inspect_iris_source_taxon_labels_v0_1.py'
+      - '.github/workflows/iris-source-taxon-label-inspection-v0-1.yml'
+      - 'data/iris_source_taxon_crosswalk_v0_1.csv'
+      - 'scripts/validate_iris_source_taxon_crosswalk_v0_1.py'
+      - 'docs/IRIS_SOURCE_TAXON_CROSSWALK_V0_1.md'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  inspect:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+        with: {fetch-depth: 0}
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.12'}
+      - run: python -m pip install --disable-pip-version-check pandas openpyxl
+      - name: Inspect source taxon labels only
+        run: python scripts/inspect_iris_source_taxon_labels_v0_1.py
+      - name: Confirm no frozen statistic implementation in inspection script
+        run: |
+          ! grep -E 'roc_auc|9999|PASS.*MIXED|patristic' scripts/inspect_iris_source_taxon_labels_v0_1.py
+      - name: Confirm Paper 1 firewall
+        run: git diff --exit-code ${{ github.event.pull_request.base.sha }}...HEAD -- manuscript data/paper1_authoritative_results_v0_2_2.csv data/paper1_main_figure_manifest_v0_2_2.csv
