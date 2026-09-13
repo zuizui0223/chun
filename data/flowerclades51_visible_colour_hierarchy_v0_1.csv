@@ -1,0 +1,9 @@
+source_fine_state,intermediate_state,coarse_state
+black/dark,DARK,NONWHITE
+blue/purple,COOL,NONWHITE
+green,COOL,NONWHITE
+orange,WARM,NONWHITE
+pink,WARM,NONWHITE
+red,WARM,NONWHITE
+white,WHITE,WHITE
+yellow,WARM,NONWHITE
