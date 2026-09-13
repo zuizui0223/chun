@@ -1,0 +1,105 @@
+name: Iris primary trait-blind tree v0.1
+
+on:
+  pull_request:
+    paths:
+      - 'scripts/prepare_iris_primary_tree_inputs_v0_1.py'
+      - 'scripts/concatenate_iris_primary_tree_alignments_v0_1.py'
+      - '.github/workflows/iris-primary-tree-v0-1.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 120
+    steps:
+      - uses: actions/checkout@v4
+        with: {fetch-depth: 0}
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.12'}
+      - name: Install phylogeny tools and Python readers
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y mafft iqtree build-essential git
+          git clone --depth 1 --branch v1.5.1 https://github.com/inab/trimal.git /tmp/trimal
+          make -C /tmp/trimal/source
+          sudo install -m 0755 /tmp/trimal/source/trimal /usr/local/bin/trimal
+          python -m pip install --disable-pip-version-check biopython pandas openpyxl
+          mafft --version 2>&1 | head -1
+          trimal -h 2>&1 | head -2
+          (iqtree2 --version || iqtree --version) 2>&1 | head -3
+      - name: Confirm pre-outcome contracts
+        shell: bash
+        run: |
+          python scripts/ingest_iris_postfreeze_rows_v0_1.py --out /tmp/iris_ingest.json >/dev/null
+          python scripts/validate_iris_source_schema_erratum_v0_1.py --ingest-receipt /tmp/iris_ingest.json
+          python scripts/validate_iris_tree_record_semantics_v0_1.py
+          python scripts/validate_iris_source_taxon_crosswalk_v0_1.py --out /tmp/iris_crosswalk.json
+      - name: Prepare full-record marker inputs without traits
+        run: |
+          python scripts/prepare_iris_primary_tree_inputs_v0_1.py --out-dir build/iris_tree_inputs
+      - name: Align and trim six source marker partitions
+        run: |
+          mkdir -p build/iris_trimmed
+          for locus in matK trnL ndhF trnK rbcL ITS; do
+            mafft --localpair --maxiterate 1000 --thread 2 build/iris_tree_inputs/${locus}.source_full_records.fasta > build/iris_trimmed/${locus}.aligned.fasta
+            trimal -in build/iris_trimmed/${locus}.aligned.fasta -out build/iris_trimmed/${locus}.trimmed.fasta -automated1
+          done
+      - name: Concatenate partitioned alignment
+        run: |
+          python scripts/concatenate_iris_primary_tree_alignments_v0_1.py \
+            --tree-input-dir build/iris_tree_inputs \
+            --trimmed-dir build/iris_trimmed \
+            --out-dir build/iris_primary_tree
+      - name: Infer partitioned trait-blind IQ-TREE2 tree
+        run: |
+          IQBIN=$(command -v iqtree2 || command -v iqtree)
+          "$IQBIN" \
+            -s build/iris_primary_tree/iris_primary_concatenated.fasta \
+            -p build/iris_primary_tree/iris_primary_partitions.nex \
+            -m MFP+MERGE \
+            -B 1000 \
+            --seed 20260913 \
+            -T AUTO \
+            --prefix build/iris_primary_tree/iris_primary
+      - name: Freeze trait-blind tree receipt
+        run: |
+          python - <<'PY'
+          import json, pathlib, re, hashlib
+          root=pathlib.Path('build/iris_primary_tree')
+          tree=(root/'iris_primary.treefile').read_text().strip()
+          tips=re.findall(r'(?<=[,(])([^():,;]+)(?=:)',tree)
+          if len(tips)!=227 or len(set(tips))!=227:
+              raise SystemExit(f'expected 227 unique tips, got {len(tips)} / {len(set(tips))}')
+          x=json.loads((root/'concat_receipt.json').read_text())
+          x.update({
+            'tree_status':'IRIS_PRIMARY_TRAIT_BLIND_TREE_BUILT',
+            'tree_tips':len(tips),
+            'tree_sha256':hashlib.sha256((root/'iris_primary.treefile').read_bytes()).hexdigest(),
+            'auc_computed':False,
+            'decision_computed':False,
+            'trait_values_used':False,
+            'trimal_source_tag':'v1.5.1',
+          })
+          (root/'primary_tree_receipt.json').write_text(json.dumps(x,indent=2)+'\n')
+          print(json.dumps(x,indent=2))
+          PY
+      - name: Confirm Paper 1 science firewall
+        run: git diff --exit-code ${{ github.event.pull_request.base.sha }}...HEAD -- manuscript data/paper1_authoritative_results_v0_2_2.csv data/paper1_main_figure_manifest_v0_2_2.csv
+      - uses: actions/upload-artifact@v4
+        with:
+          name: iris-primary-trait-blind-tree-v0-1
+          path: |
+            build/iris_tree_inputs/tree_input_receipt.json
+            build/iris_primary_tree/concat_receipt.json
+            build/iris_primary_tree/primary_tree_receipt.json
+            build/iris_primary_tree/iris_primary.treefile
+            build/iris_primary_tree/iris_primary.contree
+            build/iris_primary_tree/iris_primary.iqtree
+            build/iris_primary_tree/iris_primary.log
+            build/iris_primary_tree/iris_primary_partitions.nex
+            build/iris_primary_tree/iris_primary_concatenated.fasta
+          retention-days: 90
