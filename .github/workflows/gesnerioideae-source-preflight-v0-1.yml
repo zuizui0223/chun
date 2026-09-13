@@ -1,0 +1,55 @@
+name: Gesnerioideae source preflight v0.1
+
+on:
+  pull_request:
+    paths:
+      - 'data/gesnerioideae_source_semantics_contract_v0_1.json'
+      - 'scripts/preflight_gesnerioideae_sources_v0_1.py'
+      - '.github/workflows/gesnerioideae-source-preflight-v0-1.yml'
+  workflow_dispatch:
+
+jobs:
+  source-preflight:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Assert outcome remains unopened on preflight branch
+        run: |
+          test ! -e results/gesnerioideae_resolution_profile_v0_1/gesnerioideae_resolution_profile_result_v0_1.json
+      - name: Install preflight dependencies
+        run: python -m pip install --disable-pip-version-check requests openpyxl biopython
+      - name: Run outcome-blind source and crosswalk preflight
+        run: python scripts/preflight_gesnerioideae_sources_v0_1.py
+      - name: Assert receipt contains no outcome exposure
+        run: |
+          python - <<'PY'
+          import json
+          p='build/gesnerioideae_source_preflight_v0_1/source_preflight_receipt.json'
+          x=json.load(open(p))
+          assert x['status']=='GESNERIOIDEAE_SOURCE_PREFLIGHT_COMPLETE_OUTCOME_BLIND'
+          assert x['outcome_values_read'] is False
+          assert x['auc_computed'] is False
+          assert x['decision_computed'] is False
+          assert x['forbidden_columns_read'] is False
+          assert x['hard_stop'] in {'PASS_CROSSWALK_PREFLIGHT','HOLD_CROSSWALK','HOLD_SOURCE_ACCESS'}
+          print('HARD_STOP='+x['hard_stop'])
+          if x['hard_stop']=='HOLD_SOURCE_ACCESS':
+              assert x['crosswalk_executed'] is False
+              assert x['tree_byte_access']=='BEARER_TOKEN_REQUIRED_401'
+              print('TREE_FILE_ID='+str(x['tree_source_manifest']['file_id']))
+              print('TREE_DIGEST='+str(x['tree_source_manifest'].get('digest')))
+          else:
+              print('MATCHED='+str(x['matched_unique_binomials']))
+              print('UNMATCHED='+str(len(x['unmatched_source_species'])))
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: gesnerioideae-source-preflight-v0-1
+          path: build/gesnerioideae_source_preflight_v0_1/
+          retention-days: 90
