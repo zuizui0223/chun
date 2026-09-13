@@ -1,0 +1,6 @@
+trait_source_label,accession_source_label,rule,status,notes
+Iris albertii Regel,Iris_alberti,SOURCE_ORTHOGRAPHY_VARIANT,ADMITTED,"Source trait and accession tables differ by terminal i spelling only; no trait value used for mapping."
+Iris albo-marginata R.C. Foster,Iris_albomarginata,SOURCE_HYPHENATION_ORTHOGRAPHY_VARIANT,ADMITTED,"Hyphen/spacing orthography differs between the two frozen source tables."
+Iris linifoia (Regel) O. Fedtschenko,Iris_linifolia,SOURCE_TYPOGRAPHIC_VARIANT,ADMITTED,"Trait source spells linifoia; accession source spells linifolia."
+Iris mandschurica Maxim,Iris_mandshurica,SOURCE_ORTHOGRAPHY_VARIANT,ADMITTED,"Trait source spells mandschurica; accession source spells mandshurica."
+Iris spuria subsp. sogdiana Bunge,Iris_sogdiana,SOURCE_INFRASPECIFIC_TO_ACCESSION_LABEL,ADMITTED,"Trait table retains the subspecies combination while accession table labels the sampled unit Iris_sogdiana."
