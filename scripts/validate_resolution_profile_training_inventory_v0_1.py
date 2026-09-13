@@ -50,8 +50,10 @@ def main() -> int:
     assert by['GESNERIOIDEAE']['same_estimand_training_eligible']=='false'
 
     # Discovery radiations are positive conditional-hierarchy evidence, not interchangeable profile outcomes.
-    assert hier['hierarchical_fine_state_replication']['testable_external_radiations']==3
-    assert hier['hierarchical_fine_state_replication']['supporting_external_radiations']==3
+    h=hier['hierarchical_fine_state_rule']
+    assert h['testable_external_radiations']==3
+    assert h['supporting_external_radiations']==3
+    assert set(h['supporting_ids'])=={'LINOIDEAE','ANGRAECINAE','ANTIRRHINEAE'}
     for rid in ['LINOIDEAE','ANGRAECINAE','ANTIRRHINEAE']:
         assert by[rid]['estimand']=='CONDITIONAL_FINE_STATE_PHYLOGENETIC_ORGANIZATION'
         assert by[rid]['same_estimand_training_eligible']=='false'
