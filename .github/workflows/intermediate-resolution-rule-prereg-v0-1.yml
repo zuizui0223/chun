@@ -1,0 +1,37 @@
+name: Intermediate-resolution rule preregistration v0.1
+
+on:
+  pull_request:
+    paths:
+      - 'data/intermediate_resolution_rule_prereg_v0_1.json'
+      - 'docs/INTERMEDIATE_RESOLUTION_RULE_PREREG_V0_1.md'
+      - 'scripts/validate_intermediate_resolution_rule_prereg_v0_1.py'
+      - '.github/workflows/intermediate-resolution-rule-prereg-v0-1.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Validate frozen rule and absence of Iris outcome files
+        run: |
+          python scripts/validate_intermediate_resolution_rule_prereg_v0_1.py \
+            --input data/intermediate_resolution_rule_prereg_v0_1.json
+      - name: Confirm Paper 1 science firewall
+        run: |
+          git diff --exit-code ${{ github.event.pull_request.base.sha }}...HEAD -- \
+            manuscript \
+            data/paper1_authoritative_results_v0_2_2.csv \
+            data/paper1_main_figure_manifest_v0_2_2.csv || {
+              echo 'Paper 1 science/manuscript changed unexpectedly' >&2
+              exit 1
+            }
