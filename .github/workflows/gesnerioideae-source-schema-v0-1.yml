@@ -1,0 +1,107 @@
+name: Gesnerioideae source schema v0.1
+
+on:
+  pull_request:
+    paths:
+      - 'scripts/inspect_gesnerioideae_source_schema_v0_1.py'
+      - '.github/workflows/gesnerioideae-source-schema-v0-1.yml'
+      - 'docs/GESNERIOIDEAE_SOURCE_SCHEMA_V0_1.md'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  acquire-schema:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install workbook reader
+        run: python -m pip install --disable-pip-version-check openpyxl
+      - name: Resolve current PMC article version and object list
+        run: |
+          set -euo pipefail
+          aws --version
+          mkdir -p build/gesnerioideae_schema/supp
+          aws s3api list-objects-v2 \
+            --bucket pmc-oa-opendata \
+            --prefix 'PMC7767864.' \
+            --delimiter '/' \
+            --no-sign-request \
+            > build/gesnerioideae_schema/versions.json
+          python - <<'PY'
+          import json, re
+          from pathlib import Path
+          p=Path('build/gesnerioideae_schema/versions.json')
+          x=json.loads(p.read_text())
+          prefs=[r['Prefix'] for r in x.get('CommonPrefixes',[])]
+          if not prefs:
+              raise SystemExit('no PMC7767864 article version prefix found')
+          def v(s):
+              m=re.search(r'\.([0-9]+)/$',s)
+              return int(m.group(1)) if m else -1
+          pref=max(prefs,key=v)
+          Path('build/gesnerioideae_schema/prefix.txt').write_text(pref+'\n')
+          print({'prefixes':prefs,'selected':pref})
+          PY
+          PREFIX="$(cat build/gesnerioideae_schema/prefix.txt)"
+          aws s3api list-objects-v2 \
+            --bucket pmc-oa-opendata \
+            --prefix "$PREFIX" \
+            --no-sign-request \
+            > build/gesnerioideae_schema/objects_raw.json
+      - name: Freeze object manifest and download XLSX supplements only
+        run: |
+          python - <<'PY'
+          import json, os, subprocess
+          from pathlib import Path
+          root=Path('build/gesnerioideae_schema')
+          prefix=root.joinpath('prefix.txt').read_text().strip()
+          x=json.loads(root.joinpath('objects_raw.json').read_text())
+          contents=x.get('Contents',[])
+          objects=[]
+          xlsx=[]
+          for r in contents:
+              key=r['Key']
+              rec={'key':key,'bytes':r.get('Size'),'etag':str(r.get('ETag','')).strip('"'),'last_modified':r.get('LastModified')}
+              objects.append(rec)
+              if key.lower().endswith('.xlsx'):
+                  xlsx.append(key)
+          if not xlsx:
+              raise SystemExit('no XLSX supplementary objects found in PMC prefix')
+          out={'source':'NIH_NLM_PMC_ARTICLE_DATASETS_AWS','pmc_prefix':prefix,'objects':objects,'xlsx_keys':xlsx}
+          root.joinpath('object_manifest.json').write_text(json.dumps(out,indent=2)+'\n')
+          for key in xlsx:
+              subprocess.run(['aws','s3','cp','--no-sign-request',f's3://pmc-oa-opendata/{key}',str(root/'supp'/Path(key).name)],check=True)
+          print(json.dumps({'pmc_prefix':prefix,'xlsx_keys':xlsx},indent=2))
+          PY
+      - name: Inspect workbook schema without reading row outcomes
+        run: |
+          python scripts/inspect_gesnerioideae_source_schema_v0_1.py \
+            --input-dir build/gesnerioideae_schema/supp \
+            --object-manifest build/gesnerioideae_schema/object_manifest.json \
+            --out build/gesnerioideae_schema/schema.json
+      - name: Confirm preregistration and Paper 1 firewalls
+        run: |
+          python scripts/validate_gesnerioideae_resolution_profile_prereg_v0_1.py
+          git diff --exit-code ${{ github.event.pull_request.base.sha }}...HEAD -- \
+            data/gesnerioideae_resolution_profile_prereg_v0_1.json \
+            docs/GESNERIOIDEAE_RESOLUTION_PROFILE_PREREG_V0_1.md \
+            manuscript \
+            data/paper1_authoritative_results_v0_2_2.csv \
+            data/paper1_main_figure_manifest_v0_2_2.csv || {
+              echo 'Frozen preregistration or Paper 1 changed unexpectedly' >&2
+              exit 1
+            }
+      - uses: actions/upload-artifact@v4
+        with:
+          name: gesnerioideae-source-schema-v0-1
+          path: |
+            build/gesnerioideae_schema/object_manifest.json
+            build/gesnerioideae_schema/schema.json
+          retention-days: 90
