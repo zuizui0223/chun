@@ -7,6 +7,10 @@ on:
       - 'data/cross_radiation_resolution_tier_expansion_summary_v0_1.json'
       - 'data/cross_clade_mechanistic_recurrence_benchmark_v0_1.csv'
       - 'data/petunieae_prospective_cross_level_v0_1.json'
+      - 'data/iochrominae_cross_level_bridge_summary_v0_1.json'
+      - 'data/erica_phenotype_axis_molecular_bridge_summary_v0_1.json'
+      - 'data/erica_white_yellow_mechanisms_v0_1.csv'
+      - 'data/epimedium_cross_level_endpoint_bridge_summary_v0_1.json'
       - 'scripts/summarize_cross_radiation_resolution_tier_expansion_v0_1.py'
       - 'docs/CROSS_RADIATION_RESOLUTION_TIER_EXPANSION_V0_1.md'
       - '.github/workflows/cross-radiation-resolution-tier-expansion-v0-1.yml'
@@ -25,7 +29,7 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
-      - name: Rebuild tier-expansion synthesis
+      - name: Rebuild tier-expansion synthesis from frozen source receipts
         run: |
           python scripts/summarize_cross_radiation_resolution_tier_expansion_v0_1.py \
             --out build/cross_radiation_resolution_tier_expansion_summary_v0_1.json
@@ -38,6 +42,12 @@ jobs:
           assert observed==expected, (observed, expected)
           assert observed['primary_paired_M1']['hue_branch_specific_or_finer']=='3/3'
           assert observed['primary_paired_M1']['amount_or_depletion_branch_specific_or_finer']=='0/3'
+          expanded=observed['expanded_descriptive_stress']
+          assert expanded['hue_branch_specific_or_finer']=='4/4'
+          assert expanded['amount_or_depletion_branch_specific_or_finer']=='0/5'
+          assert expanded['amount_or_depletion_module_or_core']=='3/5'
+          assert expanded['amount_or_depletion_diverse_or_primary_fail']=='2/5'
+          assert expanded['interpretation']=='DESCRIPTIVE_SPECIFICITY_CONTRAST_ONLY_HETEROGENEOUS_OBSERVATION_REGIMES'
           assert observed['external_stress']['M2_hue_branching']['system']=='IPOMOEA'
           assert observed['external_stress']['M3_depletion_or_loss']['systems']==['AQUILEGIA','EPIMEDIUM']
           assert observed['superseded_binary_wording']=='HUE_STABLE_WHILE_DEPLETION_UNSTABLE'
