@@ -1,0 +1,14 @@
+{
+  "version": "v0.1",
+  "gate_status": "FROZEN_BEFORE_FOURTH_RADIATION_CANDIDATE_OUTCOME_INSPECTION",
+  "candidate_screen_rows": 0,
+  "current_state": "FROZEN_NO_CANDIDATE_SCREENED",
+  "primary_dimension": "PIGMENT_QUANTITY_CONTINUOUS",
+  "predicted_target_family": "OUTPUT_CONTROL",
+  "minimum_matched_taxa": 20,
+  "all_four_target_classes_required": true,
+  "raw_response_primary": true,
+  "rank_sensitivity_can_upgrade": false,
+  "maximum_source_publications_screened": 20,
+  "paper1_science_changed": false
+}

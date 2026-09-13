@@ -1,0 +1,136 @@
+{
+  "version": "v0.1",
+  "status": "FROZEN_BEFORE_FOURTH_RADIATION_CANDIDATE_OUTCOME_INSPECTION",
+  "question": "In an unused independent flower-colour radiation, does continuous floral pigment quantity map most strongly to an intermediate-resolution output-control molecular target family?",
+  "calibration_context_only": {
+    "IOCHROMINAE": "continuous pigment intensity mapped to a late-pathway coexpression module",
+    "PETUNIEAE": "frozen raw total anthocyanin amount failed to identify a stable primary subspace; source-method log sensitivity favored LATE_OUTPUT but cannot count as primary support"
+  },
+  "primary_prediction": {
+    "phenotype_dimension": "PIGMENT_QUANTITY_CONTINUOUS",
+    "predicted_target_family": "OUTPUT_CONTROL",
+    "OUTPUT_CONTROL_members": [
+      "LATE_OUTPUT",
+      "PATHWAY_REGULATION"
+    ],
+    "competing_target_classes": [
+      "EARLY_CORE",
+      "BRANCH_COMPOSITION"
+    ],
+    "interpretation": "Quantity is predicted to associate with flux/output-control architecture at an intermediate molecular resolution rather than with one exact gene or a complete programme."
+  },
+  "target_class_ontology": {
+    "EARLY_CORE": ["CHS", "CHI", "F3H"],
+    "BRANCH_COMPOSITION": ["F3_PRIME_H", "F3_PRIME_5_H"],
+    "LATE_OUTPUT": ["DFR", "ANS", "UFGT_3GT", "GST_TRANSPORT"],
+    "PATHWAY_REGULATION": ["R2R3_MYB", "BHLH", "WD40"]
+  },
+  "candidate_admission": {
+    "unused_independent_radiation": true,
+    "excluded_calibration_or_already_outcome_inspected_systems": [
+      "CAMELLIA",
+      "IOCHROMINAE",
+      "CAPE_ERICA",
+      "PETUNIEAE",
+      "IPOMOEA",
+      "PENSTEMON",
+      "AQUILEGIA",
+      "EPIMEDIUM",
+      "PETUNIA",
+      "MIMULUS"
+    ],
+    "minimum_matched_taxa": 20,
+    "response_requirements": {
+      "continuous_numeric_total_floral_pigment_quantity": true,
+      "minimum_unique_values": 10,
+      "maximum_exact_zero_fraction": 0.2,
+      "ordinal_colour_scores_forbidden": true,
+      "binary_presence_absence_forbidden": true
+    },
+    "molecular_requirements": {
+      "flower_or_petal_tissue": true,
+      "same_taxa_as_response": true,
+      "EARLY_CORE_min_genes": 2,
+      "BRANCH_COMPOSITION_min_genes": 1,
+      "LATE_OUTPUT_min_genes": 2,
+      "PATHWAY_REGULATION_min_genes": 2,
+      "all_four_target_classes_required": true
+    },
+    "phylogeny_requirements": {
+      "branch_length_tree_required": true,
+      "same_taxa_join_required": true
+    },
+    "public_numeric_data_required": true,
+    "decisive_target_class_outcome_must_not_be_inspected_before_admission": true
+  },
+  "candidate_search": {
+    "maximum_source_publications_screened": 20,
+    "screen_fields_allowed_before_admission": [
+      "publication_identity",
+      "radiation_identity",
+      "taxon_count",
+      "tissue",
+      "continuous_pigment_quantity_available",
+      "molecular_matrix_available",
+      "gene_or_orthogroup_coverage",
+      "branch_length_phylogeny_available",
+      "public_data_accessibility"
+    ],
+    "outcome_fields_forbidden_before_admission": [
+      "best_target_class",
+      "target_class_effect_sizes",
+      "target_class_AICc",
+      "gene_by_pigment_association_results_recomputed_by_project"
+    ],
+    "selection_if_multiple_pass": [
+      "largest_matched_taxon_count",
+      "earliest_publication_year",
+      "lexicographically_smallest_DOI"
+    ],
+    "stop_rule": "After screening at most 20 source publications, admit the deterministic top-ranked passing source or record NO_QUALIFIED_UNUSED_RADIATION without weakening thresholds."
+  },
+  "primary_response_rule": {
+    "use_source_reported_continuous_total_pigment_quantity": true,
+    "primary_scale": "RAW_SOURCE_SCALE_Z_STANDARDIZED_WITHIN_RADIATION",
+    "post_outcome_log_sqrt_rank_transform_forbidden_for_primary_gate": true,
+    "one_predeclared_rank_sensitivity_allowed": true,
+    "rank_sensitivity_cannot_upgrade_primary_classification": true
+  },
+  "molecular_summary_rule": {
+    "within_gene_standardization": "Z_SCORE_ACROSS_MATCHED_TAXA",
+    "multi_gene_target_class_summary": "PC1_WITH_SIGN_ORIENTED_TO_NONNEGATIVE_SUM_OF_LOADINGS",
+    "single_gene_target_class_summary": "Z_SCORED_GENE_VALUE",
+    "orthology_mapping_must_be_frozen_before_response_model_fit": true
+  },
+  "model_rule": {
+    "model_family": "SINGLE_PREDICTOR_PGLS_WITH_BROWNIAN_COVARIANCE_ON_ONE_FIXED_BRANCH_LENGTH_TREE",
+    "same_taxon_set_for_null_and_all_target_classes": true,
+    "candidate_models": [
+      "NULL",
+      "EARLY_CORE",
+      "BRANCH_COMPOSITION",
+      "LATE_OUTPUT",
+      "PATHWAY_REGULATION"
+    ],
+    "ranking_metric": "AICc",
+    "effect_direction_predeclared": false
+  },
+  "classification_rule": {
+    "PASS": "Coverage passes; best non-null model is LATE_OUTPUT or PATHWAY_REGULATION; best model improves on NULL by >=2 AICc; and best OUTPUT_CONTROL model beats the best non-output model by >=2 AICc.",
+    "MIXED": "Coverage passes but OUTPUT_CONTROL versus non-output or versus NULL has <2 AICc separation, including ties between target families.",
+    "FAIL": "Coverage passes and EARLY_CORE or BRANCH_COMPOSITION beats the best OUTPUT_CONTROL model by >=2 AICc, or NULL beats every molecular model by >=2 AICc.",
+    "UNQUALIFIED": "Any frozen admission requirement fails; no biological negative is inferred."
+  },
+  "no_rescue_rule": [
+    "Do not change the pigment response definition after seeing target-class fits.",
+    "Do not merge or split target classes after seeing target-class fits.",
+    "Do not change the minimum taxon threshold after candidate screening begins.",
+    "Do not promote the predeclared rank sensitivity into the primary classification.",
+    "Do not substitute a discrete pigment-loss dataset for continuous pigment quantity."
+  ],
+  "relationship_to_current_programme": {
+    "hue_composition_status": "descriptively concentrated on branch-control architecture across five heterogeneous systems; not the next highest-information test",
+    "continuous_quantity_status": "two direct radiation-scale systems only; highest-information unresolved phenotype dimension",
+    "paper1_science_changed": false
+  }
+}
