@@ -1,0 +1,44 @@
+name: Iris Frontiers supplementary asset diagnostic v0.1
+
+on:
+  pull_request:
+    paths:
+      - 'scripts/diagnose_frontiers_iris_assets_v0_1.py'
+      - '.github/workflows/iris-frontiers-asset-diagnostic-v0-1.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  diagnose:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Probe publisher supplementary asset routes only
+        run: |
+          python scripts/diagnose_frontiers_iris_assets_v0_1.py \
+            --out build/iris_frontiers_asset_diagnostic_v0_1.json
+      - name: Report successful routes without row values
+        run: |
+          python - <<'PY'
+          import json
+          x=json.load(open('build/iris_frontiers_asset_diagnostic_v0_1.json'))
+          print('filenames=',x['filenames'])
+          for d in x['diagnostics']:
+              print(d['filename'], 'success_count=',len(d['successes']))
+              for s in d['successes']:
+                  print(s)
+          assert x['auc_computed'] is False
+          assert x['row_level_values_emitted'] is False
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: iris-frontiers-asset-diagnostic-v0-1
+          path: build/iris_frontiers_asset_diagnostic_v0_1.json
+          if-no-files-found: warn
+          retention-days: 90
