@@ -24,33 +24,44 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
-      - name: Validate gate and pre-screen state
+      - name: Validate frozen gate across screening lifecycle
         run: |
           python scripts/validate_continuous_pigment_quantity_prospective_gate_v0_1.py \
             --gate data/continuous_pigment_quantity_prospective_gate_v0_1.json \
             --screen data/continuous_pigment_quantity_candidate_screen_v0_1.csv \
             --out build/continuous_pigment_quantity_prospective_gate_receipt_v0_1.json
-      - name: Verify frozen receipt exactly before candidate search
+      - name: Verify freeze receipt or outcome-blind screening state
         run: |
           python - <<'PY'
           import json
           observed=json.load(open('build/continuous_pigment_quantity_prospective_gate_receipt_v0_1.json'))
           expected=json.load(open('data/continuous_pigment_quantity_prospective_gate_receipt_v0_1.json'))
-          assert observed==expected, (observed, expected)
-          assert observed['current_state']=='FROZEN_NO_CANDIDATE_SCREENED'
-          assert observed['candidate_screen_rows']==0
           assert observed['primary_dimension']=='PIGMENT_QUANTITY_CONTINUOUS'
           assert observed['predicted_target_family']=='OUTPUT_CONTROL'
+          assert observed['minimum_matched_taxa']==20
+          assert observed['all_four_target_classes_required'] is True
           assert observed['raw_response_primary'] is True
           assert observed['rank_sensitivity_can_upgrade'] is False
           assert observed['paper1_science_changed'] is False
+          if observed['candidate_screen_rows']==0:
+              assert observed==expected, (observed, expected)
+              assert observed['current_state']=='FROZEN_NO_CANDIDATE_SCREENED'
+          else:
+              assert observed['current_state']=='SCREENING_STARTED_OUTCOME_BLIND'
+              assert 0 < observed['candidate_screen_rows'] <= observed['maximum_source_publications_screened']
           print(json.dumps(observed, indent=2))
           PY
-      - name: Confirm candidate outcome values have not entered the gate branch
+      - name: Confirm candidate outcome values have not entered the screen
         run: |
-          test "$(wc -l < data/continuous_pigment_quantity_candidate_screen_v0_1.csv)" -eq 1
-          ! grep -R -E 'best_target_class|target_class_AICc|target_class_effect_size' \
+          ! grep -E 'best_target_class|target_class_AICc|target_class_effect_size' \
             data/continuous_pigment_quantity_candidate_screen_v0_1.csv
+          python - <<'PY'
+          import csv
+          rows=list(csv.DictReader(open('data/continuous_pigment_quantity_candidate_screen_v0_1.csv', encoding='utf-8-sig')))
+          for row in rows:
+              assert row['decisive_target_outcome_inspected'].strip().lower() in {'false','0','no'}
+          print({'candidate_rows': len(rows), 'outcome_firewall': 'PASS'})
+          PY
       - name: Confirm Paper 1 science firewall
         run: |
           git diff --exit-code ${{ github.event.pull_request.base.sha }}...HEAD -- \
