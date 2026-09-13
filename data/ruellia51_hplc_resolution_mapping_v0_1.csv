@@ -1,0 +1,4 @@
+level,input_components,state_definition
+coarse,"Pelargonidin|Cyanidin|Peonidin|Delphinidin|Petunidin|Malvidin","ANY_PRESENT vs NONE"
+intermediate,"PEL=Pelargonidin; CYA=Cyanidin|Peonidin; DEL=Delphinidin|Petunidin|Malvidin","three-bit PEL/CYA/DEL branch-presence pattern"
+fine,"Pelargonidin|Cyanidin|Peonidin|Delphinidin|Petunidin|Malvidin","six-bit compound-presence pattern in listed order"
