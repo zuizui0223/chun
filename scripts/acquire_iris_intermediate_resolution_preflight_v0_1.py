@@ -7,6 +7,7 @@ import hashlib
 import io
 import json
 import re
+import tarfile
 import urllib.parse
 import urllib.request
 import xml.etree.ElementTree as ET
@@ -16,6 +17,7 @@ from pathlib import Path
 PMC_ID = "PMC7588356"
 PMC_NUMERIC = "7588356"
 XML_URL = f"https://eutils.ncbi.nlm.nih.gov/entrez/eutils/efetch.fcgi?db=pmc&id={PMC_NUMERIC}&retmode=xml"
+OA_URL = f"https://www.ncbi.nlm.nih.gov/pmc/utils/oa/oa.fcgi?id={PMC_ID}"
 XLINK = "{http://www.w3.org/1999/xlink}href"
 USER_AGENT = "chun-iris-preregistered-analysis/0.1"
 
@@ -26,10 +28,6 @@ def fetch_with_meta(url: str) -> tuple[str, str, bytes]:
         final_url = r.geturl()
         content_type = (r.headers.get("Content-Type") or "").split(";", 1)[0].strip().lower()
         return final_url, content_type, r.read()
-
-
-def fetch(url: str) -> bytes:
-    return fetch_with_meta(url)[2]
 
 
 def sha256_bytes(b: bytes) -> str:
@@ -52,7 +50,6 @@ def candidate_urls(href: str) -> list[str]:
             urllib.parse.urljoin(f"https://pmc.ncbi.nlm.nih.gov/articles/{PMC_ID}/", href),
         ]
     )
-    # Stable-order de-duplication.
     return list(dict.fromkeys(urls))
 
 
@@ -64,6 +61,58 @@ def looks_like_html(content_type: str, b: bytes) -> bool:
         or prefix.startswith(b"<html")
         or b"<html" in prefix[:200]
     )
+
+
+def oa_package_member(href: str) -> tuple[str, str, bytes, dict[str, object]]:
+    oa_final, oa_content_type, oa_bytes = fetch_with_meta(OA_URL)
+    root = ET.fromstring(oa_bytes)
+    links = root.findall(".//link")
+    tgz = [x.attrib.get("href", "") for x in links if x.attrib.get("format") == "tgz"]
+    if len(tgz) != 1:
+        raise RuntimeError(f"expected one PMC OA tgz link, found {tgz}")
+    package_url = tgz[0]
+    if package_url.startswith("ftp://ftp.ncbi.nlm.nih.gov/"):
+        package_url = "https://ftp.ncbi.nlm.nih.gov/" + package_url[len("ftp://ftp.ncbi.nlm.nih.gov/"):]
+    pkg_final, pkg_content_type, pkg_bytes = fetch_with_meta(package_url)
+    if looks_like_html(pkg_content_type, pkg_bytes):
+        raise RuntimeError(f"PMC OA package URL returned HTML: {pkg_final}")
+
+    target = Path(urllib.parse.urlparse(href).path).name.lower()
+    with tarfile.open(fileobj=io.BytesIO(pkg_bytes), mode="r:gz") as tf:
+        members = [m for m in tf.getmembers() if m.isfile()]
+        exact = [m for m in members if Path(m.name).name.lower() == target]
+        if len(exact) != 1:
+            # Some PMC packages normalize punctuation/case. Use a strict stem fallback.
+            stem = Path(target).stem.lower()
+            ext = Path(target).suffix.lower()
+            stem_hits = [
+                m for m in members
+                if Path(m.name).suffix.lower() == ext and Path(m.name).stem.lower() == stem
+            ]
+            exact = stem_hits
+        if len(exact) != 1:
+            raise RuntimeError(
+                f"OA package did not uniquely contain {href!r}; candidates="
+                f"{[m.name for m in members if Path(m.name).suffix.lower() in {'.xlsx','.xls','.csv','.tsv','.txt'}][:100]}"
+            )
+        member = exact[0]
+        fh = tf.extractfile(member)
+        if fh is None:
+            raise RuntimeError(f"could not extract OA package member {member.name}")
+        payload = fh.read()
+
+    meta = {
+        "oa_api_url": OA_URL,
+        "oa_api_final_url": oa_final,
+        "oa_api_content_type": oa_content_type,
+        "oa_api_sha256": sha256_bytes(oa_bytes),
+        "oa_package_url": pkg_final,
+        "oa_package_content_type": pkg_content_type,
+        "oa_package_bytes": len(pkg_bytes),
+        "oa_package_sha256": sha256_bytes(pkg_bytes),
+        "oa_package_member": member.name,
+    }
+    return f"{pkg_final}#{member.name}", "application/octet-stream", payload, meta
 
 
 def download_href(href: str) -> tuple[str, str, bytes, list[dict[str, object]]]:
@@ -85,6 +134,16 @@ def download_href(href: str) -> tuple[str, str, bytes, list[dict[str, object]]]:
             return final_url, content_type, b, attempts
         except Exception as e:
             attempts.append({"requested_url": url, "error": repr(e)})
+
+    try:
+        final_url, content_type, b, oa_meta = oa_package_member(href)
+        attempts.append({"oa_package_fallback": True, **oa_meta, "bytes": len(b), "magic_hex": b[:16].hex()})
+        if len(b) <= 100:
+            raise RuntimeError(f"OA package member too small: {len(b)} bytes")
+        return final_url, content_type, b, attempts
+    except Exception as e:
+        attempts.append({"oa_package_fallback": True, "error": repr(e)})
+
     raise RuntimeError(
         "could not download a non-HTML supplement for href %r\n%s"
         % (href, json.dumps(attempts, indent=2))
@@ -152,18 +211,16 @@ def inspect_table(name: str, filename: str, content_type: str, b: bytes) -> dict
     if looks_like_html(content_type, b):
         raise RuntimeError(f"HTML reached table inspector for {filename}")
 
-    lower = filename.lower()
+    lower = filename.lower().split("#", 1)[-1]
     if zipfile.is_zipfile(io.BytesIO(b)):
         with zipfile.ZipFile(io.BytesIO(b)) as zf:
             members = [m for m in zf.namelist() if not m.endswith("/") and not m.startswith("__MACOSX/")]
-            # A native XLSX is itself a ZIP containing the Office package structure.
             if "[Content_Types].xml" in members and any(m.startswith("xl/") for m in members):
                 return inspect_xlsx(name, b)
             tabular = [m for m in members if m.lower().endswith((".xlsx", ".csv", ".tsv", ".txt"))]
             if len(tabular) != 1:
                 raise RuntimeError(
-                    f"generic ZIP for {filename} has {len(tabular)} candidate tabular members; "
-                    f"members={members[:50]}"
+                    f"generic ZIP for {filename} has {len(tabular)} candidate tabular members; members={members[:50]}"
                 )
             member = tabular[0]
             payload = zf.read(member)
@@ -171,7 +228,6 @@ def inspect_table(name: str, filename: str, content_type: str, b: bytes) -> dict
                 return inspect_xlsx(name, payload, container_member=member)
             return inspect_text_table(name, member, payload, container_member=member)
 
-    # Legacy Excel OLE container. We do not inspect values; pandas/xlrd is used only for headers.
     if b.startswith(bytes.fromhex("d0cf11e0a1b11ae1")) or lower.endswith(".xls"):
         import pandas as pd
 
@@ -206,7 +262,7 @@ def main() -> int:
             raise RuntimeError(f"no href for {logical}: {item}")
         href = str(hrefs[0])
         url, content_type, b, attempts = download_href(href)
-        inspection = inspect_table(logical, href, content_type, b)
+        inspection = inspect_table(logical, url, content_type, b)
         inspection.update(
             {
                 "description": item["description"],
