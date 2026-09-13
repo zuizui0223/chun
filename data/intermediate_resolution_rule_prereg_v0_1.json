@@ -1,0 +1,105 @@
+{
+  "version": "v0.1",
+  "status": "FROZEN_BEFORE_CHUN_IRIS_ROW_LEVEL_OUTCOME_INGESTION",
+  "rule_name": "CHUN_INTERMEDIATE_RESOLUTION_RULE",
+  "rule": "Across an independent flower-colour radiation, phylogenetic predictability should peak at an intermediate biologically grounded representation that is finer than coarse pigment presence/absence but coarser than exact visible hue.",
+  "derivation_inputs": [
+    "data/cross_radiation_state_granularity_v0_3.json",
+    "data/cross_radiation_resolution_synthesis_v0_1.json",
+    "data/cross_clade_mechanistic_recurrence_benchmark_v0_1.csv"
+  ],
+  "forbidden_derivation_inputs": [
+    "Iris row-level flower-colour values",
+    "Iris row-level pigment values",
+    "any CHUN-computed Iris coarse/intermediate/fine AUC",
+    "any CHUN-computed Iris resolution ordering"
+  ],
+  "fourth_radiation": {
+    "id": "IRIS",
+    "source_doi": "10.3389/fpls.2020.569811",
+    "source_scope": "227 Iris taxa in the source phylogenetic sampling frame before source-specified exclusions",
+    "why_unused": "Iris was present only as a Phase-1 atlas/control candidate and was not used to derive the 3-radiation macro state-granularity result or the Iochrominae/Cape-Erica/Petunieae matched molecular-axis result.",
+    "public_inputs_to_ingest_only_after_freeze_merge": [
+      "Supplementary Table 1: row-level flower-colour and pigment traits",
+      "Supplementary Material 1: source GenBank accession list"
+    ]
+  },
+  "exposure_log": {
+    "known_before_freeze": [
+      "source paper methods define seven human-visible hue categories and pigment categories",
+      "source paper states that a phylogeny was reconstructed from six loci",
+      "source paper reports aggregate trait frequencies and its own ancestral-state/phylogenetic-signal analyses"
+    ],
+    "not_inspected_or_computed_for_this_test_before_freeze": [
+      "CHUN row-level Supplementary Table 1 ingestion",
+      "CHUN source-accession phylogeny reconstruction",
+      "CHUN pairwise same-state AUC at any of the three frozen resolutions",
+      "CHUN intermediate-minus-coarse or intermediate-minus-fine deltas"
+    ],
+    "prospective_label": "ANALYSIS_PROSPECTIVE_NOT_LITERATURE_BLINDED"
+  },
+  "primary_analysis_frame": {
+    "taxa": "Iris tips present in the reconstructed outcome-independent phylogeny with one unambiguous visible hue and one unambiguous major-pigment state; source-specified Iris darwasica exclusion retained; outgroups removed before trait analysis",
+    "rare_fine_state_rule": "Fine hue states represented by fewer than 5 eligible tips are excluded from the primary frame; the same resulting tip set is then used for coarse, intermediate and fine analyses.",
+    "missingness_rule": "No imputation. Taxa missing any primary-resolution state are excluded from all three primary-resolution analyses.",
+    "outcome_independent_exclusions_only": true
+  },
+  "nested_resolutions": {
+    "coarse": {
+      "name": "PIGMENT_PRESENCE",
+      "states": ["CHROMATIC_PIGMENT_PRESENT", "NO_CHROMATIC_PIGMENT"],
+      "construction": "Derived only from the admitted source pigment state; anthocyanin and/or carotenoid presence -> CHROMATIC_PIGMENT_PRESENT, neither -> NO_CHROMATIC_PIGMENT."
+    },
+    "intermediate": {
+      "name": "MAJOR_PIGMENT_CLASS",
+      "states": ["ANTHOCYANIN", "CAROTENOID", "NO_CHROMATIC_PIGMENT"],
+      "construction": "Use the source major-pigment coding. Primary frame excludes taxa coded simultaneously into multiple pigment classes."
+    },
+    "fine": {
+      "name": "VISIBLE_HUE",
+      "states": ["MAROON", "ORANGE", "PINK", "PURPLE", "RED", "YELLOW", "WHITE"],
+      "construction": "Use source hue coding; primary frame excludes polymorphic or bicoloured taxa assigned to multiple hue categories."
+    }
+  },
+  "phylogeny_reconstruction": {
+    "trait_blind": true,
+    "inputs": "Supplementary Material 1 accession list only",
+    "loci": ["matK", "trnL", "trnK", "NADPH", "rbcL", "ITS"],
+    "alignment": "MAFFT --localpair --maxiterate 1000 per locus",
+    "trimming": "trimAl -automated1 per locus",
+    "tree": "IQ-TREE2 partitioned concatenation with ModelFinder and 1000 ultrafast bootstrap replicates",
+    "rooting": "source outgroups when available; prune outgroups before trait statistic",
+    "source_specific_exclusion": "Iris darwasica",
+    "trait_values_forbidden_during_tree_build": true
+  },
+  "primary_statistic": {
+    "name": "PAIRWISE_PHYLOGENETIC_SAME_STATE_AUC",
+    "definition": "For all unordered eligible tip pairs, outcome=1 when the pair has the same state at the focal resolution and 0 otherwise; predictor is negative patristic distance. AUC therefore measures whether phylogenetically closer pairs are more likely to share state.",
+    "permutations": 9999,
+    "permutation_unit": "permute the complete coarse/intermediate/fine state triplet jointly across tips so marginal state frequencies and cross-resolution dependence are preserved while phylogenetic association is destroyed",
+    "seed": 20260913,
+    "reported": [
+      "AUC_coarse",
+      "AUC_intermediate",
+      "AUC_fine",
+      "delta_intermediate_minus_coarse",
+      "delta_intermediate_minus_fine",
+      "one-sided empirical p for intermediate signal",
+      "one-sided empirical p for each intermediate-superiority delta"
+    ]
+  },
+  "decision_rule": {
+    "PASS": "AUC_intermediate > 0.5 with empirical p<=0.05 AND delta_intermediate_minus_coarse>0 with empirical p<=0.05 AND delta_intermediate_minus_fine>0 with empirical p<=0.05.",
+    "MIXED": "AUC_intermediate >0.5 with empirical p<=0.05 and both observed deltas are positive, but one or both delta p-values exceed 0.05; OR exactly one superiority contrast is positive/significant without the other being significantly negative.",
+    "FAIL": "AUC_intermediate is not above 0.5, or either coarse/fine resolution is significantly more predictive than intermediate under the frozen joint-permutation test.",
+    "NO_POST_HOC_UPGRADE": "Sensitivity analyses cannot upgrade MIXED/FAIL to PASS."
+  },
+  "planned_sensitivities": [
+    "repeat on source-complete taxa without the >=5-tip fine-state frequency filter",
+    "repeat using topology-only pair distance (number of intervening branches) instead of branch-length patristic distance",
+    "report but do not use source polymorphic/bicoloured taxa in a set-valued exact-match sensitivity"
+  ],
+  "claim_if_pass": "An independently held-out fourth radiation supports the CHUN intermediate-resolution rule: flower-colour phylogenetic predictability is strongest at a biologically grounded pigment-class representation rather than at a binary pigment-presence state or exact visible hue.",
+  "claim_boundary": "A PASS would be prospective for the frozen CHUN statistic and resolution ordering, not a claim that the Iris literature was unseen, not a universal causal law, and not evidence that the same intermediate partition must win in every radiation.",
+  "paper1_science_changed": false
+}
