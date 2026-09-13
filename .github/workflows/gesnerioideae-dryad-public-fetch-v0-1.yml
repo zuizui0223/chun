@@ -1,0 +1,27 @@
+name: Gesnerioideae Dryad public fetch v0.1
+on:
+  pull_request:
+    paths:
+      - 'scripts/fetch_frozen_gesnerioideae_tree_public_v0_1.py'
+      - '.github/workflows/gesnerioideae-dryad-public-fetch-v0-1.yml'
+  workflow_dispatch:
+
+jobs:
+  fetch-frozen-tree:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: python -m pip install --disable-pip-version-check requests
+      - name: Fetch exact frozen Dryad tree bytes without outcome access
+        run: python scripts/fetch_frozen_gesnerioideae_tree_public_v0_1.py
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: gesnerioideae-frozen-tree-public-fetch-v0-1
+          path: build/gesnerioideae_dryad_public_fetch_v0_1/
+          retention-days: 90
