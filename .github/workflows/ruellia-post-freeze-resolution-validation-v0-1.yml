@@ -1,0 +1,46 @@
+name: Ruellia post-freeze resolution validation v0.1
+
+on:
+  pull_request:
+    paths:
+      - 'data/ruellia_post_freeze_resolution_validation_v0_1.csv'
+      - 'data/ruellia_post_freeze_resolution_result_v0_1.json'
+      - 'data/cross_radiation_pathway_region_tier_summary_v0_1.json'
+      - 'scripts/summarize_ruellia_post_freeze_resolution_v0_1.py'
+      - 'docs/RUELLIA_POST_FREEZE_RESOLUTION_VALIDATION_V0_1.md'
+      - '.github/workflows/ruellia-post-freeze-resolution-validation-v0-1.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Rebuild Ruellia external stress-test result
+        run: |
+          python scripts/summarize_ruellia_post_freeze_resolution_v0_1.py --out build/ruellia_post_freeze_resolution_result_v0_1.json
+      - name: Verify adverse component is retained
+        run: |
+          python - <<'PY'
+          import json
+          x=json.load(open('build/ruellia_post_freeze_resolution_result_v0_1.json'))
+          assert x['classification']=='HUE_PASS_DEPLETION_MIXED'
+          assert x['hue_component']['classification']=='SUPPORT_BRANCHING_HYDROXYLATION'
+          assert 'COUNTEREXAMPLE' in x['depletion_component']['classification']
+          assert x['cross_system_update']['hue_branching_system_support_after_Ruellia']=='5/5 systems'
+          assert x['cross_system_update']['loss_depletion_mixed_early_late_counterexample_after_Ruellia'].startswith('1/6')
+          assert x['prospective_status']=='NOT_PROSPECTIVE_TARGET_SELECTION'
+          assert x['paper1_science_changed'] is False
+          print(json.dumps(x,indent=2))
+          PY
+      - name: Confirm Paper 1 science firewall
+        run: |
+          git diff --exit-code ${{ github.event.pull_request.base.sha }}...HEAD -- manuscript data/paper1_authoritative_results_v0_2_2.csv data/paper1_main_figure_manifest_v0_2_2.csv
