@@ -1,0 +1,63 @@
+{
+  "version": "v0.1",
+  "status": "FROZEN_PRE_OUTCOME_SOURCE_SEMANTICS",
+  "target": "Gesnerioideae",
+  "trait_source": {
+    "doi": "10.3389/fpls.2020.604389",
+    "pmcid": "PMC7767864",
+    "primary_table": "Supplementary Table S1",
+    "expected_samples": 180,
+    "expected_species": 156
+  },
+  "tree_source": {
+    "doi": "10.5061/dryad.m7589",
+    "primary_filename": "Gesne_Ago8_simple_combined_CA.tre",
+    "role": "trait-blind source tree"
+  },
+  "sample_representation": {
+    "primary_unit": "species",
+    "duplicate_sample_rule": "within each normalized species name, retain the first source-table row in original Supplementary Table S1 row order",
+    "outcome_independent": true,
+    "no_reselection_after_outcome": true
+  },
+  "taxon_mapping": {
+    "primary_key": "normalized binomial genus + species epithet from source labels",
+    "allowed_pre_outcome_repairs": [
+      "whitespace/punctuation normalization",
+      "source-documented spelling or synonym mapping supported without consulting colour/pigment values"
+    ],
+    "forbidden_repairs": [
+      "drop or rename a taxon because its observed resolution profile improves",
+      "choose among duplicate samples using any colour, pigment, reflectance, or anthocyanin value"
+    ],
+    "hard_stop": "HOLD_CROSSWALK if a one-to-one species/tree mapping cannot be frozen without outcome values"
+  },
+  "resolution_semantics": {
+    "coarse": {
+      "definition": "anthocyanin presence versus absence",
+      "states": ["ANTHOCYANIN_PRESENT", "NO_ANTHOCYANIN"]
+    },
+    "intermediate": {
+      "definition": "source biochemical class",
+      "states": ["HYD90", "DEO90", "DEO_PLUS_HYD", "NO_ANTHOCYANIN"],
+      "thresholds": {
+        "HYD90": ">90% hydroxyanthocyanins",
+        "DEO90": ">90% deoxyanthocyanins",
+        "DEO_PLUS_HYD": "10-90% of both hydroxy- and deoxyanthocyanins"
+      }
+    },
+    "fine": {
+      "definition": "source reflectance colour group under the Chittka-style 300-700 nm classification reported by Ogutcen et al. 2020",
+      "expected_number_of_source_groups": 9,
+      "rule": "use the source-reported categorical colour-group label verbatim after trivial string normalization; do not derive new cutpoints from target values",
+      "rare_state_rule": "exclude fine states represented by fewer than 5 retained species from the common three-resolution frame"
+    }
+  },
+  "common_frame": "all three AUCs use exactly the same retained species after duplicate resolution, tree matching, ambiguity filtering, and the frozen <5 fine-state exclusion",
+  "analysis_contract_reference": "data/gesnerioideae_resolution_profile_prereg_v0_1.json",
+  "outcome_firewall": {
+    "preflight_may_read": ["file names", "sheet names", "headers", "row counts", "species/sample identifiers", "tree tip labels"],
+    "preflight_must_not_read": ["colour-group values", "reflectance values", "anthocyanin composition values", "pigment-class values", "any CHUN-computed AUC or resolution ordering"]
+  },
+  "paper1_science_changed": false
+}
