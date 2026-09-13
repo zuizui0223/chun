@@ -1,0 +1,51 @@
+name: Iris post-freeze row ingestion v0.1
+
+on:
+  pull_request:
+    paths:
+      - 'scripts/ingest_iris_postfreeze_rows_v0_1.py'
+      - '.github/workflows/iris-postfreeze-row-ingest-v0-1.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  ingest:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install table readers
+        run: python -m pip install --disable-pip-version-check pandas openpyxl
+      - name: Confirm frozen rule predates this row ingestion
+        run: |
+          test -f data/intermediate_resolution_rule_prereg_v0_1.json
+          python - <<'PY'
+          import json
+          x=json.load(open('data/intermediate_resolution_rule_prereg_v0_1.json'))
+          assert x['status']=='FROZEN_BEFORE_CHUN_IRIS_ROW_LEVEL_OUTCOME_INGESTION'
+          assert x['fourth_radiation']['id']=='IRIS'
+          PY
+      - name: Ingest row-level sources after freeze without computing AUC
+        run: python scripts/ingest_iris_postfreeze_rows_v0_1.py --out build/iris_postfreeze_row_ingestion_v0_1.json
+      - name: Assert this is an ingestion diagnostic only
+        run: |
+          python - <<'PY'
+          import json
+          x=json.load(open('build/iris_postfreeze_row_ingestion_v0_1.json'))
+          assert x['status']=='POST_FREEZE_ROW_LEVEL_INGESTION_DIAGNOSTIC'
+          assert x['auc_computed'] is False
+          assert x['decision_computed'] is False
+          assert x['paper1_science_changed'] is False
+          print(json.dumps(x,indent=2,ensure_ascii=False))
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: iris-postfreeze-row-ingestion-v0-1
+          path: build/iris_postfreeze_row_ingestion_v0_1.json
+          retention-days: 90
