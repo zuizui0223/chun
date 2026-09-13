@@ -1,0 +1,115 @@
+name: Iris prospective intermediate-resolution outcome v0.1
+
+on:
+  pull_request:
+    paths:
+      - 'scripts/run_iris_prospective_resolution_test_v0_1.py'
+      - '.github/workflows/iris-prospective-outcome-v0-1.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  prospective-outcome:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 150
+    steps:
+      - uses: actions/checkout@v4
+        with: {fetch-depth: 0}
+
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.12'}
+
+      - name: Assert frozen contracts are byte-unchanged on outcome branch
+        run: |
+          git fetch origin main --depth=1
+          git diff --exit-code origin/main...HEAD -- \
+            data/intermediate_resolution_rule_prereg_v0_1.json \
+            data/iris_source_schema_erratum_v0_1.json \
+            data/iris_source_taxon_crosswalk_v0_1.csv \
+            data/iris_tree_record_semantics_v0_1.json
+
+      - name: Install frozen tree toolchain and analysis dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y mafft iqtree build-essential git
+          git clone --depth 1 --branch v1.5.1 https://github.com/inab/trimal.git /tmp/trimal
+          make -C /tmp/trimal/source
+          sudo install -m 0755 /tmp/trimal/source/trimal /usr/local/bin/trimal
+          python -m pip install --disable-pip-version-check biopython pandas openpyxl numpy scipy
+
+      - name: Revalidate pre-outcome contracts
+        run: |
+          python scripts/ingest_iris_postfreeze_rows_v0_1.py --out /tmp/iris_ingest.json >/dev/null
+          python scripts/validate_iris_source_schema_erratum_v0_1.py --ingest-receipt /tmp/iris_ingest.json
+          python scripts/validate_iris_tree_record_semantics_v0_1.py
+          python scripts/validate_iris_source_taxon_crosswalk_v0_1.py --out /tmp/iris_crosswalk.json
+
+      - name: Rebuild frozen trait-blind six-locus primary tree inputs
+        run: |
+          python scripts/prepare_iris_primary_tree_inputs_v0_1.py --out-dir build/iris_tree_inputs
+          mkdir -p build/iris_trimmed
+          for locus in matK trnL ndhF trnK rbcL ITS; do
+            mafft --localpair --maxiterate 1000 --thread 2 \
+              build/iris_tree_inputs/${locus}.source_full_records.fasta \
+              > build/iris_trimmed/${locus}.aligned.fasta
+            trimal -in build/iris_trimmed/${locus}.aligned.fasta \
+              -out build/iris_trimmed/${locus}.trimmed.fasta -automated1
+          done
+          python scripts/concatenate_iris_primary_tree_alignments_v0_1.py \
+            --tree-input-dir build/iris_tree_inputs \
+            --trimmed-dir build/iris_trimmed \
+            --out-dir build/iris_primary_tree
+
+      - name: Rebuild frozen trait-blind IQ-TREE2 primary tree
+        run: |
+          IQBIN=$(command -v iqtree2 || command -v iqtree)
+          "$IQBIN" \
+            -s build/iris_primary_tree/iris_primary_concatenated.fasta \
+            -p build/iris_primary_tree/iris_primary_partitions.nex \
+            -m MFP+MERGE \
+            -B 1000 \
+            --seed 20260913 \
+            -T AUTO \
+            --prefix build/iris_primary_tree/iris_primary
+          python - <<'PY'
+          from Bio import Phylo
+          p='build/iris_primary_tree/iris_primary.treefile'
+          tree=Phylo.read(p,'newick')
+          tips=[t.name for t in tree.get_terminals()]
+          assert len(tips)==227 and len(set(tips))==227, (len(tips),len(set(tips)))
+          print({'tree_tips':len(tips),'auc_computed':False,'decision_computed':False})
+          PY
+
+      - name: Open the preregistered Iris outcome exactly once
+        run: |
+          python scripts/run_iris_prospective_resolution_test_v0_1.py \
+            --tree build/iris_primary_tree/iris_primary.treefile \
+            --out results/iris_intermediate_resolution_v0_1/iris_intermediate_resolution_result_v0_1.json
+
+      - name: Assert terminal result is immutable-classified
+        run: |
+          python - <<'PY'
+          import json
+          p='results/iris_intermediate_resolution_v0_1/iris_intermediate_resolution_result_v0_1.json'
+          x=json.load(open(p))
+          assert x['status']=='IRIS_PROSPECTIVE_INTERMEDIATE_RESOLUTION_PRIMARY_RESULT'
+          assert x['decision'] in {'PASS','MIXED','FAIL'}
+          assert x['seed']==20260913 and x['permutations']==9999
+          assert x['post_hoc_upgrade_allowed'] is False
+          print('TERMINAL_DECISION='+x['decision'])
+          print('OBSERVED='+json.dumps(x['observed'],sort_keys=True))
+          print('PVALUES='+json.dumps(x['empirical_p_one_sided'],sort_keys=True))
+          PY
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: iris-prospective-intermediate-resolution-outcome-v0-1
+          path: |
+            results/iris_intermediate_resolution_v0_1/iris_intermediate_resolution_result_v0_1.json
+            build/iris_primary_tree/iris_primary.treefile
+            build/iris_primary_tree/iris_primary.iqtree
+            build/iris_primary_tree/iris_primary.log
+            build/iris_primary_tree/iris_primary_partitions.nex
+          retention-days: 90
