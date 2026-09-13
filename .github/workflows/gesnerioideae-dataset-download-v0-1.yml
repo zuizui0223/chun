@@ -1,0 +1,23 @@
+name: Gesnerioideae dataset bundle fetch v0.1
+on:
+  pull_request:
+    paths:
+      - 'scripts/fetch_gesnerioideae_dataset_bundle_v0_1.py'
+      - '.github/workflows/gesnerioideae-dataset-download-v0-1.yml'
+jobs:
+  fetch-bundle:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: python -m pip install --disable-pip-version-check requests
+      - name: Fetch dataset bundle and verify exact frozen tree
+        run: python scripts/fetch_gesnerioideae_dataset_bundle_v0_1.py
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: gesnerioideae-dataset-bundle-v0-1
+          path: build/gesnerioideae_dataset_bundle_v0_1/
+          retention-days: 90
