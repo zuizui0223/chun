@@ -1,0 +1,31 @@
+{
+  "version":"v0.1",
+  "status":"TREE_NOT_PRESENT_IN_ANY_FIGSHARE_VERSION_OUTCOMES_UNOPENED",
+  "figshare_article_id":30282448,
+  "versions_checked":[
+    {
+      "version":1,
+      "doi":"10.6084/m9.figshare.30282448.v1",
+      "files":[
+        {"id":58502632,"name":"anthocyanins_spectra.csv","size":468339,"md5":"bb76b658952017e1c30bc5b488068f63"},
+        {"id":58502635,"name":"raw_data.csv","size":130680,"md5":"0e3b9830abb1378f9546cd7d07ae1f97"}
+      ]
+    },
+    {
+      "version":2,
+      "doi":"10.6084/m9.figshare.30282448.v2",
+      "files":[
+        {"id":58502632,"name":"anthocyanins_spectra.csv","size":468339,"md5":"bb76b658952017e1c30bc5b488068f63"},
+        {"id":58502635,"name":"raw_data.csv","size":130680,"md5":"0e3b9830abb1378f9546cd7d07ae1f97"},
+        {"id":58520542,"name":"ruellia_occurrences.csv","size":1210527,"md5":"e1eeb161db7a735d88f5c016a15167f2"}
+      ]
+    }
+  ],
+  "expected_author_code_tree":"03-Ruellia_phylo.timed.tre",
+  "tree_present_in_any_figshare_version":false,
+  "public_search_anchor":{"doi":"10.1002/tax.13001","reported_ddRAD_species":187,"identity_to_expected_timed_tree_proven":false},
+  "interpretation":"The Figshare version history cannot unlock the frozen tree gate. A related published New World Ruellia ddRAD phylogeny exists, but CHUN has not established identity with the exact timed tree consumed by the author analysis and therefore will not substitute it.",
+  "outcome_firewall":{"row_level_HPLC_values_read":false,"state_patterns_materialized":false,"AUCs_computed":false,"permutations_run":false,"winner_assigned":false},
+  "terminal_gate":"HOLD_TREE_SOURCE_OUTCOMES_UNOPENED",
+  "paper1_science_changed":false
+}
