@@ -4,6 +4,7 @@ on:
   pull_request:
     paths:
       - 'scripts/diagnose_ruellia51_figshare_metadata_v0_1.py'
+      - 'scripts/diagnose_ruellia51_csv_headers_v0_1.py'
       - 'data/ruellia51_source_preflight_receipt_v0_1.json'
       - 'docs/RUELLIA51_SOURCE_PREFLIGHT_V0_1.md'
       - '.github/workflows/ruellia51-source-preflight-v0-1.yml'
@@ -26,17 +27,26 @@ jobs:
         run: test ! -e results/ruellia51_hplc_resolution_profile_v0_1
       - name: Query Figshare metadata only
         run: python scripts/diagnose_ruellia51_figshare_metadata_v0_1.py
+      - name: Download exact CSV bytes and inspect headers only
+        run: python scripts/diagnose_ruellia51_csv_headers_v0_1.py
       - name: Validate outcome firewall
         run: |
           python - <<'PY'
           import json
-          x=json.load(open('build/ruellia51_figshare_metadata_v0_1.json'))
-          assert x['status']=='FIGSHARE_METADATA_ONLY_OUTCOMES_UNOPENED'
-          assert x['article_id']==30282448
-          assert x['row_level_HPLC_values_read'] is False
-          assert x['AUC_computed'] is False
-          assert x['winner_computed'] is False
-          print({'doi':x['doi'],'version':x['version'],'files':[(f['id'],f['name'],f['size']) for f in x['files']]})
+          m=json.load(open('build/ruellia51_figshare_metadata_v0_1.json'))
+          h=json.load(open('build/ruellia51_csv_headers_v0_1.json'))
+          assert m['status']=='FIGSHARE_METADATA_ONLY_OUTCOMES_UNOPENED'
+          assert m['article_id']==30282448
+          assert m['version']==2
+          assert m['row_level_HPLC_values_read'] is False
+          assert h['status']=='CSV_HEADERS_ONLY_OUTCOMES_UNOPENED'
+          assert h['data_rows_read']==0
+          assert h['row_level_HPLC_values_read'] is False
+          assert h['AUC_computed'] is False and h['winner_computed'] is False
+          by={x['name']:x for x in h['files']}
+          assert by['anthocyanins_spectra.csv']['md5']=='bb76b658952017e1c30bc5b488068f63'
+          assert by['raw_data.csv']['md5']=='0e3b9830abb1378f9546cd7d07ae1f97'
+          print({'metadata_version':m['version'],'headers':{k:v['header'] for k,v in by.items()}})
           PY
       - name: Confirm Paper 1 science firewall
         if: github.event_name == 'pull_request'
@@ -44,6 +54,8 @@ jobs:
           git diff --exit-code ${{ github.event.pull_request.base.sha }}...HEAD -- manuscript data/paper1_authoritative_results_v0_2_2.csv data/paper1_main_figure_manifest_v0_2_2.csv
       - uses: actions/upload-artifact@v4
         with:
-          name: ruellia51-figshare-metadata-v0-1
-          path: build/ruellia51_figshare_metadata_v0_1.json
+          name: ruellia51-source-preflight-v0-1
+          path: |
+            build/ruellia51_figshare_metadata_v0_1.json
+            build/ruellia51_csv_headers_v0_1.json
           retention-days: 90
