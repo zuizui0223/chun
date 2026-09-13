@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# Outcome-blind diagnostic: reads exact public CSV bytes but parses header row only.
 import csv, hashlib, io, json, urllib.request
 from pathlib import Path
 
