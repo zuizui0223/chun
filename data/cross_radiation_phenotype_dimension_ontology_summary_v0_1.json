@@ -1,0 +1,73 @@
+{
+  "version": "v0.1",
+  "status": "SPECIFICITY_ASYMMETRY_FALSIFIED_PHENOTYPE_DIMENSION_TARGET_ARCHITECTURE_RETAINED",
+  "superseded_claim": "HUE_OR_HYDROXYLATION_IS_INTRINSICALLY_FINE_GRAINED_WHILE_PIGMENT_AMOUNT_OR_LOSS_IS_INTRINSICALLY_COARSE_GRAINED",
+  "falsification": {
+    "reason_1": "THE_OLD_AMOUNT_OR_DEPLETION_CATEGORY_CONFLATED_CONTINUOUS_PIGMENT_QUANTITY_WITH_DISCRETE_PIGMENT_LOSS",
+    "reason_2": "FIXED_PIGMENT_LOSS_CAN_REPEAT_AT_SPECIFIC_R2R3_MYB_REGULATORS_OR_REGULATOR_CLASSES",
+    "direct_counterexample": "PETUNIA_AXILLARIS_AN2_LOF_AT_LEAST_FIVE_INDEPENDENT_ALLELES",
+    "prior_art_boundary": "WESSINGER_RAUSHER_2012_ALREADY_SYNTHESIZED_TRANSITION_TYPE_DEPENDENCE_AND_R2R3_MYB_BIAS_FOR_FIXED_PIGMENT_LOSS"
+  },
+  "dimension_summary": {
+    "HUE_COMPOSITION": {
+      "systems": 5,
+      "branch_control_support": "5/5",
+      "systems_list": [
+        "IOCHROMINAE",
+        "CAPE_ERICA",
+        "PETUNIEAE",
+        "IPOMOEA",
+        "PENSTEMON"
+      ],
+      "prospective_components": "1/5 (Petunieae)",
+      "target_architectures": [
+        "BRANCH_CONTROL_F3H_F35H",
+        "BRANCH_CONTROL_F3_PRIME_5_H",
+        "BRANCH_CONTROL_F3_PRIME_H",
+        "BRANCH_CONTROL_SUBSPACE"
+      ],
+      "interpretation": "STRONG_CURRENT_CROSS_SYSTEM_TARGET_CLASS_CONCENTRATION_ON_ANTHOCYANIN_BRANCH_CONTROL"
+    },
+    "PIGMENT_QUANTITY_CONTINUOUS": {
+      "systems": 2,
+      "support_vs_primary_fail": "1/2 vs 1/2",
+      "target_architectures": [
+        "LATE_PATHWAY_COEXPRESSION",
+        "NO_PRIMARY_STABLE_TARGET"
+      ],
+      "interpretation": "UNDERDETERMINED_HIGHEST_INFORMATION_GAP"
+    },
+    "PIGMENT_LOSS": {
+      "systems": 4,
+      "target_architectures": [
+        "HETEROGENEOUS_LATE_AND_REGULATORY",
+        "LATE_PATHWAY_EXPRESSION",
+        "R2R3_MYB_AN2",
+        "RECURRENT_ANS_CORE"
+      ],
+      "interpretation": "TARGET_CLASS_REPEATABILITY_EXISTS_BUT_CURRENT_ADMITTED_SYSTEMS_DO_NOT_SHARE_ONE_EXACT_ARCHITECTURE",
+      "prior_art_control": "R2R3_MYB_BIAS_FOR_FIXED_LOSSES_ALREADY_ESTABLISHED"
+    },
+    "PIGMENT_GAIN": {
+      "systems": 2,
+      "target_architectures": [
+        "R2R3_MYB_PARALOG_CLASS",
+        "TRANSITION_CLASS_DEPENDENT_MODULE"
+      ],
+      "interpretation": "REGULATOR_OR_MODULE_REUSE_WITHOUT_COMPLETE_PROGRAMME_IDENTITY"
+    },
+    "REGAIN_FROM_COLORLESS": {
+      "systems": 1,
+      "target_architectures": [
+        "R2R3_MYB_REGULATOR_CLASS"
+      ],
+      "interpretation": "REGULATOR_CLASS_REUSE_WITH_IMPLEMENTATION_HETEROGENEITY"
+    }
+  },
+  "retained_cross_radiation_rule": "PHENOTYPE_DIMENSION_OR_TRANSITION_CLASS_PREDICTS_WHICH_MOLECULAR_TARGET_ARCHITECTURE_IS_REUSED_BETTER_THAN_A_GLOBAL_FINE_VERSUS_COARSE_REPEATABILITY_ORDERING",
+  "novelty_boundary": "TRANSITION_TYPE_DEPENDENCE_ITSELF_IS_PRIOR_ART; THE_PROGRAMME_LEVEL_CANDIDATE_IS ITS_EXPLICIT_ALIGNMENT_WITH_CROSS_RADIATION_MACRO_STATE_REPRESENTATION_AND_PROSPECTIVE_TESTING_UNDER_FROZEN_DIMENSION_DEFINITIONS",
+  "next_gate": "FREEZE_A_CONTINUOUS_PIGMENT_QUANTITY_TARGET_CLASS_RULE_BEFORE_INSPECTING_OUTCOMES_IN_AN_UNUSED_INDEPENDENT_RADIATION; DO_NOT_SPEND_THE_NEXT_PROSPECTIVE_TEST_ON_ANOTHER_HUE_SYSTEM",
+  "numeric_pooling": "FORBIDDEN_ACROSS_HETEROGENEOUS_EVIDENCE_UNITS",
+  "claim_boundary": "The five hue systems are heterogeneous evidence types and their 5/5 target-class concentration is descriptive. Pigment-loss systems cannot be described as generally coarse or unpredictable. No first claim, pooled effect size, or universal target gene is authorized.",
+  "paper1_science_changed": false
+}
