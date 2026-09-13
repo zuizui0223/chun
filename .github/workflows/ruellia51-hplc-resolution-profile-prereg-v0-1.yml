@@ -1,0 +1,33 @@
+name: Ruellia51 HPLC resolution profile prereg v0.1
+
+on:
+  pull_request:
+    paths:
+      - 'data/ruellia51_hplc_resolution_profile_prereg_v0_1.json'
+      - 'docs/RUELLIA51_HPLC_RESOLUTION_PROFILE_PREREG_V0_1.md'
+      - 'scripts/validate_ruellia51_hplc_resolution_profile_prereg_v0_1.py'
+      - '.github/workflows/ruellia51-hplc-resolution-profile-prereg-v0-1.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Validate outcome-blind preregistration
+        run: python scripts/validate_ruellia51_hplc_resolution_profile_prereg_v0_1.py
+      - name: Confirm Paper 1 science firewall
+        if: github.event_name == 'pull_request'
+        run: |
+          git diff --exit-code ${{ github.event.pull_request.base.sha }}...HEAD -- manuscript data/paper1_authoritative_results_v0_2_2.csv data/paper1_main_figure_manifest_v0_2_2.csv || {
+            echo 'Paper 1 science/manuscript changed unexpectedly' >&2
+            exit 1
+          }
