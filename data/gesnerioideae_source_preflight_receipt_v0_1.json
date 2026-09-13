@@ -1,0 +1,43 @@
+{
+  "version": "v0.1",
+  "status": "GESNERIOIDEAE_SOURCE_PREFLIGHT_COMPLETE_OUTCOME_BLIND",
+  "generated_from_workflow_run": 34739684126,
+  "workflow_artifact_id": 10312277501,
+  "outcome_values_read": false,
+  "auc_computed": false,
+  "decision_computed": false,
+  "forbidden_columns_read": false,
+  "supplementary_source": {
+    "pmcid": "PMC7767864",
+    "endpoint": "https://www.ebi.ac.uk/europepmc/webservices/rest/PMC7767864/supplementaryFiles",
+    "supplementary_zip_sha256": "01a9669569b3a08a6531a7ac76c93a96967bb368bef90710e0fd8f3337b49f33",
+    "selected_href": "Table_1.xlsx",
+    "sha256": "a84abf67da0afb8c0bafd4c1251dbcbb6dc48eb286dca788e6e88ce0176ccbc8",
+    "sheet": "FINAL SAMPLE LIST",
+    "max_row": 183,
+    "max_column": 33,
+    "header_row": 3,
+    "selection_basis": "workbook shape + whitelisted header-token matches only"
+  },
+  "species_identifier_only": {
+    "source_rows_nonempty": 180,
+    "unique_normalized_binomials": 154,
+    "malformed_species_labels": []
+  },
+  "tree_source_manifest": {
+    "dryad_doi": "10.5061/dryad.m7589",
+    "filename": "Gesne_Ago8_simple_combined_CA.tre",
+    "file_id": "72407",
+    "size": 668933,
+    "mimeType": "text/plain",
+    "digest": "94d6f267f5c123d6d875170da1783ffa",
+    "digestType": "md5",
+    "download_endpoint": "https://datadryad.org/api/v2/files/72407/download"
+  },
+  "tree_byte_access": "BEARER_TOKEN_REQUIRED_401",
+  "hard_stop": "HOLD_SOURCE_ACCESS",
+  "crosswalk_executed": false,
+  "required_external_input": "Exact Dryad tree bytes for file id 72407 matching size 668933 and md5 94d6f267f5c123d6d875170da1783ffa. Do not inspect trait outcomes first.",
+  "scientific_interpretation": "Source-access hold only; not a biological negative and not a resolution-profile result.",
+  "paper1_science_changed": false
+}
