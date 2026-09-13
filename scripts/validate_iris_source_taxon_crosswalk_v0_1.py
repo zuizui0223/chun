@@ -37,24 +37,22 @@ def accession_rows(data: bytes) -> list[str]:
     return [clean(r[0]) for r in rows[2:] if r and clean(r[0])]
 
 
-def source_key(raw: str) -> str:
-    """Outcome-independent source-label normalization, retaining infraspecific identity."""
-    s = clean(raw).replace("×", "x").replace("_", " ")
-    # Drop nomenclatural author tail after the taxonomic unit; preserve named rank epithet.
+def binomial_key(raw: str) -> str:
+    """Source-only join key; infraspecific ranks collapse to the source binomial unless explicitly overridden."""
+    s = clean(raw).lower().replace("×", "x").replace("_", " ")
+    s = re.sub(r"\b(subsp|subs|ssp|var|cf)\.?\b", " ", s)
+    s = re.sub(r"\b(l|mill|auct)\.?\b", " ", s)
+    s = re.sub(r"[^a-z0-9]+", " ", s)
     toks = s.split()
     if not toks:
         return ""
-    if toks[0].lower().startswith("irisx") and len(toks[0]) > 5:
-        return "iris x " + toks[0][5:].lower()
-    if toks[0].lower() != "iris":
-        return re.sub(r"[^a-z0-9]+", " ", s.lower()).strip()
-    out = ["iris"]
-    if len(toks) >= 2:
-        out.append(re.sub(r"[^A-Za-z0-9-]", "", toks[1]).lower())
-    if len(toks) >= 4 and toks[2].lower().rstrip(".") in {"subsp", "ssp", "subs", "var"}:
-        out.append(toks[2].lower().rstrip("."))
-        out.append(re.sub(r"[^A-Za-z0-9-]", "", toks[3]).lower())
-    return " ".join(out).replace("-", "")
+    if toks[0].startswith("irisx") and len(toks[0]) > 5:
+        return "iris " + toks[0][5:]
+    if toks[0] == "iris" and len(toks) > 1:
+        if toks[1] == "x" and len(toks) > 2:
+            return "iris " + toks[2]
+        return "iris " + toks[1]
+    return " ".join(toks[:2])
 
 
 def main() -> int:
@@ -82,9 +80,15 @@ def main() -> int:
     assert set(explicit).issubset(set(trait_labels))
     assert set(explicit.values()).issubset(set(acc_labels))
 
+    # Remove explicitly claimed accession rows before generic binomial matching. This is
+    # necessary for Iris spuria subsp. sogdiana -> Iris_sogdiana, while the other
+    # Iris spuria trait row must remain available for Iris_spuria subsp. spuria.
+    reserved_accessions = set(explicit.values())
     acc_by_key: dict[str, list[str]] = {}
     for a in acc_labels:
-        acc_by_key.setdefault(source_key(a), []).append(a)
+        if a in reserved_accessions:
+            continue
+        acc_by_key.setdefault(binomial_key(a), []).append(a)
 
     mapped: dict[str, str] = {}
     ambiguous: dict[str, list[str]] = {}
@@ -93,7 +97,7 @@ def main() -> int:
         if t in explicit:
             mapped[t] = explicit[t]
             continue
-        candidates = acc_by_key.get(source_key(t), [])
+        candidates = acc_by_key.get(binomial_key(t), [])
         if len(candidates) == 1:
             mapped[t] = candidates[0]
         elif len(candidates) > 1:
@@ -126,6 +130,7 @@ def main() -> int:
         "unmatched_accession_rows": unmatched_accessions,
         "iris_darwasica_role": "SOURCE_SPECIFIC_EXCLUSION_NO_TRAIT_ROW",
         "iris_cedretii_role": "TREE_ONLY_NO_TRAIT_ROW",
+        "generic_join_rule": "BINOMIAL_KEY_AFTER_EXPLICIT_SOURCE_LABEL_OVERRIDES",
         "trait_columns_read": ["Species"],
         "trait_values_inspected": False,
         "auc_computed": False,
