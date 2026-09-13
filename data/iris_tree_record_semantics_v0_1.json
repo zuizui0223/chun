@@ -1,0 +1,39 @@
+{
+  "version": "v0.1",
+  "status": "FROZEN_PRE_TREE_PRE_AUC_RECORD_SEMANTICS",
+  "source_method": "MatPhylobi",
+  "matphylobi_repository": "hansiu/MatPhylobi",
+  "matphylobi_source_commit": "a54443c475aecc8567d6981346ee53c0a126e0ca",
+  "matphylobi_semantics": {
+    "sequence_download": "Entrez efetch nucleotide GenBank record",
+    "sequence_assignment": "record.seq full GenBank record",
+    "general_marker_blast_coordinates_used_for_sequence_slicing": false,
+    "marker_specific_candidate_selection": true,
+    "final_sequence_representation": "FULL_GENBANK_RECORD_PER_ACCESSION_ASSIGNED_TO_MARKER"
+  },
+  "iris_primary_tree_contract": {
+    "effective_loci": ["matK", "trnL", "ndhF", "trnK", "rbcL", "ITS"],
+    "input_accession_table": "frozen PMC7588356.1 Data_Sheet_1.csv",
+    "sequence_unit": "FULL_GENBANK_RECORD",
+    "cross_locus_duplicate_accessions": "RETAIN_AS_ASSIGNED_IN_EACH_SOURCE_MARKER_COLUMN",
+    "reason": "This reproduces the source-tool sequence semantics instead of inventing post-freeze feature extraction.",
+    "Iris_darwasica": "EXCLUDE_SOURCE_SPECIFIC_RULE",
+    "Iris_cedretii": "TREE_ONLY_NO_TRAIT_ROW",
+    "outgroups": "UNAVAILABLE_IN_FROZEN_ACCESSION_BUNDLE_PRIMARY_TREE_UNROOTED",
+    "rooting_note": "Pairwise patristic distance is root-invariant; absence of source outgroup accessions does not alter the primary AUC distance statistic.",
+    "trait_values_used_for_tree": false
+  },
+  "sensitivity_only": {
+    "deduplicate_matK_trnK_shared_records": true,
+    "feature_specific_extraction": "NOT_PRIMARY_NOT_AUTHORIZED_TO_UPGRADE_PRIMARY_DECISION"
+  },
+  "outcome_exposure_at_freeze": {
+    "trait_rows_ingested": true,
+    "taxon_crosswalk_frozen": true,
+    "auc_computed": false,
+    "resolution_delta_computed": false,
+    "pass_mixed_fail_decision_computed": false
+  },
+  "claim_boundary": "The primary reconstruction follows the source tool's full-record semantics. Cross-locus duplicate records may overweight shared plastid sequence and therefore require a sensitivity analysis, but sensitivity results cannot upgrade the preregistered primary decision.",
+  "paper1_science_changed": false
+}

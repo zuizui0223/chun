@@ -1,0 +1,29 @@
+name: Iris tree record semantics v0.1
+
+on:
+  pull_request:
+    paths:
+      - 'data/iris_tree_record_semantics_v0_1.json'
+      - 'docs/IRIS_TREE_RECORD_SEMANTICS_V0_1.md'
+      - 'scripts/validate_iris_tree_record_semantics_v0_1.py'
+      - '.github/workflows/iris-tree-record-semantics-v0-1.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+        with: {fetch-depth: 0}
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.12'}
+      - name: Validate frozen record semantics
+        run: python scripts/validate_iris_tree_record_semantics_v0_1.py
+      - name: Confirm no outcome statistic implementation
+        run: |
+          ! grep -E 'roc_auc|9999|patristic|PASS.*MIXED' scripts/validate_iris_tree_record_semantics_v0_1.py
+      - name: Confirm Paper 1 science firewall
+        run: git diff --exit-code ${{ github.event.pull_request.base.sha }}...HEAD -- manuscript data/paper1_authoritative_results_v0_2_2.csv data/paper1_main_figure_manifest_v0_2_2.csv
