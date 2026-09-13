@@ -1,0 +1,70 @@
+{
+  "version": "v0.1",
+  "status": "FROZEN_BEFORE_GESNERIOIDEAE_ROW_LEVEL_OUTCOME_INGESTION",
+  "source_doi": "10.3389/fpls.2020.604389",
+  "prospective_label": "ANALYSIS_PROSPECTIVE_NOT_LITERATURE_BLINDED",
+  "candidate_role": "FIFTH_RADIATION_SAME_ESTIMAND_PROFILE_REPLICATION_AND_TRAINING_EXPANSION",
+  "selection_basis": {
+    "reported_samples": 180,
+    "reported_species": 156,
+    "layers_known_pre_outcome": [
+      "reflectance",
+      "detailed_anthocyanin_chemistry",
+      "phylogenetic_framework"
+    ],
+    "not_selected_for": "matched_radiation_wide_molecular_expression_bridge"
+  },
+  "nested_resolutions": {
+    "coarse": "chromatic anthocyanin pigmentation present versus absent, or source-equivalent binary biochemical presence state",
+    "intermediate": "source-defined major anthocyanin/anthocyanidin biochemical class using a semantics-only mapping frozen before values are inspected",
+    "fine": "source-defined visible hue/reflectance class; if continuous-only, external colour-space cutpoints must be frozen before target values are inspected"
+  },
+  "schema_stop_rule": "HOLD_SCHEMA if three nested levels cannot be instantiated without outcome-dependent recoding",
+  "common_frame": {
+    "require_one_to_one_tree_crosswalk": true,
+    "exclude_missing_any_primary_state_from_all_three": true,
+    "fine_state_minimum_tips": 5,
+    "exclude_rare_fine_state_from_common_frame": true,
+    "outcome_improving_exclusions_forbidden": true
+  },
+  "primary_statistic": {
+    "score": "negative_patristic_distance_predicts_same_state_pair",
+    "metric": "ROC_AUC",
+    "permutations": 9999,
+    "seed": 20260913,
+    "permutation_unit": "jointly permute the complete coarse/intermediate/fine state triplet across eligible tips",
+    "reported": [
+      "AUC_coarse",
+      "AUC_intermediate",
+      "AUC_fine",
+      "all_pairwise_AUC_differences",
+      "one_sided_p_each_AUC_above_0.5",
+      "one_sided_p_observed_winner_vs_runner_up"
+    ]
+  },
+  "decision_rule": {
+    "PROFILE_SIGNALLED_COARSE": "coarse AUC>0.5 with p<=0.05 and coarse exceeds both alternatives with winner-vs-runner-up joint-permutation p<=0.05",
+    "PROFILE_SIGNALLED_INTERMEDIATE": "intermediate satisfies the corresponding unique-winner rule",
+    "PROFILE_SIGNALLED_FINE": "fine satisfies the corresponding unique-winner rule",
+    "PROFILE_SIGNALLED_TIED": "at least one resolution has AUC>0.5 with p<=0.05 but no unique winner clears p<=0.05",
+    "PROFILE_NO_PHYLOGENETIC_SIGNAL": "no resolution has AUC>0.5 with p<=0.05",
+    "NO_POST_HOC_UPGRADE": true
+  },
+  "cross_radiation_hypothesis": "identity of the resolution carrying the strongest phylogenetic signal is not invariant across angiosperm radiations",
+  "moderator_policy": {
+    "fit_multivariable_model_now": false,
+    "reason": "biological replication count too small and discovery systems are not all measured with the exact same AUC estimand",
+    "minimum_same_estimand_training_radiations_before_quantitative_moderator": 5,
+    "max_predictors_at_n5": 1,
+    "require_outcome_independent_target_predictor": true,
+    "require_leave_one_radiation_out_improvement_over_intercept_baseline": true
+  },
+  "forbidden_pre_freeze_exposure": [
+    "row-level realized hue frequencies",
+    "row-level realized anthocyanin-class frequencies",
+    "any CHUN-computed Gesnerioideae coarse/intermediate/fine AUC",
+    "any CHUN-computed Gesnerioideae resolution winner",
+    "threshold tuning using realized Gesnerioideae outcomes"
+  ],
+  "paper1_science_changed": false
+}

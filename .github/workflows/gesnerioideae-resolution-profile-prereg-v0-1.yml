@@ -1,0 +1,24 @@
+name: Gesnerioideae resolution-profile preregistration v0.1
+
+on:
+  pull_request:
+    paths:
+      - 'docs/GESNERIOIDEAE_RESOLUTION_PROFILE_PREREG_V0_1.md'
+      - 'data/gesnerioideae_resolution_profile_prereg_v0_1.json'
+      - 'scripts/validate_gesnerioideae_resolution_profile_prereg_v0_1.py'
+      - '.github/workflows/gesnerioideae-resolution-profile-prereg-v0-1.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  validate-prereg:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Validate frozen contract and outcome firewall
+        run: python scripts/validate_gesnerioideae_resolution_profile_prereg_v0_1.py
