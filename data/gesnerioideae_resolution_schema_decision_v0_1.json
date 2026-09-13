@@ -1,0 +1,62 @@
+{
+  "version": "v0.1",
+  "status": "HOLD_SCHEMA_SOURCE_AXES_NOT_NESTED",
+  "source_doi": "10.3389/fpls.2020.604389",
+  "source_pmcid": "PMC7767864",
+  "upstream_preregistration": "data/gesnerioideae_resolution_profile_prereg_v0_1.json",
+  "upstream_preregistration_status": "FROZEN_BEFORE_GESNERIOIDEAE_ROW_LEVEL_OUTCOME_INGESTION",
+  "source_schema_receipt": {
+    "workflow_run": 34738455036,
+    "artifact_id": 10311567109,
+    "artifact_digest": "sha256:f5e4d31387bd15a4c950875457013f2220aca5b911c889438534297a7ee85a91",
+    "pmc_prefix": "PMC7767864.1/",
+    "workbook": "Table_1.xlsx",
+    "workbook_sha256": "a84abf67da0afb8c0bafd4c1251dbcbb6dc48eb286dca788e6e88ce0176ccbc8",
+    "worksheet": "FINAL SAMPLE LIST",
+    "rows": 183,
+    "columns": 33,
+    "schema_only": true
+  },
+  "pre_frozen_resolution_contract": {
+    "coarse": "chromatic anthocyanin pigmentation present versus absent, or source-equivalent binary biochemical presence state",
+    "intermediate": "source-defined major anthocyanin/anthocyanidin biochemical class using a semantics-only mapping frozen before values are inspected",
+    "fine": "source-defined visible hue/reflectance class; if continuous-only, external colour-space cutpoints must be frozen before target values are inspected"
+  },
+  "source_semantic_axes": {
+    "coarse_candidate": "anthocyanin present versus no anthocyanin",
+    "intermediate_candidate": [
+      "HYD90",
+      "DEO90",
+      "DEO+HYD",
+      "NONE"
+    ],
+    "fine_candidate": "nine source reflectance/visible-colour groups"
+  },
+  "nesting_audit": {
+    "coarse_to_intermediate": "SEMANTICALLY_NESTED_NONE_VERSUS_THREE_ANTHOCYANIN_PRESENT_CLASSES",
+    "intermediate_to_fine": "FAIL_CROSS_CUTTING_SOURCE_AXES",
+    "published_aggregate_counterexamples": [
+      "orange/red source colour groups contain DEO90, DEO+HYD and HYD90 samples",
+      "non-orange/red source colour groups contain HYD90, NONE and smaller DEO90/DEO+HYD fractions"
+    ],
+    "reason": "source-defined visible/reflectance groups do not map one-to-one or many-to-one into the source-defined pigment-chemistry classes; the two axes cross-cut"
+  },
+  "stop_rule_triggered": "HOLD_SCHEMA if three nested levels cannot be instantiated without outcome-dependent recoding",
+  "decision": "THREE_NESTED_LEVELS_CANNOT_BE_INSTANTIATED_UNDER_THE_FROZEN_CONTRACT_WITHOUT_POST_FREEZE_RECODING",
+  "forbidden_rescue": [
+    "derive new reflectance cutpoints after inspecting source rows",
+    "collapse pigment classes using realized frequencies",
+    "choose a hue-to-pigment mapping that maximizes phylogenetic AUC",
+    "replace the frozen fine visible/reflectance axis with an exact-anthocyanidin-composition axis"
+  ],
+  "outcome_firewall": {
+    "row_level_trait_values_inspected_by_CHUN_for_this_decision": false,
+    "coarse_intermediate_fine_AUC_computed": false,
+    "resolution_winner_computed": false,
+    "permutation_test_computed": false
+  },
+  "cross_radiation_consequence": "GESNERIOIDEAE_DOES_NOT_ENTER_THE_SAME_ESTIMAND_RESOLUTION_PROFILE_OUTCOME_SET_AND_DOES_NOT_INCREASE_THE_MODERATOR_TRAINING_COUNT",
+  "biological_interpretation": "NOT_A_BIOLOGICAL_NEGATIVE; THIS_IS_A_PRE_OUTCOME_MEASUREMENT_ARCHITECTURE_HOLD",
+  "reopen_rule": "reopen only with a source-defined or independently pre-frozen three-level nesting on one underlying trait axis before row-level target outcomes are inspected",
+  "paper1_science_changed": false
+}
