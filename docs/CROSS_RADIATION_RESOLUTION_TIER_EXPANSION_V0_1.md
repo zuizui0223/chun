@@ -56,9 +56,21 @@ Repeated anthocyanin-loss lineages show convergent stronger downstream pathway d
 
 ### Epimedium
 
-A-minus endpoints share **ANS low in 4/4**, while DFR is low in 3/4 and CHS-copy/FLS implementations vary. The broad signature is recurrent only in a subset, and copy-aware complete implementations are still more heterogeneous. Historical event identity remains unresolved, so this is an endpoint/common-panel stress test rather than an event-rate estimate.
+A-minus endpoints share **ANS low in 4/4** in the broader mechanistic benchmark, while DFR is low in 3/4 and CHS-copy/FLS implementations vary. In the taxon-overlap cross-level receipt, the admitted A-minus overlap is three taxa and retains the same recurrent-core/heterogeneous-implementation interpretation. Historical event identity remains unresolved, so this is an endpoint/common-panel stress test rather than an event-rate estimate.
 
 Together these systems reject the binary wording `hue stable / depletion unstable`. Depletion/loss can be highly repeatable, but its stable recurrence is supported at a **coarser module/core level** in these external controls.
+
+## Expanded descriptive stress test
+
+Combining the primary M1 systems with the independent external controls gives a useful descriptive check while retaining the tier labels:
+
+- hue/hydroxylation: Iochrominae, Cape *Erica*, Petunieae, *Ipomoea* = **4/4 branch-specific-or-finer**;
+- pigment amount/depletion: Iochrominae, Cape *Erica*, Petunieae, Aquilegia, Epimedium = **0/5 branch-specific-or-finer**;
+- among those five amount/depletion systems, **3/5** support a late-pathway/core-module level and **2/5** are heterogeneous or primary-fail.
+
+These are **not** a 4-versus-5 binomial experiment and no significance test is attached. The rows differ in unit type, source design, event-independence status and observation regime. The counts are a stress-test summary of mechanistic specificity, not a pooled recurrence rate.
+
+The source-checking script reconstructs the key entries from the frozen Iochrominae, Cape *Erica*, Petunieae and Epimedium receipts plus the mechanistic benchmark; a manually edited ledger alone cannot satisfy the validation gate.
 
 ## M4 — complementary regain test
 
@@ -91,6 +103,7 @@ Do not claim:
 - a universal F3'H law;
 - that depletion/loss cannot recur at exact-gene level;
 - a pooled cross-tier effect size;
+- statistical significance from the descriptive 4/4 versus 0/5 counts;
 - independence for repeated rows from the same radiation;
 - event-for-event matching between the macro and molecular datasets;
 - full prospective replication.
