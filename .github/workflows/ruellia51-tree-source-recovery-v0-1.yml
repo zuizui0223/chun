@@ -1,0 +1,41 @@
+name: Ruellia51 tree source recovery v0.1
+
+on:
+  pull_request:
+    paths:
+      - 'scripts/diagnose_ruellia51_figshare_versions_v0_1.py'
+      - 'data/ruellia51_tree_source_recovery_receipt_v0_1.json'
+      - 'docs/RUELLIA51_TREE_SOURCE_RECOVERY_V0_1.md'
+      - '.github/workflows/ruellia51-tree-source-recovery-v0-1.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  version-history:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Assert outcomes remain absent
+        run: test ! -e results/ruellia51_hplc_resolution_profile_v0_1
+      - name: Inspect Figshare version history metadata only
+        run: python scripts/diagnose_ruellia51_figshare_versions_v0_1.py
+      - name: Validate firewall
+        run: |
+          python - <<'PY'
+          import json
+          x=json.load(open('build/ruellia51_figshare_versions_v0_1.json'))
+          assert x['status']=='FIGSHARE_VERSION_HISTORY_METADATA_ONLY_OUTCOMES_UNOPENED'
+          assert x['row_level_HPLC_values_read'] is False
+          assert x['AUC_computed'] is False and x['winner_computed'] is False
+          print([(v['version'],[(f['id'],f['name'],f['size']) for f in v['files']]) for v in x['versions']])
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: ruellia51-tree-source-recovery-v0-1
+          path: build/ruellia51_figshare_versions_v0_1.json
+          retention-days: 90
