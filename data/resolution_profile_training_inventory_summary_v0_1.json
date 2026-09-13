@@ -1,0 +1,35 @@
+{
+  "version": "v0.1",
+  "status": "QUANTITATIVE_MODERATOR_BLOCKED_INSUFFICIENT_SAME_ESTIMAND_TRAINING_N",
+  "programme": "RADIATION_LEVEL_RESOLUTION_PROFILE_PREDICTION",
+  "frozen_profile_estimand": "PAIRWISE_SAME_STATE_ROC_AUC_COARSE_INTERMEDIATE_FINE_ON_ONE_COMMON_FRAME_WITH_9999_JOINT_TRIPLET_PERMUTATIONS",
+  "inventory_radiations": 5,
+  "exact_same_estimand_attempts": 2,
+  "exact_same_estimand_outcomes_available": 1,
+  "same_estimand_training_radiations": ["IRIS"],
+  "same_estimand_training_n": 1,
+  "schema_holds": ["GESNERIOIDEAE"],
+  "non_exchangeable_discovery_radiations": ["LINOIDEAE", "ANGRAECINAE", "ANTIRRHINEAE"],
+  "non_exchangeable_reason": "conditional fine-state organization after fixing a coarse state is a different estimand from unconditional coarse/intermediate/fine same-state AUC profiling",
+  "moderator_policy": {
+    "minimum_same_estimand_training_radiations": 5,
+    "current_same_estimand_training_radiations": 1,
+    "fit_any_quantitative_moderator_now": false,
+    "fit_multivariable_moderator_now": false,
+    "use_discovery_conditional_results_as_training_outcomes": false,
+    "reason": "n=1 exact profile outcome cannot identify or cross-validate a radiation-level predictor; importing conditional-hierarchy outcomes would mix estimands"
+  },
+  "issue_245_consequence": "DO_NOT_FIT_MODERATOR_YET; FIRST_ACQUIRE_ADDITIONAL_SOURCE_DEFINED_NESTED_SAME_ESTIMAND_RADIATIONS",
+  "next_candidate_admission_priority": [
+    "three source-defined nested state resolutions on one phenotype axis before row-level outcome inspection",
+    "public branch-length phylogeny or trait-blind reconstructable phylogeny",
+    "enough tips and state replication for one common eligible frame",
+    "no use of target state frequencies or target AUCs during candidate selection"
+  ],
+  "failure_mode_separation": {
+    "IRIS": "VALID_ESTIMAND_TERMINAL_PROSPECTIVE_FAIL",
+    "GESNERIOIDEAE": "PRE_OUTCOME_SCHEMA_HOLD_NOT_A_BIOLOGICAL_NEGATIVE"
+  },
+  "claim_boundary": "The current evidence establishes that a universal intermediate-resolution optimum is false and that some sources do not admit a common nested resolution ladder. It does not yet support a fitted predictor of which resolution profile a new radiation will show.",
+  "paper1_science_changed": false
+}
