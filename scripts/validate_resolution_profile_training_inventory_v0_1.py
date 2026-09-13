@@ -37,7 +37,8 @@ def main() -> int:
     assert len(training)==1 and training[0]['radiation']=='IRIS'
 
     # Iris is a valid exact-estimand outcome even though the preregistered universal rule failed.
-    assert iris['terminal_decision']=='FAIL'
+    assert iris['decision']=='FAIL'
+    assert iris['permutations']==9999
     assert iris['observed']['AUC_coarse'] < 0.5
     assert iris['observed']['AUC_intermediate'] < 0.5
     assert iris['observed']['AUC_fine'] < 0.5
