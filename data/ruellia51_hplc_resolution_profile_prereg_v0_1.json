@@ -1,0 +1,84 @@
+{
+  "version": "v0.1",
+  "status": "FROZEN_BEFORE_RUELLIA51_ROW_LEVEL_HPLC_STATE_INGESTION",
+  "source_article_doi": "10.1002/ajb2.70149",
+  "source_data_doi": "10.6084/m9.figshare.30282448",
+  "source_code_repo": "jlwatts98/Ruellia_theoretical_colorspace",
+  "source_code_commit_inspected_for_schema_only": "38bb511da1390bdd525a15ea8738bcc3f016fb59",
+  "prospective_label": "ANALYSIS_RULE_FROZEN_BEFORE_CHUN_ROW_LEVEL_HPLC_OUTCOME_INGESTION_NOT_LITERATURE_BLINDED",
+  "candidate_role": "NEXT_INDEPENDENT_SAME_ESTIMAND_RESOLUTION_PROFILE_REPLICATION",
+  "known_pre_outcome": {
+    "reported_species": 51,
+    "measurements": ["corolla_reflectance", "six_anthocyanidin_HPLC_concentrations", "ddRAD_phylogeny"],
+    "anthocyanidins": ["Pelargonidin", "Cyanidin", "Peonidin", "Delphinidin", "Petunidin", "Malvidin"],
+    "author_defined_pathway_branches": {
+      "PEL": ["Pelargonidin"],
+      "CYA": ["Cyanidin", "Peonidin"],
+      "DEL": ["Delphinidin", "Petunidin", "Malvidin"]
+    },
+    "row_level_CHUN_HPLC_presence_patterns_opened_before_freeze": false,
+    "CHUN_resolution_AUCs_opened_before_freeze": false
+  },
+  "phenotype_axis": "ANTHOCYANIDIN_COMPOSITION_PRESENCE_ONLY",
+  "nested_resolutions": {
+    "coarse": "ANY_ANTHOCYANIDIN_PRESENT versus NONE",
+    "intermediate": "three-bit source-pathway-branch presence pattern PEL/CYA/DEL",
+    "fine": "six-bit anthocyanidin presence pattern in fixed order Pelargonidin/Cyanidin/Peonidin/Delphinidin/Petunidin/Malvidin",
+    "presence_rule": "source numeric HPLC concentration > 0 means present; exactly 0 means absent; missing remains missing",
+    "continuous_concentration_magnitude_ignored": true,
+    "visible_hue_ignored": true,
+    "mapping_is_deterministically_nested": true
+  },
+  "source_preflight_before_outcome_opening": {
+    "allowed": ["file names", "file hashes", "column names", "sample/species identifiers", "phylogeny file identity", "tree tip labels", "branch lengths", "tip counts"],
+    "forbidden": ["row-level six HPLC numeric values", "derived compound presence patterns", "derived branch presence patterns", "state frequencies", "AUCs", "winner classes"],
+    "must_freeze_before_outcomes": ["exact HPLC table file", "exact phylogeny file", "sample-to-species aggregation rule", "species-to-tree crosswalk", "duplicate handling"]
+  },
+  "sample_to_species_rule": {
+    "primary": "if multiple corolla HPLC samples map to one tree species, OR presence within each of the six compounds across nonmissing samples",
+    "mixed_zero_positive": "present",
+    "all_missing_compound": "missing for that compound",
+    "no_frequency_or_AUC_dependent_sample_selection": true
+  },
+  "common_frame": {
+    "require_one_to_one_species_tree_crosswalk": true,
+    "exclude_species_missing_any_of_six_primary_compound_presence_states": true,
+    "fine_state_minimum_tips": 5,
+    "exclude_rare_fine_state_from_common_frame": true,
+    "same_retained_tips_all_resolutions": true,
+    "minimum_common_tips": 20,
+    "minimum_states_each_resolution": 2,
+    "outcome_improving_exclusions_forbidden": true,
+    "insufficient_status": "HOLD_INSUFFICIENT_COMMON_FRAME_OR_STATE_VARIATION"
+  },
+  "primary_statistic": {
+    "score": "negative_patristic_distance_predicts_same_state_pair",
+    "metric": "ROC_AUC",
+    "permutations": 9999,
+    "seed": 20260913,
+    "permutation_unit": "jointly permute each species complete coarse/intermediate/fine state triplet across retained tips",
+    "reported": ["AUC_coarse", "AUC_intermediate", "AUC_fine", "all_pairwise_AUC_differences", "one_sided_p_each_AUC_above_0.5", "one_sided_p_observed_winner_vs_runner_up"]
+  },
+  "decision_rule": {
+    "PROFILE_SIGNALLED_COARSE": "coarse AUC>0.5 with p<=0.05 and coarse exceeds both alternatives with winner-vs-runner-up joint-permutation p<=0.05",
+    "PROFILE_SIGNALLED_INTERMEDIATE": "intermediate satisfies the corresponding unique-winner rule",
+    "PROFILE_SIGNALLED_FINE": "fine satisfies the corresponding unique-winner rule",
+    "PROFILE_SIGNALLED_TIED": "at least one resolution has AUC>0.5 with p<=0.05 but no unique winner clears p<=0.05",
+    "PROFILE_NO_PHYLOGENETIC_SIGNAL": "no resolution has AUC>0.5 with p<=0.05",
+    "NO_POST_HOC_UPGRADE": true
+  },
+  "relation_to_prior_Ruellia_work": {
+    "prior_CHUN_source": "10.1186/s12862-021-01955-x",
+    "prior_panel_species": 10,
+    "prior_estimand": "pathway-region localization for hue/depletion mechanisms",
+    "exchangeable_with_this_profile_outcome": false,
+    "reason": "different source, different taxon frame, different estimand; prior work does not contain the three AUC profile outcomes"
+  },
+  "moderator_policy": {
+    "fit_now": false,
+    "minimum_same_estimand_radiations": 5,
+    "one_clade_one_replication": true
+  },
+  "schema_stop_rule": "HOLD_SCHEMA if source files cannot instantiate the frozen six-compound -> three-branch -> any-presence nesting without recoding based on realized outcomes",
+  "paper1_science_changed": false
+}
