@@ -1,0 +1,69 @@
+{
+  "crosswalk_sha256": "21d4e1cc6d98a23b63522c8b2893f6a0aed73dd6a1cfde4229308a7264277edd",
+  "decision": "FAIL",
+  "decision_contract_verbatim": {
+    "FAIL": "AUC_intermediate is not above 0.5, or either coarse/fine resolution is significantly more predictive than intermediate under the frozen joint-permutation test.",
+    "MIXED": "AUC_intermediate >0.5 with empirical p<=0.05 and both observed deltas are positive, but one or both delta p-values exceed 0.05; OR exactly one superiority contrast is positive/significant without the other being significantly negative.",
+    "NO_POST_HOC_UPGRADE": "Sensitivity analyses cannot upgrade MIXED/FAIL to PASS.",
+    "PASS": "AUC_intermediate > 0.5 with empirical p<=0.05 AND delta_intermediate_minus_coarse>0 with empirical p<=0.05 AND delta_intermediate_minus_fine>0 with empirical p<=0.05."
+  },
+  "empirical_p_one_sided": {
+    "coarse_gt_intermediate_for_fail_check": 0.4279,
+    "fine_gt_intermediate_for_fail_check": 0.0486,
+    "intermediate_gt_coarse": 0.5722,
+    "intermediate_gt_fine": 0.9515,
+    "intermediate_signal": 0.9718
+  },
+  "freeze_contract": "data/intermediate_resolution_rule_prereg_v0_1.json",
+  "freeze_contract_sha256": "ea5abbc998918fe50f1c5c175602134fa1ada96d4a32c7564eec42b019eee470",
+  "null_summary": {
+    "AUC_coarse_mean": 0.5000681319426475,
+    "AUC_fine_mean": 0.4999457494586847,
+    "AUC_intermediate_mean": 0.5002202925970136,
+    "delta_intermediate_minus_coarse_mean": 0.00015216065436623362,
+    "delta_intermediate_minus_fine_mean": 0.000274543138328939
+  },
+  "observed": {
+    "AUC_coarse": 0.4617285165822909,
+    "AUC_fine": 0.48705044194427866,
+    "AUC_intermediate": 0.4543945669248664,
+    "delta_intermediate_minus_coarse": -0.00733394965742451,
+    "delta_intermediate_minus_fine": -0.03265587501941225
+  },
+  "paper1_science_changed": false,
+  "permutations": 9999,
+  "post_hoc_upgrade_allowed": false,
+  "primary_frame": {
+    "coarse_state_counts": {
+      "CHROMATIC_PIGMENT_PRESENT": 162,
+      "NO_CHROMATIC_PIGMENT": 7
+    },
+    "eligible_tips": 169,
+    "fine_state_counts": {
+      "MAROON": 14,
+      "PINK": 12,
+      "PURPLE": 106,
+      "WHITE": 7,
+      "YELLOW": 30
+    },
+    "intermediate_state_counts": {
+      "ANTHOCYANIN": 126,
+      "CAROTENOID": 36,
+      "NO_CHROMATIC_PIGMENT": 7
+    },
+    "rare_fine_states_excluded": [
+      "ORANGE",
+      "RED"
+    ],
+    "trait_rows_after_source_exclusion": 226,
+    "tree_tips": 227,
+    "unambiguous_before_rare_filter": 171
+  },
+  "seed": 20260913,
+  "status": "IRIS_PROSPECTIVE_INTERMEDIATE_RESOLUTION_PRIMARY_RESULT",
+  "trait_source_sha256": "183ef5231c48e782b0ea69a7aa5605d40c892dd91d9d9b2d259ed7b65d230072",
+  "tree_semantics_contract": "data/iris_tree_record_semantics_v0_1.json",
+  "tree_semantics_sha256": "e52f6ea8b195250e9afcc2f0283412372c003257d780b179ce7f27af49396b90",
+  "tree_sha256": "59cd03e42fbf477f71833778d000d1f1a900b291888f7e17829a65106bf8b469",
+  "version": "v0.1"
+}

@@ -1,0 +1,20 @@
+{
+  "version": "v0.1",
+  "status": "IRIS_PROSPECTIVE_OUTCOME_EXECUTION_FROZEN",
+  "terminal_decision": "FAIL",
+  "outcome_workflow_run_id": 34735978734,
+  "outcome_workflow_job_id": 103667373948,
+  "outcome_branch_head_at_execution": "d061b98af82245e36848a57e1486f3d96c31d0f2",
+  "outcome_artifact_id": 10310399558,
+  "outcome_artifact_zip_sha256": "f71ef9f3d6fb2db387b82b9f82092256c6e16b71df37cb2c068d2eccc6cf8ebb",
+  "tree_workflow_run_id": 34732460066,
+  "tree_artifact_id": 10309889371,
+  "tree_artifact_zip_sha256": "dc9eaca6999f8c96e119c31f4185efcc690a594019486a335e51bf870ce3f2fe",
+  "tree_sha256": "59cd03e42fbf477f71833778d000d1f1a900b291888f7e17829a65106bf8b469",
+  "rule_freeze_commit": "c72dc4a",
+  "tree_pipeline_merge_commit": "645563e21b34e7a12e78d68fa10fb8a74e8ed41e",
+  "permutations": 9999,
+  "seed": 20260913,
+  "post_hoc_upgrade_allowed": false,
+  "note": "The terminal FAIL result is frozen exactly as produced by the first successful execution reaching the preregistered statistic after pre-outcome contract and tree-hash validation. Earlier failed runs terminated before a terminal result due only to execution implementation errors and produced no classified outcome."
+}
