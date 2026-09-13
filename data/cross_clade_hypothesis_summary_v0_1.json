@@ -1,0 +1,99 @@
+{
+  "version": "v0.1",
+  "status": "H4_FLAGSHIP_H3_SECONDARY_H1_H5_UNCLOSED",
+  "registry_clades": 18,
+  "post_registry_systems": [
+    "PETUNIEAE"
+  ],
+  "evidence_rows": 33,
+  "hypotheses": {
+    "H1": {
+      "name": "H1_BASELINE_DEPENDENT_TRANSITION_ARCHITECTURE",
+      "systems_with_evidence": 6,
+      "evidence_class_counts": {
+        "COMPATIBLE_ONLY": 4,
+        "COUNTEREXAMPLE_TO_STRONGER_FORM": 2
+      },
+      "decision": "STRONGER_ONE_WAY_WHITE_GAIN_FORM_FALSIFIED_BUT_BASELINE_DEPENDENT_RATE_OR_ROUTE_EFFECT_NOT_DIRECTLY_CLOSED",
+      "flagship_ready": false
+    },
+    "H2": {
+      "name": "H2_RETAINED_CAPACITY_REGULATORY_REDEPLOYMENT",
+      "systems_with_evidence": 4,
+      "evidence_class_counts": {
+        "DIRECT_SUPPORT": 1,
+        "PRIOR_ART_SUPPORT": 2,
+        "COMPATIBLE_ONLY": 1
+      },
+      "decision": "SUPPORTED_IN_DIRECT_REGAIN_AND_PRIOR_ART_CONTEXT_BUT_GENERIC_GENETIC_CONTEXT_NOVELTY_PREEMPTED",
+      "flagship_ready": false
+    },
+    "H3": {
+      "name": "H3_HIERARCHICAL_REPEATABILITY",
+      "systems_with_evidence": 7,
+      "evidence_class_counts": {
+        "DIRECT_SUPPORT": 5,
+        "PARTIAL_SUPPORT": 2
+      },
+      "decision": "STRONG_CROSS_CLADE_SUPPORT_FOR_HIERARCHICAL_REPEATABILITY_WITH_HETEROGENEOUS_UNITS",
+      "flagship_ready": true,
+      "role": "SECONDARY_MECHANISTIC_SPINE"
+    },
+    "H4": {
+      "name": "H4_REPRESENTATION_AND_OBSERVATION_RESOLUTION_DEPENDENCE",
+      "systems_with_evidence": 7,
+      "evidence_class_counts": {
+        "DIRECT_SUPPORT": 7
+      },
+      "macro_direct_support_systems": [
+        "LINOIDEAE",
+        "ANGRAECINAE",
+        "ANTIRRHINEAE"
+      ],
+      "molecular_or_observation_direct_support_systems": [
+        "CAMELLIA",
+        "IOCHROMINAE",
+        "ERICA_CAPE",
+        "PETUNIEAE"
+      ],
+      "prospective_component": "PETUNIEAE",
+      "decision": "DIRECT_CROSS_SCALE_SUPPORT_FOR_RESOLUTION_DEPENDENCE_AT_MACRO_STATE_AND_MOLECULAR_AXIS_LEVELS",
+      "flagship_ready": true,
+      "role": "PRIMARY_FLAGSHIP_CLAIM"
+    },
+    "H5": {
+      "name": "H5_ACCESSIBILITY_REALIZATION_GAP",
+      "systems_with_evidence": 3,
+      "evidence_class_counts": {
+        "PARTIAL_SUPPORT": 2,
+        "IDENTIFIABILITY_STRESS": 1
+      },
+      "decision": "PARTIAL_IDENTIFIABILITY_AND_ENDPOINT_EVENT_GAP_ONLY_NO_COMMON_ACCESSIBILITY_REALIZATION_ESTIMATOR",
+      "flagship_ready": false
+    },
+    "H6": {
+      "name": "H6_ECOLOGICAL_FILTERING_CONDITIONAL_ON_LATENT_PHENOTYPE",
+      "systems_with_evidence": 6,
+      "evidence_class_counts": {
+        "PARTIAL_SUPPORT": 2,
+        "DIRECT_SUPPORT": 4
+      },
+      "decision": "MULTISYSTEM_ECOLOGICAL_FILTERING_SUPPORT_BUT_GENERAL_BRANCH_CAUSAL_ASSIGNMENT_REMAINS_OPEN",
+      "flagship_ready": false,
+      "role": "ECOLOGICAL_CONTEXT_AND_FUTURE_CAUSAL_LAYER"
+    }
+  },
+  "paper_candidate": {
+    "primary": "H4_REPRESENTATION_AND_OBSERVATION_RESOLUTION_DEPENDENCE",
+    "secondary": "H3_HIERARCHICAL_REPEATABILITY",
+    "one_sentence": "Across independent flower-colour radiations, evolutionary predictability is resolution dependent: fine phylogenetic states and selected biochemical or regulatory dimensions recur more consistently than privileged coarse boundaries, universal directions, or complete molecular implementations.",
+    "not_claimed": [
+      "universal colour direction",
+      "universal causal gene",
+      "complete programme replay",
+      "pooled recurrence rate across heterogeneous units",
+      "branch-specific ecological cause across the atlas"
+    ]
+  },
+  "paper1_science_changed": false
+}
