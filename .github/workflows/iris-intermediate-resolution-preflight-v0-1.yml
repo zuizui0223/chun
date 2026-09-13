@@ -21,7 +21,7 @@ jobs:
         with:
           python-version: '3.12'
       - name: Install table reader
-        run: python -m pip install --disable-pip-version-check pandas openpyxl
+        run: python -m pip install --disable-pip-version-check pandas openpyxl xlrd
       - name: Confirm preregistration is already on base main
         run: |
           test -f data/intermediate_resolution_rule_prereg_v0_1.json
