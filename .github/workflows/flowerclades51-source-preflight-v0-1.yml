@@ -1,0 +1,62 @@
+name: Flower-clades-51 source preflight v0.1
+
+on:
+  pull_request:
+    paths:
+      - 'scripts/run_flowerclades51_source_preflight_v0_1.py'
+      - 'data/flowerclades51_source_preflight_receipt_v0_1.json'
+      - 'docs/FLOWERCLADES51_SOURCE_PREFLIGHT_V0_1.md'
+      - '.github/workflows/flowerclades51-source-preflight-v0-1.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  preflight:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install tree parser only
+        run: python -m pip install --disable-pip-version-check biopython
+      - name: Assert outcome result remains absent
+        run: test ! -e results/flowerclades51_resolution_profile_v0_1
+      - name: Run identifiers/tree-only Dryad preflight
+        run: python scripts/run_flowerclades51_source_preflight_v0_1.py --out build/flowerclades51_source_preflight_receipt_v0_1.json
+      - name: Validate outcome firewall in receipt
+        run: |
+          python - <<'PY'
+          import json
+          x=json.load(open('build/flowerclades51_source_preflight_receipt_v0_1.json'))
+          assert x['status']=='PREFLIGHT_COMPLETE_OUTCOMES_UNOPENED', x['status']
+          f=x['outcome_firewall']
+          assert all(v is False for v in f.values()), f
+          assert x['identifier_projection']['outcome_columns_accessed_by_preflight'] is False
+          assert x['paper1_science_changed'] is False
+          print({'rows':x['identifier_projection']['row_count'],'clades':x['identifier_projection']['clade_count'],'trees':x['tree_archive_members_total'],'parsed':x['tree_members_parsed'],'outcome_firewall':f})
+          PY
+      - name: Compare to frozen receipt when present
+        run: |
+          if test -f data/flowerclades51_source_preflight_receipt_v0_1.json; then
+            cmp build/flowerclades51_source_preflight_receipt_v0_1.json data/flowerclades51_source_preflight_receipt_v0_1.json
+          else
+            echo 'No frozen receipt yet; artifact is inspection-only.'
+          fi
+      - name: Confirm Paper 1 science firewall
+        if: github.event_name == 'pull_request'
+        run: |
+          git diff --exit-code ${{ github.event.pull_request.base.sha }}...HEAD -- manuscript data/paper1_authoritative_results_v0_2_2.csv data/paper1_main_figure_manifest_v0_2_2.csv || {
+            echo 'Paper 1 science/manuscript changed unexpectedly' >&2
+            exit 1
+          }
+      - uses: actions/upload-artifact@v4
+        with:
+          name: flowerclades51-source-preflight-v0-1
+          path: build/flowerclades51_source_preflight_receipt_v0_1.json
+          if-no-files-found: error
+          retention-days: 90
