@@ -36,9 +36,16 @@ jobs:
           assert x['auc_computed'] is False
           assert x['decision_computed'] is False
           assert x['forbidden_columns_read'] is False
+          assert x['hard_stop'] in {'PASS_CROSSWALK_PREFLIGHT','HOLD_CROSSWALK','HOLD_SOURCE_ACCESS'}
           print('HARD_STOP='+x['hard_stop'])
-          print('MATCHED='+str(x['species_identifier_only']['matched_unique_binomials']))
-          print('UNMATCHED='+str(len(x['species_identifier_only']['unmatched_source_species'])))
+          if x['hard_stop']=='HOLD_SOURCE_ACCESS':
+              assert x['crosswalk_executed'] is False
+              assert x['tree_byte_access']=='BEARER_TOKEN_REQUIRED_401'
+              print('TREE_FILE_ID='+str(x['tree_source_manifest']['file_id']))
+              print('TREE_DIGEST='+str(x['tree_source_manifest'].get('digest')))
+          else:
+              print('MATCHED='+str(x['matched_unique_binomials']))
+              print('UNMATCHED='+str(len(x['unmatched_source_species'])))
           PY
       - uses: actions/upload-artifact@v4
         if: always()
