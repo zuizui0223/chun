@@ -20,22 +20,21 @@ jobs:
         with: {fetch-depth: 0}
       - uses: actions/setup-python@v5
         with: {python-version: '3.12'}
-      - name: Install phylogeny tools
+      - name: Install phylogeny tools and Python readers
         run: |
           sudo apt-get update
           sudo apt-get install -y mafft trimal iqtree
-          python -m pip install --disable-pip-version-check biopython
+          python -m pip install --disable-pip-version-check biopython pandas openpyxl
           mafft --version 2>&1 | head -1
           trimal --version 2>&1 | head -2
           (iqtree2 --version || iqtree --version) 2>&1 | head -3
       - name: Confirm pre-outcome contracts
+        shell: bash
         run: |
-          python scripts/validate_iris_source_schema_erratum_v0_1.py \
-            --ingest-receipt <(python scripts/ingest_iris_postfreeze_rows_v0_1.py --out /tmp/iris_ingest.json >/dev/null && cat /tmp/iris_ingest.json)
-        run_contract=1
-        python scripts/validate_iris_tree_record_semantics_v0_1.py
-        python -m pip install --disable-pip-version-check pandas openpyxl
-        python scripts/validate_iris_source_taxon_crosswalk_v0_1.py --out /tmp/iris_crosswalk.json
+          python scripts/ingest_iris_postfreeze_rows_v0_1.py --out /tmp/iris_ingest.json >/dev/null
+          python scripts/validate_iris_source_schema_erratum_v0_1.py --ingest-receipt /tmp/iris_ingest.json
+          python scripts/validate_iris_tree_record_semantics_v0_1.py
+          python scripts/validate_iris_source_taxon_crosswalk_v0_1.py --out /tmp/iris_crosswalk.json
       - name: Prepare full-record marker inputs without traits
         run: |
           python scripts/prepare_iris_primary_tree_inputs_v0_1.py --out-dir build/iris_tree_inputs
