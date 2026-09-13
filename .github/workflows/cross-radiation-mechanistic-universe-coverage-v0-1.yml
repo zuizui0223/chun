@@ -1,0 +1,59 @@
+name: Cross-radiation mechanistic universe coverage v0.1
+
+on:
+  pull_request:
+    paths:
+      - 'data/cross_clade_evidence_tier_registry_v0_5.csv'
+      - 'data/cross_clade_mechanistic_recurrence_benchmark_v0_1.csv'
+      - 'data/cross_radiation_mechanistic_universe_coverage_v0_1.csv'
+      - 'data/cross_radiation_mechanistic_universe_coverage_summary_v0_1.json'
+      - 'scripts/audit_cross_radiation_mechanistic_universe_coverage_v0_1.py'
+      - 'docs/CROSS_RADIATION_MECHANISTIC_UNIVERSE_COVERAGE_V0_1.md'
+      - '.github/workflows/cross-radiation-mechanistic-universe-coverage-v0-1.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Rebuild coverage audit
+        run: |
+          python scripts/audit_cross_radiation_mechanistic_universe_coverage_v0_1.py \
+            --out build/cross_radiation_mechanistic_universe_coverage_summary_v0_1.json
+      - name: Verify frozen result exactly
+        run: |
+          python - <<'PY'
+          import json
+          o=json.load(open('build/cross_radiation_mechanistic_universe_coverage_summary_v0_1.json'))
+          e=json.load(open('data/cross_radiation_mechanistic_universe_coverage_summary_v0_1.json'))
+          assert o==e, (o,e)
+          assert o['v0_5_registry']['eligible_coverage']=='7/7'
+          assert o['v0_5_registry']['eligible_omissions']==[]
+          assert o['selection_bias_result']=='NO_ELIGIBLE_V0_5_MECHANISTIC_CLADE_OMITTED_FROM_BENCHMARK'
+          assert o['paper1_science_changed'] is False
+          print(json.dumps(o, indent=2))
+          PY
+      - name: Verify temporal firewall in git history
+        run: |
+          git merge-base --is-ancestor 1e69a6494ad9ec7e38b583158bb385ce8bd46296 HEAD
+          git merge-base --is-ancestor ac15ecfe1b1f390efbcead7683258671372b2bbe HEAD
+          test "$(git show -s --format=%cI 1e69a6494ad9ec7e38b583158bb385ce8bd46296)" = "2026-09-06T13:35:37+09:00"
+          test "$(git show -s --format=%cI ac15ecfe1b1f390efbcead7683258671372b2bbe)" = "2026-09-06T13:38:59+09:00"
+      - name: Confirm Paper 1 science firewall
+        run: |
+          git diff --exit-code ${{ github.event.pull_request.base.sha }}...HEAD -- \
+            manuscript \
+            data/paper1_authoritative_results_v0_2_2.csv \
+            data/paper1_main_figure_manifest_v0_2_2.csv || {
+              echo 'Paper 1 science/manuscript changed unexpectedly' >&2
+              exit 1
+            }
