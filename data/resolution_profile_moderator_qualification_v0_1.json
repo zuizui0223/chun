@@ -1,0 +1,29 @@
+{
+  "version": "v0.1",
+  "status": "NO_MODERATOR_QUALIFIED_CURRENT_STANDARDIZED_TRAINING",
+  "training_frame": {
+    "completed_visible_colour_clades": 28,
+    "source": "Flower-clades-51 standardized batch",
+    "representation_type": "SOURCE_HUMAN_PERCEIVED_FLOWER_COLOR_ONLY",
+    "shared_source_method_dependence": true
+  },
+  "candidate_predictors": ["log_n_tips", "pair_distance_cv", "branch_length_cv", "root_to_tip_cv"],
+  "predictor_provenance": "tree-only; computable before target outcome labels",
+  "complexity_cap": "one predictor plus intercept",
+  "profile_prediction_requirement": {
+    "independent_contrasts": ["intermediate_minus_coarse", "fine_minus_intermediate"],
+    "qualification": "same predictor must improve leave-one-clade-out RMSE over intercept-only for both independent contrasts"
+  },
+  "candidate_joint_qualification": {
+    "log_n_tips": false,
+    "pair_distance_cv": false,
+    "branch_length_cv": false,
+    "root_to_tip_cv": false
+  },
+  "qualified_predictors": [],
+  "derived_fine_minus_coarse_check": "all four candidate predictors also failed to improve LOO RMSE over intercept-only for fine_minus_coarse",
+  "secondary_observation": "log_n_tips improved fine_minus_intermediate LOO RMSE by 2.53% but worsened intermediate_minus_coarse by 3.11%; therefore it does not predict the full three-resolution profile",
+  "next_heldout_prediction_frozen": false,
+  "hard_stop": "Do not open a new held-out resolution-profile outcome under Issue #245 until cross-representation training expands or a predeclared outcome-independent moderator passes the joint LOO gate.",
+  "paper1_science_changed": false
+}
