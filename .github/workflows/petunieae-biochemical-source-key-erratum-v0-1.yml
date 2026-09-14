@@ -1,0 +1,42 @@
+name: Petunieae biochemical source-key erratum v0.1
+
+on:
+  pull_request:
+    paths:
+      - 'data/petunieae_biochemical_resolution_profile_source_key_erratum_v0_1.json'
+      - '.github/workflows/petunieae-biochemical-source-key-erratum-v0-1.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Validate erratum before profile outcome
+        run: |
+          python - <<'PY'
+          import json, pathlib
+          x=json.load(open('data/petunieae_biochemical_resolution_profile_source_key_erratum_v0_1.json'))
+          assert x['status']=='FROZEN_POST_SOURCE_IDENTITY_CHECK_PRE_PROFILE_AUC'
+          assert x['original_value']=='BROWALLIA_AMERICANA_BROW'
+          assert x['corrected_source_key']=='BROW'
+          assert x['correction_type']=='SOURCE_KEY_LEXICAL_IDENTITY_ONLY'
+          assert x['biological_taxon_changed'] is False
+          assert x['state_hierarchy_changed'] is False
+          assert x['profile_auc_computed_before_erratum'] is False
+          assert x['profile_winner_computed_before_erratum'] is False
+          assert not pathlib.Path('results/petunieae_biochemical_resolution_profile_v0_1').exists()
+          assert x['paper1_science_changed'] is False
+          print(x)
+          PY
+      - name: Confirm Paper 1 science firewall
+        if: github.event_name == 'pull_request'
+        run: git diff --exit-code ${{ github.event.pull_request.base.sha }}...HEAD -- manuscript data/paper1_authoritative_results_v0_2_2.csv data/paper1_main_figure_manifest_v0_2_2.csv
