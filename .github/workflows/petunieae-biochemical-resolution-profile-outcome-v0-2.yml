@@ -5,6 +5,8 @@ on:
     paths:
       - 'scripts/run_petunieae_biochemical_resolution_profile_v0_1.py'
       - 'data/petunieae_biochemical_source_fallback_v0_1.json'
+      - 'data/petunieae_biochemical_resolution_profile_result_v0_1.json'
+      - 'docs/PETUNIEAE_BIOCHEMICAL_RESOLUTION_PROFILE_RESULT_V0_1.md'
       - '.github/workflows/petunieae-biochemical-resolution-profile-outcome-v0-2.yml'
   workflow_dispatch:
 
@@ -80,6 +82,8 @@ jobs:
           python scripts/run_petunieae_biochemical_resolution_profile_v0_1.py \
             --source build/petunieae_source \
             --out build/petunieae_biochemical_resolution_profile_result_v0_1.json
+      - name: Verify committed terminal receipt is byte-identical
+        run: cmp build/petunieae_biochemical_resolution_profile_result_v0_1.json data/petunieae_biochemical_resolution_profile_result_v0_1.json
       - name: Validate result boundaries only
         run: |
           python - <<'PY'
@@ -89,6 +93,11 @@ jobs:
           assert x['programme_role']=='RETROSPECTIVE_STANDARDIZED_CROSS_REPRESENTATION_TRAINING'
           assert x['do_not_count_as_new_prospective_replication'] is True
           assert x['source_key_erratum_status']=='FROZEN_POST_SOURCE_IDENTITY_CHECK_PRE_PROFILE_AUC'
+          assert x['terminal_class']=='PROFILE_SIGNALLED_FINE'
+          assert x['primary_frame']['eligible_tips']==47
+          assert x['observed']['AUC_fine']==0.6995630849367751
+          assert x['p_signal_one_sided']['fine']==0.0001
+          assert x['p_winner_gt_runner']==0.0001
           assert x['paper1_science_changed'] is False
           print({'terminal_class':x['terminal_class'],'primary_frame':x.get('primary_frame'),'observed':x.get('observed'),'p_signal':x.get('p_signal_one_sided'),'winner':x.get('winner'),'p_winner_gt_runner':x.get('p_winner_gt_runner')})
           PY
