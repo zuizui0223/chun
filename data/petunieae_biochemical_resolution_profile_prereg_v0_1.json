@@ -1,0 +1,75 @@
+{
+  "version": "v0.1",
+  "status": "FROZEN_BEFORE_PETUNIEAE_BIOCHEMICAL_RESOLUTION_AUC_COMPUTATION",
+  "programme_role": "RETROSPECTIVE_STANDARDIZED_CROSS_REPRESENTATION_TRAINING",
+  "prospective_label": "NOT_PROSPECTIVE_SOURCE_VALUES_PREVIOUSLY_INSPECTED_FOR_DIFFERENT_CROSS_LEVEL_ESTIMAND",
+  "source_osf_node": "zg9cu",
+  "source_doi": "10.1098/rspb.2023.0275",
+  "authoritative_source_root": "phyloCCA",
+  "source_identity": {
+    "table": "tpm10k-mgg-combined-with-flavs.csv",
+    "table_sha256": "5843d4cd4eb253046f97349fa6bd285ca77e43e7a9c3aaa0e78fae3e8e391edd",
+    "tree": "11genestre_dated_pruned.tre",
+    "tree_sha256": "95b4a688d3d71417b712b37a2b04cdc22a9431be3172d6509def4435f5fd8614",
+    "processed_rows_before_outgroup_exclusion": 60,
+    "source_defined_outgroup": "BROWALLIA_AMERICANA_BROW",
+    "expected_petunieae_taxa_after_outgroup_exclusion": 59
+  },
+  "phenotype_axis": "ANTHOCYANIDIN_COMPOSITION_PRESENCE_ONLY",
+  "compound_order": ["Pel_mgg", "Cyan_mgg", "Peon_mgg", "Del_mgg", "Pet_mgg", "Malv_mgg"],
+  "nested_resolutions": {
+    "coarse": "ANY_ANTHOCYANIDIN_PRESENT versus NONE",
+    "intermediate": "three-bit anthocyanidin-class presence pattern PEL/CYA/DEL",
+    "fine": "six-bit compound presence pattern in frozen compound_order",
+    "class_mapping": {
+      "PEL": ["Pel_mgg"],
+      "CYA": ["Cyan_mgg", "Peon_mgg"],
+      "DEL": ["Del_mgg", "Pet_mgg", "Malv_mgg"]
+    },
+    "presence_rule": "numeric mass fraction > 0 means present; exactly 0 means absent; missing remains missing",
+    "continuous_concentration_magnitude_ignored": true,
+    "visible_hue_ignored": true,
+    "mapping_is_deterministically_nested": true
+  },
+  "common_frame": {
+    "source_defined_outgroup_excluded_before_states": true,
+    "require_one_to_one_table_tree_join": true,
+    "exclude_taxa_missing_any_six_compounds": true,
+    "fine_state_minimum_tips": 5,
+    "exclude_rare_fine_state_from_common_frame": true,
+    "same_retained_tips_all_resolutions": true,
+    "minimum_common_tips": 20,
+    "minimum_states_each_resolution": 2,
+    "outcome_improving_exclusions_forbidden": true,
+    "insufficient_status": "HOLD_INSUFFICIENT_COMMON_FRAME_OR_STATE_VARIATION"
+  },
+  "primary_statistic": {
+    "score": "negative_patristic_distance_predicts_same_state_pair",
+    "metric": "ROC_AUC",
+    "permutations": 9999,
+    "seed": 20260913,
+    "permutation_unit": "jointly permute each taxon complete coarse/intermediate/fine state triplet across retained tips",
+    "implementation_reference": "Iris and Flower-clades-51 rank-based AUC estimator"
+  },
+  "decision_rule": {
+    "PROFILE_SIGNALLED_COARSE": "coarse AUC>0.5 with p<=0.05 and coarse exceeds both alternatives with winner-vs-runner-up joint-permutation p<=0.05",
+    "PROFILE_SIGNALLED_INTERMEDIATE": "intermediate satisfies the corresponding unique-winner rule",
+    "PROFILE_SIGNALLED_FINE": "fine satisfies the corresponding unique-winner rule",
+    "PROFILE_SIGNALLED_TIED": "at least one resolution has AUC>0.5 with p<=0.05 but no unique winner clears p<=0.05",
+    "PROFILE_NO_PHYLOGENETIC_SIGNAL": "no resolution has AUC>0.5 with p<=0.05",
+    "NO_POST_HOC_UPGRADE": true
+  },
+  "training_policy": {
+    "biological_replication_unit": "Petunieae radiation",
+    "one_outcome_for_radiation": true,
+    "do_not_count_as_new_prospective_replication": true,
+    "may_expand_cross_representation_training": true
+  },
+  "prior_exposure_boundary": {
+    "source_values_previously_used_for_cross_level_bridge": true,
+    "resolution_profile_AUCs_previously_computed": false,
+    "resolution_profile_winner_previously_computed": false,
+    "claim": "This is a standardized retrospective training result, not a held-out validation."
+  },
+  "paper1_science_changed": false
+}
