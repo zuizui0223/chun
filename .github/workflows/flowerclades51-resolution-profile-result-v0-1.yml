@@ -1,0 +1,55 @@
+name: Flower-clades-51 resolution profile result v0.1
+
+on:
+  pull_request:
+    paths:
+      - 'scripts/run_flowerclades51_resolution_profile_v0_1.py'
+      - 'results/flowerclades51_resolution_profile_v0_1/**'
+      - '.github/workflows/flowerclades51-resolution-profile-result-v0-1.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Compile frozen runner
+        run: python -m py_compile scripts/run_flowerclades51_resolution_profile_v0_1.py
+      - name: Validate frozen batch result
+        run: |
+          python - <<'PY'
+          import csv,json
+          p='results/flowerclades51_resolution_profile_v0_1/flowerclades51_resolution_profile_batch_result_v0_1.json'
+          c='results/flowerclades51_resolution_profile_v0_1/flowerclades51_resolution_profile_summary_v0_1.csv'
+          x=json.load(open(p))
+          assert x['status']=='FLOWERCLADES51_BATCH_RESULT'
+          assert x['clades_total']==51
+          assert x['clades_completed_exact_profile']==28
+          assert x['clades_hold']==23
+          assert x['intermediate_unique_winner_count']==0
+          assert x['terminal_class_counts']=={
+            'HOLD_INSUFFICIENT_COMMON_FRAME_OR_STATE_VARIATION':23,
+            'PROFILE_NO_PHYLOGENETIC_SIGNAL':16,
+            'PROFILE_SIGNALLED_COARSE':3,
+            'PROFILE_SIGNALLED_FINE':3,
+            'PROFILE_SIGNALLED_TIED':6,
+          }
+          assert x['compiled_permutation_equivalence_check']['max_absolute_difference']==0.0
+          rows=list(csv.DictReader(open(c)))
+          assert len(rows)==51
+          assert sum(r['terminal_class'].startswith('PROFILE_') for r in rows)==28
+          assert sum(r['terminal_class']=='PROFILE_SIGNALLED_INTERMEDIATE' for r in rows)==0
+          print(x['terminal_class_counts'])
+          PY
+      - name: Confirm Paper 1 science firewall
+        if: github.event_name == 'pull_request'
+        run: |
+          git diff --exit-code ${{ github.event.pull_request.base.sha }}...HEAD -- manuscript data/paper1_authoritative_results_v0_2_2.csv data/paper1_main_figure_manifest_v0_2_2.csv
