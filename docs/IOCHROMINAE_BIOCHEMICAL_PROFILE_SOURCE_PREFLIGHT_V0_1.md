@@ -25,16 +25,39 @@ The source article reports HPLC measurement of anthocyanidins and related flavon
 4. If exact archive bytes are available, list archive member **names only**.
 5. Do not extract or parse row-level HPLC/expression values in this step.
 
+## Hosted preflight result
+
+Terminal state:
+
+`HOLD_SOURCE_ACCESS_README_AND_ARCHIVE_PROFILE_UNCOMPUTED`
+
+Dryad metadata resolved both expected objects exactly:
+
+- README: file id `108458`, 4,072 bytes, MD5 `2e4a251725ad4c13975fc09481da302d`;
+- archive: file id `108456`, 3,054,999 bytes, MD5 `76b46e384fb7c9bf1ef3fbd7d1e5d2f0`.
+
+Neither ordinary public file-stream nor API download yielded exact source bytes in the hosted environment. Exact filename/digest web search found no independent mirror. Therefore README interpretation, archive-member inspection and profile state mapping remain unopened.
+
+Hosted evidence:
+
+- workflow run `34848769129`;
+- job `103991099017`;
+- artifact `10348639063`;
+- artifact digest `sha256:d82ac9dfd37cb74b5a25d4210258f4177a516cfe0be5460d2f9a0029d4b6aa66`.
+
 ## Decision logic
 
-- If README/archive bytes are blocked, freeze a source-access HOLD rather than treating it as a biological negative.
-- If exact bytes are recovered, inspect schema/member names and only then decide whether a deterministic nested biochemical representation can be frozen before computing a new profile AUC.
-- No substitute tree or hand-transcribed phenotype table is admitted merely to create a second biochemical observation.
+- The current state is a **source-access HOLD**, not a biological negative.
+- The source is not counted as a second biochemical exact-profile unit.
+- No substitute tree, hand-transcribed pigment table or figure-derived approximation is admitted merely to create representation replication.
+- Resume only from exact README/archive bytes matching the frozen identities above; then inspect README plus archive member names before freezing any profile state mapping.
 
 ## Scientific boundary
 
 Iochrominae has been used previously as retrospective mechanistic evidence, so any future exact-profile result from this source will be **retrospective standardized cross-representation training**, not a prospective replication.
 
 The current representation-moderator gate remains blocked until an independent second non-visible exact-profile unit is actually completed. This source preflight alone does not increment that count.
+
+No archive data rows, profile states, patristic distances, AUCs, permutations or winner class were computed in this preflight.
 
 Camellia Paper 1 remains unchanged.
