@@ -1,0 +1,39 @@
+{
+  "version": "v0.1",
+  "status": "HOLD_SOURCE_ACCESS_OUTCOMES_UNOPENED",
+  "trait_source": {
+    "doi": "10.1111/plb.12649",
+    "supplement": "plb12649-sup-0002-TableS3.docx",
+    "reported_species": 30,
+    "publisher_routes_probed": 5,
+    "genuine_docx_recovered": false,
+    "all_routes_http_status": 403
+  },
+  "primary_tree": {
+    "doi": "10.5061/dryad.8cz8w9grq",
+    "file": "1_WP_RAxML.tre",
+    "file_id": 1853438,
+    "size_bytes": 13100,
+    "digest_type": "sha-256",
+    "sha256": "784011d0e2e17df9ea21eb22d31197bad29219a37ac213fda013766e29b51362",
+    "public_stream_returned_tree": false,
+    "public_stream_returned_validation_html": true
+  },
+  "crosswalk": {
+    "executed": false,
+    "reason": "Neither exact Table S3 species bytes nor exact primary-tree bytes were recovered through anonymous machine routes."
+  },
+  "outcome_firewall": {
+    "table_s1_chemistry_downloaded": false,
+    "row_level_anthocyanin_values_accessed": false,
+    "flower_colour_values_accessed": false,
+    "CIELAB_values_accessed": false,
+    "compound_presence_states_computed": false,
+    "state_frequencies_computed": false,
+    "AUC_computed": false,
+    "winner_computed": false
+  },
+  "resume_condition": "Recover exact Table S3 species identifiers and exact 1_WP_RAxML.tre bytes, verify frozen tree SHA256, then execute species/tree-only crosswalk before any Table S1 chemistry ingestion.",
+  "alternative_tree_switch_after_outcome": false,
+  "paper1_science_changed": false
+}
