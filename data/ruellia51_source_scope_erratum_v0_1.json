@@ -1,0 +1,49 @@
+{
+  "version": "v0.1",
+  "status": "FROZEN_POST_IDENTIFIER_INGEST_PRE_HPLC_OUTCOME_PRE_AUC",
+  "source_article_doi": "10.1002/ajb2.70149",
+  "source_data_doi": "10.6084/m9.figshare.30282448",
+  "original_prereg": "data/ruellia51_hplc_resolution_profile_prereg_v0_1.json",
+  "original_metadata_error": {
+    "field": "known_pre_outcome.reported_species",
+    "original_value": 51,
+    "corrected_source_scope": {
+      "HPLC_rows": 197,
+      "unique_species_in_raw_data_csv": 123
+    },
+    "basis": "exact Figshare raw_data.csv identifier projection plus source article description; no six-compound numeric values used"
+  },
+  "phylogeny_provenance_correction": {
+    "source_statement": "Watts et al. 2026 pruned a ddRADseq maximum-likelihood phylogeny of 187 Ruellia species from Manzitto-Tripp and Daniel 2023",
+    "source_article": "Manzitto-Tripp and Daniel 2023, TAXON 72:1034-1056, DOI 10.1002/tax.13001",
+    "author_code_tree_path": "color data/color data/phylogeny/03-Ruellia_phylo.timed.tre",
+    "author_code_crosswalk_key": "phylo_ID",
+    "2021_chronogram_substitution_authorized": false,
+    "reason": "the 2026 article explicitly identifies the comparative tree as a prune of the 2023 ddRAD maximum-likelihood phylogeny"
+  },
+  "identifier_semantics": {
+    "phylo_ID_literal_NA_is_missing": true,
+    "multiple_phylo_IDs_per_species_are_possible": true,
+    "tree_tip_to_species_mapping_in_author_code": "match(tree tip labels, antho_db$phylo_ID), then map matched rows to species; unmatched tips become missing",
+    "species_level_tree_representative_rule": "TO_BE_FROZEN_ONLY_AFTER_AUTHORITATIVE_2023_TREE_TIPS_ARE_AVAILABLE; no outcome-dependent choice allowed"
+  },
+  "unchanged_scientific_contract": {
+    "phenotype_axis": "ANTHOCYANIDIN_COMPOSITION_PRESENCE_ONLY",
+    "coarse_intermediate_fine_mapping_changed": false,
+    "presence_rule_changed": false,
+    "common_frame_thresholds_changed": false,
+    "permutations_changed": false,
+    "seed_changed": false,
+    "decision_rule_changed": false
+  },
+  "outcome_exposure_at_freeze": {
+    "six_HPLC_numeric_values_opened": false,
+    "compound_presence_patterns_computed": false,
+    "branch_presence_patterns_computed": false,
+    "state_frequencies_computed": false,
+    "AUC_computed": false,
+    "winner_computed": false
+  },
+  "next_gate": "RECOVER_OR_AUTHORITATIVELY_RECONSTRUCT_THE_2023_DDRAD_ML_TREE_AND_FREEZE_PHYLO_ID_CROSSWALK_BEFORE_HPLC_OUTCOME_OPENING",
+  "paper1_science_changed": false
+}
