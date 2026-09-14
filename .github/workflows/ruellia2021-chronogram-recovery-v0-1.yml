@@ -5,6 +5,7 @@ on:
     paths:
       - 'scripts/recover_ruellia2021_chronogram_v0_1.py'
       - 'scripts/freeze_ruellia51_identifier_projection_v0_1.py'
+      - 'data/ruellia51_source_scope_erratum_v0_1.json'
       - '.github/workflows/ruellia2021-chronogram-recovery-v0-1.yml'
   workflow_dispatch:
 
@@ -25,17 +26,26 @@ jobs:
         run: python scripts/freeze_ruellia51_identifier_projection_v0_1.py
       - name: Recover public 2021 chronogram candidate
         run: python scripts/recover_ruellia2021_chronogram_v0_1.py
-      - name: Validate no HPLC outcome exposure
+      - name: Validate source-scope erratum and no HPLC outcome exposure
         run: |
           python - <<'PY'
           import json
           i=json.load(open('build/ruellia51_identifier_projection_v0_1.json'))
           x=json.load(open('build/ruellia2021_chronogram_recovery_v0_1.json'))
+          e=json.load(open('data/ruellia51_source_scope_erratum_v0_1.json'))
           assert i['status']=='RUELLIA51_IDENTIFIER_PROJECTION_FROZEN_OUTCOMES_UNOPENED'
           assert i['forbidden_hplc_numeric_columns_accessed'] is False
+          assert i['data_rows_total']==197
+          assert i['unique_species_normalized']==123
+          assert 'na' not in {r['phylo_id_normalized'] for r in i['phylo_id_species_projection']}
+          assert e['status']=='FROZEN_POST_IDENTIFIER_INGEST_PRE_HPLC_OUTCOME_PRE_AUC'
+          assert e['original_metadata_error']['original_value']==51
+          assert e['original_metadata_error']['corrected_source_scope']=={'HPLC_rows':197,'unique_species_in_raw_data_csv':123}
+          assert e['phylogeny_provenance_correction']['2021_chronogram_substitution_authorized'] is False
+          assert all(v is False for v in e['outcome_exposure_at_freeze'].values())
           assert i['hplc_outcomes_opened'] is False and i['auc_computed'] is False
           assert x['hplc_outcomes_opened'] is False and x['auc_computed'] is False
-          print({'identifier_projection':{k:i[k] for k in ['data_rows_total','unique_species_normalized','unique_phylo_ids_normalized','species_mapping_to_multiple_phylo_ids','phylo_id_mapping_to_multiple_species']},'tree_probe_status':x['status']})
+          print({'identifier_projection':{k:i[k] for k in ['data_rows_total','unique_species_normalized','unique_species_with_nonmissing_phylo_id','unique_phylo_ids_normalized','rows_with_missing_phylo_id']},'tree_probe_status':x['status'],'erratum':e['status']})
           PY
       - uses: actions/upload-artifact@v4
         if: always()
