@@ -4,6 +4,7 @@ on:
   pull_request:
     paths:
       - 'scripts/recover_ruellia2021_chronogram_v0_1.py'
+      - 'scripts/freeze_ruellia51_identifier_projection_v0_1.py'
       - '.github/workflows/ruellia2021-chronogram-recovery-v0-1.yml'
   workflow_dispatch:
 
@@ -20,22 +21,28 @@ jobs:
           python-version: '3.12'
       - name: Assert Ruellia51 outcome remains unopened
         run: test ! -e results/ruellia51_hplc_resolution_profile_v0_1
+      - name: Freeze identifier-only Ruellia51 projection
+        run: python scripts/freeze_ruellia51_identifier_projection_v0_1.py
       - name: Recover public 2021 chronogram candidate
         run: python scripts/recover_ruellia2021_chronogram_v0_1.py
       - name: Validate no HPLC outcome exposure
         run: |
           python - <<'PY'
           import json
+          i=json.load(open('build/ruellia51_identifier_projection_v0_1.json'))
           x=json.load(open('build/ruellia2021_chronogram_recovery_v0_1.json'))
-          assert x['hplc_outcomes_opened'] is False
-          assert x['auc_computed'] is False
-          print(x)
+          assert i['status']=='RUELLIA51_IDENTIFIER_PROJECTION_FROZEN_OUTCOMES_UNOPENED'
+          assert i['forbidden_hplc_numeric_columns_accessed'] is False
+          assert i['hplc_outcomes_opened'] is False and i['auc_computed'] is False
+          assert x['hplc_outcomes_opened'] is False and x['auc_computed'] is False
+          print({'identifier_projection':{k:i[k] for k in ['data_rows_total','unique_species_normalized','unique_phylo_ids_normalized','species_mapping_to_multiple_phylo_ids','phylo_id_mapping_to_multiple_species']},'tree_probe_status':x['status']})
           PY
       - uses: actions/upload-artifact@v4
         if: always()
         with:
           name: ruellia2021-chronogram-recovery-v0-1
           path: |
+            build/ruellia51_identifier_projection_v0_1.json
             build/ruellia2021_chronogram_recovery_v0_1.json
             build/Ruellia_chronogram.tre
           if-no-files-found: warn
