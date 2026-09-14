@@ -1,0 +1,61 @@
+{
+  "version": "v0.1",
+  "status": "HOLD_AUTHORITATIVE_2023_TREE_BYTES_OR_EXACT_RECONSTRUCTION_SOURCE_UNAVAILABLE_OUTCOMES_UNOPENED",
+  "target_programme": "RUELLIA_HPLC_RESOLUTION_PROFILE",
+  "source_article_doi": "10.1002/ajb2.70149",
+  "source_data_doi": "10.6084/m9.figshare.30282448",
+  "tree_provenance": {
+    "author_code_path": "color data/color data/phylogeny/03-Ruellia_phylo.timed.tre",
+    "author_code_tip_crosswalk_key": "phylo_ID",
+    "source_statement": "Watts et al. use a pruned ddRADseq maximum-likelihood phylogeny of 187 Ruellia species from Manzitto-Tripp and Daniel 2023",
+    "primary_phylogeny_reference_doi": "10.1002/tax.13001",
+    "primary_phylogeny_method": "ddRAD; RAxML maximum likelihood; 187 New World Ruellia species; Ruellia primuloides root",
+    "primary_phylogeny_public_sequence_archive": "NCBI BioProject PRJNA948660",
+    "bioproject_public_data_type": "RAW_SEQUENCE_READS",
+    "authoritative_final_tree_object_located": false
+  },
+  "searched_surfaces": {
+    "watts_figshare_v1_v2": "NO_TREE_OBJECT",
+    "watts_author_github_current_and_full_six_commit_history": "NO_TREE_OR_DATA_DIRECTORY_EVER_COMMITTED",
+    "manzitto_tripp_2023_wiley_article_and_indexed_supplement_search": "NO_FINAL_NEWICK_OR_RAXML_TREE_OBJECT_LOCATED",
+    "ncbi_bioproject_PRJNA948660": "RAW_SEQUENCE_READS_ONLY_IN_PUBLIC_PROJECT_SURFACE",
+    "generic_public_web_and_github_search": "NO_AUTHORITATIVE_2023_FINAL_TREE_OBJECT_LOCATED"
+  },
+  "rejected_substitute": {
+    "doi": "10.5061/dryad.qnk98sfff",
+    "file": "Ruellia_chronogram.tre",
+    "file_id": 529362,
+    "size_bytes": 8201,
+    "sha256": "2644cf014c2e4434bee8d496fce729802efef322a1b97c2fb8773d5f5ce72cb6",
+    "reason": "The 2026 source explicitly states that its comparative phylogeny was pruned from the 2023 187-species ddRAD maximum-likelihood phylogeny. Filename/organism similarity to the 2021 chronogram does not establish identity.",
+    "substitution_authorized": false
+  },
+  "identifier_only_frame": {
+    "raw_data_rows": 197,
+    "unique_species": 123,
+    "rows_with_nonmissing_phylo_ID": 139,
+    "rows_with_missing_phylo_ID": 58,
+    "unique_species_with_nonmissing_phylo_ID": 93,
+    "unique_nonmissing_phylo_IDs": 122,
+    "phylo_ID_to_multiple_species": 0,
+    "multiple_phylo_IDs_per_species_present": true,
+    "literal_NA_treated_as_missing": true
+  },
+  "why_raw_read_reconstruction_is_not_authorized": [
+    "The preregistered estimator uses patristic distances, so topology and branch lengths are part of the estimand input.",
+    "Reconstructing a new RAxML tree from the public raw reads would not prove identity to the exact timed/pruned tree consumed by the Watts et al. author code.",
+    "Tree reconstruction choices made after the programme exists could alter pairwise patristic distances; therefore a new reconstruction requires a separately frozen estimand rather than being treated as source recovery."
+  ],
+  "outcome_firewall": {
+    "six_HPLC_numeric_values_opened": false,
+    "compound_presence_patterns_computed": false,
+    "branch_presence_patterns_computed": false,
+    "state_frequencies_computed": false,
+    "AUC_computed": false,
+    "permutations_computed": false,
+    "winner_computed": false
+  },
+  "release_condition": "Recover authoritative bytes for 03-Ruellia_phylo.timed.tre, an authoritative final 2023 ML tree object plus an outcome-independent deterministic pruning/timing recipe demonstrably matching the Watts tree, or an author-supplied exact tree/hash. Then freeze tree hash, branch lengths, phylo_ID crosswalk, and species representative rule before HPLC outcomes are opened.",
+  "no_post_hoc_substitution": true,
+  "paper1_science_changed": false
+}

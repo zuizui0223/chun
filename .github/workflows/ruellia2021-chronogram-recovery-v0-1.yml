@@ -1,0 +1,75 @@
+name: Ruellia 2021 chronogram recovery v0.1
+
+on:
+  pull_request:
+    paths:
+      - 'scripts/recover_ruellia2021_chronogram_v0_1.py'
+      - 'scripts/freeze_ruellia51_identifier_projection_v0_1.py'
+      - 'data/ruellia51_source_scope_erratum_v0_1.json'
+      - 'data/ruellia51_tree_provenance_hold_v0_1.json'
+      - 'docs/RUELLIA51_TREE_PROVENANCE_HOLD_V0_1.md'
+      - '.github/workflows/ruellia2021-chronogram-recovery-v0-1.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  recover:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Assert Ruellia51 outcome remains unopened
+        run: test ! -e results/ruellia51_hplc_resolution_profile_v0_1
+      - name: Freeze identifier-only Ruellia51 projection
+        run: python scripts/freeze_ruellia51_identifier_projection_v0_1.py
+      - name: Probe rejected public 2021 chronogram candidate
+        run: python scripts/recover_ruellia2021_chronogram_v0_1.py
+      - name: Validate terminal tree provenance hold and no HPLC outcome exposure
+        run: |
+          python - <<'PY'
+          import json
+          i=json.load(open('build/ruellia51_identifier_projection_v0_1.json'))
+          x=json.load(open('build/ruellia2021_chronogram_recovery_v0_1.json'))
+          e=json.load(open('data/ruellia51_source_scope_erratum_v0_1.json'))
+          h=json.load(open('data/ruellia51_tree_provenance_hold_v0_1.json'))
+          assert i['status']=='RUELLIA51_IDENTIFIER_PROJECTION_FROZEN_OUTCOMES_UNOPENED'
+          assert i['forbidden_hplc_numeric_columns_accessed'] is False
+          assert i['data_rows_total']==197
+          assert i['unique_species_normalized']==123
+          assert i['rows_with_nonmissing_phylo_id']==139
+          assert i['rows_with_missing_phylo_id']==58
+          assert i['unique_species_with_nonmissing_phylo_id']==93
+          assert i['unique_phylo_ids_normalized']==122
+          assert not i['phylo_id_mapping_to_multiple_species']
+          assert 'na' not in {r['phylo_id_normalized'] for r in i['phylo_id_species_projection']}
+          assert e['status']=='FROZEN_POST_IDENTIFIER_INGEST_PRE_HPLC_OUTCOME_PRE_AUC'
+          assert e['original_metadata_error']['original_value']==51
+          assert e['original_metadata_error']['corrected_source_scope']=={'HPLC_rows':197,'unique_species_in_raw_data_csv':123}
+          assert e['phylogeny_provenance_correction']['primary_phylogeny_reference_doi']=='10.1002/tax.13001'
+          assert e['phylogeny_provenance_correction']['2021_chronogram_substitution_authorized'] is False
+          assert all(v is False for v in e['outcome_exposure_at_freeze'].values())
+          assert h['status']=='HOLD_AUTHORITATIVE_2023_TREE_BYTES_OR_EXACT_RECONSTRUCTION_SOURCE_UNAVAILABLE_OUTCOMES_UNOPENED'
+          assert h['tree_provenance']['primary_phylogeny_reference_doi']=='10.1002/tax.13001'
+          assert h['tree_provenance']['primary_phylogeny_public_sequence_archive']=='NCBI BioProject PRJNA948660'
+          assert h['tree_provenance']['authoritative_final_tree_object_located'] is False
+          assert h['rejected_substitute']['substitution_authorized'] is False
+          assert h['no_post_hoc_substitution'] is True
+          assert all(v is False for v in h['outcome_firewall'].values())
+          assert i['hplc_outcomes_opened'] is False and i['auc_computed'] is False
+          assert x['hplc_outcomes_opened'] is False and x['auc_computed'] is False
+          print({'identifier_projection':{k:i[k] for k in ['data_rows_total','unique_species_normalized','unique_species_with_nonmissing_phylo_id','unique_phylo_ids_normalized','rows_with_missing_phylo_id']},'rejected_2021_probe':x['status'],'terminal_hold':h['status']})
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: ruellia2021-chronogram-recovery-v0-1
+          path: |
+            build/ruellia51_identifier_projection_v0_1.json
+            build/ruellia2021_chronogram_recovery_v0_1.json
+            build/Ruellia_chronogram.tre
+          if-no-files-found: warn
+          retention-days: 90
