@@ -1,0 +1,46 @@
+{
+  "biological_replication_unit": "clade",
+  "clades_completed_exact_profile": 28,
+  "clades_hold": 23,
+  "clades_total": 51,
+  "compiled_permutation_equivalence_check": {
+    "first_100_permutations_exact_array_equality": true,
+    "max_absolute_difference": 0.0,
+    "tested_clades": ["Solanum", "Cornus"]
+  },
+  "intermediate_unique_winner_count": 0,
+  "moderator_gate": {
+    "completed_batch_clades": 28,
+    "gate_reached": true,
+    "minimum_completed_same_estimand_radiations": 5,
+    "moderator_fitted_in_this_analysis": false
+  },
+  "paper1_science_changed": false,
+  "permutations_per_clade": 9999,
+  "post_hoc_upgrade_allowed": false,
+  "schema_erratum_status": "FROZEN_POST_ROW_INGEST_PRE_AUC_SOURCE_SCHEMA_ERRATUM",
+  "seed_each_clade": 20260913,
+  "shared_source_method_dependence": true,
+  "source_dataset_doi": "10.5061/dryad.r4xgxd2sc",
+  "source_file_sha256": {
+    "final_dataset.csv": "a253308785e4cbd0e361b3ca04cdfdae29c523eefa843375cebf8030ee0874af",
+    "trees.zip": "ae5c82945e5bf9c29bcabc52d6029acd8d4f5be1fe9141fad95918eacb4f674d"
+  },
+  "status": "FLOWERCLADES51_BATCH_RESULT",
+  "summary_csv": "results/flowerclades51_resolution_profile_v0_1/flowerclades51_resolution_profile_summary_v0_1.csv",
+  "terminal_class_clades": {
+    "HOLD_INSUFFICIENT_COMMON_FRAME_OR_STATE_VARIATION": ["Annona", "Bactris", "Calophyllum", "Canthium", "Casearia", "Celtis", "Crataegus", "Cryptocarya", "Cyphostemma", "Endiandra", "Erythroxylum", "Grewia", "Iochroma", "Nectandra", "Ochna", "Pavetta", "Rhamnus", "Smilax", "Sorbus", "Strychnos", "Tricalysia", "Viburnum", "Vitex"],
+    "PROFILE_NO_PHYLOGENETIC_SIGNAL": ["Asparagus", "Capparis", "Chrysophyllum", "Cissus", "Clidemia", "Cordia", "Diospyros", "Elaeocarpus", "Lonicera", "Ocotea", "Pouteria", "Protium", "Prunus", "Rhus", "Ribes", "Rubus"],
+    "PROFILE_SIGNALLED_COARSE": ["Ilex", "Maytenus", "Symplocos"],
+    "PROFILE_SIGNALLED_FINE": ["Passiflora", "Rosa", "Solanum"],
+    "PROFILE_SIGNALLED_TIED": ["Cornus", "Garcinia", "Gaultheria", "Scaevola", "Terminalia", "Vaccinium"]
+  },
+  "terminal_class_counts": {
+    "HOLD_INSUFFICIENT_COMMON_FRAME_OR_STATE_VARIATION": 23,
+    "PROFILE_NO_PHYLOGENETIC_SIGNAL": 16,
+    "PROFILE_SIGNALLED_COARSE": 3,
+    "PROFILE_SIGNALLED_FINE": 3,
+    "PROFILE_SIGNALLED_TIED": 6
+  },
+  "version": "v0.1"
+}
