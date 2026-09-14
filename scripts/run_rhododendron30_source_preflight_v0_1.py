@@ -7,7 +7,14 @@ from Bio import Phylo
 
 TRAIT_DOI='10.1111/plb.12649'
 TABLE_S3='plb12649-sup-0002-TableS3.docx'
-TABLE_URL='https://onlinelibrary.wiley.com/action/downloadSupplement?doi=10.1111%2Fplb.12649&file='+TABLE_S3
+ARTICLE_URL='https://onlinelibrary.wiley.com/doi/10.1111/plb.12649'
+TABLE_URLS=[
+    'https://onlinelibrary.wiley.com/action/downloadSupplement?doi=10.1111%2Fplb.12649&file='+TABLE_S3,
+    'https://onlinelibrary.wiley.com/action/downloadSupplement?doi=10.1111/plb.12649&file='+TABLE_S3,
+    'https://onlinelibrary.wiley.com/doi/suppl/10.1111/plb.12649/supinfo/'+TABLE_S3,
+    'https://onlinelibrary.wiley.com/doi/supinfo/10.1111/plb.12649/supinfo/'+TABLE_S3,
+    'https://onlinelibrary.wiley.com/doi/suppl/10.1111/plb.12649/suppinfo/'+TABLE_S3,
+]
 TREE_DOI='10.5061/dryad.8cz8w9grq'
 TREE_FILE='1_WP_RAxML.tre'
 API='https://datadryad.org/api/v2'
@@ -96,16 +103,34 @@ def main():
     }
 
     # Trait species identity only from Table S3 first column.
-    tr=request(op,TABLE_URL,'application/vnd.openxmlformats-officedocument.wordprocessingml.document,*/*')
-    trait_receipt={'url':TABLE_URL,'http_status':tr.get('status'),'ok':tr.get('ok'),'downloaded_bytes':len(tr['body']),
-                   'sha256':hashlib.sha256(tr['body']).hexdigest() if tr['body'] else None,
-                   'content_type':tr.get('headers',{}).get('Content-Type'),'reason':tr.get('reason')}
+    landing=request(op,ARTICLE_URL,'text/html')
+    trait_attempts=[]
+    tr=None
     trait_species=[]; first_cells=[]
-    if tr['ok'] and tr['body'][:2]==b'PK':
-        try: trait_species,first_cells=first_column_species(tr['body'])
-        except Exception as e: trait_receipt['parse_error']=repr(e)
-    trait_receipt['species_first_column_count']=len(trait_species)
-    trait_receipt['first_column_preview_only']=first_cells
+    for u in TABLE_URLS:
+        r=request(op,u,'application/vnd.openxmlformats-officedocument.wordprocessingml.document,*/*',referer=ARTICLE_URL)
+        ctype=str(r.get('headers',{}).get('Content-Type',''))
+        is_docx=r.get('ok') and r['body'][:2]==b'PK'
+        a={
+          'url':u,'http_status':r.get('status'),'ok':r.get('ok'),'final_url':r.get('final_url'),
+          'downloaded_bytes':len(r['body']),'sha256':hashlib.sha256(r['body']).hexdigest() if r['body'] else None,
+          'content_type':ctype,'reason':r.get('reason'),'is_docx_payload':bool(is_docx),
+        }
+        trait_attempts.append(a)
+        if is_docx:
+            tr=r
+            try: trait_species,first_cells=first_column_species(r['body'])
+            except Exception as e: a['parse_error']=repr(e)
+            break
+    if tr is None:
+        # preserve the last attempt only as a convenience pointer; all routes remain auditable below.
+        tr={'ok':False,'status':trait_attempts[-1].get('http_status') if trait_attempts else None,
+            'body':b'','headers':{},'reason':'no genuine DOCX payload recovered'}
+    trait_receipt={
+      'article_landing_http_status':landing.get('status'),'article_landing_ok':landing.get('ok'),
+      'attempts':trait_attempts,'selected_url':next((a['url'] for a in trait_attempts if a['is_docx_payload']),None),
+      'species_first_column_count':len(trait_species),'first_column_preview_only':first_cells,
+    }
 
     # Frozen primary-tree metadata then public bytes if available.
     ds=jget(op,API+'/datasets/'+urllib.parse.quote('doi:'+TREE_DOI,safe=''))
@@ -116,9 +141,9 @@ def main():
     by={f.get('path'):f for f in files}
     if TREE_FILE not in by: raise SystemExit(f'{TREE_FILE} absent from Dryad files: {sorted(by)}')
     tm=by[TREE_FILE]; fid=dryad_file_id(tm)
-    landing='https://datadryad.org/dataset/'+urllib.parse.quote('doi:'+TREE_DOI,safe='/')
-    request(op,landing,'text/html')
-    rr=request(op,f'https://datadryad.org/stash/downloads/file_stream/{fid}','*/*',referer=landing)
+    landing_dryad='https://datadryad.org/dataset/'+urllib.parse.quote('doi:'+TREE_DOI,safe='/')
+    request(op,landing_dryad,'text/html')
+    rr=request(op,f'https://datadryad.org/stash/downloads/file_stream/{fid}','*/*',referer=landing_dryad)
     sha,md5,match=digest_matches(tm,rr['body'])
     ctype=str(rr.get('headers',{}).get('Content-Type',''))
     treeish=(len(rr['body'])>1000 and b'(' in rr['body'] and b';' in rr['body'] and 'html' not in ctype.lower())
@@ -173,6 +198,6 @@ def main():
     Path('build').mkdir(exist_ok=True)
     Path('build/rhododendron30_source_preflight_v0_1.json').write_text(json.dumps(out,indent=2,ensure_ascii=False)+'\n',encoding='utf-8')
     if treeish and match is True: Path('build/1_WP_RAxML.tre').write_bytes(rr['body'])
-    print(json.dumps({'status':status,'trait_species':len(ts),'tree_tips':len(tt),'matched':len(matched),'trait_http':tr.get('status'),'tree_http':rr.get('status'),'tree_digest_match':match,'treeish':treeish,'outcome_firewall':outcome_firewall},indent=2))
+    print(json.dumps({'status':status,'trait_species':len(ts),'tree_tips':len(tt),'matched':len(matched),'trait_attempts':[(a['http_status'],a['is_docx_payload'],a['url']) for a in trait_attempts],'tree_http':rr.get('status'),'tree_digest_match':match,'treeish':treeish,'outcome_firewall':outcome_firewall},indent=2))
 
 if __name__=='__main__': main()
