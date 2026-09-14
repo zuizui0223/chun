@@ -4,11 +4,13 @@ on:
   pull_request:
     paths:
       - 'scripts/run_petunieae_biochemical_resolution_profile_v0_1.py'
+      - 'data/petunieae_biochemical_source_fallback_v0_1.json'
       - '.github/workflows/petunieae-biochemical-resolution-profile-outcome-v0-2.yml'
   workflow_dispatch:
 
 permissions:
   contents: read
+  actions: read
 
 jobs:
   execute:
@@ -31,13 +33,48 @@ jobs:
           python - <<'PY'
           import json
           e=json.load(open('data/petunieae_biochemical_resolution_profile_source_key_erratum_v0_1.json'))
+          f=json.load(open('data/petunieae_biochemical_source_fallback_v0_1.json'))
           assert e['status']=='FROZEN_POST_SOURCE_IDENTITY_CHECK_PRE_PROFILE_AUC'
           assert e['corrected_source_key']=='BROW'
           assert e['profile_auc_computed_before_erratum'] is False
           assert e['profile_winner_computed_before_erratum'] is False
+          assert f['status']=='SOURCE_TRANSPORT_FALLBACK_ONLY'
+          assert f['fallback_artifact']['workflow_run_id']==34182646549
+          assert f['fallback_artifact']['artifact_id']==10039433384
+          assert f['outcome_rule_changed'] is False
           PY
-      - name: Reacquire audited OSF source
+      - name: Try live audited OSF acquisition
+        id: live_source
+        continue-on-error: true
         run: python scripts/ingest_petunieae_osf_v0_1.py --out-dir build/petunieae_source
+      - name: Clear partial live source before fallback
+        if: steps.live_source.outcome == 'failure'
+        run: rm -rf build/petunieae_source
+      - name: Recover frozen audited source artifact
+        if: steps.live_source.outcome == 'failure'
+        uses: actions/download-artifact@v4
+        with:
+          name: petunieae-prospective-osf-v0-1
+          github-token: ${{ github.token }}
+          repository: ${{ github.repository }}
+          run-id: 34182646549
+          path: build/petunieae_source
+      - name: Record source transport mode and verify fallback hashes
+        run: |
+          python - <<'PY'
+          import hashlib,json,os,pathlib
+          root=pathlib.Path('build/petunieae_source')
+          f=json.load(open('data/petunieae_biochemical_source_fallback_v0_1.json'))
+          assert (root/'source_manifest.json').is_file()
+          for rel,want in f['required_inner_file_hashes'].items():
+              p=root/rel
+              assert p.is_file(), rel
+              got=hashlib.sha256(p.read_bytes()).hexdigest()
+              assert got==want,(rel,got,want)
+          print({'source_transport':'live_osf' if os.environ.get('LIVE_OUTCOME')=='success' else 'frozen_prior_artifact_fallback','all_inner_hashes_match':True})
+          PY
+        env:
+          LIVE_OUTCOME: ${{ steps.live_source.outcome }}
       - name: Execute frozen post-erratum resolution profile
         run: |
           python scripts/run_petunieae_biochemical_resolution_profile_v0_1.py \
