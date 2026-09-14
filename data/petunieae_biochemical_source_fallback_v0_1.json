@@ -1,0 +1,26 @@
+{
+  "version": "v0.1",
+  "status": "SOURCE_TRANSPORT_FALLBACK_ONLY",
+  "purpose": "Allow exact-source replay when live OSF API transport fails; does not alter the biological or statistical estimand.",
+  "live_source": {
+    "osf_node": "zg9cu",
+    "authoritative_root": "phyloCCA"
+  },
+  "fallback_artifact": {
+    "repository": "zuizui0223/chun",
+    "workflow_run_id": 34182646549,
+    "artifact_id": 10039433384,
+    "artifact_name": "petunieae-prospective-osf-v0-1",
+    "artifact_digest": "sha256:12334ed9f6d05c84d13f5566aa2ac32e74ec8d0d73e970c26fcad5bebef8d5d6",
+    "created_at": "2026-09-08T03:12:04Z",
+    "source_head_sha": "3dd8aa65023daabda342661010c3f098b1de6c80"
+  },
+  "required_inner_file_hashes": {
+    "processed/phyloCCA__11genestre_dated_pruned.tre": "95b4a688d3d71417b712b37a2b04cdc22a9431be3172d6509def4435f5fd8614",
+    "processed/phyloCCA__tpm10k-mgg-combined-with-flavs.csv": "5843d4cd4eb253046f97349fa6bd285ca77e43e7a9c3aaa0e78fae3e8e391edd",
+    "processed/phyloCCA__phyloCCA_expression_HPLC-with-flavs-final.r": "abbb43dbec756ca34e9f501b7eb9aaecb7330009b79739b8c1171d9cccce13b8"
+  },
+  "fallback_condition": "Use only after live OSF acquisition fails for transport/service reasons; exact inner hashes remain mandatory in the analysis runner.",
+  "outcome_rule_changed": false,
+  "paper1_science_changed": false
+}

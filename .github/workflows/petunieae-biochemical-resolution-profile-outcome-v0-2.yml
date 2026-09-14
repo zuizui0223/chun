@@ -1,0 +1,116 @@
+name: Petunieae biochemical resolution profile outcome v0.2
+
+on:
+  pull_request:
+    paths:
+      - 'scripts/run_petunieae_biochemical_resolution_profile_v0_1.py'
+      - 'data/petunieae_biochemical_source_fallback_v0_1.json'
+      - 'data/petunieae_biochemical_resolution_profile_result_v0_1.json'
+      - 'docs/PETUNIEAE_BIOCHEMICAL_RESOLUTION_PROFILE_RESULT_V0_1.md'
+      - '.github/workflows/petunieae-biochemical-resolution-profile-outcome-v0-2.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  actions: read
+
+jobs:
+  execute:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install runtime
+        run: python -m pip install --disable-pip-version-check numpy pandas scipy biopython
+      - name: Assert preregistration and pre-AUC erratum are in history
+        if: github.event_name == 'pull_request'
+        run: |
+          git merge-base --is-ancestor 17b4eecfbc9bcba85cf68f9157419593059d2933 HEAD
+          git merge-base --is-ancestor f818bed04f04944d65f8d8e418fe8956c80574ea HEAD
+          python scripts/validate_petunieae_biochemical_resolution_profile_prereg_v0_1.py
+          python - <<'PY'
+          import json
+          e=json.load(open('data/petunieae_biochemical_resolution_profile_source_key_erratum_v0_1.json'))
+          f=json.load(open('data/petunieae_biochemical_source_fallback_v0_1.json'))
+          assert e['status']=='FROZEN_POST_SOURCE_IDENTITY_CHECK_PRE_PROFILE_AUC'
+          assert e['corrected_source_key']=='BROW'
+          assert e['profile_auc_computed_before_erratum'] is False
+          assert e['profile_winner_computed_before_erratum'] is False
+          assert f['status']=='SOURCE_TRANSPORT_FALLBACK_ONLY'
+          assert f['fallback_artifact']['workflow_run_id']==34182646549
+          assert f['fallback_artifact']['artifact_id']==10039433384
+          assert f['outcome_rule_changed'] is False
+          PY
+      - name: Try live audited OSF acquisition
+        id: live_source
+        continue-on-error: true
+        run: python scripts/ingest_petunieae_osf_v0_1.py --out-dir build/petunieae_source
+      - name: Clear partial live source before fallback
+        if: steps.live_source.outcome == 'failure'
+        run: rm -rf build/petunieae_source
+      - name: Recover frozen audited source artifact
+        if: steps.live_source.outcome == 'failure'
+        uses: actions/download-artifact@v4
+        with:
+          name: petunieae-prospective-osf-v0-1
+          github-token: ${{ github.token }}
+          repository: ${{ github.repository }}
+          run-id: 34182646549
+          path: build/petunieae_source
+      - name: Record source transport mode and verify fallback hashes
+        run: |
+          python - <<'PY'
+          import hashlib,json,os,pathlib
+          root=pathlib.Path('build/petunieae_source')
+          f=json.load(open('data/petunieae_biochemical_source_fallback_v0_1.json'))
+          assert (root/'source_manifest.json').is_file()
+          for rel,want in f['required_inner_file_hashes'].items():
+              p=root/rel
+              assert p.is_file(), rel
+              got=hashlib.sha256(p.read_bytes()).hexdigest()
+              assert got==want,(rel,got,want)
+          print({'source_transport':'live_osf' if os.environ.get('LIVE_OUTCOME')=='success' else 'frozen_prior_artifact_fallback','all_inner_hashes_match':True})
+          PY
+        env:
+          LIVE_OUTCOME: ${{ steps.live_source.outcome }}
+      - name: Execute frozen post-erratum resolution profile
+        run: |
+          python scripts/run_petunieae_biochemical_resolution_profile_v0_1.py \
+            --source build/petunieae_source \
+            --out build/petunieae_biochemical_resolution_profile_result_v0_1.json
+      - name: Verify committed terminal receipt is byte-identical
+        run: cmp build/petunieae_biochemical_resolution_profile_result_v0_1.json data/petunieae_biochemical_resolution_profile_result_v0_1.json
+      - name: Validate result boundaries only
+        run: |
+          python - <<'PY'
+          import json
+          x=json.load(open('build/petunieae_biochemical_resolution_profile_result_v0_1.json'))
+          assert x['status']=='PETUNIEAE_BIOCHEMICAL_RESOLUTION_PROFILE_RESULT'
+          assert x['programme_role']=='RETROSPECTIVE_STANDARDIZED_CROSS_REPRESENTATION_TRAINING'
+          assert x['do_not_count_as_new_prospective_replication'] is True
+          assert x['source_key_erratum_status']=='FROZEN_POST_SOURCE_IDENTITY_CHECK_PRE_PROFILE_AUC'
+          assert x['terminal_class']=='PROFILE_SIGNALLED_FINE'
+          assert x['primary_frame']['eligible_tips']==47
+          assert x['observed']['AUC_fine']==0.6995630849367751
+          assert x['p_signal_one_sided']['fine']==0.0001
+          assert x['p_winner_gt_runner']==0.0001
+          assert x['paper1_science_changed'] is False
+          print({'terminal_class':x['terminal_class'],'primary_frame':x.get('primary_frame'),'observed':x.get('observed'),'p_signal':x.get('p_signal_one_sided'),'winner':x.get('winner'),'p_winner_gt_runner':x.get('p_winner_gt_runner')})
+          PY
+      - name: Confirm Paper 1 science firewall
+        if: github.event_name == 'pull_request'
+        run: |
+          git diff --exit-code ${{ github.event.pull_request.base.sha }}...HEAD -- manuscript data/paper1_authoritative_results_v0_2_2.csv data/paper1_main_figure_manifest_v0_2_2.csv
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: petunieae-biochemical-resolution-profile-outcome-v0-2
+          path: |
+            build/petunieae_biochemical_resolution_profile_result_v0_1.json
+            build/petunieae_source/source_manifest.json
+          if-no-files-found: error
+          retention-days: 90

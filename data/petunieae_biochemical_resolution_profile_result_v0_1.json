@@ -1,0 +1,89 @@
+{
+  "do_not_count_as_new_prospective_replication": true,
+  "observed": {
+    "AUC_coarse": 0.518925563507132,
+    "AUC_fine": 0.6995630849367751,
+    "AUC_intermediate": 0.518925563507132
+  },
+  "p_signal_one_sided": {
+    "coarse": 0.1985,
+    "fine": 0.0001,
+    "intermediate": 0.1985
+  },
+  "p_winner_gt_runner": 0.0001,
+  "pairwise_differences": {
+    "coarse_minus_fine": {
+      "observed": -0.18063752142964307,
+      "p_gt_zero": 1.0
+    },
+    "coarse_minus_intermediate": {
+      "observed": 0.0,
+      "p_gt_zero": 1.0
+    },
+    "fine_minus_coarse": {
+      "observed": 0.18063752142964307,
+      "p_gt_zero": 0.0001
+    },
+    "fine_minus_intermediate": {
+      "observed": 0.18063752142964307,
+      "p_gt_zero": 0.0001
+    },
+    "intermediate_minus_coarse": {
+      "observed": -0.0,
+      "p_gt_zero": 1.0
+    },
+    "intermediate_minus_fine": {
+      "observed": -0.18063752142964307,
+      "p_gt_zero": 1.0
+    }
+  },
+  "paper1_science_changed": false,
+  "permutations": 9999,
+  "post_hoc_upgrade_allowed": false,
+  "primary_frame": {
+    "coarse_state_counts": {
+      "0": 6,
+      "1": 41
+    },
+    "eligible_tips": 47,
+    "fine_state_counts": {
+      "000000": 6,
+      "000010": 6,
+      "000011": 6,
+      "000100": 10,
+      "000110": 6,
+      "000111": 13
+    },
+    "intermediate_state_counts": {
+      "000": 6,
+      "001": 41
+    },
+    "petunieae_taxa_before_rare_filter": 59,
+    "rare_fine_states_excluded": [
+      "000101",
+      "001111",
+      "010000",
+      "010110",
+      "011111",
+      "100011",
+      "100111",
+      "101111",
+      "110100"
+    ],
+    "source_rows_before_outgroup": 60
+  },
+  "programme_role": "RETROSPECTIVE_STANDARDIZED_CROSS_REPRESENTATION_TRAINING",
+  "prospective_label": "NOT_PROSPECTIVE_SOURCE_VALUES_PREVIOUSLY_INSPECTED_FOR_DIFFERENT_CROSS_LEVEL_ESTIMAND",
+  "runner_up": "coarse",
+  "seed": 20260913,
+  "source_defined_outgroup_key_used": "BROW",
+  "source_key_erratum_status": "FROZEN_POST_SOURCE_IDENTITY_CHECK_PRE_PROFILE_AUC",
+  "source_osf_node": "zg9cu",
+  "source_table_sha256": "5843d4cd4eb253046f97349fa6bd285ca77e43e7a9c3aaa0e78fae3e8e391edd",
+  "source_tree_sha256": "95b4a688d3d71417b712b37a2b04cdc22a9431be3172d6509def4435f5fd8614",
+  "status": "PETUNIEAE_BIOCHEMICAL_RESOLUTION_PROFILE_RESULT",
+  "terminal_class": "PROFILE_SIGNALLED_FINE",
+  "version": "v0.1",
+  "winner": "fine",
+  "winner_minus_runner_up": 0.18063752142964307
+}
