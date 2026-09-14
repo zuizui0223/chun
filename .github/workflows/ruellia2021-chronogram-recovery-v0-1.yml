@@ -1,0 +1,42 @@
+name: Ruellia 2021 chronogram recovery v0.1
+
+on:
+  pull_request:
+    paths:
+      - 'scripts/recover_ruellia2021_chronogram_v0_1.py'
+      - '.github/workflows/ruellia2021-chronogram-recovery-v0-1.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  recover:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Assert Ruellia51 outcome remains unopened
+        run: test ! -e results/ruellia51_hplc_resolution_profile_v0_1
+      - name: Recover public 2021 chronogram candidate
+        run: python scripts/recover_ruellia2021_chronogram_v0_1.py
+      - name: Validate no HPLC outcome exposure
+        run: |
+          python - <<'PY'
+          import json
+          x=json.load(open('build/ruellia2021_chronogram_recovery_v0_1.json'))
+          assert x['hplc_outcomes_opened'] is False
+          assert x['auc_computed'] is False
+          print(x)
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: ruellia2021-chronogram-recovery-v0-1
+          path: |
+            build/ruellia2021_chronogram_recovery_v0_1.json
+            build/Ruellia_chronogram.tre
+          if-no-files-found: warn
+          retention-days: 90
