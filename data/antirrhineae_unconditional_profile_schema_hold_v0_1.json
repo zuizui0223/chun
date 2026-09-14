@@ -1,0 +1,45 @@
+{
+  "version": "v0.1",
+  "status": "HOLD_SCHEMA_NO_SOURCE_DEFINED_THREE_LEVEL_NESTING_INTERMEDIATE_FINE_COLLAPSE",
+  "source_doi": "10.15479/AT:ISTA:34",
+  "source_artifact": {
+    "workflow_run_id": 34170228964,
+    "artifact_id": 10035457456,
+    "artifact_name": "antirrhineae-source-v0-1",
+    "artifact_digest": "sha256:e0533bc349d87544b96346187ae58860f7e60e7267ac11252d922b2312c40d1f",
+    "source_current_sha256": "5f25dc400d91ce913d1057aa9c5d7fac13addaf2a479f3af629f8393a90876dd"
+  },
+  "source_native_face_phenotype_codes": {
+    "0": "UNPIGMENTED",
+    "1": "ANTHOCYANIN",
+    "2": "YELLOW",
+    "3": "DOUBLE_PIGMENTED"
+  },
+  "source_readme_colour_descriptions_role": "VERBATIM_TAXONOMIC_COLOUR_DESCRIPTIONS_AND_CITATION_PROVENANCE_NOT_A_SECOND_STRUCTURED_STATE_LAYER",
+  "observed_source_native_counts": {
+    "monomorphic_primary_152_exact_tips": {"0": 21, "1": 68, "2": 63, "3": 0},
+    "polymorphic_sensitivity_179_exact_tips": {"0": 29, "1": 83, "2": 67, "3": 0}
+  },
+  "coarse_representation_is_source_supported": {
+    "UNPIGMENTED": [0],
+    "PIGMENTED": [1, 2, 3]
+  },
+  "fine_representation_is_source_supported": {
+    "UNPIGMENTED": [0],
+    "ANTHOCYANIN": [1],
+    "YELLOW": [2],
+    "DOUBLE_PIGMENTED": [3]
+  },
+  "intermediate_problem": {
+    "source_defined_unique_intermediate_partition": false,
+    "reason": "The source supplies pigment-presence coarse semantics and four native pigment-pattern codes, but no privileged intermediate grouping. Grouping DOUBLE_PIGMENTED with ANTHOCYANIN versus YELLOW would be an analyst choice, not a source-defined hierarchy.",
+    "observed_frame_collapse": "State 3 is absent from both the monomorphic primary and polymorphic sensitivity exact joins, so any such three-category intermediate grouping reduces to the same observed 0/1/2 partition as the source-native fine coding."
+  },
+  "why_verbatim_colour_text_is_not_promoted_to_fine_states": "Exact taxonomic colour-description strings are provenance text with heterogeneous wording and citations. Treating literal strings or post-hoc normalized text as biological fine states would introduce an analyst-defined observation-language resolution rather than a source-defined pigment hierarchy.",
+  "unconditional_profile_auc_computed": false,
+  "profile_winner_computed": false,
+  "counts_as_second_non_visible_exact_profile": false,
+  "next_gate": "DO_NOT_RUN_UNCONDITIONAL_PROFILE_UNLESS_AN_INDEPENDENT_SOURCE_DEFINED_NESTED_STATE_LAYER_IS_RECOVERED_WITHOUT_OUTCOME_DEPENDENT_RECODING",
+  "scientific_interpretation": "Schema applicability hold only; the existing conditional Antirrhineae fine-state result remains valid for its different conditional-null estimand.",
+  "paper1_science_changed": false
+}
