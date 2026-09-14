@@ -1,0 +1,44 @@
+{
+  "version": "v0.1",
+  "status": "FROZEN_BEFORE_FLOWERCLADES51_FLOWER_COLOR_OUTCOME_OPENING",
+  "source_dataset_doi": "10.5061/dryad.r4xgxd2sc",
+  "source_files": {
+    "final_dataset.csv": {
+      "bytes": 118867,
+      "sha256": "a253308785e4cbd0e361b3ca04cdfdae29c523eefa843375cebf8030ee0874af"
+    },
+    "trees.zip": {
+      "bytes": 80326,
+      "sha256": "ae5c82945e5bf9c29bcabc52d6029acd8d4f5be1fe9141fad95918eacb4f674d"
+    }
+  },
+  "identifier_rules": {
+    "dataset_duplicate_species_within_clade": "retain first source row in source row order",
+    "tree_tip_normalization": "trim whitespace; replace underscores with spaces; collapse internal whitespace; lowercase for exact normalized comparison only",
+    "automatic_taxonomic_synonym_substitution": false,
+    "ambiguous_crosswalk": "HOLD_CLADE_CROSSWALK rather than force-match"
+  },
+  "summary": {
+    "clades": 51,
+    "unique_filename_mappings": 51,
+    "source_rows": 2960,
+    "unique_source_species": 2960,
+    "exact_tree_matches": 2960,
+    "data_only_species": 0,
+    "tree_only_species": 0,
+    "tree_duplicate_tip_labels": 0,
+    "duplicate_source_rows_removed": 0,
+    "all_tree_branch_lengths_complete": true
+  },
+  "mapping_file": "data/flowerclades51_crosswalk_v0_1.csv",
+  "outcome_firewall": {
+    "flower_color_values_accessed_or_emitted": false,
+    "fruit_color_values_accessed_or_emitted": false,
+    "color_frequencies_computed": false,
+    "coarse_intermediate_fine_states_materialized": false,
+    "AUC_computed": false,
+    "profile_winner_computed": false
+  },
+  "next_gate": "OPEN_FLOWER_COLOR_AND_APPLY_FROZEN_COMMON_FRAME_AND_PROFILE_ESTIMAND",
+  "paper1_science_changed": false
+}
