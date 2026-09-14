@@ -1,0 +1,23 @@
+{
+  "version": "v0.1",
+  "status": "FROZEN_POST_SOURCE_IDENTITY_CHECK_PRE_PROFILE_AUC",
+  "original_prereg": "data/petunieae_biochemical_resolution_profile_prereg_v0_1.json",
+  "field_corrected": "source_identity.source_defined_outgroup",
+  "original_value": "BROWALLIA_AMERICANA_BROW",
+  "corrected_source_key": "BROW",
+  "basis": {
+    "audited_source_csv_key_0": "BROW",
+    "audited_source_tree_tip": "BROW",
+    "preexisting_authoritative_bridge_runner": "scripts/analyze_petunieae_prospective_bridge_v0_1.py",
+    "preexisting_runner_constant": "OUTGROUP='BROW'"
+  },
+  "correction_type": "SOURCE_KEY_LEXICAL_IDENTITY_ONLY",
+  "biological_taxon_changed": false,
+  "state_hierarchy_changed": false,
+  "common_frame_thresholds_changed": false,
+  "permutation_contract_changed": false,
+  "decision_rule_changed": false,
+  "profile_auc_computed_before_erratum": false,
+  "profile_winner_computed_before_erratum": false,
+  "paper1_science_changed": false
+}
