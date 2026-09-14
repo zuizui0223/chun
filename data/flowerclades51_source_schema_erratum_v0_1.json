@@ -1,0 +1,28 @@
+{
+  "version": "v0.1",
+  "status": "FROZEN_POST_ROW_INGEST_PRE_AUC_SOURCE_SCHEMA_ERRATUM",
+  "source_dataset_doi": "10.5061/dryad.r4xgxd2sc",
+  "reason": "The preregistration used publication-level category labels black/dark and blue/purple, while the exact source CSV uses literal row tokens black and purple.",
+  "changes": [
+    {
+      "preregistered_token": "black/dark",
+      "source_literal_token": "black",
+      "intermediate_state_unchanged": "DARK",
+      "coarse_state_unchanged": "NONWHITE"
+    },
+    {
+      "preregistered_token": "blue/purple",
+      "source_literal_token": "purple",
+      "intermediate_state_unchanged": "COOL",
+      "coarse_state_unchanged": "NONWHITE"
+    }
+  ],
+  "biological_grouping_changed": false,
+  "thresholds_changed": false,
+  "common_frame_rule_changed": false,
+  "permutation_rule_changed": false,
+  "AUC_computed_before_erratum_freeze": false,
+  "profile_winner_computed_before_erratum_freeze": false,
+  "discard_pre_erratum_common_frame_diagnostics": true,
+  "paper1_science_changed": false
+}

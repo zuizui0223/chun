@@ -7,8 +7,10 @@ from pathlib import Path
 
 PREREG = Path('data/flowerclades51_resolution_profile_prereg_v0_1.json')
 MAPPING = Path('data/flowerclades51_visible_colour_hierarchy_v0_1.csv')
+ERRATUM = Path('data/flowerclades51_source_schema_erratum_v0_1.json')
 RESULT_DIR = Path('results/flowerclades51_resolution_profile_v0_1')
 PREFLIGHT = Path('data/flowerclades51_source_preflight_receipt_v0_1.json')
+CROSSWALK = Path('data/flowerclades51_crosswalk_receipt_v0_1.json')
 SOURCE_COPY = Path('data/flowerclades51_final_dataset_v0_1.csv')
 
 p = json.loads(PREREG.read_text(encoding='utf-8'))
@@ -35,8 +37,8 @@ with MAPPING.open(newline='', encoding='utf-8') as f:
     rows = list(csv.DictReader(f))
 assert len(rows) == 8
 expected = {
-    'black/dark': ('DARK', 'NONWHITE'),
-    'blue/purple': ('COOL', 'NONWHITE'),
+    'black': ('DARK', 'NONWHITE'),
+    'purple': ('COOL', 'NONWHITE'),
     'green': ('COOL', 'NONWHITE'),
     'orange': ('WARM', 'NONWHITE'),
     'pink': ('WARM', 'NONWHITE'),
@@ -46,7 +48,6 @@ expected = {
 }
 observed = {r['source_fine_state']: (r['intermediate_state'], r['coarse_state']) for r in rows}
 assert observed == expected, observed
-# Genuine nesting: every fine maps to exactly one intermediate/coarse and each intermediate to one coarse.
 intermediate_to_coarse = {}
 for r in rows:
     old = intermediate_to_coarse.setdefault(r['intermediate_state'], r['coarse_state'])
@@ -58,16 +59,36 @@ assert intermediate_to_coarse == {
     'WHITE': 'WHITE',
 }
 
-assert not RESULT_DIR.exists(), 'outcome result directory exists before preregistration freeze'
-assert not PREFLIGHT.exists(), 'source preflight receipt exists before preregistration freeze'
-assert not SOURCE_COPY.exists(), 'species-level source copy exists before preregistration freeze'
+e = json.loads(ERRATUM.read_text(encoding='utf-8'))
+assert e['status'] == 'FROZEN_POST_ROW_INGEST_PRE_AUC_SOURCE_SCHEMA_ERRATUM'
+assert e['biological_grouping_changed'] is False
+assert e['thresholds_changed'] is False
+assert e['common_frame_rule_changed'] is False
+assert e['permutation_rule_changed'] is False
+assert e['AUC_computed_before_erratum_freeze'] is False
+assert e['profile_winner_computed_before_erratum_freeze'] is False
+
+# Phase-aware audit: preregistration remains immutable; source-access and identifier/tree
+# preflights are now expected because they were merged after the freeze and before AUC.
+pre = json.loads(PREFLIGHT.read_text(encoding='utf-8'))
+assert pre['status'] == 'HOLD_SOURCE_ACCESS_OUTCOMES_UNOPENED'
+cw = json.loads(CROSSWALK.read_text(encoding='utf-8'))
+assert cw['status'] == 'FROZEN_BEFORE_FLOWERCLADES51_FLOWER_COLOR_OUTCOME_OPENING'
+assert cw['summary']['clades'] == 51
+assert cw['summary']['exact_tree_matches'] == 2960
+assert cw['outcome_firewall']['AUC_computed'] is False
+assert cw['outcome_firewall']['profile_winner_computed'] is False
+
+assert not RESULT_DIR.exists(), 'outcome result directory exists before pre-AUC erratum freeze'
+assert not SOURCE_COPY.exists(), 'species-level source copy must not be committed before outcome analysis'
 
 print(json.dumps({
-    'status': 'FLOWERCLADES51_PROFILE_PREREG_VALID',
+    'status': 'FLOWERCLADES51_PROFILE_PREREG_PLUS_SCHEMA_ERRATUM_VALID',
     'source_categories': len(rows),
     'nested_intermediate_states': sorted(intermediate_to_coarse),
+    'crosswalk_exact_matches': cw['summary']['exact_tree_matches'],
     'result_absent': True,
-    'source_outcome_absent': True,
+    'schema_erratum_pre_auc': True,
     'moderator_fitted': False,
     'paper1_science_changed': False,
 }, indent=2))
