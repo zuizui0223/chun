@@ -1,0 +1,62 @@
+name: Iochrominae biochemical profile source preflight v0.1
+
+on:
+  pull_request:
+    paths:
+      - 'scripts/preflight_iochrominae_biochemical_profile_source_v0_1.py'
+      - '.github/workflows/iochrominae-biochemical-profile-source-preflight-v0-1.yml'
+      - 'docs/IOCHROMINAE_BIOCHEMICAL_PROFILE_SOURCE_PREFLIGHT_V0_1.md'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  preflight:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Run metadata and byte-access preflight
+        run: python scripts/preflight_iochrominae_biochemical_profile_source_v0_1.py
+      - name: List archive member names only if exact archive bytes were recovered
+        run: |
+          if [ -f build/iochrominae_dvdy2019_DATA.rar ]; then
+            if ! command -v 7z >/dev/null 2>&1; then
+              sudo apt-get update -qq
+              sudo apt-get install -y -qq p7zip-full
+            fi
+            7z l -slt build/iochrominae_dvdy2019_DATA.rar | sed -n 's/^Path = //p' > build/iochrominae_dvdy2019_archive_members.txt
+          else
+            printf '%s\n' 'ARCHIVE_BYTES_NOT_RECOVERED' > build/iochrominae_dvdy2019_archive_members.txt
+          fi
+      - name: Validate no profile computation occurred
+        run: |
+          python - <<'PY'
+          import json
+          x=json.load(open('build/iochrominae_biochemical_profile_source_preflight_v0_1.json'))
+          assert x['archive_data_rows_opened_by_preflight'] is False
+          assert x['profile_states_computed'] is False
+          assert x['patristic_distances_computed'] is False
+          assert x['profile_auc_computed'] is False
+          assert x['winner_computed'] is False
+          assert x['paper1_science_changed'] is False
+          print({'status':x['status'],'file_receipts':{k:{z:v[z] for z in ['file_id','size','digest_type_api','digest_api','recovered']} for k,v in x['file_receipts'].items()}})
+          PY
+      - name: Confirm Paper 1 science firewall
+        if: github.event_name == 'pull_request'
+        run: git diff --exit-code ${{ github.event.pull_request.base.sha }}...HEAD -- manuscript data/paper1_authoritative_results_v0_2_2.csv data/paper1_main_figure_manifest_v0_2_2.csv
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: iochrominae-biochemical-profile-source-preflight-v0-1
+          path: |
+            build/iochrominae_biochemical_profile_source_preflight_v0_1.json
+            build/iochrominae_dvdy2019_README.txt
+            build/iochrominae_dvdy2019_archive_members.txt
+          if-no-files-found: warn
+          retention-days: 90
