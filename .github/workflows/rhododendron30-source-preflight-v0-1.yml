@@ -1,0 +1,50 @@
+name: Rhododendron30 source preflight v0.1
+
+on:
+  pull_request:
+    paths:
+      - 'scripts/run_rhododendron30_source_preflight_v0_1.py'
+      - '.github/workflows/rhododendron30-source-preflight-v0-1.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  preflight:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install tree parser
+        run: python -m pip install --disable-pip-version-check biopython
+      - name: Assert chemistry outcomes remain unopened
+        run: test ! -e results/rhododendron30_biochemical_resolution_profile_v0_1
+      - name: Run species/tree-only preflight
+        run: python scripts/run_rhododendron30_source_preflight_v0_1.py
+      - name: Validate outcome firewall
+        run: |
+          python - <<'PY'
+          import json
+          x=json.load(open('build/rhododendron30_source_preflight_v0_1.json'))
+          assert all(v is False for v in x['outcome_firewall'].values()), x['outcome_firewall']
+          assert x['paper1_science_changed'] is False
+          assert x['crosswalk']['automatic_synonym_substitution'] is False
+          print({'status':x['status'],'trait_species':x['crosswalk']['trait_species_count'],'tree_tips':x['crosswalk']['tree_tip_count'],'matched':x['crosswalk']['exact_normalized_matches'],'trait_receipt':x['trait_receipt'],'tree_receipt':x['tree_receipt']})
+          PY
+      - name: Confirm Paper 1 science firewall
+        if: github.event_name == 'pull_request'
+        run: git diff --exit-code ${{ github.event.pull_request.base.sha }}...HEAD -- manuscript data/paper1_authoritative_results_v0_2_2.csv data/paper1_main_figure_manifest_v0_2_2.csv
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: rhododendron30-source-preflight-v0-1
+          path: |
+            build/rhododendron30_source_preflight_v0_1.json
+            build/1_WP_RAxML.tre
+          if-no-files-found: warn
+          retention-days: 90
