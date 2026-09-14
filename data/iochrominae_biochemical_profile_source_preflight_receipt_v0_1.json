@@ -1,0 +1,40 @@
+{
+  "version": "v0.1",
+  "status": "HOLD_SOURCE_ACCESS_README_AND_ARCHIVE_PROFILE_UNCOMPUTED",
+  "source_doi": "10.5061/dryad.p5dq84v",
+  "source_objects": {
+    "README_for_Larter et al 2019 Dvdy Iochrominae development evolution DATA.txt": {
+      "file_id": 108458,
+      "size_bytes": 4072,
+      "digest_type": "md5",
+      "digest": "2e4a251725ad4c13975fc09481da302d",
+      "recovered": false
+    },
+    "Larter et al 2019 Dvdy Iochrominae development evolution DATA.rar": {
+      "file_id": 108456,
+      "size_bytes": 3054999,
+      "digest_type": "md5",
+      "digest": "76b46e384fb7c9bf1ef3fbd7d1e5d2f0",
+      "recovered": false
+    }
+  },
+  "hosted_preflight": {
+    "workflow_run_id": 34848769129,
+    "job_id": 103991099017,
+    "artifact_id": 10348639063,
+    "artifact_digest": "sha256:d82ac9dfd37cb74b5a25d4210258f4177a516cfe0be5460d2f9a0029d4b6aa66"
+  },
+  "web_mirror_search": {
+    "exact_filename_and_digest_search_performed": true,
+    "independent_exact_mirror_recovered": false
+  },
+  "profile_state_mapping_frozen": false,
+  "archive_data_rows_opened_by_preflight": false,
+  "profile_states_computed": false,
+  "patristic_distances_computed": false,
+  "profile_auc_computed": false,
+  "winner_computed": false,
+  "next_gate": "RECOVER_EXACT_README_AND_ARCHIVE_BYTES_THEN_INSPECT_README_AND_ARCHIVE_MEMBER_NAMES_BEFORE_FREEZING_PROFILE_STATE_MAPPING",
+  "scientific_interpretation": "Source-access hold only; not a biological negative and not a completed second biochemical profile.",
+  "paper1_science_changed": false
+}
