@@ -15,6 +15,7 @@
   },
   "phylogeny_provenance_correction": {
     "source_statement": "Watts et al. 2026 pruned a ddRADseq maximum-likelihood phylogeny of 187 Ruellia species from Manzitto-Tripp and Daniel 2023",
+    "primary_phylogeny_reference_doi": "10.1002/tax.13001",
     "source_article": "Manzitto-Tripp and Daniel 2023, TAXON 72:1034-1056, DOI 10.1002/tax.13001",
     "author_code_tree_path": "color data/color data/phylogeny/03-Ruellia_phylo.timed.tre",
     "author_code_crosswalk_key": "phylo_ID",
