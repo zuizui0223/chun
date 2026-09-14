@@ -1,0 +1,30 @@
+name: Resolution profile cross-representation status v0.4
+
+on:
+  pull_request:
+    paths:
+      - 'docs/RESOLUTION_PROFILE_TRAINING_INVENTORY_V0_4.md'
+      - 'docs/CROSS_RADIATION_RESOLUTION_SYNTHESIS_V0_4.md'
+      - 'data/resolution_profile_representation_identifiability_v0_1.json'
+      - 'scripts/validate_resolution_profile_cross_representation_status_v0_4.py'
+      - '.github/workflows/resolution-profile-cross-representation-status-v0-4.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Validate representation identifiability status
+        run: python scripts/validate_resolution_profile_cross_representation_status_v0_4.py
+      - name: Confirm Paper 1 science firewall
+        if: github.event_name == 'pull_request'
+        run: git diff --exit-code ${{ github.event.pull_request.base.sha }}...HEAD -- manuscript data/paper1_authoritative_results_v0_2_2.csv data/paper1_main_figure_manifest_v0_2_2.csv

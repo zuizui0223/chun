@@ -1,0 +1,36 @@
+{
+  "version": "v0.1",
+  "status": "REPRESENTATION_MODERATOR_NOT_IDENTIFIABLE_SINGLETON_BIOCHEMICAL",
+  "exact_profile_completed_total": 30,
+  "training_composition": {
+    "standardized_visible_colour": 28,
+    "biochemical_composition": 1,
+    "mixed_pigment_hue_prospective": 1
+  },
+  "biochemical_anchor": {
+    "system": "PETUNIEAE",
+    "programme_role": "RETROSPECTIVE_STANDARDIZED_CROSS_REPRESENTATION_TRAINING",
+    "terminal_class": "PROFILE_SIGNALLED_FINE",
+    "eligible_tips": 47,
+    "AUC_coarse": 0.518925563507132,
+    "AUC_intermediate": 0.518925563507132,
+    "AUC_fine": 0.6995630849367751,
+    "p_fine_signal": 0.0001,
+    "p_fine_gt_runner_up": 0.0001,
+    "source": "data/petunieae_biochemical_resolution_profile_result_v0_1.json"
+  },
+  "previous_tree_only_moderator_status": "NO_MODERATOR_QUALIFIED_CURRENT_STANDARDIZED_TRAINING",
+  "representation_type_model_fit": false,
+  "representation_type_model_not_fit_reason": "With one biochemical observation, leave-one-out validation of the biochemical unit leaves zero biochemical observations in the training fold; a biochemical category effect is therefore not identified for out-of-sample prediction.",
+  "iris_treatment": "Iris is retained as a prospective mixed pigment/hue exact-profile observation and is not relabelled as a second biochemical replicate.",
+  "next_heldout_prediction_frozen": false,
+  "next_gate": "SECOND_INDEPENDENT_COMPLETED_EXACT_PROFILE_WITH_BIOCHEMICAL_OR_OTHER_NON_VISIBLE_NESTED_REPRESENTATION",
+  "prohibited_rescues": [
+    "pool Iris into biochemical category solely to reach n=2",
+    "fit a multivariable representation moderator with a singleton biochemical category",
+    "use realized target state frequencies or target AUCs as prospective moderator features",
+    "open another held-out outcome merely to create representation replication",
+    "upgrade Petunieae to prospective status"
+  ],
+  "paper1_science_changed": false
+}
