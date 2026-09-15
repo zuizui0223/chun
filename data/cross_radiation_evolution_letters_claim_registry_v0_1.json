@@ -1,0 +1,83 @@
+{
+  "version": "v0.1",
+  "status": "CROSS_RADIATION_EVOLUTION_LETTERS_CLAIM_REGISTRY",
+  "manuscript": "manuscript/CROSS_RADIATION_EVOLUTION_LETTERS_V0_1.md",
+  "journal_target": "Evolution Letters",
+  "journal_format_contract": {
+    "article_type": "Letter",
+    "title_max_words": 30,
+    "abstract_max_words": 300,
+    "main_text_target_max_words": 5000,
+    "source": "https://academic.oup.com/evlett/pages/author-guidelines"
+  },
+  "authoritative_sources": {
+    "iris": "results/iris_intermediate_resolution_v0_1/iris_intermediate_resolution_result_v0_1.json",
+    "flowerclades51": "results/flowerclades51_resolution_profile_v0_1/flowerclades51_resolution_profile_batch_result_v0_1.json",
+    "tree_moderator": "data/resolution_profile_moderator_qualification_v0_1.json",
+    "petunieae": "data/petunieae_biochemical_resolution_profile_result_v0_1.json",
+    "representation_identifiability": "data/resolution_profile_representation_identifiability_v0_1.json",
+    "frontier": "data/nonvisible_second_anchor_frontier_v0_1.json"
+  },
+  "frozen_numeric_claims": {
+    "iris": {
+      "eligible_tips": 169,
+      "AUC_coarse": 0.4617285165822909,
+      "AUC_intermediate": 0.4543945669248664,
+      "AUC_fine": 0.48705044194427866,
+      "p_fine_gt_intermediate": 0.0486,
+      "decision": "FAIL"
+    },
+    "flowerclades51": {
+      "total": 51,
+      "completed": 28,
+      "hold": 23,
+      "coarse_winners": 3,
+      "intermediate_winners": 0,
+      "fine_winners": 3,
+      "tied": 6,
+      "no_signal": 16
+    },
+    "tree_moderator": {
+      "candidate_predictors": 4,
+      "qualified_predictors": 0,
+      "status": "NO_MODERATOR_QUALIFIED_CURRENT_STANDARDIZED_TRAINING"
+    },
+    "petunieae": {
+      "eligible_tips": 47,
+      "AUC_coarse": 0.518925563507132,
+      "AUC_intermediate": 0.518925563507132,
+      "AUC_fine": 0.6995630849367751,
+      "p_fine_signal": 0.0001,
+      "p_fine_gt_runner": 0.0001,
+      "terminal_class": "PROFILE_SIGNALLED_FINE",
+      "prospective": false
+    },
+    "representation_training": {
+      "completed_total": 30,
+      "visible_standardized": 28,
+      "biochemical": 1,
+      "mixed_prospective": 1,
+      "representation_moderator_identifiable": false
+    }
+  },
+  "required_claims": [
+    "no universal biological resolution",
+    "prospectively falsified",
+    "28",
+    "zero unique intermediate",
+    "Petunieae",
+    "retrospective standardized",
+    "representation type",
+    "not yet predictively identifiable"
+  ],
+  "forbidden_claim_fragments": [
+    "universal fine-resolution optimum",
+    "biochemical representations generally favour fine resolution",
+    "Petunieae prospective replication",
+    "tree geometry can never explain",
+    "first demonstration that flower-colour evolution is resolution dependent",
+    "first demonstration that state coding matters",
+    "universal law of flower-colour predictability"
+  ],
+  "paper1_science_changed": false
+}
