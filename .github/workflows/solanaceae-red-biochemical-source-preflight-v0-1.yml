@@ -1,0 +1,84 @@
+name: Solanaceae red biochemical source preflight v0.1
+
+on:
+  pull_request:
+    paths:
+      - 'data/solanaceae_red_biochemical_resolution_profile_prereg_v0_1.json'
+      - 'docs/SOLANACEAE_RED_BIOCHEMICAL_RESOLUTION_PROFILE_PREREG_V0_1.md'
+      - 'scripts/preflight_solanaceae_red_biochemical_source_v0_1.py'
+      - 'scripts/preflight_solanaceae_red_biochemical_source_v0_2.py'
+      - 'scripts/preflight_solanaceae_red_biochemical_source_v0_3.py'
+      - '.github/workflows/solanaceae-red-biochemical-source-preflight-v0-1.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  preflight:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Verify preregistration predates preflight implementation
+        run: |
+          test -s data/solanaceae_red_biochemical_resolution_profile_prereg_v0_1.json
+          freeze=$(git log --format='%H %ct' --reverse -- data/solanaceae_red_biochemical_resolution_profile_prereg_v0_1.json | head -1)
+          preflight=$(git log --format='%H %ct' --reverse -- scripts/preflight_solanaceae_red_biochemical_source_v0_3.py | head -1)
+          python - "$freeze" "$preflight" <<'PY'
+          import sys
+          f=sys.argv[1].split(); p=sys.argv[2].split()
+          assert f and p,(f,p)
+          assert int(f[1]) < int(p[1]),(f,p)
+          print({'prereg_commit':f[0],'preflight_commit':p[0]})
+          PY
+      - name: Run outcome-blind source schema and tree preflight
+        run: |
+          mkdir -p build/solanaceae_red_source_preflight_v0_1
+          python scripts/preflight_solanaceae_red_biochemical_source_v0_3.py \
+            --out-dir build/solanaceae_red_source_preflight_v0_1/source \
+            --receipt build/solanaceae_red_source_preflight_v0_1/receipt.json
+      - name: Enforce outcome firewall
+        run: |
+          python - <<'PY'
+          import json
+          x=json.load(open('build/solanaceae_red_source_preflight_v0_1/receipt.json'))
+          assert x['system']=='SOLANACEAE_RED_27'
+          assert x['paper1_science_changed'] is False
+          assert x['supplement']['outcome_columns_emitted'] is False
+          assert x['supplement']['outcome_data_rows_emitted'] is False
+          assert x['supplement']['identical_species_universe_across_candidate_tables'] is True
+          assert x['supplement']['species_identifier_table_count'] == 3
+          assert x['parsed_unique_species'] == x['reported_taxa_contract'] == 27
+          assert all(v is False for v in x['outcome_firewall'].values()), x['outcome_firewall']
+          assert x['status'] in {
+              'PASS_SOURCE_SCHEMA_TREE_CROSSWALK_SINGLE_ELIGIBLE_TREE',
+              'HOLD_TREE_OBJECT_AMBIGUOUS_OR_UNAVAILABLE',
+              'HOLD_NO_TREE_OBJECT_MEETS_FROZEN_CROSSWALK_AND_BRANCH_LENGTH_GATE',
+          }, x['status']
+          print({'status':x['status'],'species':x['parsed_unique_species'],
+                 'species_tables':x['supplement']['species_identifier_table_indices'],
+                 'tree_count':x['treebase']['retrieval']['nexml']['tree_count'] if x['treebase']['retrieval'].get('nexml') else 0,
+                 'eligible_tree_count':x['treebase']['eligible_tree_count']})
+          PY
+      - name: Confirm no profile outcome exists
+        run: |
+          test ! -e data/solanaceae_red_biochemical_resolution_profile_v0_1.json
+          test ! -e results/solanaceae_red_biochemical_resolution_profile_v0_1
+      - name: Confirm Camellia Paper 1 firewall
+        run: |
+          git diff --exit-code ${{ github.event.pull_request.base.sha }}...HEAD -- \
+            manuscript \
+            data/paper1_authoritative_results_v0_2_2.csv \
+            data/paper1_main_figure_manifest_v0_2_2.csv
+      - uses: actions/upload-artifact@v4
+        with:
+          name: solanaceae-red-biochemical-source-preflight-v0-1
+          path: build/solanaceae_red_source_preflight_v0_1
+          if-no-files-found: error
+          retention-days: 90
