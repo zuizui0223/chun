@@ -106,7 +106,7 @@ The next decisive test is accordingly predictive rather than descriptive. A seco
 
 # Data and code availability
 
-All analysis code, preregistration contracts, source manifests, frozen receipts, validation workflows, and machine-readable results are versioned in the `zuizui0223/chun` repository. The 51-clade source data and phylogenies are archived in Dryad (Sinnott-Armstrong et al., 2025). The Petunieae processed pigment data, phylogenetic inputs, and associated analysis resources are available through the Open Science Framework (Wheeler et al., 2023b), with the corresponding published study described by Wheeler et al. (2023a). The *Iris* source data and phylogenetic sampling are documented in Roguz et al. (2020) and its supplementary materials. A submission-specific CHUN code snapshot will be archived with a persistent identifier before submission.
+All analysis code, preregistration contracts, source manifests, frozen receipts, validation workflows, and machine-readable results are versioned in the `zuizui0223/chun` repository. The 51-clade source data and phylogenies are archived in Dryad at https://doi.org/10.5061/dryad.r4xgxd2sc (Sinnott-Armstrong et al., 2025). The Petunieae processed pigment data, phylogenetic inputs, and associated analysis resources are available through the Open Science Framework at https://osf.io/zg9cu/ (Wheeler et al., 2023b), with the corresponding published study described by Wheeler et al. (2023a). The *Iris* source data and phylogenetic sampling are documented in Roguz et al. (2020) and its supplementary materials. A submission-specific CHUN code snapshot will be archived with a persistent identifier before submission.
 
 # Author contributions
 
