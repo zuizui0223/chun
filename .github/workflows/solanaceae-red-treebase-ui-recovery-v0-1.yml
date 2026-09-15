@@ -6,6 +6,7 @@ on:
       - 'scripts/recover_solanaceae_red_treebase_ui_v0_1.py'
       - '.github/workflows/solanaceae-red-treebase-ui-recovery-v0-1.yml'
       - 'docs/SOLANACEAE_RED_TREEBASE_UI_RECOVERY_V0_1.md'
+      - 'data/solanaceae_red_treebase_ui_recovery_v0_1.json'
       - 'data/solanaceae_red_biochemical_resolution_profile_prereg_v0_1.json'
       - 'scripts/preflight_solanaceae_red_biochemical_source_v0_*.py'
   workflow_dispatch:
@@ -29,24 +30,20 @@ jobs:
           python scripts/recover_solanaceae_red_treebase_ui_v0_1.py \
             --out-dir build/solanaceae_red_treebase_ui_recovery_v0_1/source \
             --receipt build/solanaceae_red_treebase_ui_recovery_v0_1/receipt.json
-      - name: Enforce outcome firewall and source-only decision
+      - name: Enforce outcome firewall and frozen source-only decision
         run: |
           python - <<'PY'
           import json
           x=json.load(open('build/solanaceae_red_treebase_ui_recovery_v0_1/receipt.json'))
+          frozen=json.load(open('data/solanaceae_red_treebase_ui_recovery_v0_1.json'))
           assert x['system']=='SOLANACEAE_RED_27'
           assert x['study_id']=='S16617'
           assert x['substitute_tree_used'] is False
           assert x['profile_outcome_opened'] is False
           assert x['paper1_science_changed'] is False
           assert all(v is False for v in x['outcome_firewall'].values()), x['outcome_firewall']
-          assert x['status'] in {
-              'PASS_TREEBASE_UI_RECOVERED_SINGLE_ELIGIBLE_SOURCE_TREE',
-              'HOLD_TREEBASE_WEB_UI_STUDY_UNAVAILABLE',
-              'HOLD_TREEBASE_WEB_UI_HAS_NO_DISCOVERABLE_TREE_OBJECT',
-              'HOLD_NO_RECOVERED_TREE_OBJECT_MEETS_FROZEN_GATE',
-              'HOLD_MULTIPLE_RECOVERED_TREE_OBJECTS_MEET_FROZEN_GATE',
-          }, x['status']
+          for key in ['status','source_identity_supported_by_ui','discovered_tree_object_ids','recovered_tree_object_count','eligible_tree_count','species_identifier_count','substitute_tree_used','profile_outcome_opened','outcome_firewall','paper1_science_changed']:
+              assert x[key] == frozen[key], (key, x[key], frozen[key])
           print({k:x[k] for k in ['status','source_identity_supported_by_ui','discovered_tree_object_ids','recovered_tree_object_count','eligible_tree_count']})
           PY
       - name: Confirm no Solanaceae profile outcome exists
