@@ -1,0 +1,67 @@
+name: Rhododendron30 source access recheck v0.2
+
+on:
+  pull_request:
+    paths:
+      - 'scripts/recheck_rhododendron30_source_access_v0_2.py'
+      - 'scripts/run_rhododendron30_source_preflight_v0_1.py'
+      - '.github/workflows/rhododendron30-source-access-recheck-v0-2.yml'
+      - 'docs/RHODODENDRON30_SOURCE_ACCESS_RECHECK_V0_2.md'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  recheck:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install tree parser
+        run: python -m pip install --disable-pip-version-check biopython
+      - name: Confirm chemistry outcome remains absent before source recheck
+        run: test ! -e results/rhododendron30_biochemical_resolution_profile_v0_1
+      - name: Recheck exact Table S3 and primary Dryad tree under frozen routes
+        run: |
+          python scripts/recheck_rhododendron30_source_access_v0_2.py \
+            --out build/rhododendron30_source_access_recheck_v0_2.json
+      - name: Enforce source-only firewall
+        run: |
+          python - <<'PY'
+          import json
+          x=json.load(open('build/rhododendron30_source_access_recheck_v0_2.json'))
+          assert x['status'] in {
+            'SOURCE_ACCESS_AND_CROSSWALK_PASS_CHEMISTRY_STILL_UNOPENED',
+            'HOLD_SOURCE_ACCESS_STILL_BLOCKED_OUTCOMES_UNOPENED',
+          }, x['status']
+          assert x['primary_tree']['file_id']==1853438
+          assert x['primary_tree']['digest_api']=='784011d0e2e17df9ea21eb22d31197bad29219a37ac213fda013766e29b51362'
+          assert x['crosswalk']['automatic_synonym_substitution'] is False
+          assert x['chemistry_opened'] is False
+          assert x['profile_auc_computed'] is False
+          assert x['paper1_science_changed'] is False
+          assert all(v is False for v in x['outcome_firewall'].values()), x['outcome_firewall']
+          print({k:x[k] for k in ['status','legacy_preflight_status','trait_species_count','decision']})
+          print(x['primary_tree'])
+          PY
+      - name: Confirm Camellia Paper 1 firewall
+        run: |
+          git diff --exit-code ${{ github.event.pull_request.base.sha }}...HEAD -- \
+            manuscript/PAPER1_AJB_MANUSCRIPT_V0_2.md \
+            data/paper1_authoritative_results_v0_2_2.csv \
+            data/paper1_main_figure_manifest_v0_2_2.csv
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: rhododendron30-source-access-recheck-v0-2
+          path: |
+            build/rhododendron30_source_access_recheck_v0_2.json
+            build/rhododendron30_source_preflight_v0_1.json
+            build/1_WP_RAxML.tre
+          if-no-files-found: warn
+          retention-days: 90
