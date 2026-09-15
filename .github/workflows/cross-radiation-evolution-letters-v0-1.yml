@@ -5,7 +5,9 @@ on:
     paths:
       - 'manuscript/CROSS_RADIATION_EVOLUTION_LETTERS_V0_1.md'
       - 'data/cross_radiation_evolution_letters_claim_registry_v0_1.json'
+      - 'data/cross_radiation_evolution_letters_figure_manifest_v0_1.csv'
       - 'scripts/validate_cross_radiation_evolution_letters_v0_1.py'
+      - 'scripts/build_cross_radiation_evolution_letters_figures_v0_1.py'
       - '.github/workflows/cross-radiation-evolution-letters-v0-1.yml'
   workflow_dispatch:
 
@@ -22,8 +24,25 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
+      - name: Install figure runtime
+        run: python -m pip install --disable-pip-version-check matplotlib pandas numpy
       - name: Validate manuscript claims and Evolution Letters length gates
         run: python scripts/validate_cross_radiation_evolution_letters_v0_1.py
+      - name: Build authoritative-result figures
+        run: python scripts/build_cross_radiation_evolution_letters_figures_v0_1.py --out-dir build/cross_radiation_el_v0_1
+      - name: Validate figure manifest outputs
+        run: |
+          python - <<'PY'
+          import csv,pathlib
+          rows=list(csv.DictReader(open('data/cross_radiation_evolution_letters_figure_manifest_v0_1.csv')))
+          assert len(rows)==5
+          root=pathlib.Path('build/cross_radiation_el_v0_1')
+          names=['fig1_iris_profile.png','fig2_visible_clades_profiles.png','fig3_tree_moderators.png','fig4_petunieae_profile.png','fig5_representation_training.png']
+          for name in names:
+              p=root/name
+              assert p.is_file() and p.stat().st_size>5000,(name,p.stat().st_size if p.exists() else None)
+          print({'figure_count':len(names),'status':'FIGURE_MANIFEST_VALID'})
+          PY
       - name: Confirm Camellia Paper 1 science firewall
         if: github.event_name == 'pull_request'
         run: |
@@ -31,3 +50,10 @@ jobs:
             manuscript/PAPER1_AJB_MANUSCRIPT_V0_2.md \
             data/paper1_authoritative_results_v0_2_2.csv \
             data/paper1_main_figure_manifest_v0_2_2.csv
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: cross-radiation-evolution-letters-v0-1
+          path: build/cross_radiation_el_v0_1/*.png
+          if-no-files-found: error
+          retention-days: 90
