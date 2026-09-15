@@ -1,0 +1,48 @@
+name: Cross-radiation Evolution Letters manuscript v0.2
+
+on:
+  pull_request:
+    paths:
+      - 'manuscript/CROSS_RADIATION_EVOLUTION_LETTERS_V0_2.md'
+      - 'data/cross_radiation_el_reference_manifest_v0_1.json'
+      - 'scripts/validate_cross_radiation_evolution_letters_v0_2.py'
+      - '.github/workflows/cross-radiation-evolution-letters-v0-2.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install figure runtime
+        run: python -m pip install --disable-pip-version-check matplotlib pandas numpy
+      - name: Validate manuscript, references, and Evolution Letters gates
+        run: python scripts/validate_cross_radiation_evolution_letters_v0_2.py
+      - name: Rebuild authoritative-result figures
+        run: python scripts/build_cross_radiation_evolution_letters_figures_v0_1.py --out-dir build/cross_radiation_el_v0_2
+      - name: Validate figure outputs
+        run: |
+          test $(find build/cross_radiation_el_v0_2 -maxdepth 1 -name 'fig*.png' -type f | wc -l) -eq 5
+          find build/cross_radiation_el_v0_2 -maxdepth 1 -name 'fig*.png' -type f -size +5000c | wc -l | grep -qx 5
+      - name: Confirm Camellia Paper 1 science firewall
+        if: github.event_name == 'pull_request'
+        run: |
+          git diff --exit-code ${{ github.event.pull_request.base.sha }}...HEAD -- \
+            manuscript/PAPER1_AJB_MANUSCRIPT_V0_2.md \
+            data/paper1_authoritative_results_v0_2_2.csv \
+            data/paper1_main_figure_manifest_v0_2_2.csv
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: cross-radiation-evolution-letters-v0-2
+          path: build/cross_radiation_el_v0_2/*.png
+          if-no-files-found: warn
+          retention-days: 90
