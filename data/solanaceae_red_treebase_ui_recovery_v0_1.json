@@ -1,0 +1,27 @@
+{
+  "version": "v0.1",
+  "system": "SOLANACEAE_RED_27",
+  "study_id": "S16617",
+  "status": "HOLD_TREEBASE_WEB_UI_STUDY_UNAVAILABLE",
+  "source_identity_supported_by_ui": false,
+  "discovered_tree_object_ids": [],
+  "recovered_tree_object_count": 0,
+  "eligible_tree_count": 0,
+  "species_identifier_count": 27,
+  "substitute_tree_used": false,
+  "profile_outcome_opened": false,
+  "outcome_firewall": {
+    "pigment_values_emitted": false,
+    "pigment_states_computed": false,
+    "state_frequencies_computed": false,
+    "patristic_distances_computed": false,
+    "profile_auc_computed": false,
+    "permutations_computed": false,
+    "winner_class_computed": false
+  },
+  "source_run": 34949501087,
+  "artifact_id": 10388583154,
+  "decision": "STOP_HOLD_NO_SOURCE_FAITHFUL_TREE_OBJECT_RECOVERED",
+  "reopen_only_if": "TreeBASE S16617 itself or an author-deposited machine-readable object demonstrably identical to S16617 becomes publicly recoverable; no substitute phylogeny or digitized Figure S1 tree is allowed.",
+  "paper1_science_changed": false
+}

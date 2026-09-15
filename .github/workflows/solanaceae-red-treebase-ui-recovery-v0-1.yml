@@ -1,0 +1,63 @@
+name: Solanaceae red TreeBASE UI recovery v0.1
+
+on:
+  pull_request:
+    paths:
+      - 'scripts/recover_solanaceae_red_treebase_ui_v0_1.py'
+      - '.github/workflows/solanaceae-red-treebase-ui-recovery-v0-1.yml'
+      - 'docs/SOLANACEAE_RED_TREEBASE_UI_RECOVERY_V0_1.md'
+      - 'data/solanaceae_red_treebase_ui_recovery_v0_1.json'
+      - 'data/solanaceae_red_biochemical_resolution_profile_prereg_v0_1.json'
+      - 'scripts/preflight_solanaceae_red_biochemical_source_v0_*.py'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  recover:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Recover only source-faithful TreeBASE S16617 objects
+        run: |
+          mkdir -p build/solanaceae_red_treebase_ui_recovery_v0_1
+          python scripts/recover_solanaceae_red_treebase_ui_v0_1.py \
+            --out-dir build/solanaceae_red_treebase_ui_recovery_v0_1/source \
+            --receipt build/solanaceae_red_treebase_ui_recovery_v0_1/receipt.json
+      - name: Enforce outcome firewall and frozen source-only decision
+        run: |
+          python - <<'PY'
+          import json
+          x=json.load(open('build/solanaceae_red_treebase_ui_recovery_v0_1/receipt.json'))
+          frozen=json.load(open('data/solanaceae_red_treebase_ui_recovery_v0_1.json'))
+          assert x['system']=='SOLANACEAE_RED_27'
+          assert x['study_id']=='S16617'
+          assert x['substitute_tree_used'] is False
+          assert x['profile_outcome_opened'] is False
+          assert x['paper1_science_changed'] is False
+          assert all(v is False for v in x['outcome_firewall'].values()), x['outcome_firewall']
+          for key in ['status','source_identity_supported_by_ui','discovered_tree_object_ids','recovered_tree_object_count','eligible_tree_count','species_identifier_count','substitute_tree_used','profile_outcome_opened','outcome_firewall','paper1_science_changed']:
+              assert x[key] == frozen[key], (key, x[key], frozen[key])
+          print({k:x[k] for k in ['status','source_identity_supported_by_ui','discovered_tree_object_ids','recovered_tree_object_count','eligible_tree_count']})
+          PY
+      - name: Confirm no Solanaceae profile outcome exists
+        run: |
+          test ! -e data/solanaceae_red_biochemical_resolution_profile_v0_1.json
+          test ! -e results/solanaceae_red_biochemical_resolution_profile_v0_1
+      - name: Confirm Camellia Paper 1 firewall
+        run: |
+          git diff --exit-code ${{ github.event.pull_request.base.sha }}...HEAD -- \
+            manuscript \
+            data/paper1_authoritative_results_v0_2_2.csv \
+            data/paper1_main_figure_manifest_v0_2_2.csv
+      - uses: actions/upload-artifact@v4
+        with:
+          name: solanaceae-red-treebase-ui-recovery-v0-1
+          path: build/solanaceae_red_treebase_ui_recovery_v0_1
+          retention-days: 90
