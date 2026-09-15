@@ -1,0 +1,53 @@
+name: Solanaceae red biochemical source preflight v0.1
+
+on:
+  pull_request:
+    paths:
+      - 'data/solanaceae_red_biochemical_resolution_profile_prereg_v0_1.json'
+      - 'scripts/preflight_solanaceae_red_biochemical_profile_v0_1.py'
+      - '.github/workflows/solanaceae-red-biochemical-profile-preflight-v0-1.yml'
+      - 'docs/SOLANACEAE_RED_BIOCHEMICAL_PROFILE_PREFLIGHT_V0_1.md'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  preflight:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Run source/schema/tree preflight without pigment outcomes
+        run: |
+          python scripts/preflight_solanaceae_red_biochemical_profile_v0_1.py \
+            --out build/solanaceae_red_biochemical_profile_preflight_v0_1.json
+      - name: Enforce outcome firewall
+        run: |
+          python - <<'PY'
+          import json
+          x=json.load(open('build/solanaceae_red_biochemical_profile_preflight_v0_1.json'))
+          f=x['outcome_firewall']
+          assert all(v is False for v in f.values()), f
+          assert x['paper1_science_changed'] is False
+          print(json.dumps({'status':x.get('status'),'crosswalk':x.get('crosswalk',{}),'tree_selection':x.get('tree_selection_rule_result')},indent=2))
+          PY
+      - name: Confirm Paper 1 science firewall
+        run: |
+          BASE='${{ github.event.pull_request.base.sha }}'
+          if [ -n "$BASE" ]; then
+            git diff --exit-code "$BASE"...HEAD -- manuscript data/paper1_authoritative_results_v0_2_2.csv data/paper1_main_figure_manifest_v0_2_2.csv || {
+              echo 'Paper 1 science/manuscript changed unexpectedly' >&2
+              exit 1
+            }
+          fi
+      - uses: actions/upload-artifact@v4
+        with:
+          name: solanaceae-red-biochemical-profile-preflight-v0-1
+          path: build/solanaceae_red_biochemical_profile_preflight_v0_1.json
+          if-no-files-found: error
+          retention-days: 90
