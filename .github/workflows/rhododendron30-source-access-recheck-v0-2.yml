@@ -5,6 +5,7 @@ on:
     paths:
       - 'scripts/recheck_rhododendron30_source_access_v0_2.py'
       - 'scripts/run_rhododendron30_source_preflight_v0_1.py'
+      - 'data/rhododendron30_source_access_recheck_v0_2.json'
       - '.github/workflows/rhododendron30-source-access-recheck-v0-2.yml'
       - 'docs/RHODODENDRON30_SOURCE_ACCESS_RECHECK_V0_2.md'
   workflow_dispatch:
@@ -30,11 +31,12 @@ jobs:
         run: |
           python scripts/recheck_rhododendron30_source_access_v0_2.py \
             --out build/rhododendron30_source_access_recheck_v0_2.json
-      - name: Enforce source-only firewall
+      - name: Enforce source-only firewall and frozen HOLD
         run: |
           python - <<'PY'
           import json
           x=json.load(open('build/rhododendron30_source_access_recheck_v0_2.json'))
+          f=json.load(open('data/rhododendron30_source_access_recheck_v0_2.json'))
           assert x['status'] in {
             'SOURCE_ACCESS_AND_CROSSWALK_PASS_CHEMISTRY_STILL_UNOPENED',
             'HOLD_SOURCE_ACCESS_STILL_BLOCKED_OUTCOMES_UNOPENED',
@@ -46,6 +48,19 @@ jobs:
           assert x['profile_auc_computed'] is False
           assert x['paper1_science_changed'] is False
           assert all(v is False for v in x['outcome_firewall'].values()), x['outcome_firewall']
+          # Deliberately fail if either blocked source becomes available so the HOLD must be reopened.
+          assert x['status']==f['status'], (x['status'],f['status'])
+          assert x['legacy_preflight_status']==f['legacy_preflight_status']
+          assert [q['http_status'] for q in x['trait_attempts']]==f['trait_source']['route_http_statuses']
+          assert x['trait_species_count']==f['trait_source']['species_identifiers_recovered']
+          t=x['primary_tree']; ft=f['primary_tree']
+          assert t['file_id']==ft['file_id']
+          assert t['public_route_http_status']==ft['public_route_http_status']
+          assert t['public_route_content_type']==ft['public_route_content_type']
+          assert t['downloaded_bytes']==ft['downloaded_bytes']
+          assert t['digest_match']==ft['digest_match']
+          assert t['treeish_payload']==ft['treeish_payload']
+          assert x['crosswalk']['exact_normalized_matches']==f['crosswalk_exact_matches']
           print({k:x[k] for k in ['status','legacy_preflight_status','trait_species_count','decision']})
           print(x['primary_tree'])
           PY
