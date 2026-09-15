@@ -31,16 +31,12 @@ jobs:
         run: |
           python scripts/recheck_rhododendron30_source_access_v0_2.py \
             --out build/rhododendron30_source_access_recheck_v0_2.json
-      - name: Enforce source-only firewall and frozen HOLD
+      - name: Enforce source-only firewall and semantic frozen HOLD
         run: |
           python - <<'PY'
           import json
           x=json.load(open('build/rhododendron30_source_access_recheck_v0_2.json'))
           f=json.load(open('data/rhododendron30_source_access_recheck_v0_2.json'))
-          assert x['status'] in {
-            'SOURCE_ACCESS_AND_CROSSWALK_PASS_CHEMISTRY_STILL_UNOPENED',
-            'HOLD_SOURCE_ACCESS_STILL_BLOCKED_OUTCOMES_UNOPENED',
-          }, x['status']
           assert x['primary_tree']['file_id']==1853438
           assert x['primary_tree']['digest_api']=='784011d0e2e17df9ea21eb22d31197bad29219a37ac213fda013766e29b51362'
           assert x['crosswalk']['automatic_synonym_substitution'] is False
@@ -48,21 +44,18 @@ jobs:
           assert x['profile_auc_computed'] is False
           assert x['paper1_science_changed'] is False
           assert all(v is False for v in x['outcome_firewall'].values()), x['outcome_firewall']
-          # Deliberately fail if either blocked source becomes available so the HOLD must be reopened.
-          assert x['status']==f['status'], (x['status'],f['status'])
-          assert x['legacy_preflight_status']==f['legacy_preflight_status']
-          assert [q['http_status'] for q in x['trait_attempts']]==f['trait_source']['route_http_statuses']
-          assert x['trait_species_count']==f['trait_source']['species_identifiers_recovered']
-          t=x['primary_tree']; ft=f['primary_tree']
-          assert t['file_id']==ft['file_id']
-          assert t['public_route_http_status']==ft['public_route_http_status']
-          assert t['public_route_content_type']==ft['public_route_content_type']
-          assert t['downloaded_bytes']==ft['downloaded_bytes']
-          assert t['digest_match']==ft['digest_match']
-          assert t['treeish_payload']==ft['treeish_payload']
-          assert x['crosswalk']['exact_normalized_matches']==f['crosswalk_exact_matches']
+          # Freeze the biological/source-availability meaning, not transient anti-bot HTML bytes.
+          # Fail deliberately if either required source becomes genuinely recoverable.
+          assert x['status']==f['status']=='HOLD_SOURCE_ACCESS_STILL_BLOCKED_OUTCOMES_UNOPENED'
+          assert x['legacy_preflight_status']==f['legacy_preflight_status']=='HOLD_TRAIT_SPECIES_SCHEMA_OR_ACCESS'
+          assert x['trait_species_count']==0
+          assert all(q['is_docx_payload'] is False for q in x['trait_attempts'])
+          t=x['primary_tree']
+          assert t['digest_match'] is not True
+          assert t['treeish_payload'] is False
+          assert x['crosswalk']['exact_normalized_matches']==0
           print({k:x[k] for k in ['status','legacy_preflight_status','trait_species_count','decision']})
-          print(x['primary_tree'])
+          print({'trait_http':[q['http_status'] for q in x['trait_attempts']], 'tree_http':t['public_route_http_status'], 'tree_bytes':t['downloaded_bytes'], 'tree_content_type':t['public_route_content_type']})
           PY
       - name: Confirm Camellia Paper 1 firewall
         run: |
