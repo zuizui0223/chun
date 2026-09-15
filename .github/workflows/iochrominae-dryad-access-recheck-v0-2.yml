@@ -1,0 +1,67 @@
+name: Iochrominae Dryad access recheck v0.2
+
+on:
+  pull_request:
+    paths:
+      - 'scripts/recheck_iochrominae_dryad_access_v0_2.py'
+      - 'scripts/preflight_iochrominae_biochemical_profile_source_v0_1.py'
+      - 'data/iochrominae_dryad_access_recheck_v0_2.json'
+      - '.github/workflows/iochrominae-dryad-access-recheck-v0-2.yml'
+      - 'docs/IOCHROMINAE_DRYAD_ACCESS_RECHECK_V0_2.md'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  recheck:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Recheck exact Dryad objects under unchanged anonymous routes
+        run: |
+          python scripts/recheck_iochrominae_dryad_access_v0_2.py \
+            --out build/iochrominae_dryad_access_recheck_v0_2.json
+      - name: Enforce source-only firewall and frozen HOLD
+        run: |
+          python - <<'PY'
+          import json
+          x=json.load(open('build/iochrominae_dryad_access_recheck_v0_2.json'))
+          frozen=json.load(open('data/iochrominae_dryad_access_recheck_v0_2.json'))
+          assert x['source_doi']=='10.5061/dryad.p5dq84v'
+          assert x['status'] in {
+            'SOURCE_BYTES_ACQUIRED_SCHEMA_INSPECTION_ALLOWED_PROFILE_UNCOMPUTED',
+            'HOLD_DRYAD_SOURCE_BYTES_STILL_UNAVAILABLE_PROFILE_UNCOMPUTED',
+          }
+          for k in ['archive_data_rows_opened','profile_state_mapping_frozen','profile_states_computed','patristic_distances_computed','profile_auc_computed','winner_computed','paper1_science_changed']:
+              assert x[k] is False, (k,x[k])
+          assert {v['file_id'] for v in x['objects'].values()} == {108456,108458}
+          # If transport later recovers, fail deliberately so this HOLD must be reopened.
+          assert x['status'] == frozen['status'], (x['status'], frozen['status'])
+          assert x['all_exact_objects_recovered'] == frozen['all_exact_objects_recovered']
+          assert x['api_file_download_http_statuses'] == frozen['api_file_download_http_statuses']
+          assert x['public_file_stream_http_statuses'] == frozen['public_file_stream_http_statuses']
+          for name, rec in x['objects'].items():
+              f=frozen['exact_objects'][name]
+              assert rec['file_id']==f['file_id']
+              assert rec['size']==f['size_bytes']
+              assert rec['digest_api']==f['digest']
+              assert rec['recovered']==f['recovered']
+          print({k:x[k] for k in ['status','all_exact_objects_recovered','api_file_download_http_statuses','public_file_stream_http_statuses']})
+          PY
+      - name: Confirm Camellia Paper 1 firewall
+        run: |
+          git diff --exit-code ${{ github.event.pull_request.base.sha }}...HEAD -- \
+            manuscript/PAPER1_AJB_MANUSCRIPT_V0_2.md \
+            data/paper1_authoritative_results_v0_2_2.csv \
+            data/paper1_main_figure_manifest_v0_2_2.csv
+      - uses: actions/upload-artifact@v4
+        with:
+          name: iochrominae-dryad-access-recheck-v0-2
+          path: build/iochrominae_dryad_access_recheck_v0_2.json
+          retention-days: 90

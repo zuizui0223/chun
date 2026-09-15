@@ -1,0 +1,36 @@
+{
+  "version": "v0.2",
+  "source_doi": "10.5061/dryad.p5dq84v",
+  "status": "HOLD_DRYAD_SOURCE_BYTES_STILL_UNAVAILABLE_PROFILE_UNCOMPUTED",
+  "exact_objects": {
+    "README_for_Larter et al 2019 Dvdy Iochrominae development evolution DATA.txt": {
+      "file_id": 108458,
+      "size_bytes": 4072,
+      "digest_type": "md5",
+      "digest": "2e4a251725ad4c13975fc09481da302d",
+      "recovered": false
+    },
+    "Larter et al 2019 Dvdy Iochrominae development evolution DATA.rar": {
+      "file_id": 108456,
+      "size_bytes": 3054999,
+      "digest_type": "md5",
+      "digest": "76b46e384fb7c9bf1ef3fbd7d1e5d2f0",
+      "recovered": false
+    }
+  },
+  "api_file_download_http_statuses": [401],
+  "public_file_stream_http_statuses": [403],
+  "all_exact_objects_recovered": false,
+  "archive_data_rows_opened": false,
+  "profile_state_mapping_frozen": false,
+  "profile_states_computed": false,
+  "patristic_distances_computed": false,
+  "profile_auc_computed": false,
+  "winner_computed": false,
+  "source_run": 34950215790,
+  "artifact_id": 10389032567,
+  "decision": "STOP_HOLD_ANONYMOUS_DRYAD_BYTES_REQUIRE_AUTHENTICATED_ACCESS",
+  "reopen_only_if": "Both exact Dryad objects become recoverable and match the frozen size and MD5 metadata, or an independently recovered copy can be proven byte-identical to those exact Dryad objects.",
+  "scientific_interpretation": "Transport/authentication hold only; not a biological negative and not a completed second biochemical exact-profile unit.",
+  "paper1_science_changed": false
+}
