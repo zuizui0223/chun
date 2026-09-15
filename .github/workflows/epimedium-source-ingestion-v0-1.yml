@@ -1,0 +1,28 @@
+name: Epimedium actual source ingestion v0.1
+on:
+  pull_request:
+    paths:
+      - 'scripts/ingest_epimedium_reproductive_source_v0_1.py'
+      - 'scripts/analyze_epimedium_organ_states_v0_1.py'
+      - 'tests/test_epimedium_source_ingestion_v0_1.py'
+      - '.github/workflows/epimedium-source-ingestion-v0-1.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  ingest:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Retrieve open source cells and checksum inventory
+        run: python scripts/ingest_epimedium_reproductive_source_v0_1.py --out build/epimedium-source-v0-1
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: epimedium-source-v0-1
+          path: build/epimedium-source-v0-1/
+          if-no-files-found: error
