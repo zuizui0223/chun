@@ -102,6 +102,6 @@ def main():
     for fn in (fig1,fig2,fig3,fig4,fig5): fn(a.out_dir)
     expected=[a.out_dir/f'fig{i}_{name}.png' for i,name in [(1,'iris_profile'),(2,'visible_clades_profiles'),(3,'tree_moderators'),(4,'petunieae_profile'),(5,'representation_training')]]
     assert all(p.is_file() and p.stat().st_size>5000 for p in expected)
-    print(json.dumps({'status':'CROSS_RADIATION_EL_FIGURES_BUILT','outputs':[str(p.relative_to(ROOT)) for p in expected]},indent=2))
+    print(json.dumps({'status':'CROSS_RADIATION_EL_FIGURES_BUILT','outputs':[str(p) for p in expected]},indent=2))
 
 if __name__=='__main__': main()
