@@ -1,0 +1,65 @@
+{
+  "version": "v0.1",
+  "status": "FROZEN_BEFORE_SOLANACEAE_RED_TABLES1_ROW_LEVEL_OUTCOME_OPENING",
+  "system": "SOLANACEAE_RED_27",
+  "programme_role": "CANDIDATE_SECOND_NONVISIBLE_EXACT_PROFILE_UNIT",
+  "prospective_label": "RETROSPECTIVE_STANDARDIZED_CROSS_REPRESENTATION_TRAINING_NOT_PROSPECTIVE",
+  "source": {
+    "primary_pigment_article_doi": "10.1093/aobpla/plw013",
+    "primary_pigment_pmcid": "PMC4804202",
+    "reported_taxa": 27,
+    "supplement_file": "supp_plw013_plw013supp_table1.docx",
+    "supplement_description": "Table S1 reports study species, relative proportions of pelargonidin-, cyanidin- and delphinidin-based anthocyanidins, carotenoid presence, spectral hue and provenance.",
+    "row_level_trait_values_opened_for_this_profile_before_freeze": false,
+    "tree_parent_article_doi": "10.1111/nph.13576",
+    "treebase_study_id": "S16617"
+  },
+  "tree_selection": {
+    "rule": "Use the branch-length tree object in TreeBASE S16617 that is unambiguously identified by source metadata as the final published Ng & Smith 2016 Solanaceae phylogeny consumed by the red-flower analysis. Prune to eligible Table S1 species only after identifier crosswalk. If more than one eligible tree object remains and metadata alone cannot select one, terminate HOLD before opening trait rows.",
+    "substitute_tree_allowed": false,
+    "outcome_based_tree_choice_allowed": false
+  },
+  "state_variables": {
+    "anthocyanidin_branches": ["PELARGONIDIN", "CYANIDIN", "DELPHINIDIN"],
+    "branch_order_by_hydroxylation": ["PELARGONIDIN", "CYANIDIN", "DELPHINIDIN"],
+    "carotenoid_variable": "SOURCE_REPORTED_PRESENCE_ABSENCE",
+    "anthocyanidin_presence_rule": "reported relative proportion > 0 is present; exact 0 is absent; missing/non-numeric is ineligible",
+    "carotenoid_presence_rule": "use source reported presence/absence only; unresolved values are ineligible"
+  },
+  "nested_representations": {
+    "coarse": "(ANY_ANTHOCYANIDIN_PRESENT, CAROTENOID_PRESENT)",
+    "intermediate": "(CAROTENOID_PRESENT, HIGHEST_HYDROXYLATION_BRANCH_PRESENT), where highest branch is DELPHINIDIN > CYANIDIN > PELARGONIDIN and NONE if no anthocyanidin branch is present",
+    "fine": "(CAROTENOID_PRESENT, PELARGONIDIN_PRESENT, CYANIDIN_PRESENT, DELPHINIDIN_PRESENT)",
+    "nesting_contract": "fine deterministically maps to intermediate by highest present anthocyanidin branch and to coarse by any anthocyanidin presence; intermediate deterministically maps to coarse by NONE versus non-NONE plus the retained carotenoid bit"
+  },
+  "primary_frame": {
+    "identifier_crosswalk": "exact normalized source binomial to exact normalized tree tip; no fuzzy name matching; synonym repair requires an explicit pre-outcome provenance record",
+    "rare_fine_state_rule": "exclude every fine state represented by fewer than 5 taxa, then use the resulting identical retained-tip frame at coarse, intermediate and fine resolution",
+    "minimum_retained_tips": 20,
+    "minimum_states_per_resolution": 2,
+    "hold_if_any_rule_fails": true
+  },
+  "primary_statistic": {
+    "distance": "patristic branch-length distance on the frozen pruned tree",
+    "response": "same-state versus different-state pair indicator separately at coarse, intermediate and fine resolution",
+    "score": "negative patristic distance ranked with average ties",
+    "metric": "ROC_AUC",
+    "permutations": 9999,
+    "seed": 20260915,
+    "signal_gate": "AUC > 0.5 and one-sided permutation p <= 0.05",
+    "unique_winner_gate": "highest AUC is signal-positive and winner-minus-runner-up > 0 with joint-permutation p <= 0.05",
+    "terminal_classes": [
+      "PROFILE_SIGNALLED_COARSE",
+      "PROFILE_SIGNALLED_INTERMEDIATE",
+      "PROFILE_SIGNALLED_FINE",
+      "PROFILE_SIGNALLED_TIED",
+      "PROFILE_NO_PHYLOGENETIC_SIGNAL",
+      "HOLD_INSUFFICIENT_COMMON_FRAME_OR_STATE_VARIATION",
+      "HOLD_TREE_OBJECT_AMBIGUOUS_OR_UNAVAILABLE",
+      "HOLD_SOURCE_ACCESS"
+    ]
+  },
+  "claim_boundary": "This is a retrospective standardized exact-profile candidate, not a prospective replication. The analysis tests whether a source-defined non-visible pigment representation has a coarse/intermediate/fine phylogenetic same-state profile under the same estimator family used by the current CHUN resolution programme. It does not test adaptive causality, transition rates, universal biochemical-to-fine behavior or exact molecular mechanism.",
+  "post_hoc_rescue_allowed": false,
+  "paper1_science_changed": false
+}
