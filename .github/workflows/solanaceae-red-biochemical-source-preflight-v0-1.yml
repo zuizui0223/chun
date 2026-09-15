@@ -7,6 +7,7 @@ on:
       - 'docs/SOLANACEAE_RED_BIOCHEMICAL_RESOLUTION_PROFILE_PREREG_V0_1.md'
       - 'scripts/preflight_solanaceae_red_biochemical_source_v0_1.py'
       - 'scripts/preflight_solanaceae_red_biochemical_source_v0_2.py'
+      - 'scripts/preflight_solanaceae_red_biochemical_source_v0_3.py'
       - '.github/workflows/solanaceae-red-biochemical-source-preflight-v0-1.yml'
   workflow_dispatch:
 
@@ -28,7 +29,7 @@ jobs:
         run: |
           test -s data/solanaceae_red_biochemical_resolution_profile_prereg_v0_1.json
           freeze=$(git log --format='%H %ct' --reverse -- data/solanaceae_red_biochemical_resolution_profile_prereg_v0_1.json | head -1)
-          preflight=$(git log --format='%H %ct' --reverse -- scripts/preflight_solanaceae_red_biochemical_source_v0_2.py | head -1)
+          preflight=$(git log --format='%H %ct' --reverse -- scripts/preflight_solanaceae_red_biochemical_source_v0_3.py | head -1)
           python - "$freeze" "$preflight" <<'PY'
           import sys
           f=sys.argv[1].split(); p=sys.argv[2].split()
@@ -39,7 +40,7 @@ jobs:
       - name: Run outcome-blind source schema and tree preflight
         run: |
           mkdir -p build/solanaceae_red_source_preflight_v0_1
-          python scripts/preflight_solanaceae_red_biochemical_source_v0_2.py \
+          python scripts/preflight_solanaceae_red_biochemical_source_v0_3.py \
             --out-dir build/solanaceae_red_source_preflight_v0_1/source \
             --receipt build/solanaceae_red_source_preflight_v0_1/receipt.json
       - name: Enforce outcome firewall
@@ -50,14 +51,18 @@ jobs:
           assert x['system']=='SOLANACEAE_RED_27'
           assert x['paper1_science_changed'] is False
           assert x['supplement']['outcome_columns_emitted'] is False
+          assert x['supplement']['outcome_data_rows_emitted'] is False
+          assert x['supplement']['identical_species_universe_across_candidate_tables'] is True
+          assert x['supplement']['species_identifier_table_count'] == 3
+          assert x['parsed_unique_species'] == x['reported_taxa_contract'] == 27
           assert all(v is False for v in x['outcome_firewall'].values()), x['outcome_firewall']
-          assert x['parsed_unique_species'] >= 20
           assert x['status'] in {
               'PASS_SOURCE_SCHEMA_TREE_CROSSWALK_SINGLE_ELIGIBLE_TREE',
               'HOLD_TREE_OBJECT_AMBIGUOUS_OR_UNAVAILABLE',
               'HOLD_NO_TREE_OBJECT_MEETS_FROZEN_CROSSWALK_AND_BRANCH_LENGTH_GATE',
           }, x['status']
           print({'status':x['status'],'species':x['parsed_unique_species'],
+                 'species_tables':x['supplement']['species_identifier_table_indices'],
                  'tree_count':x['treebase']['retrieval']['nexml']['tree_count'] if x['treebase']['retrieval'].get('nexml') else 0,
                  'eligible_tree_count':x['treebase']['eligible_tree_count']})
           PY
