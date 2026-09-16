@@ -28,7 +28,7 @@ class SolanaceaeRedBiochemicalProfileTests(unittest.TestCase):
             self.assertTrue(mod.parse_carotenoid_presence(token), token)
         for token in ["absent", "Absent", "no", "N", "0", "-"]:
             self.assertFalse(mod.parse_carotenoid_presence(token), token)
-        for token in ["", "NA", "unknown", "trace", "+/-"]:
+        for token in ["", "NA", "unknown", "trace", "+/-", "no data"]:
             self.assertIsNone(mod.parse_carotenoid_presence(token), token)
 
     def test_nested_state_codes_follow_frozen_hierarchy(self):
@@ -57,16 +57,34 @@ class SolanaceaeRedBiochemicalProfileTests(unittest.TestCase):
 
     def test_header_block_extends_below_species_header_until_first_data_row(self):
         rows = [
-            ["Species", "Anthocyanidin proportion", "", "", "Carotenoid presence"],
-            ["", "Pelargonidin", "Cyanidin", "Delphinidin", ""],
-            ["Brugmansia sanguinea", "10", "20", "70", "present"],
+            ["Species", "Anthocyanidin proportion"],
+            ["", "Pelargonidin", "Cyanidin-based", "Delphinidin-based"],
+            ["", "", "Cyanidin", "Peonidin", "Delphinidn", "Petunidin", "Malvidin"],
+            ["Brugmansia sanguinea", "10", "20", "5", "30", "15", "20"],
         ]
         headers = mod.header_rows_before_species_data(rows, species_column_index=0)
-        self.assertEqual(headers, rows[:2])
+        self.assertEqual(headers, rows[:3])
+
+    def test_source_table_roles_are_inferred_from_frozen_headers(self):
+        anth = [
+            ["Species", "Anthocyanidin (proportion)"],
+            ["", "Pelargonidin", "Cyanidin-based", "Delphinidin-based"],
+            ["", "", "Cyanidin", "Peonidin", "Delphinidn", "Petunidin", "Malvidin"],
+        ]
+        carot = [["Species", "Carotenoids", "Polymorphic", "Flower part measured", "λRmid"]]
+        provenance = [["Species", "Source", "Voucher/Accession number"]]
+        self.assertEqual(mod.classify_source_table(anth), "anthocyanidin")
+        self.assertEqual(mod.classify_source_table(carot), "carotenoid")
+        self.assertEqual(mod.classify_source_table(provenance), "provenance")
+
+    def test_source_defined_anthocyanidin_branches_aggregate_subcompounds(self):
+        row = ["Brugmansia sanguinea", "10", "20", "5", "30", "15", "20"]
         self.assertEqual(
-            mod.required_column_map(headers, species_column_index=0),
-            {"species": 0, "pelargonidin": 1, "cyanidin": 2, "delphinidin": 3, "carotenoid": 4},
+            mod.aggregate_anthocyanidin_branches(row),
+            {"pelargonidin": 10.0, "cyanidin": 25.0, "delphinidin": 65.0},
         )
+        bad = ["Brugmansia sanguinea", "10", "20", "NA", "30", "15", "20"]
+        self.assertIsNone(mod.aggregate_anthocyanidin_branches(bad))
 
     def test_terminal_classification_matches_frozen_unique_winner_gate(self):
         self.assertEqual(
