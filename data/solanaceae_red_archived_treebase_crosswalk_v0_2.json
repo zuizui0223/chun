@@ -1,0 +1,200 @@
+{
+  "crosswalk": {
+    "exact_match_count": 25,
+    "exact_matches": [
+      {
+        "normalized": "brugmansia_sanguinea",
+        "source": "Brugmansia sanguinea",
+        "tree_tip": "Brugmansia_sanguinea"
+      },
+      {
+        "normalized": "brugmansia_vulcanicola",
+        "source": "Brugmansia vulcanicola",
+        "tree_tip": "Brugmansia_vulcanicola"
+      },
+      {
+        "normalized": "calibrachoa_parviflora",
+        "source": "Calibrachoa parviflora",
+        "tree_tip": "Calibrachoa_parviflora"
+      },
+      {
+        "normalized": "cestrum_elegans",
+        "source": "Cestrum elegans",
+        "tree_tip": "Cestrum_elegans"
+      },
+      {
+        "normalized": "cestrum_endlicheri",
+        "source": "Cestrum endlicheri",
+        "tree_tip": "Cestrum_endlicheri"
+      },
+      {
+        "normalized": "cestrum_fasciculatum",
+        "source": "Cestrum fasciculatum",
+        "tree_tip": "Cestrum_fasciculatum"
+      },
+      {
+        "normalized": "cestrum_milciomejiae",
+        "source": "Cestrum milciomejiae",
+        "tree_tip": "Cestrum_milciomejiae"
+      },
+      {
+        "normalized": "cestrum_parqui",
+        "source": "Cestrum parqui",
+        "tree_tip": "Cestrum_parqui"
+      },
+      {
+        "normalized": "cestrum_roseum",
+        "source": "Cestrum roseum",
+        "tree_tip": "Cestrum_roseum"
+      },
+      {
+        "normalized": "iochroma_edule",
+        "source": "Iochroma edule",
+        "tree_tip": "Iochroma_edule"
+      },
+      {
+        "normalized": "iochroma_fuchsioides",
+        "source": "Iochroma fuchsioides",
+        "tree_tip": "Iochroma_fuchsioides"
+      },
+      {
+        "normalized": "iochroma_gesnerioides",
+        "source": "Iochroma gesnerioides",
+        "tree_tip": "Iochroma_gesnerioides"
+      },
+      {
+        "normalized": "juanulloa_mexicana",
+        "source": "Juanulloa mexicana",
+        "tree_tip": "Juanulloa_mexicana"
+      },
+      {
+        "normalized": "juanulloa_ochracea",
+        "source": "Juanulloa ochracea",
+        "tree_tip": "Juanulloa_ochracea"
+      },
+      {
+        "normalized": "juanulloa_speciosa",
+        "source": "Juanulloa speciosa",
+        "tree_tip": "Juanulloa_speciosa"
+      },
+      {
+        "normalized": "nicotiana_forgetiana",
+        "source": "Nicotiana forgetiana",
+        "tree_tip": "Nicotiana_forgetiana"
+      },
+      {
+        "normalized": "nicotiana_glauca",
+        "source": "Nicotiana glauca",
+        "tree_tip": "Nicotiana_glauca"
+      },
+      {
+        "normalized": "nicotiana_otophora",
+        "source": "Nicotiana otophora",
+        "tree_tip": "Nicotiana_otophora"
+      },
+      {
+        "normalized": "nicotiana_rastroensis",
+        "source": "Nicotiana rastroensis",
+        "tree_tip": "Nicotiana_rastroensis"
+      },
+      {
+        "normalized": "nicotiana_tomentosa",
+        "source": "Nicotiana tomentosa",
+        "tree_tip": "Nicotiana_tomentosa"
+      },
+      {
+        "normalized": "petunia_exserta",
+        "source": "Petunia exserta",
+        "tree_tip": "Petunia_exserta"
+      },
+      {
+        "normalized": "plowmania_nyctaginoides",
+        "source": "Plowmania nyctaginoides",
+        "tree_tip": "Plowmania_nyctaginoides"
+      },
+      {
+        "normalized": "salpiglossis_sinuata",
+        "source": "Salpiglossis sinuata",
+        "tree_tip": "Salpiglossis_sinuata"
+      },
+      {
+        "normalized": "schizanthus_grahamii",
+        "source": "Schizanthus grahamii",
+        "tree_tip": "Schizanthus_grahamii"
+      },
+      {
+        "normalized": "streptosolen_jamesonii",
+        "source": "Streptosolen jamesonii",
+        "tree_tip": "Streptosolen_jamesonii"
+      }
+    ],
+    "fuzzy_or_synonym_repair_used": false,
+    "source_unmatched": [
+      "Cestrum newelli",
+      "Cestrum sp"
+    ]
+  },
+  "frozen_gate": {
+    "automatic_synonym_or_fuzzy_repair_allowed": false,
+    "exact_match_count": 25,
+    "minimum_exact_matches": 20
+  },
+  "next_gate": "After this source/tree crosswalk receipt is frozen on main, a separate outcome execution may open Table S1 pigment values and apply the already-preregistered common-frame/AUC/permutation estimator.",
+  "outcome_firewall": {
+    "patristic_distances_computed": false,
+    "permutations_computed": false,
+    "pigment_states_computed": false,
+    "pigment_values_emitted": false,
+    "profile_auc_computed": false,
+    "state_frequencies_computed": false,
+    "winner_class_computed": false
+  },
+  "paper1_science_changed": false,
+  "profile_outcome_opened": false,
+  "source_identity": {
+    "independent_study_path": "studies/S16617.xml",
+    "independent_study_sha256": "b0bdbee1722661cc30ed17a2ddea2c80ddea4c95a6d1731043cee1d0802584a1",
+    "independent_treebase_studies_commit": "e08d03e4d6a945bd2fa3d927d93bd45a89a6bc77",
+    "static_study_path": "studies/study_16617.html",
+    "static_study_sha256": "cdf93626f814f5f0b556dc6ef031b342b090aa0dc50bcb1a6147540fd79c682a",
+    "study_tree_links": [
+      "tree_85881.phy"
+    ],
+    "substitute_tree_used": false,
+    "supported": true,
+    "tree_label": "MLT",
+    "treebasestatic_file_add_commit": "c83783faaa86566015d90c52bf06d67f62bfb2c8",
+    "treebasestatic_repository_commit": "7adf8ff09557dc1d368d4b8f8e7848c98da7ad93",
+    "treebasestatic_tree_blob": "7d145c11d61b795d6939934368092fe12723529e"
+  },
+  "source_recovery_class": "ARCHIVED_TREEBASE_SERIALIZATION_RECOVERY_NOT_SUBSTITUTE_TREE",
+  "status": "PASS_ARCHIVED_TREEBASE_S16617_OBJECT_CROSSWALK_FROZEN",
+  "system": "SOLANACEAE_RED_27",
+  "trait_identifier_source": {
+    "acquisition": {
+      "member_bytes": 118778,
+      "member_sha256": "be5b7c75d52fef4714080938d638e31645ef5909c6b7a40ca1e8f2cadacebc2a",
+      "route": "europe_pmc",
+      "selected_member": "supp_plw013_plw013supp_table1.docx",
+      "selected_method": "europe_pmc_supplementaryFiles",
+      "selected_url": "https://www.ebi.ac.uk/europepmc/webservices/rest/PMC4804202/supplementaryFiles"
+    },
+    "outcome_columns_emitted": false,
+    "outcome_data_rows_emitted": false,
+    "supplement": "supp_plw013_plw013supp_table1.docx",
+    "supplement_sha256": "be5b7c75d52fef4714080938d638e31645ef5909c6b7a40ca1e8f2cadacebc2a",
+    "unique_species_identifiers": 27
+  },
+  "tree_object": {
+    "duplicate_normalized_tips": 0,
+    "expected_terminal_count_from_archived_study": 1344,
+    "filename": "tree_85881.phy",
+    "nonroot_branch_count": 2686,
+    "nonroot_branches_missing_length": 0,
+    "sha256": "5fcc6d72d7d8c78aee59c3c32b5b73567424d701281c5056fb0c5ac93fa0a249",
+    "terminal_count": 1344
+  },
+  "tree_parent_article_doi": "10.1111/nph.13576",
+  "treebase_study_id": "S16617",
+  "version": "v0.2"
+}
