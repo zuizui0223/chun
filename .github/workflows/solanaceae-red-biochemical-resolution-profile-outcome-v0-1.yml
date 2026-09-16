@@ -31,13 +31,13 @@ jobs:
       - name: Diagnose frozen Table S1 table structure
         run: |
           python - <<'PY'
+          import collections
           import importlib.util
           import json
           import tempfile
           from pathlib import Path
 
-          root = Path('.')
-          path = root / 'scripts/run_solanaceae_red_biochemical_resolution_profile_v0_1.py'
+          path = Path('scripts/run_solanaceae_red_biochemical_resolution_profile_v0_1.py')
           spec = importlib.util.spec_from_file_location('sol_outcome', path)
           mod = importlib.util.module_from_spec(spec)
           spec.loader.exec_module(mod)
@@ -55,7 +55,18 @@ jobs:
           for ti in identifiers['species_identifier_table_indices']:
               rows = mod.docx_table_rows(payload, ti)
               headers = mod.header_rows_before_species_data(rows, identifiers['selected_species_column_index'])
+              data = rows[len(headers):]
               print('candidate_table=', ti, 'header_rows=', headers)
+              print('candidate_table=', ti, 'data_row_width_counts=', dict(sorted(collections.Counter(len(r) for r in data).items())))
+              if ti == 0:
+                  for ci in range(1, 7):
+                      tokens = [r[ci].strip() if ci < len(r) else '' for r in data]
+                      parsed = [mod.parse_numeric_proportion(x) for x in tokens]
+                      print('anthocyanidin_col=', ci, 'numeric=', sum(x is not None for x in parsed), 'missing=', sum(x is None for x in parsed), 'non_numeric_tokens=', sorted(set(t for t, p in zip(tokens, parsed) if p is None)))
+              if ti == 1:
+                  tokens = [r[1].strip() if len(r) > 1 else '' for r in data]
+                  print('carotenoid_tokens=', dict(sorted(collections.Counter(tokens).items())))
+                  print('carotenoid_parsed=', {repr(k): mod.parse_carotenoid_presence(k) for k in sorted(set(tokens))})
           PY
       - name: Run frozen outcome analysis
         if: ${{ hashFiles('scripts/run_solanaceae_red_biochemical_resolution_profile_v0_1.py') != '' }}
