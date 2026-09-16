@@ -28,6 +28,35 @@ jobs:
         run: python -m pip install --disable-pip-version-check biopython==1.85 numpy==2.5.3 scipy==1.16.1
       - name: Unit tests
         run: python -m unittest tests/test_solanaceae_red_biochemical_resolution_profile_v0_1.py
+      - name: Diagnose frozen Table S1 table structure
+        run: |
+          python - <<'PY'
+          import importlib.util
+          import json
+          import tempfile
+          from pathlib import Path
+
+          root = Path('.')
+          path = root / 'scripts/run_solanaceae_red_biochemical_resolution_profile_v0_1.py'
+          spec = importlib.util.spec_from_file_location('sol_outcome', path)
+          mod = importlib.util.module_from_spec(spec)
+          spec.loader.exec_module(mod)
+          prereg = json.load(open(mod.PREREG))
+          preflight = mod.load_preflight_module()
+          with tempfile.TemporaryDirectory() as td:
+              payload, _ = preflight.v2.acquire_pmc_supplement(
+                  prereg['source']['primary_pigment_pmcid'],
+                  prereg['source']['supplement_file'],
+                  Path(td),
+              )
+          identifiers = preflight.inspect_docx_identifiers(payload, prereg['source']['supplement_file'])
+          print('species_identifier_table_indices=', identifiers['species_identifier_table_indices'])
+          print('table_structure=', identifiers['table_structure'])
+          for ti in identifiers['species_identifier_table_indices']:
+              rows = mod.docx_table_rows(payload, ti)
+              headers = mod.header_rows_before_species_data(rows, identifiers['selected_species_column_index'])
+              print('candidate_table=', ti, 'header_rows=', headers)
+          PY
       - name: Run frozen outcome analysis
         if: ${{ hashFiles('scripts/run_solanaceae_red_biochemical_resolution_profile_v0_1.py') != '' }}
         run: |
