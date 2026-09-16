@@ -102,6 +102,35 @@ def classify_gate(
     return "PASS_ARCHIVED_TREEBASE_S16617_OBJECT_CROSSWALK_FROZEN"
 
 
+def stable_acquisition_summary(acquisition: dict) -> dict:
+    for route in ("oa_package", "europe_pmc", "current_pmc_bin", "article_fallback"):
+        info = acquisition.get(route)
+        if not isinstance(info, dict) or not info.get("selected_method"):
+            continue
+        attempts = info.get("attempts", [])
+        member_record = next(
+            (
+                record
+                for record in reversed(attempts)
+                if isinstance(record, dict)
+                and record.get("sha256") == EXPECTED_SUPPLEMENT_SHA256
+                and record.get("is_docx") is True
+            ),
+            None,
+        )
+        if member_record is None:
+            raise RuntimeError("selected supplement route lacks the exact frozen DOCX member record")
+        return {
+            "route": route,
+            "selected_method": info.get("selected_method"),
+            "selected_url": info.get("selected_url") or info.get("selected_package_url"),
+            "selected_member": info.get("selected_member") or member_record.get("member"),
+            "member_bytes": member_record.get("bytes"),
+            "member_sha256": member_record.get("sha256"),
+        }
+    raise RuntimeError("no stable selected supplement acquisition route")
+
+
 def load_preflight_module():
     spec = importlib.util.spec_from_file_location("solanaceae_preflight_v03", PREFLIGHT)
     if spec is None or spec.loader is None:
@@ -175,6 +204,7 @@ def main() -> int:
         doc = preflight.inspect_docx_identifiers(docx, supplement_name)
     assert doc["docx_sha256"] == EXPECTED_SUPPLEMENT_SHA256
     assert doc["unique_normalized_species"] == 27
+    stable_acquisition = stable_acquisition_summary(acquisition)
 
     source_names = [x.replace("_", " ").title() for x in doc["normalized_species"]]
     source_names = [" ".join([p.split()[0].capitalize(), p.split()[1].lower()]) for p in source_names]
@@ -232,7 +262,7 @@ def main() -> int:
             "supplement": prereg["source"]["supplement_file"],
             "supplement_sha256": doc["docx_sha256"],
             "unique_species_identifiers": doc["unique_normalized_species"],
-            "acquisition_method": acquisition,
+            "acquisition": stable_acquisition,
             "outcome_columns_emitted": False,
             "outcome_data_rows_emitted": False,
         },
