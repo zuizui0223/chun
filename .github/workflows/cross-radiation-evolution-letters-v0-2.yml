@@ -5,6 +5,7 @@ on:
     paths:
       - 'manuscript/CROSS_RADIATION_EVOLUTION_LETTERS_V0_2.md'
       - 'data/cross_radiation_el_reference_manifest_v0_1.json'
+      - 'data/cross_radiation_evolution_letters_submission_gate_v0_2.json'
       - 'scripts/validate_cross_radiation_evolution_letters_v0_2.py'
       - '.github/workflows/cross-radiation-evolution-letters-v0-2.yml'
   workflow_dispatch:
@@ -24,14 +25,17 @@ jobs:
           python-version: '3.12'
       - name: Install figure runtime
         run: python -m pip install --disable-pip-version-check matplotlib pandas numpy
-      - name: Validate manuscript, references, and Evolution Letters gates
-        run: python scripts/validate_cross_radiation_evolution_letters_v0_2.py
+      - name: Validate manuscript, references, science receipts, and Evolution Letters gates
+        run: |
+          mkdir -p build/cross_radiation_el_v0_2
+          python scripts/validate_cross_radiation_evolution_letters_v0_2.py | tee build/cross_radiation_el_v0_2/validation.json
       - name: Rebuild authoritative-result figures
         run: python scripts/build_cross_radiation_evolution_letters_figures_v0_1.py --out-dir build/cross_radiation_el_v0_2
       - name: Validate figure outputs
         run: |
           test $(find build/cross_radiation_el_v0_2 -maxdepth 1 -name 'fig*.png' -type f | wc -l) -eq 5
           find build/cross_radiation_el_v0_2 -maxdepth 1 -name 'fig*.png' -type f -size +5000c | wc -l | grep -qx 5
+          test -s build/cross_radiation_el_v0_2/validation.json
       - name: Confirm Camellia Paper 1 science firewall
         if: github.event_name == 'pull_request'
         run: |
@@ -43,6 +47,6 @@ jobs:
         if: always()
         with:
           name: cross-radiation-evolution-letters-v0-2
-          path: build/cross_radiation_el_v0_2/*.png
+          path: build/cross_radiation_el_v0_2/*
           if-no-files-found: warn
           retention-days: 90
