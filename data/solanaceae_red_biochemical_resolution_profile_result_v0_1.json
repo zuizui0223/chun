@@ -1,0 +1,132 @@
+{
+  "do_not_count_as_new_prospective_replication": true,
+  "hold_reasons": [
+    "COMMON_TIPS_LT_20",
+    "COARSE_STATES_LT_2",
+    "INTERMEDIATE_STATES_LT_2",
+    "FINE_STATES_LT_2"
+  ],
+  "paper1_science_changed": false,
+  "permutations": 9999,
+  "post_hoc_rescue_allowed": false,
+  "primary_frame": {
+    "coarse_state_counts": {},
+    "crosswalk_matched_tips": 25,
+    "eligible_before_rare_filter": 24,
+    "eligible_tips": 0,
+    "fine_state_counts": {},
+    "fine_state_counts_before_filter": {
+      "C0_P0_C0_D1": 2,
+      "C0_P0_C1_D0": 2,
+      "C0_P0_C1_D1": 1,
+      "C0_P1_C0_D0": 1,
+      "C0_P1_C1_D0": 4,
+      "C1_P0_C0_D0": 2,
+      "C1_P0_C0_D1": 3,
+      "C1_P0_C1_D0": 4,
+      "C1_P0_C1_D1": 4,
+      "C1_P1_C0_D0": 1
+    },
+    "ineligible_after_outcome_opening": [
+      {
+        "carotenoid_token_if_unresolved": "no data",
+        "normalized": "schizanthus_grahamii",
+        "tree_tip": "Schizanthus_grahamii",
+        "unresolved_fields": [
+          "carotenoid"
+        ]
+      }
+    ],
+    "intermediate_state_counts": {},
+    "rare_fine_states_excluded": [
+      "C0_P0_C0_D1",
+      "C0_P0_C1_D0",
+      "C0_P0_C1_D1",
+      "C0_P1_C0_D0",
+      "C0_P1_C1_D0",
+      "C1_P0_C0_D0",
+      "C1_P0_C0_D1",
+      "C1_P0_C1_D0",
+      "C1_P0_C1_D1",
+      "C1_P1_C0_D0"
+    ]
+  },
+  "programme_role": "CANDIDATE_SECOND_NONVISIBLE_EXACT_PROFILE_UNIT",
+  "prospective_label": "RETROSPECTIVE_STANDARDIZED_CROSS_REPRESENTATION_TRAINING_NOT_PROSPECTIVE",
+  "resolution_profile_AUC_computed": false,
+  "schema": {
+    "anthocyanidin_branch_aggregation": {
+      "cyanidin": "Cyanidin + Peonidin",
+      "delphinidin": "Delphinidn + Petunidin + Malvidin",
+      "pelargonidin": "Pelargonidin"
+    },
+    "anthocyanidin_header_rows": [
+      [
+        "Species",
+        "Anthocyanidin (proportion)"
+      ],
+      [
+        "",
+        "Pelargonidin",
+        "Cyanidin-based",
+        "Delphinidin-based"
+      ],
+      [
+        "",
+        "",
+        "Cyanidin",
+        "Peonidin",
+        "Delphinidn",
+        "Petunidin",
+        "Malvidin"
+      ]
+    ],
+    "anthocyanidin_table_index": 0,
+    "carotenoid_header_rows": [
+      [
+        "Species",
+        "Carotenoids",
+        "Polymorphic",
+        "Flower part measured",
+        "\u03bbRmid"
+      ],
+      [
+        "",
+        "",
+        "in color",
+        "for reflectance",
+        ""
+      ]
+    ],
+    "carotenoid_table_index": 1,
+    "carotenoid_value_column": "Carotenoids",
+    "species_identifier_table_indices": [
+      0,
+      1,
+      2
+    ],
+    "species_join": "exact normalized source binomial across frozen same-universe tables"
+  },
+  "seed": 20260915,
+  "source": {
+    "crosswalk_exact_matches": 25,
+    "crosswalk_status": "PASS_ARCHIVED_TREEBASE_S16617_OBJECT_CROSSWALK_FROZEN",
+    "source_unmatched_before_outcome": [
+      "Cestrum newelli",
+      "Cestrum sp"
+    ],
+    "supplement_acquisition": {
+      "route": "europe_pmc",
+      "selected_member": "supp_plw013_plw013supp_table1.docx",
+      "selected_method": "europe_pmc_supplementaryFiles"
+    },
+    "supplement_sha256": "be5b7c75d52fef4714080938d638e31645ef5909c6b7a40ca1e8f2cadacebc2a",
+    "tree_object": "tree_85881.phy",
+    "tree_sha256": "5fcc6d72d7d8c78aee59c3c32b5b73567424d701281c5056fb0c5ac93fa0a249",
+    "treebase_study_id": "S16617"
+  },
+  "status": "SOLANACEAE_RED_BIOCHEMICAL_RESOLUTION_PROFILE_RESULT",
+  "terminal_class": "HOLD_INSUFFICIENT_COMMON_FRAME_OR_STATE_VARIATION",
+  "version": "v0.1",
+  "winner_computed": false
+}
