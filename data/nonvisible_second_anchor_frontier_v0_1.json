@@ -10,15 +10,34 @@
     "mixed_prospective_systems": ["IRIS"]
   },
   "representation_moderator_identifiable": false,
-  "identifiability_reason": "Only one completed biochemical exact-profile unit exists. In leave-one-out validation, holding out Petunieae leaves zero biochemical training observations, so a biochemical-versus-visible representation effect is not identified.",
+  "identifiability_reason": "Only one completed biochemical exact-profile unit exists. In leave-one-out validation, holding out Petunieae leaves zero biochemical training observations, so a biochemical-versus-visible representation effect is not identified. The executed Solanaceae candidate terminated at the frozen common-frame gate and therefore supplies no moderator outcome value.",
+  "closed_attempts": [
+    {
+      "system": "SOLANACEAE_RED_27",
+      "role": "CANDIDATE_SECOND_NONVISIBLE_EXACT_PROFILE_UNIT",
+      "source_tree_gate": "PASS_ARCHIVED_TREEBASE_S16617_OBJECT_CROSSWALK_FROZEN",
+      "status": "HOLD_INSUFFICIENT_COMMON_FRAME_OR_STATE_VARIATION",
+      "crosswalk_exact_matches": 25,
+      "eligible_before_rare_filter": 24,
+      "observed_fine_state_count": 10,
+      "maximum_observed_fine_state_support": 4,
+      "frozen_minimum_fine_state_support": 5,
+      "eligible_tips_after_rare_filter": 0,
+      "profile_auc_computed": false,
+      "winner_computed": false,
+      "post_hoc_rescue_allowed": false,
+      "counts_as_completed_biochemical_unit": false,
+      "reason": "All ten observed preregistered joint carotenoid × anthocyanidin-composition fine states had support 1–4, below the frozen minimum of 5, so the identical common frame collapsed to zero tips before AUC computation."
+    }
+  ],
   "candidate_frontier": [
     {
       "system": "IOCHROMINAE",
-      "role": "HIGHEST_LEVERAGE_SECOND_BIOCHEMICAL_ANCHOR",
-      "status": "HOLD_SOURCE_ACCESS_README_AND_ARCHIVE_PROFILE_UNCOMPUTED",
+      "role": "HIGHEST_LEVERAGE_SECOND_BIOCHEMICAL_ANCHOR_IF_SOURCE_BYTES_RECOVERABLE",
+      "status": "HOLD_DRYAD_SOURCE_BYTES_STILL_UNAVAILABLE_PROFILE_UNCOMPUTED",
       "source_doi": "10.5061/dryad.p5dq84v",
       "unlock": {
-        "preferred_single_input": "Dryad full-dataset download containing both the README and DATA.rar",
+        "preferred_single_input": "Authenticated recovery of the exact frozen Dryad README and DATA.rar bytes",
         "required_archive_name": "Larter et al 2019 Dvdy Iochrominae development evolution DATA.rar",
         "required_archive_file_id": 108456,
         "required_archive_size": 3054999,
@@ -32,14 +51,14 @@
     },
     {
       "system": "RUELLIA",
-      "status": "HOLD_AUTHORITATIVE_TREE_SOURCE_OUTCOMES_UNOPENED",
-      "reason": "The 2023 ddRAD ML phylogeny provenance is identified but the exact author-used timed tree object is not publicly recoverable; substitute trees are forbidden.",
+      "status": "HOLD_AUTHORITATIVE_2023_TREE_BYTES_OR_EXACT_RECONSTRUCTION_SOURCE_UNAVAILABLE_OUTCOMES_UNOPENED",
+      "reason": "The 2023 ddRAD ML phylogeny provenance is identified but the exact author-used timed tree object is not publicly recoverable; substitute or newly reconstructed trees are forbidden for the frozen source-faithful estimand.",
       "profile_auc_computed": false
     },
     {
       "system": "RHODODENDRON",
-      "status": "HOLD_SOURCE_ACCESS_OUTCOMES_UNOPENED",
-      "reason": "Nested biochemical hierarchy is frozen, but Table S3 species supplement and the frozen primary tree are blocked by source transport/access.",
+      "status": "HOLD_SOURCE_ACCESS_STILL_BLOCKED_OUTCOMES_UNOPENED",
+      "reason": "Nested biochemical hierarchy is frozen, but the Wiley chemistry supplement and exact Dryad primary-tree payload remain blocked by source transport/access; chemistry outcomes remain unopened.",
       "profile_auc_computed": false
     },
     {
@@ -55,7 +74,7 @@
       "profile_auc_computed": false
     }
   ],
-  "next_gate": "Complete one additional independent non-visible exact-profile unit before fitting a representation-type moderator.",
-  "candidate_hunting_policy": "Do not broaden open-endedly. Reopen only when a currently blocked authoritative source becomes available or a new source already satisfies the frozen exact-profile admission fields before outcome inspection.",
+  "next_gate": "Complete one additional independent non-visible exact-profile unit that survives its frozen common-frame/state-variation gate before fitting a representation-type moderator.",
+  "candidate_hunting_policy": "Do not broaden open-endedly. Reopen only when a currently blocked authoritative source becomes available or a new source already satisfies the frozen exact-profile admission fields before outcome inspection. Do not post-hoc rescue Solanaceae by weakening its support threshold or merging states after inspection.",
   "paper1_science_changed": false
 }
