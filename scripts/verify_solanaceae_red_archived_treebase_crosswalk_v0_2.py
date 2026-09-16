@@ -169,7 +169,7 @@ def main() -> int:
     with tempfile.TemporaryDirectory() as td:
         out_dir = Path(td)
         supplement_name = prereg["source"]["supplement_file"]
-        docx, acquisition = preflight.acquire_pmc_supplement(
+        docx, acquisition = preflight.v2.acquire_pmc_supplement(
             prereg["source"]["primary_pigment_pmcid"], supplement_name, out_dir
         )
         doc = preflight.inspect_docx_identifiers(docx, supplement_name)
@@ -177,7 +177,6 @@ def main() -> int:
     assert doc["unique_normalized_species"] == 27
 
     source_names = [x.replace("_", " ").title() for x in doc["normalized_species"]]
-    # Preserve source epithet case semantics after title conversion for exact syntactic normalization.
     source_names = [" ".join([p.split()[0].capitalize(), p.split()[1].lower()]) for p in source_names]
     crosswalk = exact_crosswalk(source_names, terminals)
 
