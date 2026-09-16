@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
 import importlib.util
-import math
 import unittest
 from pathlib import Path
 
@@ -56,45 +55,35 @@ class SolanaceaeRedBiochemicalProfileTests(unittest.TestCase):
         self.assertEqual(retained, ["a", "b", "c", "d", "e"])
         self.assertEqual(rare, ["C1_P0_C1_D0"])
 
+    def test_two_row_source_header_finds_subcolumns_below_spanning_label(self):
+        headers = [
+            ["Species", "Anthocyanidin proportion", "", "", "Carotenoid presence"],
+            ["", "Pelargonidin", "Cyanidin", "Delphinidin", ""],
+        ]
+        self.assertEqual(
+            mod.required_column_map(headers, species_column_index=0),
+            {"species": 0, "pelargonidin": 1, "cyanidin": 2, "delphinidin": 3, "carotenoid": 4},
+        )
+
     def test_terminal_classification_matches_frozen_unique_winner_gate(self):
         self.assertEqual(
-            mod.classify_terminal(
-                aucs=[0.62, 0.58, 0.55],
-                signal_p=[0.01, 0.02, 0.03],
-                winner_vs_runner_p=0.01,
-            ),
+            mod.classify_terminal(aucs=[0.62, 0.58, 0.55], signal_p=[0.01, 0.02, 0.03], winner_vs_runner_p=0.01),
             "PROFILE_SIGNALLED_COARSE",
         )
         self.assertEqual(
-            mod.classify_terminal(
-                aucs=[0.55, 0.63, 0.59],
-                signal_p=[0.01, 0.01, 0.01],
-                winner_vs_runner_p=0.01,
-            ),
+            mod.classify_terminal(aucs=[0.55, 0.63, 0.59], signal_p=[0.01, 0.01, 0.01], winner_vs_runner_p=0.01),
             "PROFILE_SIGNALLED_INTERMEDIATE",
         )
         self.assertEqual(
-            mod.classify_terminal(
-                aucs=[0.55, 0.59, 0.67],
-                signal_p=[0.01, 0.01, 0.01],
-                winner_vs_runner_p=0.01,
-            ),
+            mod.classify_terminal(aucs=[0.55, 0.59, 0.67], signal_p=[0.01, 0.01, 0.01], winner_vs_runner_p=0.01),
             "PROFILE_SIGNALLED_FINE",
         )
         self.assertEqual(
-            mod.classify_terminal(
-                aucs=[0.49, 0.50, 0.48],
-                signal_p=[0.01, 0.01, 0.01],
-                winner_vs_runner_p=0.01,
-            ),
+            mod.classify_terminal(aucs=[0.49, 0.50, 0.48], signal_p=[0.01, 0.01, 0.01], winner_vs_runner_p=0.01),
             "PROFILE_NO_PHYLOGENETIC_SIGNAL",
         )
         self.assertEqual(
-            mod.classify_terminal(
-                aucs=[0.61, 0.60, 0.59],
-                signal_p=[0.01, 0.01, 0.01],
-                winner_vs_runner_p=0.20,
-            ),
+            mod.classify_terminal(aucs=[0.61, 0.60, 0.59], signal_p=[0.01, 0.01, 0.01], winner_vs_runner_p=0.20),
             "PROFILE_SIGNALLED_TIED",
         )
 
