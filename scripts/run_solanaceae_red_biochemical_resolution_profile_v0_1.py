@@ -3,7 +3,6 @@ from __future__ import annotations
 
 import argparse
 import collections
-import copy
 import hashlib
 import importlib.util
 import io
@@ -151,6 +150,19 @@ def normalize_header(text: str) -> str:
     return " ".join(text.split())
 
 
+def header_rows_before_species_data(rows: list[list[str]], species_column_index: int) -> list[list[str]]:
+    headers = []
+    binomial = re.compile(r"^[A-Z][A-Za-z-]+\s+[a-z][A-Za-z-]+\b")
+    for row in rows:
+        cell = row[species_column_index].strip() if species_column_index < len(row) else ""
+        if binomial.match(re.sub(r"\s+", " ", cell)):
+            break
+        headers.append(row)
+    if not headers or len(headers) == len(rows):
+        raise RuntimeError("could not delimit source header block before first species data row")
+    return headers
+
+
 def required_column_map(header_rows: list[list[str]], species_column_index: int) -> dict[str, int]:
     width = max((len(r) for r in header_rows), default=0)
     labels = []
@@ -177,6 +189,14 @@ def required_column_map(header_rows: list[list[str]], species_column_index: int)
     return out
 
 
+def combined_header_labels(header_rows: list[list[str]], width: int) -> list[str]:
+    labels = []
+    for ci in range(width):
+        pieces = [row[ci].strip() for row in header_rows if ci < len(row) and row[ci].strip()]
+        labels.append(" | ".join(dict.fromkeys(pieces)))
+    return labels
+
+
 def docx_table_rows(docx_bytes: bytes, table_index: int) -> list[list[str]]:
     with zipfile.ZipFile(io.BytesIO(docx_bytes)) as zf:
         root = ET.fromstring(zf.read("word/document.xml"))
@@ -191,19 +211,15 @@ def docx_table_rows(docx_bytes: bytes, table_index: int) -> list[list[str]]:
 
 
 def stable_acquisition_summary(acquisition: dict) -> dict:
-    # Transport-container hashes can change while the exact DOCX member remains identical.
     for route_key in ["oa_package", "europe_pmc", "current_pmc_bin", "article_fallback"]:
         route = acquisition.get(route_key)
         if not isinstance(route, dict) or not route.get("selected_method"):
             continue
-        selected_method = route.get("selected_method")
-        selected_member = route.get("selected_member")
-        selected_url = route.get("selected_url") or route.get("selected_package_url") or route.get("selected_final_url")
         return {
             "route": route_key,
-            "selected_method": selected_method,
-            "selected_member": selected_member,
-            "selected_url": selected_url,
+            "selected_method": route.get("selected_method"),
+            "selected_member": route.get("selected_member"),
+            "selected_url": route.get("selected_url") or route.get("selected_package_url") or route.get("selected_final_url"),
         }
     return {"route": "unknown", "selected_method": None, "selected_member": None, "selected_url": None}
 
@@ -240,14 +256,15 @@ def main() -> int:
         raise ValueError("source species universe drift")
 
     rows = docx_table_rows(docx_bytes, identifiers["selected_table_index"])
-    hi = int(identifiers["selected_header_row_index"])
     species_ci = int(identifiers["selected_species_column_index"])
-    cols = required_column_map(rows[: hi + 1], species_ci)
+    header_rows = header_rows_before_species_data(rows, species_ci)
+    cols = required_column_map(header_rows, species_ci)
+    header_labels = combined_header_labels(header_rows, max(len(r) for r in header_rows))
     base = preflight.base
 
     row_by_species: dict[str, list[str]] = {}
     duplicate_species = []
-    for row in rows[hi + 1 :]:
+    for row in rows[len(header_rows):]:
         if species_ci >= len(row):
             continue
         norm = base.norm_species(row[species_ci])
@@ -269,27 +286,18 @@ def main() -> int:
         if row is None:
             missing_rows.append(norm)
             continue
-        values = {}
-        for key in ["pelargonidin", "cyanidin", "delphinidin", "carotenoid"]:
-            ci = cols[key]
-            values[key] = row[ci] if ci < len(row) else ""
+        values = {key: (row[cols[key]] if cols[key] < len(row) else "") for key in ["pelargonidin", "cyanidin", "delphinidin", "carotenoid"]}
         pel = parse_numeric_proportion(values["pelargonidin"])
         cya = parse_numeric_proportion(values["cyanidin"])
         dele = parse_numeric_proportion(values["delphinidin"])
         car = parse_carotenoid_presence(values["carotenoid"])
         if pel is None or cya is None or dele is None or car is None:
-            ineligible.append(
-                {
-                    "normalized": norm,
-                    "tree_tip": tree_tip,
-                    "unresolved_fields": [
-                        name
-                        for name, val in [("pelargonidin", pel), ("cyanidin", cya), ("delphinidin", dele), ("carotenoid", car)]
-                        if val is None
-                    ],
-                    "carotenoid_token_if_unresolved": values["carotenoid"] if car is None else None,
-                }
-            )
+            ineligible.append({
+                "normalized": norm,
+                "tree_tip": tree_tip,
+                "unresolved_fields": [name for name, val in [("pelargonidin", pel), ("cyanidin", cya), ("delphinidin", dele), ("carotenoid", car)] if val is None],
+                "carotenoid_token_if_unresolved": values["carotenoid"] if car is None else None,
+            })
             continue
         raw_states[tree_tip] = state_codes(pel=pel, cya=cya, dele=dele, carotenoid=car)
 
@@ -305,10 +313,7 @@ def main() -> int:
         if len(set(states[name])) < int(prereg["primary_frame"]["minimum_states_per_resolution"]):
             hold_reasons.append(f"{name.upper()}_STATES_LT_2")
 
-    tree_url = (
-        "https://raw.githubusercontent.com/bomeara/treebasestatic/"
-        f"{TREEBASE_STATIC_COMMIT}/trees/2016/{TREE_OBJECT}"
-    )
+    tree_url = "https://raw.githubusercontent.com/bomeara/treebasestatic/" + f"{TREEBASE_STATIC_COMMIT}/trees/2016/{TREE_OBJECT}"
     tree_bytes = fetch(tree_url)
     if sha256_bytes(tree_bytes) != cross["tree_object"]["sha256"]:
         raise ValueError("frozen TreeBASE tree SHA256 mismatch")
@@ -335,11 +340,9 @@ def main() -> int:
         },
         "schema": {
             "selected_table_index": identifiers["selected_table_index"],
-            "selected_header_row_index": hi,
+            "header_row_count": len(header_rows),
             "required_column_indices": cols,
-            "required_column_labels": {
-                key: (rows[hi][ci] if ci < len(rows[hi]) else "") for key, ci in cols.items()
-            },
+            "required_column_labels": {key: header_labels[ci] for key, ci in cols.items()},
         },
         "primary_frame": {
             "crosswalk_matched_tips": cross["frozen_gate"]["exact_match_count"],
@@ -372,10 +375,7 @@ def main() -> int:
 
     n = len(retained)
     ii, jj = np.triu_indices(n, 1)
-    dist = np.array(
-        [tree.distance(terminals[retained[int(i)]], terminals[retained[int(j)]]) for i, j in zip(ii, jj)],
-        dtype=float,
-    )
+    dist = np.array([tree.distance(terminals[retained[int(i)]], terminals[retained[int(j)]]) for i, j in zip(ii, jj)], dtype=float)
     ranks = rankdata(-dist, method="average")
     encs = {name: enc(states[name]) for name in NAMES}
     observed = np.array([auc(encs[name], ii, jj, ranks) for name in NAMES], dtype=float)
@@ -399,14 +399,8 @@ def main() -> int:
     for x in range(3):
         for y in range(x + 1, 3):
             d = float(observed[x] - observed[y])
-            pairwise[f"{NAMES[x]}_minus_{NAMES[y]}"] = {
-                "observed": d,
-                "p_gt_zero": upper(null[x] - null[y], d),
-            }
-            pairwise[f"{NAMES[y]}_minus_{NAMES[x]}"] = {
-                "observed": -d,
-                "p_gt_zero": upper(null[y] - null[x], -d),
-            }
+            pairwise[f"{NAMES[x]}_minus_{NAMES[y]}"] = {"observed": d, "p_gt_zero": upper(null[x] - null[y], d)}
+            pairwise[f"{NAMES[y]}_minus_{NAMES[x]}"] = {"observed": -d, "p_gt_zero": upper(null[y] - null[x], -d)}
 
     out = {
         **base_result,
@@ -423,21 +417,16 @@ def main() -> int:
     }
     args.out.parent.mkdir(parents=True, exist_ok=True)
     args.out.write_text(json.dumps(out, indent=2, sort_keys=True) + "\n", encoding="utf-8")
-    print(
-        json.dumps(
-            {
-                "terminal_class": terminal,
-                "eligible_tips": n,
-                "AUC": dict(zip(NAMES, observed.tolist())),
-                "p_signal": dict(zip(NAMES, signal_p.tolist())),
-                "winner": NAMES[winner],
-                "p_winner_gt_runner": pwin,
-                "rare_fine_states_excluded": rare,
-                "ineligible_count": len(ineligible),
-            },
-            indent=2,
-        )
-    )
+    print(json.dumps({
+        "terminal_class": terminal,
+        "eligible_tips": n,
+        "AUC": dict(zip(NAMES, observed.tolist())),
+        "p_signal": dict(zip(NAMES, signal_p.tolist())),
+        "winner": NAMES[winner],
+        "p_winner_gt_runner": pwin,
+        "rare_fine_states_excluded": rare,
+        "ineligible_count": len(ineligible),
+    }, indent=2))
     return 0
 
 
