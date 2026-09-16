@@ -1,0 +1,55 @@
+name: Solanaceae red biochemical resolution profile outcome v0.1
+
+on:
+  push:
+    branches:
+      - analysis/solanaceae-red-biochemical-profile-outcome-v0-1
+  pull_request:
+    paths:
+      - 'scripts/run_solanaceae_red_biochemical_resolution_profile_v0_1.py'
+      - 'tests/test_solanaceae_red_biochemical_resolution_profile_v0_1.py'
+      - 'data/solanaceae_red_biochemical_resolution_profile_result_v0_1.json'
+      - 'docs/SOLANACEAE_RED_BIOCHEMICAL_RESOLUTION_PROFILE_RESULT_V0_1.md'
+      - '.github/workflows/solanaceae-red-biochemical-resolution-profile-outcome-v0-1.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  outcome:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install analysis dependencies
+        run: python -m pip install --disable-pip-version-check biopython==1.85 numpy==2.5.3 scipy==1.16.1
+      - name: Unit tests
+        run: python -m unittest tests/test_solanaceae_red_biochemical_resolution_profile_v0_1.py
+      - name: Run frozen outcome analysis
+        if: ${{ hashFiles('scripts/run_solanaceae_red_biochemical_resolution_profile_v0_1.py') != '' }}
+        run: |
+          mkdir -p build/solanaceae_red_biochemical_resolution_profile_v0_1
+          python scripts/run_solanaceae_red_biochemical_resolution_profile_v0_1.py \
+            --out build/solanaceae_red_biochemical_resolution_profile_v0_1/result.json
+      - name: Verify frozen result if present
+        if: ${{ hashFiles('data/solanaceae_red_biochemical_resolution_profile_result_v0_1.json') != '' }}
+        run: |
+          cmp build/solanaceae_red_biochemical_resolution_profile_v0_1/result.json \
+              data/solanaceae_red_biochemical_resolution_profile_result_v0_1.json
+      - name: Frozen-input and Paper 1 guard
+        run: |
+          git diff --exit-code 77ebf3f9d36a13cdcc21f9356a26b42e910f0e11...HEAD -- \
+            data/solanaceae_red_biochemical_resolution_profile_prereg_v0_1.json \
+            data/solanaceae_red_archived_treebase_crosswalk_v0_2.json \
+            manuscript \
+            data/paper1_authoritative_results_v0_2_2.csv \
+            data/paper1_main_figure_manifest_v0_2_2.csv
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: solanaceae-red-biochemical-resolution-profile-outcome-v0-1
+          path: build/solanaceae_red_biochemical_resolution_profile_v0_1
+          retention-days: 90
