@@ -69,11 +69,9 @@ def parse_numeric_proportion(value: object) -> float | None:
 
 def parse_carotenoid_presence(value: object) -> bool | None:
     text = re.sub(r"\s+", " ", str(value).strip().lower())
-    present = {"present", "yes", "y", "1", "+", "true"}
-    absent = {"absent", "no", "n", "0", "-", "false"}
-    if text in present:
+    if text in {"present", "yes", "y", "1", "+", "true"}:
         return True
-    if text in absent:
+    if text in {"absent", "no", "n", "0", "-", "false"}:
         return False
     return None
 
@@ -102,7 +100,7 @@ def common_frame(raw_states: dict[str, dict[str, str]], minimum_fine_count: int 
     fine_counts = collections.Counter(v["fine"] for v in raw_states.values())
     rare = sorted(state for state, count in fine_counts.items() if count < minimum_fine_count)
     rare_set = set(rare)
-    retained = [name for name, states in raw_states.items() if states["fine"] not in rare_set]
+    retained = [tip for tip, states in raw_states.items() if states["fine"] not in rare_set]
     return retained, rare
 
 
@@ -163,39 +161,56 @@ def header_rows_before_species_data(rows: list[list[str]], species_column_index:
     return headers
 
 
-def required_column_map(header_rows: list[list[str]], species_column_index: int) -> dict[str, int]:
-    width = max((len(r) for r in header_rows), default=0)
-    labels = []
-    for ci in range(width):
-        pieces = [normalize_header(row[ci]) for row in header_rows if ci < len(row) and row[ci].strip()]
-        labels.append(" | ".join(dict.fromkeys(pieces)))
+def classify_source_table(header_rows: list[list[str]]) -> str | None:
+    joined = " | ".join(
+        normalize_header(cell)
+        for row in header_rows
+        for cell in row
+        if str(cell).strip()
+    )
+    if (
+        re.search(r"\banthocyanidin\b", joined)
+        and re.search(r"\bpelargonidin\b", joined)
+        and "cyanidin-based" in joined
+        and "delphinidin-based" in joined
+    ):
+        return "anthocyanidin"
+    if re.search(r"\bcarotenoids?\b", joined):
+        return "carotenoid"
+    if re.search(r"\bsource\b", joined) and "voucher accession number" in joined:
+        return "provenance"
+    return None
 
-    def candidates(token: str) -> list[int]:
-        pattern = re.compile(rf"\b{re.escape(token)}\b")
-        return [i for i, label in enumerate(labels) if pattern.search(label)]
 
-    out = {"species": species_column_index}
-    for key, token in [
-        ("pelargonidin", "pelargonidin"),
-        ("cyanidin", "cyanidin"),
-        ("delphinidin", "delphinidin"),
-        ("carotenoid", "carotenoid"),
-    ]:
-        hits = candidates(token)
-        if len(hits) != 1:
-            raise RuntimeError(f"required source column {key!r} is not unique; hits={hits}; labels={labels}")
-        out[key] = hits[0]
-    if len(set(out.values())) != len(out):
-        raise RuntimeError(f"required source columns collide: {out}; labels={labels}")
+def aggregate_anthocyanidin_branches(row: list[str]) -> dict[str, float] | None:
+    if len(row) < 7:
+        return None
+    values = [parse_numeric_proportion(row[i]) for i in range(1, 7)]
+    if any(value is None for value in values):
+        return None
+    pel, cya, peo, dele, pet, mal = (float(x) for x in values)
+    return {
+        "pelargonidin": pel,
+        "cyanidin": cya + peo,
+        "delphinidin": dele + pet + mal,
+    }
+
+
+def species_row_map(rows: list[list[str]], header_count: int, species_column_index: int, norm_species) -> dict[str, list[str]]:
+    out: dict[str, list[str]] = {}
+    duplicates = []
+    for row in rows[header_count:]:
+        if species_column_index >= len(row):
+            continue
+        norm = norm_species(row[species_column_index])
+        if not norm:
+            continue
+        if norm in out:
+            duplicates.append(norm)
+        out[norm] = row
+    if duplicates:
+        raise RuntimeError(f"duplicate source species rows after normalization: {sorted(set(duplicates))}")
     return out
-
-
-def combined_header_labels(header_rows: list[list[str]], width: int) -> list[str]:
-    labels = []
-    for ci in range(width):
-        pieces = [row[ci].strip() for row in header_rows if ci < len(row) and row[ci].strip()]
-        labels.append(" | ".join(dict.fromkeys(pieces)))
-    return labels
 
 
 def docx_table_rows(docx_bytes: bytes, table_index: int) -> list[list[str]]:
@@ -220,9 +235,8 @@ def stable_acquisition_summary(acquisition: dict) -> dict:
             "route": route_key,
             "selected_method": route.get("selected_method"),
             "selected_member": route.get("selected_member"),
-            "selected_url": route.get("selected_url") or route.get("selected_package_url") or route.get("selected_final_url"),
         }
-    return {"route": "unknown", "selected_method": None, "selected_member": None, "selected_url": None}
+    return {"route": "unknown", "selected_method": None, "selected_member": None}
 
 
 def main() -> int:
@@ -256,26 +270,31 @@ def main() -> int:
     if identifiers["unique_normalized_species"] != 27:
         raise ValueError("source species universe drift")
 
-    rows = docx_table_rows(docx_bytes, identifiers["selected_table_index"])
     species_ci = int(identifiers["selected_species_column_index"])
-    header_rows = header_rows_before_species_data(rows, species_ci)
-    cols = required_column_map(header_rows, species_ci)
-    header_labels = combined_header_labels(header_rows, max(len(r) for r in header_rows))
-    base = preflight.base
+    role_tables: dict[str, dict] = {}
+    for table_index in identifiers["species_identifier_table_indices"]:
+        rows = docx_table_rows(docx_bytes, int(table_index))
+        headers = header_rows_before_species_data(rows, species_ci)
+        role = classify_source_table(headers)
+        if role is None:
+            continue
+        if role in role_tables:
+            raise RuntimeError(f"multiple source tables assigned role {role!r}")
+        role_tables[role] = {"table_index": int(table_index), "rows": rows, "headers": headers}
+    for required_role in ["anthocyanidin", "carotenoid"]:
+        if required_role not in role_tables:
+            raise RuntimeError(f"missing required source table role: {required_role}")
 
-    row_by_species: dict[str, list[str]] = {}
-    duplicate_species = []
-    for row in rows[len(header_rows):]:
-        if species_ci >= len(row):
-            continue
-        norm = base.norm_species(row[species_ci])
-        if not norm:
-            continue
-        if norm in row_by_species:
-            duplicate_species.append(norm)
-        row_by_species[norm] = row
-    if duplicate_species:
-        raise RuntimeError(f"duplicate source species rows after normalization: {sorted(set(duplicate_species))}")
+    base = preflight.base
+    anth = role_tables["anthocyanidin"]
+    carot = role_tables["carotenoid"]
+    anth_map = species_row_map(anth["rows"], len(anth["headers"]), species_ci, base.norm_species)
+    carot_map = species_row_map(carot["rows"], len(carot["headers"]), species_ci, base.norm_species)
+    if len(anth_map) != 27 or len(carot_map) != 27 or set(anth_map) != set(carot_map):
+        raise RuntimeError(
+            f"source table species universes diverged: anth={len(anth_map)} carot={len(carot_map)} "
+            f"anth_only={sorted(set(anth_map)-set(carot_map))} carot_only={sorted(set(carot_map)-set(anth_map))}"
+        )
 
     raw_states: dict[str, dict[str, str]] = {}
     ineligible = []
@@ -283,27 +302,36 @@ def main() -> int:
     for item in cross["crosswalk"]["exact_matches"]:
         norm = item["normalized"]
         tree_tip = item["tree_tip"]
-        row = row_by_species.get(norm)
-        if row is None:
+        anth_row = anth_map.get(norm)
+        carot_row = carot_map.get(norm)
+        if anth_row is None or carot_row is None:
             missing_rows.append(norm)
             continue
-        values = {key: (row[cols[key]] if cols[key] < len(row) else "") for key in ["pelargonidin", "cyanidin", "delphinidin", "carotenoid"]}
-        pel = parse_numeric_proportion(values["pelargonidin"])
-        cya = parse_numeric_proportion(values["cyanidin"])
-        dele = parse_numeric_proportion(values["delphinidin"])
-        car = parse_carotenoid_presence(values["carotenoid"])
-        if pel is None or cya is None or dele is None or car is None:
+        branches = aggregate_anthocyanidin_branches(anth_row)
+        car_token = carot_row[1] if len(carot_row) > 1 else ""
+        car = parse_carotenoid_presence(car_token)
+        unresolved = []
+        if branches is None:
+            unresolved.append("anthocyanidin_branch_proportions")
+        if car is None:
+            unresolved.append("carotenoid")
+        if unresolved:
             ineligible.append({
                 "normalized": norm,
                 "tree_tip": tree_tip,
-                "unresolved_fields": [name for name, val in [("pelargonidin", pel), ("cyanidin", cya), ("delphinidin", dele), ("carotenoid", car)] if val is None],
-                "carotenoid_token_if_unresolved": values["carotenoid"] if car is None else None,
+                "unresolved_fields": unresolved,
+                "carotenoid_token_if_unresolved": car_token if car is None else None,
             })
             continue
-        raw_states[tree_tip] = state_codes(pel=pel, cya=cya, dele=dele, carotenoid=car)
+        raw_states[tree_tip] = state_codes(
+            pel=branches["pelargonidin"],
+            cya=branches["cyanidin"],
+            dele=branches["delphinidin"],
+            carotenoid=bool(car),
+        )
 
     if missing_rows:
-        raise RuntimeError(f"frozen exact crosswalk species missing from source table: {missing_rows}")
+        raise RuntimeError(f"frozen exact crosswalk species missing from source tables: {missing_rows}")
 
     retained, rare = common_frame(raw_states, minimum_fine_count=5)
     states = {name: [raw_states[tip][name] for tip in retained] for name in NAMES}
@@ -314,7 +342,10 @@ def main() -> int:
         if len(set(states[name])) < int(prereg["primary_frame"]["minimum_states_per_resolution"]):
             hold_reasons.append(f"{name.upper()}_STATES_LT_2")
 
-    tree_url = "https://raw.githubusercontent.com/bomeara/treebasestatic/" + f"{TREEBASE_STATIC_COMMIT}/trees/2016/{TREE_OBJECT}"
+    tree_url = (
+        "https://raw.githubusercontent.com/bomeara/treebasestatic/"
+        f"{TREEBASE_STATIC_COMMIT}/trees/2016/{TREE_OBJECT}"
+    )
     tree_bytes = fetch(tree_url)
     if sha256_bytes(tree_bytes) != cross["tree_object"]["sha256"]:
         raise ValueError("frozen TreeBASE tree SHA256 mismatch")
@@ -340,15 +371,24 @@ def main() -> int:
             "source_unmatched_before_outcome": cross["crosswalk"]["source_unmatched"],
         },
         "schema": {
-            "selected_table_index": identifiers["selected_table_index"],
-            "header_row_count": len(header_rows),
-            "required_column_indices": cols,
-            "required_column_labels": {key: header_labels[ci] for key, ci in cols.items()},
+            "species_identifier_table_indices": identifiers["species_identifier_table_indices"],
+            "anthocyanidin_table_index": anth["table_index"],
+            "anthocyanidin_header_rows": anth["headers"],
+            "anthocyanidin_branch_aggregation": {
+                "pelargonidin": "Pelargonidin",
+                "cyanidin": "Cyanidin + Peonidin",
+                "delphinidin": "Delphinidn + Petunidin + Malvidin",
+            },
+            "carotenoid_table_index": carot["table_index"],
+            "carotenoid_header_rows": carot["headers"],
+            "carotenoid_value_column": "Carotenoids",
+            "species_join": "exact normalized source binomial across frozen same-universe tables",
         },
         "primary_frame": {
             "crosswalk_matched_tips": cross["frozen_gate"]["exact_match_count"],
             "eligible_before_rare_filter": len(raw_states),
             "ineligible_after_outcome_opening": ineligible,
+            "fine_state_counts_before_filter": dict(sorted(collections.Counter(v["fine"] for v in raw_states.values()).items())),
             "rare_fine_states_excluded": rare,
             "eligible_tips": len(retained),
             "coarse_state_counts": dict(sorted(collections.Counter(states["coarse"]).items())),
@@ -371,12 +411,22 @@ def main() -> int:
         }
         args.out.parent.mkdir(parents=True, exist_ok=True)
         args.out.write_text(json.dumps(out, indent=2, sort_keys=True) + "\n", encoding="utf-8")
-        print(json.dumps({"terminal_class": out["terminal_class"], "eligible_tips": len(retained), "hold_reasons": hold_reasons}, indent=2))
+        print(json.dumps({
+            "terminal_class": out["terminal_class"],
+            "eligible_before_rare_filter": len(raw_states),
+            "eligible_tips": len(retained),
+            "ineligible_count": len(ineligible),
+            "rare_fine_states_excluded": rare,
+            "hold_reasons": hold_reasons,
+        }, indent=2))
         return 0
 
     n = len(retained)
     ii, jj = np.triu_indices(n, 1)
-    dist = np.array([tree.distance(terminals[retained[int(i)]], terminals[retained[int(j)]]) for i, j in zip(ii, jj)], dtype=float)
+    dist = np.array(
+        [tree.distance(terminals[retained[int(i)]], terminals[retained[int(j)]]) for i, j in zip(ii, jj)],
+        dtype=float,
+    )
     ranks = rankdata(-dist, method="average")
     encs = {name: enc(states[name]) for name in NAMES}
     observed = np.array([auc(encs[name], ii, jj, ranks) for name in NAMES], dtype=float)
@@ -400,8 +450,14 @@ def main() -> int:
     for x in range(3):
         for y in range(x + 1, 3):
             d = float(observed[x] - observed[y])
-            pairwise[f"{NAMES[x]}_minus_{NAMES[y]}"] = {"observed": d, "p_gt_zero": upper(null[x] - null[y], d)}
-            pairwise[f"{NAMES[y]}_minus_{NAMES[x]}"] = {"observed": -d, "p_gt_zero": upper(null[y] - null[x], -d)}
+            pairwise[f"{NAMES[x]}_minus_{NAMES[y]}"] = {
+                "observed": d,
+                "p_gt_zero": upper(null[x] - null[y], d),
+            }
+            pairwise[f"{NAMES[y]}_minus_{NAMES[x]}"] = {
+                "observed": -d,
+                "p_gt_zero": upper(null[y] - null[x], -d),
+            }
 
     out = {
         **base_result,
@@ -420,13 +476,14 @@ def main() -> int:
     args.out.write_text(json.dumps(out, indent=2, sort_keys=True) + "\n", encoding="utf-8")
     print(json.dumps({
         "terminal_class": terminal,
+        "eligible_before_rare_filter": len(raw_states),
         "eligible_tips": n,
+        "ineligible_count": len(ineligible),
         "AUC": dict(zip(NAMES, observed.tolist())),
         "p_signal": dict(zip(NAMES, signal_p.tolist())),
         "winner": NAMES[winner],
         "p_winner_gt_runner": pwin,
         "rare_fine_states_excluded": rare,
-        "ineligible_count": len(ineligible),
     }, indent=2))
     return 0
 
