@@ -2,19 +2,35 @@
 
 ## Current state
 
-The unconditional exact-profile programme now contains **30 completed biological units**: 28 standardized visible-colour clades, one retrospective biochemical unit (Petunieae), and the prospective mixed Iris unit.
+The unconditional exact-profile programme still contains **30 completed biological units**: 28 standardized visible-colour clades, one retrospective biochemical unit (Petunieae), and the prospective mixed Iris unit.
 
-This is enough replication to establish substantial profile heterogeneity, but it is **not enough representation diversity to identify a biochemical-versus-visible moderator**. Petunieae is currently the only completed biochemical exact-profile observation. If Petunieae is held out under leave-one-out validation, the training fold contains zero biochemical examples.
+This is enough replication to establish substantial profile heterogeneity, but it is **not enough representation diversity to identify a biochemical-versus-visible moderator**. Petunieae remains the only completed biochemical exact-profile observation. If Petunieae is held out under leave-one-out validation, the training fold contains zero biochemical examples.
 
-Therefore the next gate is not another tree-geometry model and not another arbitrary visible-colour clade. The programme needs one additional independent non-visible exact-profile unit.
+A second non-visible candidate has now been executed without post-hoc rescue:
 
-## Candidate frontier
+### Solanaceae red 27 — executed, structural HOLD
 
-### 1. Iochrominae — highest leverage
+Frozen source/tree gate:
+
+`PASS_ARCHIVED_TREEBASE_S16617_OBJECT_CROSSWALK_FROZEN`
+
+Outcome terminal state:
+
+`HOLD_INSUFFICIENT_COMMON_FRAME_OR_STATE_VARIATION`
+
+The archived TreeBASE S16617 source tree supplied 25 exact source/tree matches. Of these, 24 had complete chemistry after outcome opening. The preregistered joint carotenoid × anthocyanidin-composition fine representation produced ten observed fine states with counts 1–4. Because **every fine state was below the frozen minimum of 5 taxa**, the common retained frame was 0 tips. No AUC, permutation p-value, or winner was computed.
+
+This is not a negative biochemical profile and does not count as a second completed biochemical unit. Relaxing the support threshold or merging states after inspection is prohibited for the primary result.
+
+Therefore the next gate remains one additional independent non-visible exact-profile unit that survives its frozen common-frame/state-variation gate.
+
+## Remaining candidate frontier
+
+### 1. Iochrominae — highest leverage if source bytes become accessible
 
 Current terminal state:
 
-`HOLD_SOURCE_ACCESS_README_AND_ARCHIVE_PROFILE_UNCOMPUTED`
+`HOLD_DRYAD_SOURCE_BYTES_STILL_UNAVAILABLE_PROFILE_UNCOMPUTED`
 
 Dryad DOI: `10.5061/dryad.p5dq84v`.
 
@@ -31,19 +47,19 @@ Frozen source objects:
 
 The public article establishes a 28-species biochemical/phylogenetic comparative panel, but CHUN has not opened the Dryad row-level profile source for this new estimand. No resolution-profile AUC has been calculated.
 
-The preferred unlock is **one Dryad full-dataset download** containing both frozen objects. That single input is higher leverage than manually assembling multiple substitute files.
+The preferred unlock is authenticated recovery of the exact frozen Dryad source bytes. Do not substitute manually assembled outcome data.
 
 ### 2. Ruellia
 
-`HOLD_AUTHORITATIVE_TREE_SOURCE_OUTCOMES_UNOPENED`
+`HOLD_AUTHORITATIVE_2023_TREE_BYTES_OR_EXACT_RECONSTRUCTION_SOURCE_UNAVAILABLE_OUTCOMES_UNOPENED`
 
-The biochemical source is available, but the exact author-used timed tree is not publicly recoverable. Related trees are not substituted.
+The biochemical source is available, but the exact author-used timed tree is not publicly recoverable. The source comparative tree derives from the Manzitto-Tripp & Daniel 2023 ddRAD phylogeny, but a newly reconstructed tree is not the frozen source tree and is not substituted.
 
 ### 3. Rhododendron
 
-`HOLD_SOURCE_ACCESS_OUTCOMES_UNOPENED`
+`HOLD_SOURCE_ACCESS_STILL_BLOCKED_OUTCOMES_UNOPENED`
 
-A deterministic nested biochemical hierarchy was frozen, but the species supplement and frozen primary tree remain inaccessible through the public automated routes tested.
+A deterministic nested biochemical hierarchy was frozen, but the Wiley chemistry supplement and exact Dryad primary-tree payload remain inaccessible through the tested public routes. Chemistry outcomes remain unopened.
 
 ### 4. Antirrhineae
 
@@ -62,6 +78,6 @@ Do not broaden candidate hunting simply to obtain a second non-visible winner. R
 1. one of the blocked authoritative sources becomes available; or
 2. a new independent source already satisfies the frozen exact-profile admission fields before its outcome is inspected.
 
-Do not fit a biochemical-versus-visible moderator with one biochemical observation. Do not count schema/source holds as biological negatives. Do not reclassify Petunieae as prospective.
+Do not fit a biochemical-versus-visible moderator with one completed biochemical observation. Do not count source/schema/common-frame holds as biological negatives. Do not weaken the Solanaceae support rule after seeing its fragmentation. Do not reclassify Petunieae as prospective.
 
 Camellia Paper 1 remains unchanged.
