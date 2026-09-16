@@ -144,7 +144,7 @@ def main() -> int:
     tree_links = re.findall(r"\.\./trees/2016/(tree_\d+\.phy)", study_text)
     unique_tree_links = sorted(set(tree_links))
     static_identity = (
-        "16617" in study_text
+        "10.1111/nph.13576" in study_text
         and TREE_OBJECT in unique_tree_links
         and TREE_LABEL in study_text
         and "Species Tree" in study_text
@@ -211,7 +211,9 @@ def main() -> int:
             "treebasestatic_tree_blob": TREEBASE_STATIC_TREE_BLOB,
             "treebasestatic_file_add_commit": TREEBASE_STATIC_FILE_ADD_COMMIT,
             "independent_treebase_studies_commit": TREEBASE_STUDIES_COMMIT,
+            "static_study_path": "studies/study_16617.html",
             "static_study_sha256": sha256_bytes(study_html),
+            "independent_study_path": "studies/S16617.xml",
             "independent_study_sha256": sha256_bytes(independent_xml),
             "study_tree_links": unique_tree_links,
             "tree_label": TREE_LABEL,
