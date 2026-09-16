@@ -44,6 +44,32 @@ class ArchivedTreebaseCrosswalkTests(unittest.TestCase):
         self.assertTrue(mod.classify_gate(True, 1, 1344, 1, 0, 25).startswith("HOLD_"))
         self.assertTrue(mod.classify_gate(True, 1, 1344, 0, 1, 25).startswith("HOLD_"))
 
+    def test_stable_acquisition_summary_ignores_outer_zip_digest(self):
+        acquisition = {
+            "oa_package": {"selected_method": None},
+            "europe_pmc": {
+                "selected_method": "europe_pmc_supplementaryFiles",
+                "selected_url": "https://example.test/supplementaryFiles",
+                "selected_member": "supp_plw013_plw013supp_table1.docx",
+                "attempts": [
+                    {"method": "europe_pmc_supplementaryFiles", "sha256": "volatile-outer-zip"},
+                    {
+                        "method": "europe_pmc_member",
+                        "member": "supp_plw013_plw013supp_table1.docx",
+                        "bytes": 118778,
+                        "sha256": mod.EXPECTED_SUPPLEMENT_SHA256,
+                        "is_docx": True,
+                    },
+                ],
+            },
+        }
+        summary = mod.stable_acquisition_summary(acquisition)
+        self.assertEqual(summary["selected_method"], "europe_pmc_supplementaryFiles")
+        self.assertEqual(summary["selected_member"], "supp_plw013_plw013supp_table1.docx")
+        self.assertEqual(summary["member_bytes"], 118778)
+        self.assertEqual(summary["member_sha256"], mod.EXPECTED_SUPPLEMENT_SHA256)
+        self.assertNotIn("volatile-outer-zip", repr(summary))
+
 
 if __name__ == "__main__":
     unittest.main()
