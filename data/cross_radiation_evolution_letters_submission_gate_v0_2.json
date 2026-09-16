@@ -1,0 +1,72 @@
+{
+  "version": "v0.2",
+  "status": "SCIENCE_AND_JOURNAL_FORMAT_READY_METADATA_HOLD",
+  "target_journal": "Evolution Letters",
+  "article_type": "Letter",
+  "author_guidelines_checked": "2026-09-16",
+  "author_guidelines_url": "https://academic.oup.com/evlett/pages/author-guidelines",
+  "format_contract": {
+    "title_max_words": 30,
+    "abstract_max_words": 300,
+    "teaser_max_words": 150,
+    "keywords_max": 10,
+    "main_text_target_max_words": 5000,
+    "required_sections": [
+      "Introduction",
+      "Methods",
+      "Results",
+      "Discussion",
+      "Data and code availability",
+      "Author contributions",
+      "Funding",
+      "Conflict of interest",
+      "References"
+    ]
+  },
+  "required_reference_identifiers": [
+    "10.1093/aobpla/plw013",
+    "10.1086/523358",
+    "10.3389/fpls.2020.569811",
+    "10.5061/dryad.r4xgxd2sc",
+    "10.1002/ajb2.70146",
+    "10.3389/fpls.2013.00321",
+    "10.1093/sysbio/syz005",
+    "10.1093/sysbio/syab074",
+    "10.1093/jxb/ers267",
+    "10.1098/rspb.2023.0275",
+    "https://osf.io/zg9cu/"
+  ],
+  "source_year_contract": {
+    "flowerclades51_dryad_dataset": 2025,
+    "flowerclades51_article": 2026,
+    "petunieae_article": 2023,
+    "iris_article": 2020
+  },
+  "figure_contract": {
+    "main_figures": 5,
+    "alt_text_required_each": true,
+    "builder": "scripts/build_cross_radiation_evolution_letters_figures_v0_1.py"
+  },
+  "authoritative_science_sources": {
+    "iris": "results/iris_intermediate_resolution_v0_1/iris_intermediate_resolution_result_v0_1.json",
+    "flowerclades51": "results/flowerclades51_resolution_profile_v0_1/flowerclades51_resolution_profile_batch_result_v0_1.json",
+    "tree_moderator": "data/resolution_profile_moderator_qualification_v0_1.json",
+    "petunieae": "data/petunieae_biochemical_resolution_profile_result_v0_1.json",
+    "representation_identifiability": "data/resolution_profile_representation_identifiability_v0_1.json"
+  },
+  "submission_metadata_holds": [
+    "author names, affiliations, ORCIDs and corresponding-author contact must be confirmed",
+    "CRediT author contributions must be completed",
+    "funding and grant numbers must be completed",
+    "acknowledgements must be completed or explicitly omitted",
+    "submission-specific CHUN code snapshot must receive a persistent archive identifier"
+  ],
+  "claim_ceiling": [
+    "no universal optimal flower-color resolution is supported",
+    "Iris is a prospective FAIL and not a fine-resolution success",
+    "Petunieae is retrospective standardized cross-representation training, not a prospective replication",
+    "representation type itself remains predictively unidentified with only one biochemical exact-profile unit",
+    "HOLD states are not biological negatives"
+  ],
+  "paper1_science_changed": false
+}
