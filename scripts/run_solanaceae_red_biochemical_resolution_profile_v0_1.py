@@ -171,7 +171,8 @@ def required_column_map(header_rows: list[list[str]], species_column_index: int)
         labels.append(" | ".join(dict.fromkeys(pieces)))
 
     def candidates(token: str) -> list[int]:
-        return [i for i, label in enumerate(labels) if token in label]
+        pattern = re.compile(rf"\b{re.escape(token)}\b")
+        return [i for i, label in enumerate(labels) if pattern.search(label)]
 
     out = {"species": species_column_index}
     for key, token in [
