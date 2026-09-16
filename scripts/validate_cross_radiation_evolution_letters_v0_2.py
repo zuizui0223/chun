@@ -7,6 +7,7 @@ from pathlib import Path
 ROOT=Path(__file__).resolve().parents[1]
 REG=ROOT/'data/cross_radiation_evolution_letters_claim_registry_v0_1.json'
 REFS=ROOT/'data/cross_radiation_el_reference_manifest_v0_1.json'
+GATE=ROOT/'data/cross_radiation_evolution_letters_submission_gate_v0_2.json'
 MAN=ROOT/'manuscript/CROSS_RADIATION_EVOLUTION_LETTERS_V0_2.md'
 
 
@@ -33,12 +34,18 @@ def subsection(text:str, heading:str)->str:
 def main():
     reg=json.loads(REG.read_text())
     refs=json.loads(REFS.read_text())
+    gate=json.loads(GATE.read_text())
     text=MAN.read_text()
     low=text.lower()
 
     assert reg['status']=='CROSS_RADIATION_EVOLUTION_LETTERS_CLAIM_REGISTRY'
     assert refs['status']=='CROSS_RADIATION_EL_REFERENCES_VERIFIED'
     assert refs['paper1_science_changed'] is False
+    assert gate['status']=='SCIENCE_AND_JOURNAL_FORMAT_READY_METADATA_HOLD'
+    assert gate['target_journal']=='Evolution Letters'
+    assert gate['article_type']=='Letter'
+    assert gate['paper1_science_changed'] is False
+    assert len(gate['submission_metadata_holds'])==5
 
     title=section(text,'Title').strip().splitlines()[0].strip('* ')
     teaser=subsection(text,'Teaser text')
@@ -50,17 +57,21 @@ def main():
     references=section(text,'References')
     main_text='\n'.join([intro,methods,results,discussion])
 
-    assert words(title)<=30, words(title)
-    assert words(teaser)<=150, words(teaser)
-    assert words(abstract)<=300, words(abstract)
-    assert words(main_text)<=5000, words(main_text)
+    fmt=gate['format_contract']
+    assert words(title)<=fmt['title_max_words'], words(title)
+    assert words(teaser)<=fmt['teaser_max_words'], words(teaser)
+    assert words(abstract)<=fmt['abstract_max_words'], words(abstract)
+    assert words(main_text)<=fmt['main_text_target_max_words'], words(main_text)
 
     km=re.search(r'^Keywords:\s*(.+)$', text, flags=re.M|re.I)
     assert km
     keywords=[x.strip() for x in km.group(1).split(';') if x.strip()]
-    assert len(keywords)<=10, len(keywords)
+    assert len(keywords)<=fmt['keywords_max'], len(keywords)
 
-    # Evolution Letters requests US spelling in manuscript prose; published reference titles may retain original spelling.
+    for required in fmt['required_sections']:
+        section(text, required)
+
+    # Evolution Letters manuscript prose is normalized to US spelling; published reference titles may retain original spelling.
     before_refs=text.split('# References',1)[0]
     assert re.search(r'\bcolour\b|\bcolours\b|flower-colour|visible-colour', before_refs, flags=re.I) is None
 
@@ -69,13 +80,15 @@ def main():
 
     # Five figure legends and five explicit alt-text statements are required.
     legends=re.findall(r'^\*\*Figure [1-5]\.', text, flags=re.M)
-    assert len(legends)==5, len(legends)
-    assert text.count('**Alt text:**')==5
+    assert len(legends)==gate['figure_contract']['main_figures'], len(legends)
+    assert text.count('**Alt text:**')==gate['figure_contract']['main_figures']
 
     # References are bound to a verified manifest and data sources are explicitly tagged.
     for r in refs['references']:
         token=r.get('doi') or r.get('identifier')
         assert token and token.lower() in references.lower(), r['key']
+    for token in gate['required_reference_identifiers']:
+        assert token.lower() in text.lower(), token
     assert references.count('[dataset]')==2
     assert '10.5061/dryad.r4xgxd2sc' in section(text,'Data and code availability')
     assert 'osf.io/zg9cu' in section(text,'Data and code availability')
@@ -129,8 +142,14 @@ def main():
     for bad in reg['forbidden_claim_fragments']:
         assert bad.lower() not in low, bad
 
+    # Submission metadata are intentionally left as explicit holds rather than invented.
+    assert 'To be completed using CRediT roles before submission.' in text
+    assert '# Funding\n\nTo be completed before submission.' in text
+    assert '# Acknowledgements\n\nTo be completed before submission.' in text
+    assert 'will be archived with a persistent identifier before submission' in text
+
     print(json.dumps({
-      'status':'CROSS_RADIATION_EVOLUTION_LETTERS_V0_2_VALID',
+      'status':'SCIENCE_AND_JOURNAL_FORMAT_READY_METADATA_HOLD',
       'title_words':words(title),
       'teaser_words':words(teaser),
       'abstract_words':words(abstract),
@@ -139,6 +158,7 @@ def main():
       'references':len(refs['references']),
       'dataset_citations':references.count('[dataset]'),
       'figure_legends':len(legends),
+      'metadata_holds':len(gate['submission_metadata_holds']),
       'iris_decision':iris['decision'],
       'flowerclades_completed':f51['clades_completed_exact_profile'],
       'petunieae_terminal_class':pet['terminal_class'],
