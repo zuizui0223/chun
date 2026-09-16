@@ -55,11 +55,14 @@ class SolanaceaeRedBiochemicalProfileTests(unittest.TestCase):
         self.assertEqual(retained, ["a", "b", "c", "d", "e"])
         self.assertEqual(rare, ["C1_P0_C1_D0"])
 
-    def test_two_row_source_header_finds_subcolumns_below_spanning_label(self):
-        headers = [
+    def test_header_block_extends_below_species_header_until_first_data_row(self):
+        rows = [
             ["Species", "Anthocyanidin proportion", "", "", "Carotenoid presence"],
             ["", "Pelargonidin", "Cyanidin", "Delphinidin", ""],
+            ["Brugmansia sanguinea", "10", "20", "70", "present"],
         ]
+        headers = mod.header_rows_before_species_data(rows, species_column_index=0)
+        self.assertEqual(headers, rows[:2])
         self.assertEqual(
             mod.required_column_map(headers, species_column_index=0),
             {"species": 0, "pelargonidin": 1, "cyanidin": 2, "delphinidin": 3, "carotenoid": 4},
