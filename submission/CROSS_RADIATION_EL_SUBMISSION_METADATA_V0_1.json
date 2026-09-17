@@ -1,0 +1,32 @@
+{
+  "schema_version": "v0.1",
+  "paper_title": "No universal scale of predictability in flower-color evolution",
+  "phase1_author_identity": {
+    "authors": [],
+    "affiliations": [],
+    "corresponding_author": {
+      "author_name": null,
+      "email": null,
+      "postal_address": null,
+      "orcid": null
+    }
+  },
+  "phase2_declarations": {
+    "acknowledgments": null,
+    "funding_status": null,
+    "funding_sources": [],
+    "credit_roles": [],
+    "conflict_of_interest": "The authors declare no conflicts of interest."
+  },
+  "phase3_archive": {
+    "archive_doi": null,
+    "archive_version": null,
+    "archive_url": null
+  },
+  "governance": {
+    "do_not_infer_missing_human_metadata": true,
+    "science_status": "SCIENCE_AND_JOURNAL_FORMAT_READY_METADATA_HOLD",
+    "submission_route": "Evolution Letters v0.2",
+    "current_state": "AWAITING_PHASE1_AUTHOR_IDENTITY"
+  }
+}
