@@ -2,12 +2,14 @@ from __future__ import annotations
 
 import io
 import unittest
+import zipfile
 
 import numpy as np
 from Bio import Phylo
 
 from scripts.flowercolor_persistence_axis_v0_1 import (
     persistence_curve,
+    summarize_tree_archive,
     tree_axis_diagnostics,
 )
 
@@ -36,6 +38,18 @@ class PersistenceAxisTests(unittest.TestCase):
         self.assertAlmostEqual(rows[0]["excess_same_probability"], 0.5)
         self.assertAlmostEqual(rows[1]["same_probability"], 0.0)
         self.assertAlmostEqual(rows[1]["excess_same_probability"], -0.5)
+
+    def test_tree_archive_summary_keeps_time_label_only_for_ultrametric_members(self):
+        buf = io.BytesIO()
+        with zipfile.ZipFile(buf, "w") as zf:
+            zf.writestr("Ultra.tre", "((A:1,B:1):1,(C:1,D:1):1);")
+            zf.writestr("NonUltra.tre", "((A:1,B:2):1,(C:1,D:1):1);")
+        s = summarize_tree_archive(buf.getvalue())
+        self.assertEqual(s["tree_count"], 2)
+        self.assertEqual(s["relative_time_tree_count"], 1)
+        self.assertEqual(s["normalized_patristic_tree_count"], 1)
+        self.assertEqual(s["members"]["Ultra.tre"]["axis_class"], "RELATIVE_DIVERGENCE_TIME")
+        self.assertEqual(s["members"]["NonUltra.tre"]["axis_class"], "NORMALIZED_PATRISTIC_DISTANCE")
 
 
 if __name__ == "__main__":
