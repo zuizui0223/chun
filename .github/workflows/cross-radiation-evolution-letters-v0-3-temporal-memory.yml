@@ -1,0 +1,38 @@
+name: Cross-radiation Evolution Letters v0.3 temporal-memory candidate
+
+on:
+  pull_request:
+    paths:
+      - 'manuscript/CROSS_RADIATION_EVOLUTION_LETTERS_V0_3_TEMPORAL_MEMORY_CANDIDATE.md'
+      - 'scripts/validate_cross_radiation_evolution_letters_v0_3_temporal_memory.py'
+      - 'scripts/build_cross_radiation_evolution_letters_figures_v0_3_temporal_memory.py'
+      - 'data/flowerclades51_fine_time_persistence_median_curve_v0_1.csv'
+      - 'data/flowerclades51_relative_time_persistence_result_v0_1.json'
+      - '.github/workflows/cross-radiation-evolution-letters-v0-3-temporal-memory.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install figure runtime
+        run: pip install matplotlib numpy pandas
+      - name: Validate temporal-memory candidate
+        run: python scripts/validate_cross_radiation_evolution_letters_v0_3_temporal_memory.py
+      - name: Build temporal-memory candidate figures
+        run: python scripts/build_cross_radiation_evolution_letters_figures_v0_3_temporal_memory.py --out-dir build/cross_radiation_el_v0_3_figures
+      - name: Confirm frozen EL v0.2 remains unchanged
+        if: github.event_name == 'pull_request'
+        run: git diff --exit-code ${{ github.event.pull_request.base.sha }}...HEAD -- manuscript/CROSS_RADIATION_EVOLUTION_LETTERS_V0_2.md data/cross_radiation_evolution_letters_submission_gate_v0_2.json submission/CROSS_RADIATION_EL_SUBMISSION_METADATA_V0_1.json
+      - name: Confirm Camellia Paper 1 science firewall
+        if: github.event_name == 'pull_request'
+        run: git diff --exit-code ${{ github.event.pull_request.base.sha }}...HEAD -- manuscript data/paper1_authoritative_results_v0_2_2.csv data/paper1_main_figure_manifest_v0_2_2.csv -- ':!manuscript/CROSS_RADIATION_EVOLUTION_LETTERS_V0_3_TEMPORAL_MEMORY_CANDIDATE.md'
