@@ -1,0 +1,72 @@
+name: Flower-clades-51 distance persistence v0.1
+
+on:
+  pull_request:
+    paths:
+      - 'scripts/run_flowerclades51_distance_persistence_v0_1.py'
+      - 'tests/test_flowerclades51_distance_persistence_v0_1.py'
+      - 'data/flowerclades51_relative_time_persistence_result_v0_1.json'
+      - 'data/flowerclades51_fine_time_persistence_clades_v0_1.csv'
+      - 'data/flowerclades51_fine_time_persistence_median_curve_v0_1.csv'
+      - 'docs/FLOWERCLADES51_RELATIVE_TIME_PERSISTENCE_V0_1.md'
+      - '.github/workflows/flowerclades51-distance-persistence-v0-1.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  spike:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install runtime
+        run: pip install numpy scipy biopython pytest
+      - name: Unit tests
+        run: pytest -q tests/test_flowerclades51_distance_persistence_v0_1.py
+      - name: Validate frozen derived result
+        run: |
+          python - <<'PY'
+          import csv,json
+          p='data/flowerclades51_relative_time_persistence_result_v0_1.json'
+          x=json.load(open(p))
+          assert x['status']=='FLOWERCLADES51_RELATIVE_TIME_PERSISTENCE_RETROSPECTIVE_RESULT'
+          assert x['source_sha256']['final_dataset.csv']=='a253308785e4cbd0e361b3ca04cdfdae29c523eefa843375cebf8030ee0874af'
+          assert x['source_sha256']['trees.zip']=='ae5c82945e5bf9c29bcabc52d6029acd8d4f5be1fe9141fad95918eacb4f674d'
+          assert x['time_axis']['absolute_time_units'] is False
+          assert x['time_axis']['fine32_root_to_tip_cv_max'] < 1e-8
+          f=x['fine_visible_color_all_eligible']
+          assert f['eligible_clades']==32 and f['hold_clades']==19
+          assert f['slope']['median'] < 0 and f['slope']['favorable']==23
+          assert f['slope']['wilcoxon_p_one_sided'] < 0.01
+          assert f['area']['median'] > 0 and f['area']['favorable']==23
+          assert f['area']['wilcoxon_p_one_sided'] < 0.01
+          common=x['common_three_resolution_frame']
+          assert common['eligible_clades']==28
+          assert common['area_winner_counts']=={'coarse':13,'intermediate':10,'fine':5}
+          assert all(v['p_two_sided'] > 0.05 for v in common['area_difference_tests'].values())
+          assert x['paper1_science_changed'] is False
+          rows=list(csv.DictReader(open('data/flowerclades51_fine_time_persistence_clades_v0_1.csv')))
+          assert len(rows)==32
+          med=list(csv.DictReader(open('data/flowerclades51_fine_time_persistence_median_curve_v0_1.csv')))
+          assert len(med)==10
+          print({'fine_clades':len(rows),'slope_p':f['slope']['wilcoxon_p_one_sided']})
+          PY
+      - name: Diagnose current public source recovery path
+        run: |
+          python scripts/run_flowerclades51_distance_persistence_v0_1.py             --download             --outdir build/flowerclades51_distance_persistence_v0_1
+      - name: Show public-download diagnostic headline
+        run: |
+          python - <<'PY'
+          import json
+          p='build/flowerclades51_distance_persistence_v0_1/summary.json'
+          x=json.load(open(p))
+          print(json.dumps(x['headline'],indent=2))
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: flowerclades51-distance-persistence-v0-1
+          path: build/flowerclades51_distance_persistence_v0_1/
