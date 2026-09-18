@@ -25,8 +25,9 @@ def test_focal_curve_is_positive_when_same_color_is_near():
         [0.9,0.9,0.1,0.0],
     ])
     out=mod.focal_memory_curve(dist,states,"white",n_bins=2)
-    assert out["area"] > 0
+    assert out["bins"][0]["excess_retention"] > 0
     assert out["bins"][0]["excess_retention"] > out["bins"][-1]["excess_retention"]
+    assert out["slope"] < 0
 
 
 def test_stress_minus_white_contrast_averages_available_stress_colors():
