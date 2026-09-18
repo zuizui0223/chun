@@ -138,6 +138,12 @@ def main():
     assert ident['representation_type_model_fit'] is False
     assert frontier['status']=='SECOND_NONVISIBLE_EXACT_PROFILE_NOT_YET_IDENTIFIED'
 
+    # The submission must define the estimand narrowly enough that "predictability"
+    # cannot be read as transition forecasting.
+    estimand=subsection(text,'General estimand')
+    assert 'same-state phylogenetic discrimination' in estimand
+    assert 'does not estimate transition probabilities or forecast evolutionary transitions' in estimand
+
     # Claim ceilings remain enforced without keeping an internal-warning section in the submission draft.
     for bad in reg['forbidden_claim_fragments']:
         assert bad.lower() not in low, bad
