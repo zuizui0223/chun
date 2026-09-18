@@ -1,0 +1,41 @@
+{
+  "version": "v0.1",
+  "status": "FLOWER_FRUIT_MEMORY_TRADEOFF_FAIL",
+  "eligible_clades": 26,
+  "hold_clades": 25,
+  "primary_test": {
+    "metric": "signed_excess_retention_area",
+    "rho": 0.14188034188034188,
+    "p_one_sided_permutation": 0.75854,
+    "permutations": 99999,
+    "seed": 20260918,
+    "decision": "FAIL"
+  },
+  "secondary_slope_test": {
+    "rho": 0.28752136752136753,
+    "p_one_sided_permutation": 0.92283
+  },
+  "leave_one_clade_out": {
+    "negative_rho_count": 0,
+    "total": 26
+  },
+  "dominance_counts": {
+    "flower_memory_stronger": 15,
+    "fruit_memory_stronger": 11,
+    "tied": 0
+  },
+  "interpretation": "The published cross-clade flower-fruit transition-count tradeoff does not translate into a negative tradeoff in relative-time memory strength. Flower and fruit memory areas are weakly positively, not negatively, associated, and the negative primary direction is absent in every leave-one-clade-out fit.",
+  "claim_boundary": [
+    "retrospective cross-organ derived analysis",
+    "not independent of the published flower-fruit color-lability tradeoff",
+    "does not overturn the published transition-count tradeoff; it shows that transition lability and relative-time phylogenetic memory are distinct summaries",
+    "no causal energetic allocation, pollinator, disperser, climate, or pigment mechanism identified",
+    "clade is the inferential replication unit"
+  ],
+  "source_sha256": {
+    "final_dataset.csv": "a253308785e4cbd0e361b3ca04cdfdae29c523eefa843375cebf8030ee0874af",
+    "trees.zip": "ae5c82945e5bf9c29bcabc52d6029acd8d4f5be1fe9141fad95918eacb4f674d"
+  },
+  "paper1_science_changed": false,
+  "el_v0_2_science_changed": false
+}
