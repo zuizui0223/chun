@@ -1,0 +1,41 @@
+{
+  "version": "v0.1",
+  "status": "SOURCE_DATED_PHYLOGENY_LINEAGE_SUPPORTED_EXACT_TREE_RECHECK_TRANSPORT_HOLD",
+  "source_dataset": {
+    "doi": "10.5061/dryad.r4xgxd2sc",
+    "frozen_version_id": 402189,
+    "trees_file_id": 4411880,
+    "trees_bytes": 80326,
+    "trees_sha256": "ae5c82945e5bf9c29bcabc52d6029acd8d4f5be1fe9141fad95918eacb4f674d",
+    "exact_bytes_previously_verified_in_chun_pr": 266,
+    "current_public_transport": "Dryad file-stream returns Anubis validation interstitial on GitHub-hosted runner"
+  },
+  "provenance_evidence": [
+    {
+      "source": "Sinnott-Armstrong et al. 2026, American Journal of Botany",
+      "doi": "10.1002/ajb2.70146",
+      "supports": "51 clades were analysed with stochastic character mapping to estimate numbers and rates of colour transitions"
+    },
+    {
+      "source": "Dellinger et al. 2026, American Journal of Botany",
+      "doi": "10.1002/ajb2.70044",
+      "supports": "the same 51-clade colour-data framework selected taxa included in the phylogeny of Jin and Qian (2019)"
+    },
+    {
+      "source": "Jin and Qian 2019 V.PhyloMaker lineage, documented by V.PhyloMaker2",
+      "doi": "10.1111/ecog.04434",
+      "supports": "GBOTB.extended is a dated vascular-plant megaphylogeny; downstream V.PhyloMaker phylogenies inherit a time-scaled source lineage"
+    }
+  ],
+  "interpretation_boundary": {
+    "source_lineage_time_scaled": true,
+    "exact_51_tree_ultrametricity_rechecked_current_branch": false,
+    "absolute_myr_persistence_claim_authorized": false,
+    "relative_divergence_time_label_authorized_only_after_exact_tree_gate": true,
+    "fallback_if_exact_tree_gate_non_ultrametric": "NORMALIZED_PATRISTIC_DISTANCE",
+    "transport_hold_is_not_biological_negative": true
+  },
+  "next_gate": "RECOVER_EXACT_FROZEN_TREES_ZIP_THEN_RUN_TRAIT_BLIND_AXIS_DIAGNOSTIC_BEFORE_NEW_PERSISTENCE_OUTCOMES",
+  "paper1_science_changed": false,
+  "cross_radiation_el_v0_2_changed": false
+}
