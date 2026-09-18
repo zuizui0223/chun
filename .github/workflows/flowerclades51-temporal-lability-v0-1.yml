@@ -19,5 +19,7 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
+      - name: Install test runtime
+        run: python -m pip install pytest
       - name: Validate frozen temporal-lability bridge contract
         run: python -m pytest -q tests/test_flowerclades51_temporal_lability_bridge_prereg_v0_1.py
