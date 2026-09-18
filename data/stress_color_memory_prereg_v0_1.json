@@ -1,0 +1,57 @@
+{
+  "version": "v0.1",
+  "status": "FROZEN_BEFORE_COLOR_SPECIFIC_MEMORY_COMPUTATION",
+  "programme_role": "RETROSPECTIVE_ECOLOGICAL_CONVERGENCE_TEST",
+  "source_sha256": {
+    "final_dataset.csv": "a253308785e4cbd0e361b3ca04cdfdae29c523eefa843375cebf8030ee0874af",
+    "trees.zip": "ae5c82945e5bf9c29bcabc52d6029acd8d4f5be1fe9141fad95918eacb4f674d"
+  },
+  "ecological_anchor": {
+    "reference": "Dellinger et al. 2026, American Journal of Botany, DOI 10.1002/ajb2.70044",
+    "stress_associated_flower_colors": ["pink", "red", "purple", "yellow"],
+    "reference_color": "white",
+    "rationale": "The published macroecological analysis associates pink/red flowers with cold conditions and purple/yellow flowers with aridity and/or UV-B. If these colors repeatedly arise under abiotic selection in distant lineages, they should retain less clade-internal phylogenetic memory than white."
+  },
+  "common_frame": {
+    "remove_source_fine_states_with_fewer_than_tips": 5,
+    "minimum_retained_tips": 20,
+    "minimum_focal_color_tips": 5,
+    "minimum_nonfocal_tips": 5,
+    "require_white": true,
+    "require_at_least_one_stress_color": true
+  },
+  "relative_time_axis": "pairwise patristic distance / (2 * source-tree crown height); require root-to-tip CV <= 1e-8",
+  "focal_color_memory": {
+    "sampling_unit": "directed focal-color species -> every other retained species",
+    "baseline": "(k-1)/(n-1), where k is focal-color tip count",
+    "bins": 10,
+    "binning": "equal directed-pair count by relative divergence depth",
+    "excess_retention": "(P[partner has focal color | bin] - baseline)/(1-baseline)",
+    "primary_color_metric": "signed trapezoid area of focal-color excess-retention curve"
+  },
+  "clade_contrast": {
+    "stress_metric": "mean signed area across eligible stress-associated colors present in that clade",
+    "contrast": "stress_mean_area - white_area",
+    "minimum_paired_clades": 10
+  },
+  "primary_test": {
+    "prediction": "stress-associated colors have weaker phylogenetic memory than white",
+    "expected_contrast": "negative",
+    "statistic": "paired one-sided Wilcoxon signed-rank test across clades",
+    "alpha": 0.05,
+    "pass_rule": "median contrast < 0 and one-sided Wilcoxon P <= 0.05"
+  },
+  "secondary_diagnostics": [
+    "sign test on clade contrasts",
+    "individual pink/red/purple/yellow versus white paired contrasts",
+    "leave-one-clade-out sign stability"
+  ],
+  "claim_boundary": [
+    "retrospective derived test on already-opened flower-color outcomes",
+    "environment-color associations come from Dellinger et al. 2026 and are not re-estimated here",
+    "a PASS is consistent with repeated ecological convergence but does not establish abiotic causation",
+    "a FAIL rejects this simple stress-color convergence prediction without rejecting environment-color associations themselves"
+  ],
+  "paper1_science_changed": false,
+  "el_v0_2_science_changed": false
+}
