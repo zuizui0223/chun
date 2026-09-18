@@ -98,7 +98,7 @@ def main():
     for cite in (
         'Ng & Smith, 2016','Rausher, 2008','Sobel & Streisfeld, 2013','Wessinger & Rausher, 2012',
         'Tarasov, 2019','Vera-Ruiz et al., 2022','Roguz et al., 2020',
-        'Sinnott-Armstrong et al. (2025, 2026)','Wheeler et al. (2023a, 2023b)'):
+        'Sinnott-Armstrong et al. (2025, 2026)','Wheeler et al. (2023a, 2023b)','Dellinger et al., 2026'):
         assert cite in text, cite
 
     iris=json.loads((ROOT/reg['authoritative_sources']['iris']).read_text())
@@ -171,6 +171,9 @@ def main():
     assert 'relative divergence' in low
     assert 'not absolute' in low or 'not calibrated' in low
     assert '23/32' in text or '23 of 32' in text
+    assert '10.1002/ajb2.70044' in references
+    assert 'temperature, aridity, and UV-B' in discussion
+    assert 'does not test' in discussion.lower() and 'memory' in discussion.lower()
 
     print(json.dumps({
       'status':'EL_V0_3_TEMPORAL_MEMORY_CANDIDATE_VALID',
