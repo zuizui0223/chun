@@ -33,3 +33,21 @@ def test_persistence_curve_declines_when_only_close_pairs_share_state():
 def test_root_to_tip_cv_detects_ultrametric_branch_lengths():
     tree = Phylo.read(StringIO("(A:1,B:1,(C:0.5,D:0.5):0.5);"), "newick")
     assert abs(mod.root_to_tip_cv(tree)) < 1e-12
+
+
+def test_relative_divergence_time_is_fraction_of_crown_depth_for_ultrametric_tree():
+    tree = Phylo.read(StringIO("(A:1,B:1,(C:0.5,D:0.5):0.5);"), "newick")
+    tips = tree.get_terminals()
+    ii, jj = np.triu_indices(len(tips), 1)
+    dist = np.array([tree.distance(tips[int(a)], tips[int(b)]) for a, b in zip(ii, jj)])
+    rel = mod.relative_divergence_time(tree, dist)
+    assert rel.min() >= 0
+    assert rel.max() <= 1 + 1e-12
+    assert np.isclose(rel.max(), 1.0)
+
+
+def test_fine_only_eligibility_does_not_require_coarse_variation():
+    colors = ["red"] * 10 + ["orange"] * 10
+    ok, reasons = mod.fine_only_eligibility(colors, minimum_tips=20, minimum_fine_states=2)
+    assert ok is True
+    assert reasons == []
