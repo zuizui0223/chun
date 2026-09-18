@@ -1,0 +1,61 @@
+{
+  "absolute_time_claim_allowed": false,
+  "completed_clades": 28,
+  "contract_provenance": {
+    "machine_readable_contract_materialized_post_outcome": true,
+    "pre_outcome_test_commit": "82aacf4281d64587eec58d21eee595a483fbe252"
+  },
+  "cross_resolution": {
+    "boundary_counts": {
+      "coarse": {"lower": 0, "upper": 3},
+      "fine": {"lower": 0, "upper": 4},
+      "intermediate": {"lower": 0, "upper": 4}
+    },
+    "friedman": {
+      "p_value": 0.44295561125456395,
+      "statistic": 1.6285714285713766
+    },
+    "largest_half_depth_counts": {
+      "coarse": 7,
+      "coarse+intermediate": 1,
+      "coarse+intermediate+fine": 8,
+      "fine": 3,
+      "intermediate": 1,
+      "intermediate+fine": 8
+    },
+    "median_half_depth": {
+      "coarse": 0.006001067773893024,
+      "fine": 0.010427830520070024,
+      "intermediate": 0.010674325269028593
+    },
+    "median_lambda": {
+      "coarse": 158.96838991876047,
+      "fine": 66.59691327401458,
+      "intermediate": 65.07289264804143
+    },
+    "pairwise_if_friedman_significant": {},
+    "q25_half_depth": {
+      "coarse": 0.0003467388743360217,
+      "fine": 0.0002547375942054339,
+      "intermediate": 0.0002697467613818993
+    },
+    "q75_half_depth": {
+      "coarse": 0.08296874938565661,
+      "fine": 0.09929183852147692,
+      "intermediate": 0.09745705069948286
+    }
+  },
+  "distance_scale": "pairwise patristic distance / (2 * clade crown height)",
+  "el_v0_2_science_changed": false,
+  "hold_clades": 23,
+  "independent_replication": false,
+  "inference_boundary": "clade is inferential unit; pairwise Bernoulli likelihood is pseudo-likelihood used to define a within-clade decay estimand",
+  "model": "p_same(d)=q+(1-q)*exp(-lambda*d)",
+  "paper1_science_changed": false,
+  "source_sha256": {
+    "final_dataset.csv": "a253308785e4cbd0e361b3ca04cdfdae29c523eefa843375cebf8030ee0874af",
+    "trees.zip": "ae5c82945e5bf9c29bcabc52d6029acd8d4f5be1fe9141fad95918eacb4f674d"
+  },
+  "status": "FLOWERCLADES51_RELATIVE_TIME_HALFDEPTH_RESULT",
+  "version": "v0.1"
+}

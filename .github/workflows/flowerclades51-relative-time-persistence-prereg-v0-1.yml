@@ -1,0 +1,23 @@
+name: Flowerclades51 relative-time persistence prereg v0.1
+
+on:
+  push:
+    branches:
+      - analysis/flowerclades51-relative-time-persistence-prereg-v0-1
+  pull_request:
+    paths:
+      - 'data/flowerclades51_relative_time_persistence_prereg_v0_1.json'
+      - 'docs/FLOWERCLADES51_RELATIVE_TIME_PERSISTENCE_PREREG_V0_1.md'
+      - 'tests/test_flowerclades51_relative_time_persistence_prereg_v0_1.py'\n      - 'tests/test_flowerclades51_relative_time_halfdepth_v0_1.py'\n      - 'scripts/run_flowerclades51_relative_time_halfdepth_v0_1.py'\n      - 'results/flowerclades51_relative_time_halfdepth_v0_1/**'
+      - '.github/workflows/flowerclades51-relative-time-persistence-prereg-v0-1.yml'
+
+jobs:
+  validate-prereg:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: python -m pip install pytest numpy scipy biopython
+      - run: python -m pytest -q tests/test_flowerclades51_relative_time_persistence_prereg_v0_1.py tests/test_flowerclades51_relative_time_halfdepth_v0_1.py\n      - name: Validate frozen result if present\n        run: |\n          if [ -f results/flowerclades51_relative_time_halfdepth_v0_1/result_v0_1.json ]; then\n            python - <<'PY'\n          import json\n          x=json.load(open('results/flowerclades51_relative_time_halfdepth_v0_1/result_v0_1.json'))\n          assert x['status']=='FLOWERCLADES51_RELATIVE_TIME_HALFDEPTH_RESULT'\n          assert x['completed_clades']==28\n          assert x['absolute_time_claim_allowed'] is False\n          assert x['paper1_science_changed'] is False\n          assert x['el_v0_2_science_changed'] is False\n          print(x['cross_resolution'])\n          PY\n          fi
