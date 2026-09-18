@@ -1,0 +1,24 @@
+{
+  "version": "v0.1",
+  "status": "HOLD_WILEY_APPENDIX_S2_BYTES_UNAVAILABLE",
+  "doi": "10.1002/ajb2.70146",
+  "expected_filename": "ajb270146-sup-0002-AJB_SinnottArmstrong_D_24_00358_AppendixS2_ce.docx",
+  "publisher_listing_verified": true,
+  "publisher_reported_size": "254.6 KB",
+  "diagnostics": [
+    {"stage":"article_discovery","url":"https://bsapubs.onlinelibrary.wiley.com/doi/10.1002/ajb2.70146","error":"HTTP 403"},
+    {"stage":"article_discovery","url":"https://onlinelibrary.wiley.com/doi/10.1002/ajb2.70146","error":"HTTP 403"},
+    {"stage":"article_discovery","url":"https://doi.org/10.1002/ajb2.70146","error":"HTTP 403"},
+    {"stage":"supplement_probe","url":"Wiley downloadSupplement route for the exact Appendix S2 filename","error":"HTTP 403"}
+  ],
+  "outcome_firewall": {
+    "clade_transition_values_extracted": false,
+    "manual_plot_digitization_used": false,
+    "transition_counts_reestimated": false,
+    "chun_bridge_fitted": false
+  },
+  "decision": "HOLD_SOURCE_LABILITY_VALUE_UNRESOLVED",
+  "interpretation": "Publisher access limitation only; not evidence for or against temporal lability as a moderator.",
+  "paper1_science_changed": false,
+  "el_v0_2_science_changed": false
+}
