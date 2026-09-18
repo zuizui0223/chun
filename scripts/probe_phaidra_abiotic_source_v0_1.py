@@ -15,7 +15,7 @@ UA = "CHUN-abiotic-source-gate/0.1"
 
 
 def get_json(url: str, timeout: int = 60) -> tuple[Any | None, dict]:
-    req = urllib.request.Request(url, headers={"User-Agent": UA, "Accept": "application/json"})
+    req = urllib.request.Request(url, headers={"User-Agent": UA, "Accept": "*/*"})
     try:
         with urllib.request.urlopen(req, timeout=timeout) as r:
             raw = r.read()
@@ -119,31 +119,68 @@ def summarize_info(pid: str, payload: Any) -> dict:
     }
 
 
-def collection_member_pids() -> tuple[list[str], list[dict], dict[str, Any]]:
+def head_url(url: str, timeout: int = 60) -> dict:
+    req = urllib.request.Request(url, method="HEAD", headers={"User-Agent": UA, "Accept": "*/*"})
+    try:
+        with urllib.request.urlopen(req, timeout=timeout) as r:
+            return {
+                "url": url,
+                "http_status": getattr(r, "status", 200),
+                "content_type": r.headers.get("Content-Type"),
+                "content_length": r.headers.get("Content-Length"),
+                "content_disposition": r.headers.get("Content-Disposition"),
+                "location": r.headers.get("Location"),
+            }
+    except Exception as e:
+        return {"url": url, "error": f"{type(e).__name__}: {e}"}
+
+
+def collection_member_pids() -> tuple[list[str], list[dict], dict[str, Any], dict | None]:
     diagnostics: list[dict] = []
     raw_sources: dict[str, Any] = {}
-
+    root_summary = None
     encoded = urllib.parse.quote(COLLECTION, safe="")
-    u1 = f"{BASE}/collection/{encoded}/members"
-    payload, diag = get_json(u1)
-    diagnostics.append(diag)
-    if payload is not None:
-        raw_sources["collection_members"] = payload
-        pids = extract_pids(payload)
-        if pids:
-            return pids, diagnostics, raw_sources
 
-    q = urllib.parse.quote(f'ismemberof:"{COLLECTION}"')
-    u2 = f"{BASE}/search/select?q={q}&rows=500&wt=json"
-    payload, diag = get_json(u2)
-    diagnostics.append(diag)
-    if payload is not None:
-        raw_sources["solr_search"] = payload
-        pids = extract_pids(payload)
-        if pids:
-            return pids, diagnostics, raw_sources
+    # First determine what o:2098641 actually is. It may be a collection,
+    # container, or a single packaged asset.
+    for base in BASES:
+        for pid_token in (encoded, COLLECTION):
+            u = f"{base}/object/{pid_token}/info"
+            payload, diag = get_json(u)
+            diagnostics.append(diag)
+            if payload is not None:
+                raw_sources[f"root_info:{base}:{pid_token}"] = payload
+                root_summary = summarize_info(COLLECTION, payload)
+                pids = extract_pids(payload)
+                if pids:
+                    return pids, diagnostics, raw_sources, root_summary
+                break
+        if root_summary is not None:
+            break
 
-    return [], diagnostics, raw_sources
+    # If the root info did not expose members, try the relationships and Solr APIs.
+    for base in BASES:
+        for pid_token in (encoded, COLLECTION):
+            u1 = f"{base}/collection/{pid_token}/members"
+            payload, diag = get_json(u1)
+            diagnostics.append(diag)
+            if payload is not None:
+                raw_sources[f"collection_members:{base}:{pid_token}"] = payload
+                pids = extract_pids(payload)
+                if pids:
+                    return pids, diagnostics, raw_sources, root_summary
+
+        q = urllib.parse.quote(f'ismemberof:"{COLLECTION}"')
+        u2 = f"{base}/search/select?q={q}&rows=500&wt=json"
+        payload, diag = get_json(u2)
+        diagnostics.append(diag)
+        if payload is not None:
+            raw_sources[f"solr_search:{base}"] = payload
+            pids = extract_pids(payload)
+            if pids:
+                return pids, diagnostics, raw_sources, root_summary
+
+    return [], diagnostics, raw_sources, root_summary
 
 
 def main() -> None:
@@ -151,7 +188,7 @@ def main() -> None:
     ap.add_argument("--out", type=Path, required=True)
     args = ap.parse_args()
 
-    pids, diagnostics, raw_sources = collection_member_pids()
+    pids, diagnostics, raw_sources, root_summary = collection_member_pids()
     inventory = []
     info_diags = []
     if pids:
@@ -167,13 +204,25 @@ def main() -> None:
                 inventory.append(row)
 
     candidate_count = sum(bool(x.get("candidate_environment_or_code")) for x in inventory)
-    status = "PHAIDRA_ABIOTIC_SOURCE_INVENTORY_READY" if inventory else "HOLD_PHAIDRA_COLLECTION_INVENTORY_UNAVAILABLE"
+    download_heads = []
+    encoded = urllib.parse.quote(COLLECTION, safe="")
+    for base in BASES:
+        for pid_token in (encoded, COLLECTION):
+            download_heads.append(head_url(f"{base}/object/{pid_token}/download"))
+    if inventory:
+        status = "PHAIDRA_ABIOTIC_SOURCE_INVENTORY_READY"
+    elif root_summary and any(root_summary.get(k) for k in ("filename","mimetype","size","title")):
+        status = "PHAIDRA_ABIOTIC_ROOT_OBJECT_READY"
+    else:
+        status = "HOLD_PHAIDRA_COLLECTION_INVENTORY_UNAVAILABLE"
     out = {
         "version": "v0.1",
         "status": status,
         "collection": COLLECTION,
         "member_count": len(pids),
         "candidate_file_count": candidate_count,
+        "root_object": root_summary,
+        "download_head_diagnostics": download_heads,
         "members": inventory,
         "diagnostics": diagnostics,
         "info_diagnostics": info_diags,
@@ -191,6 +240,8 @@ def main() -> None:
         "status": status,
         "member_count": len(pids),
         "candidate_file_count": candidate_count,
+        "root_object": root_summary,
+        "download_heads": download_heads,
         "candidate_members": [x for x in inventory if x.get("candidate_environment_or_code")]
     }, indent=2))
 
