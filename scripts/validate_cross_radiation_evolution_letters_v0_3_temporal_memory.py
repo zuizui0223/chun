@@ -9,7 +9,7 @@ REG=ROOT/'data/cross_radiation_evolution_letters_claim_registry_v0_1.json'
 REFS=ROOT/'data/cross_radiation_el_reference_manifest_v0_1.json'
 GATE=ROOT/'data/cross_radiation_evolution_letters_submission_gate_v0_2.json'
 MAN=ROOT/'manuscript/CROSS_RADIATION_EVOLUTION_LETTERS_V0_3_TEMPORAL_MEMORY_CANDIDATE.md'
-PERSIST=ROOT/'data/flowerclades51_relative_time_persistence_result_v0_1.json'
+PERSIST=ROOT/'data/flowerclades51_relative_time_persistence_result_v0_1.json'\nHALFDEPTH=ROOT/'results/flowerclades51_relative_time_halfdepth_v0_1/result_v0_1.json'
 
 
 def words(s:str)->int:
@@ -107,7 +107,7 @@ def main():
     pet=json.loads((ROOT/reg['authoritative_sources']['petunieae']).read_text())
     ident=json.loads((ROOT/reg['authoritative_sources']['representation_identifiability']).read_text())
     frontier=json.loads((ROOT/reg['authoritative_sources']['frontier']).read_text())
-    persistence=json.loads(PERSIST.read_text())
+    persistence=json.loads(PERSIST.read_text())\n    halfdepth=json.loads(HALFDEPTH.read_text())
     c=reg['frozen_numeric_claims']
 
     assert iris['decision']==c['iris']['decision']=='FAIL'
@@ -150,7 +150,7 @@ def main():
     assert persistence['time_axis']['absolute_time_units'] is False
     assert persistence['common_three_resolution_frame']['eligible_clades']==28
     assert all(v['p_two_sided'] > 0.05 for v in persistence['common_three_resolution_frame']['area_difference_tests'].values())
-    assert persistence['paper1_science_changed'] is False
+    assert persistence['paper1_science_changed'] is False\n\n    # Model-based half-depth is a secondary time-scale sensitivity, not independent evidence.\n    assert halfdepth['status']=='FLOWERCLADES51_RELATIVE_TIME_HALFDEPTH_RESULT'\n    assert halfdepth['completed_clades']==28\n    hd=halfdepth['cross_resolution']\n    assert abs(hd['median_half_depth']['coarse']-0.006001067773893024) < 1e-12\n    assert abs(hd['median_half_depth']['intermediate']-0.010674325269028593) < 1e-12\n    assert abs(hd['median_half_depth']['fine']-0.010427830520070024) < 1e-12\n    assert abs(hd['friedman']['p_value']-0.44295561125456395) < 1e-12\n    assert halfdepth['absolute_time_claim_allowed'] is False\n    assert halfdepth['independent_replication'] is False
 
     # The submission must define the estimand narrowly enough that "predictability"
     # cannot be read as transition forecasting.
@@ -172,7 +172,7 @@ def main():
     assert 'not absolute' in low or 'not calibrated' in low
     assert '23/32' in text or '23 of 32' in text
     assert '10.1002/ajb2.70044' in references
-    assert 'temperature, aridity, and UV-B' in discussion
+    assert 'temperature, aridity, and UV-B' in discussion\n    assert 'half-depth' in methods.lower()\n    assert '0.0060' in results and '0.0107' in results and '0.0104' in results\n    assert 'P = 0.443' in results or 'P = 0.443' in discussion\n    assert 'restrictive exponential' in discussion.lower()
     assert 'does not test' in discussion.lower() and 'memory' in discussion.lower()
 
     print(json.dumps({
