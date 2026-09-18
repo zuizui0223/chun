@@ -1,0 +1,32 @@
+name: Flower-color persistence axis v0.1
+
+on:
+  pull_request:
+    paths:
+      - 'tests/test_flowercolor_persistence_axis_v0_1.py'
+      - 'scripts/flowercolor_persistence_axis_v0_1.py'
+      - 'data/flowercolor_persistence_axis_prereg_v0_1.json'
+      - '.github/workflows/flowercolor-persistence-axis-v0-1.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install runtime
+        run: pip install numpy biopython
+      - name: Unit tests
+        run: python -m unittest tests/test_flowercolor_persistence_axis_v0_1.py
+      - name: Confirm manuscript firewalls
+        if: github.event_name == 'pull_request'
+        run: |
+          git diff --exit-code ${{ github.event.pull_request.base.sha }}...HEAD -- manuscript data/paper1_authoritative_results_v0_2_2.csv data/cross_radiation_evolution_letters_claim_registry_v0_1.json
