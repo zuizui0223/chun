@@ -9,6 +9,7 @@ from Bio import Phylo
 
 from scripts.flowercolor_persistence_axis_v0_1 import (
     classify_source_payload,
+    normalized_pairwise_axis,
     persistence_curve,
     summarize_tree_archive,
     tree_axis_diagnostics,
@@ -28,6 +29,23 @@ class PersistenceAxisTests(unittest.TestCase):
         d = tree_axis_diagnostics(tree)
         self.assertEqual(d["axis_class"], "NORMALIZED_PATRISTIC_DISTANCE")
         self.assertGreater(d["root_to_tip_cv"], 0.0)
+
+    def test_normalized_pairwise_axis_uses_relative_divergence_time_for_ultrametric_tree(self):
+        tree = Phylo.read(io.StringIO("((A:1,B:1):1,(C:1,D:1):1);"), "newick")
+        out = normalized_pairwise_axis(tree)
+        self.assertEqual(out["axis_class"], "RELATIVE_DIVERGENCE_TIME")
+        pairs = {
+            tuple(sorted((a, b))): x
+            for a, b, x in zip(out["tip_a"], out["tip_b"], out["normalized_axis"], strict=True)
+        }
+        self.assertAlmostEqual(pairs[("A", "B")], 0.5)
+        self.assertAlmostEqual(pairs[("A", "C")], 1.0)
+
+    def test_normalized_pairwise_axis_falls_back_to_max_patristic_scaling(self):
+        tree = Phylo.read(io.StringIO("((A:1,B:2):1,(C:1,D:1):1);"), "newick")
+        out = normalized_pairwise_axis(tree)
+        self.assertEqual(out["axis_class"], "NORMALIZED_PATRISTIC_DISTANCE")
+        self.assertAlmostEqual(max(out["normalized_axis"]), 1.0)
 
     def test_persistence_curve_uses_state_frequency_baseline(self):
         distance = np.array([0.1, 0.2, 0.3, 0.7, 0.8, 0.9], dtype=float)
