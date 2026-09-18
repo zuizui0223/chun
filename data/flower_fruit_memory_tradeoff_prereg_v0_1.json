@@ -1,0 +1,55 @@
+{
+  "version": "v0.1",
+  "status": "FROZEN_BEFORE_FRUIT_MEMORY_CURVE_COMPUTATION",
+  "programme_role": "RETROSPECTIVE_CROSS_ORGAN_MEMORY_TRADEOFF_TEST",
+  "source": {
+    "dataset_doi": "10.5061/dryad.r4xgxd2sc",
+    "final_dataset_sha256": "a253308785e4cbd0e361b3ca04cdfdae29c523eefa843375cebf8030ee0874af",
+    "trees_sha256": "ae5c82945e5bf9c29bcabc52d6029acd8d4f5be1fe9141fad95918eacb4f674d"
+  },
+  "exposure_boundary": {
+    "flower_memory_already_computed": true,
+    "fruit_color_column_source_known": true,
+    "fruit_memory_curve_or_tradeoff_statistic_computed_before_freeze": false,
+    "prospective_label": false
+  },
+  "biological_hypothesis": "If clades specialize evolutionarily on the flower versus fruit signalling phase, clades retaining stronger flower-color memory should tend to retain weaker fruit-color memory, and vice versa.",
+  "common_cross_organ_frame": {
+    "fine_state_minimum_tips_each_organ": 5,
+    "drop_tip_if_flower_state_rare_or_fruit_state_rare": true,
+    "same_tip_pairs_for_flower_and_fruit": true,
+    "minimum_common_tips": 20,
+    "minimum_flower_states": 2,
+    "minimum_fruit_states": 2
+  },
+  "relative_time_axis": "pairwise patristic distance / (2 * source-tree crown height); source tree must have root-to-tip CV <= 1e-8",
+  "memory_curve": {
+    "bins": 10,
+    "binning": "equal pair count within clade",
+    "baseline": "exact without-replacement same-state probability from retained state frequencies",
+    "excess_retention": "(p_same_bin - baseline)/(1-baseline)",
+    "primary_clade_metric": "signed trapezoid area of excess-retention curve",
+    "secondary_clade_metric": "linear slope of excess retention over relative divergence depth"
+  },
+  "primary_test": {
+    "statistic": "Spearman correlation of flower versus fruit signed excess-retention area across eligible clades",
+    "direction": "negative",
+    "permutations": 99999,
+    "seed": 20260918,
+    "pass_rule": "rho < 0 and one-sided permutation p <= 0.05"
+  },
+  "secondary_tests": [
+    "Spearman correlation of flower versus fruit decay slopes, expected negative",
+    "leave-one-clade-out sign stability of the primary rho",
+    "descriptive count of flower-memory-dominant versus fruit-memory-dominant clades"
+  ],
+  "claim_boundary": [
+    "retrospective test; not independent of the published source study's flower-fruit lability tradeoff",
+    "memory metrics reuse the same color states and source trees but ask a relative-time persistence question",
+    "no causal energetic-allocation claim",
+    "no pollinator-versus-disperser mechanism is identified directly",
+    "clade is the inferential replication unit"
+  ],
+  "paper1_science_changed": false,
+  "el_v0_2_science_changed": false
+}
