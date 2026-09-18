@@ -1,0 +1,178 @@
+{
+  "version": "v0.1",
+  "status": "FLOWERCLADES51_RELATIVE_TIME_PERSISTENCE_RETROSPECTIVE_RESULT",
+  "source_sha256": {
+    "final_dataset.csv": "a253308785e4cbd0e361b3ca04cdfdae29c523eefa843375cebf8030ee0874af",
+    "trees.zip": "ae5c82945e5bf9c29bcabc52d6029acd8d4f5be1fe9141fad95918eacb4f674d"
+  },
+  "time_axis": {
+    "definition": "pairwise patristic distance / (2 * source-tree crown height)",
+    "interpretation": "relative phylogenetic divergence depth on effectively ultrametric source trees",
+    "absolute_time_units": false,
+    "fine32_root_to_tip_cv_median": 2.0757402363045486e-16,
+    "fine32_root_to_tip_cv_max": 2.9814575189447324e-11,
+    "common28_root_to_tip_cv_median": 2.1428151529687383e-16,
+    "common28_root_to_tip_cv_max": 2.9814575189447324e-11
+  },
+  "fine_visible_color_all_eligible": {
+    "eligible_clades": 32,
+    "hold_clades": 19,
+    "slope": {
+      "n": 32,
+      "median": -0.18966775303842393,
+      "favorable": 23,
+      "wilcoxon_p_one_sided": 0.0011953501962125301,
+      "sign_p_one_sided": 0.010030803503468633,
+      "bootstrap95_median": [
+        -0.3729286629990314,
+        -0.0903971993232946
+      ]
+    },
+    "area": {
+      "n": 32,
+      "median": 0.020670411188401648,
+      "favorable": 23,
+      "wilcoxon_p_one_sided": 0.004669796675443649,
+      "sign_p_one_sided": 0.010030803503468633,
+      "bootstrap95_median": [
+        0.00539425865500495,
+        0.0376863362360083
+      ]
+    },
+    "near_far": {
+      "n": 32,
+      "median": 0.08823060666114829,
+      "favorable": 19,
+      "wilcoxon_p_one_sided": 0.03540585096925497,
+      "sign_p_one_sided": 0.18854279373772442,
+      "bootstrap95_median": [
+        -0.0442086648983199,
+        0.20330930239482636
+      ]
+    },
+    "median_curve": [
+      {
+        "bin": 1,
+        "t": 0.2765470786434089,
+        "median_excess": 0.054128981145748,
+        "q25": 0.0078594214711921,
+        "q75": 0.3462567541346673,
+        "median_p_same": 0.5257685352622061
+      },
+      {
+        "bin": 2,
+        "t": 0.4668848235379292,
+        "median_excess": 0.0336885111745187,
+        "q25": -0.0270277967646389,
+        "q75": 0.1177819363894758,
+        "median_p_same": 0.4723727792833483
+      },
+      {
+        "bin": 3,
+        "t": 0.5956101952271968,
+        "median_excess": 0.0463072281254099,
+        "q25": -0.0651108920431824,
+        "q75": 0.2949580335404876,
+        "median_p_same": 0.5047169811320755
+      },
+      {
+        "bin": 4,
+        "t": 0.6692009228064892,
+        "median_excess": 0.0130156946639249,
+        "q25": -0.0820129831838522,
+        "q75": 0.1057782276191841,
+        "median_p_same": 0.444055944055944
+      },
+      {
+        "bin": 5,
+        "t": 0.7298410092628493,
+        "median_excess": -0.0452550878716285,
+        "q25": -0.2457255629524536,
+        "q75": 0.0563109380719443,
+        "median_p_same": 0.3947545070962792
+      },
+      {
+        "bin": 6,
+        "t": 0.8051201831372593,
+        "median_excess": -0.0553627994399437,
+        "q25": -0.1709961388444044,
+        "q75": 0.044488790308565,
+        "median_p_same": 0.3877533193570929
+      },
+      {
+        "bin": 7,
+        "t": 0.8599136732827126,
+        "median_excess": -0.039569927954683,
+        "q25": -0.2657464440149608,
+        "q75": 0.0487322791712104,
+        "median_p_same": 0.3818889387816195
+      },
+      {
+        "bin": 8,
+        "t": 0.9240783813855422,
+        "median_excess": -0.02453619221035,
+        "q25": -0.1272911685865391,
+        "q75": 0.0422315744101366,
+        "median_p_same": 0.4121323529411764
+      },
+      {
+        "bin": 9,
+        "t": 0.9915306803253948,
+        "median_excess": -0.0356982556169866,
+        "q25": -0.1339026364249051,
+        "q75": 0.0745417813569409,
+        "median_p_same": 0.3918826271767448
+      },
+      {
+        "bin": 10,
+        "t": 0.9999999999999998,
+        "median_excess": -0.0030800821355236,
+        "q25": -0.0919267330284279,
+        "q75": 0.1048144025514714,
+        "median_p_same": 0.4115472027972028
+      }
+    ]
+  },
+  "common_three_resolution_frame": {
+    "eligible_clades": 28,
+    "hold_clades": 23,
+    "area_winner_counts": {
+      "coarse": 13,
+      "intermediate": 10,
+      "fine": 5
+    },
+    "area_winner_uniform_chisquare_p": 0.17377394345044514,
+    "area_difference_tests": {
+      "intermediate_minus_coarse": {
+        "gt": 13,
+        "lt": 5,
+        "tie": 10,
+        "p_two_sided": 0.1083831787109375
+      },
+      "fine_minus_intermediate": {
+        "gt": 6,
+        "lt": 5,
+        "tie": 17,
+        "p_two_sided": 0.8310546875
+      },
+      "fine_minus_coarse": {
+        "gt": 13,
+        "lt": 8,
+        "tie": 7,
+        "p_two_sided": 0.41198158264160156
+      }
+    }
+  },
+  "relation_to_existing_auc": {
+    "note": "Persistence curves reuse the same pairwise flower-color state and patristic-distance information as the existing AUC; they add temporal shape and biological interpretation rather than independent replication.",
+    "fine_slope_spearman_rho": -0.8445539135194308,
+    "fine_slope_spearman_p_two_sided": 1.602268182315335e-8
+  },
+  "claim_boundary": [
+    "retrospective derived analysis, not a new prospective replication",
+    "relative phylogenetic depth, not absolute Ma",
+    "interspecific flower-color state persistence/lability, not within-population polymorphism persistence",
+    "shared pairwise information with existing AUC must be disclosed"
+  ],
+  "paper1_science_changed": false
+}
