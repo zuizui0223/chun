@@ -1,0 +1,47 @@
+{
+  "version": "v0.1",
+  "status": "FROZEN_BEFORE_NEW_PERSISTENCE_CURVE_COMPUTATION",
+  "programme_role": "RETROSPECTIVE_TIME_AXIS_REANALYSIS_OF_ALREADY_OPENED_FLOWERCLADES51_TRAITS",
+  "source_dataset_doi": "10.5061/dryad.r4xgxd2sc",
+  "source_file_ids": {"final_dataset.csv": 4411881, "trees.zip": 4411880},
+  "source_hashes": {
+    "final_dataset.csv": "a253308785e4cbd0e361b3ca04cdfdae29c523eefa843375cebf8030ee0874af",
+    "trees.zip": "ae5c82945e5bf9c29bcabc52d6029acd8d4f5be1fe9141fad95918eacb4f674d"
+  },
+  "claim_boundary": {
+    "not_prospective": true,
+    "not_transition_forecasting": true,
+    "absolute_time_claim_requires_source_calibration_evidence": true,
+    "if_tree_not_ultrametric_use_normalized_patristic_distance_label": true
+  },
+  "tree_axis_gate": {
+    "trait_blind_first": true,
+    "relative_time_axis_requires_max_relative_root_to_tip_deviation_le": 0.00001,
+    "otherwise_axis": "NORMALIZED_PATRISTIC_DISTANCE"
+  },
+  "state_hierarchy": {
+    "coarse": "WHITE versus NONWHITE",
+    "intermediate": "WHITE / DARK / WARM / COOL perceptual families",
+    "fine": "exact source eight-category flower_color state",
+    "reuse_existing_common_frame_and_rare_state_rules": true
+  },
+  "primary_output": {
+    "fixed_relative_axis_bins": [0.0, 0.125, 0.25, 0.375, 0.5, 0.625, 0.75, 0.875, 1.0],
+    "per_bin": [
+      "pair_count",
+      "same_probability",
+      "baseline_same_probability",
+      "excess_same_probability"
+    ],
+    "interpretation": "positive excess means same-state sharing above the frequency-preserving random baseline at that evolutionary depth"
+  },
+  "secondary_output": {
+    "near_far_contrast": "same_probability in shallowest quartile minus deepest quartile",
+    "distance_decay_slope": "OLS slope of same-state indicator on normalized axis, used descriptively with permutation inference",
+    "permutations": 9999,
+    "seed": 20260918,
+    "permutation_unit": "jointly permute complete coarse/intermediate/fine state triplets across retained tips within clade"
+  },
+  "paper1_science_changed": false,
+  "cross_radiation_el_v0_2_changed": false
+}
