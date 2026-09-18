@@ -1,9 +1,12 @@
 {
   "version": "v0.1",
-  "status": "FROZEN_BEFORE_NEW_PERSISTENCE_CURVE_COMPUTATION",
+  "status": "FROZEN_BEFORE_NEW_PERSISTENCE_CURVE_COMPUTATION_V0_1_1_AXIS_FORMULA_ADDED",
   "programme_role": "RETROSPECTIVE_TIME_AXIS_REANALYSIS_OF_ALREADY_OPENED_FLOWERCLADES51_TRAITS",
   "source_dataset_doi": "10.5061/dryad.r4xgxd2sc",
-  "source_file_ids": {"final_dataset.csv": 4411881, "trees.zip": 4411880},
+  "source_file_ids": {
+    "final_dataset.csv": 4411881,
+    "trees.zip": 4411880
+  },
   "source_hashes": {
     "final_dataset.csv": "a253308785e4cbd0e361b3ca04cdfdae29c523eefa843375cebf8030ee0874af",
     "trees.zip": "ae5c82945e5bf9c29bcabc52d6029acd8d4f5be1fe9141fad95918eacb4f674d"
@@ -17,7 +20,10 @@
   "tree_axis_gate": {
     "trait_blind_first": true,
     "relative_time_axis_requires_max_relative_root_to_tip_deviation_le": 0.00001,
-    "otherwise_axis": "NORMALIZED_PATRISTIC_DISTANCE"
+    "otherwise_axis": "NORMALIZED_PATRISTIC_DISTANCE",
+    "relative_time_normalization": "for an ultrametric retained-tip tree: pairwise patristic distance / (2 * mean root-to-tip tree height), yielding 0..1 relative divergence time",
+    "patristic_fallback_normalization": "for a non-ultrametric retained-tip tree: pairwise patristic distance / maximum retained-tip pairwise patristic distance",
+    "no_mixed_labeling": "the two normalized axes may be plotted on the same 0..1 support but must retain distinct labels and may not be pooled as literal time unless all included trees pass the relative-time gate"
   },
   "state_hierarchy": {
     "coarse": "WHITE versus NONWHITE",
@@ -26,7 +32,17 @@
     "reuse_existing_common_frame_and_rare_state_rules": true
   },
   "primary_output": {
-    "fixed_relative_axis_bins": [0.0, 0.125, 0.25, 0.375, 0.5, 0.625, 0.75, 0.875, 1.0],
+    "fixed_relative_axis_bins": [
+      0,
+      0.125,
+      0.25,
+      0.375,
+      0.5,
+      0.625,
+      0.75,
+      0.875,
+      1
+    ],
     "per_bin": [
       "pair_count",
       "same_probability",
