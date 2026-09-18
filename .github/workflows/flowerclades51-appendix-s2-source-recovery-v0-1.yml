@@ -1,0 +1,31 @@
+name: Flowerclades51 Appendix S2 source recovery v0.1
+
+on:
+  pull_request:
+    paths:
+      - 'scripts/recover_flowerclades51_appendix_s2_v0_1.py'
+      - 'tests/test_recover_flowerclades51_appendix_s2_v0_1.py'
+      - '.github/workflows/flowerclades51-appendix-s2-source-recovery-v0-1.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  recover:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install test runtime
+        run: pip install pytest
+      - name: Unit tests
+        run: pytest -q tests/test_recover_flowerclades51_appendix_s2_v0_1.py
+      - name: Recover exact publisher supplement and inventory tables
+        run: python scripts/recover_flowerclades51_appendix_s2_v0_1.py --outdir build/flowerclades51_appendix_s2_v0_1
+      - uses: actions/upload-artifact@v4
+        with:
+          name: flowerclades51-appendix-s2-source-recovery-v0-1
+          path: build/flowerclades51_appendix_s2_v0_1/
