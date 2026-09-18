@@ -36,13 +36,17 @@ jobs:
           )
           from scripts.flowercolor_persistence_axis_v0_1 import summarize_tree_archive
 
-          dataset=get_json(API+DATASET_PATH)
-          files=list_files(version_href(dataset))
-          by={x.get('path'):x for x in files}
           opener=browser_opener()
           browser_request(opener, LANDING_URL, timeout=90)
-          payload=download_public_file(by['trees.zip'], opener)
-          assert sha256_bytes(payload)=='ae5c82945e5bf9c29bcabc52d6029acd8d4f5be1fe9141fad95918eacb4f674d'
+          payload=browser_request(
+              opener,
+              'https://datadryad.org/stash/downloads/file_stream/4411880',
+              referer=LANDING_URL,
+              timeout=180,
+          )
+          observed=sha256_bytes(payload)
+          print('TREE_SOURCE', json.dumps({'file_id':4411880,'bytes':len(payload),'sha256':observed}))
+          assert observed=='ae5c82945e5bf9c29bcabc52d6029acd8d4f5be1fe9141fad95918eacb4f674d'
           out=summarize_tree_archive(payload)
           assert out['tree_count']==51
           vals=sorted(
