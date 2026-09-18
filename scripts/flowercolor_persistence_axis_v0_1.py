@@ -3,6 +3,7 @@ from __future__ import annotations
 
 from typing import Any
 
+import hashlib
 import io
 import zipfile
 
@@ -11,6 +12,24 @@ from Bio import Phylo
 
 ULTRAMETRIC_MAX_REL_DEV = 1e-5
 
+
+
+def classify_source_payload(
+    payload: bytes,
+    *,
+    expected_sha256: str,
+    expected_size: int,
+) -> dict[str, Any]:
+    observed_sha256 = hashlib.sha256(payload).hexdigest()
+    exact_match = len(payload) == expected_size and observed_sha256 == expected_sha256
+    return {
+        "status": "EXACT_SOURCE_BYTES" if exact_match else "SOURCE_TRANSPORT_HOLD",
+        "exact_match": exact_match,
+        "observed_bytes": len(payload),
+        "observed_sha256": observed_sha256,
+        "expected_bytes": expected_size,
+        "expected_sha256": expected_sha256,
+    }
 
 def tree_axis_diagnostics(tree) -> dict[str, Any]:
     """Classify a branch-length tree as relative-time-like only if root-to-tip
