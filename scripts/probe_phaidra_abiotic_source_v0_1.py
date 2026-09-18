@@ -9,7 +9,10 @@ import urllib.request
 from pathlib import Path
 from typing import Any
 
-BASES = [\n    "https://services.phaidra.univie.ac.at/api",\n    "https://phaidra.univie.ac.at/api",\n]
+BASES = [
+    "https://services.phaidra.univie.ac.at/api",
+    "https://phaidra.univie.ac.at/api",
+]
 COLLECTION = "o:2098641"
 UA = "CHUN-abiotic-source-gate/0.1"
 
