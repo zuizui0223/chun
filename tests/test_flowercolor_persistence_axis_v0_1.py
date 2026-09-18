@@ -8,6 +8,7 @@ import numpy as np
 from Bio import Phylo
 
 from scripts.flowercolor_persistence_axis_v0_1 import (
+    classify_source_payload,
     persistence_curve,
     summarize_tree_archive,
     tree_axis_diagnostics,
@@ -38,6 +39,20 @@ class PersistenceAxisTests(unittest.TestCase):
         self.assertAlmostEqual(rows[0]["excess_same_probability"], 0.5)
         self.assertAlmostEqual(rows[1]["same_probability"], 0.0)
         self.assertAlmostEqual(rows[1]["excess_same_probability"], -0.5)
+
+    def test_source_payload_classification_never_treats_interstitial_as_tree_bytes(self):
+        exact = b"abc"
+        self.assertEqual(
+            classify_source_payload(exact, expected_sha256="ba7816bf8f01cfea414140de5dae2223b00361a396177a9cb410ff61f20015ad", expected_size=3)["status"],
+            "EXACT_SOURCE_BYTES",
+        )
+        hold = classify_source_payload(
+            b"<html>Validating...</html>",
+            expected_sha256="ba7816bf8f01cfea414140de5dae2223b00361a396177a9cb410ff61f20015ad",
+            expected_size=3,
+        )
+        self.assertEqual(hold["status"], "SOURCE_TRANSPORT_HOLD")
+        self.assertFalse(hold["exact_match"])
 
     def test_tree_archive_summary_keeps_time_label_only_for_ultrametric_members(self):
         buf = io.BytesIO()
