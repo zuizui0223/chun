@@ -17,6 +17,7 @@ from pathlib import Path
 
 import numpy as np
 from Bio import Phylo
+from scipy.stats import wilcoxon
 
 CSV_SHA = "a253308785e4cbd0e361b3ca04cdfdae29c523eefa843375cebf8030ee0874af"
 TREES_SHA = "ae5c82945e5bf9c29bcabc52d6029acd8d4f5be1fe9141fad95918eacb4f674d"
@@ -76,8 +77,9 @@ def persistence_curve(
     baseline = pair_same_baseline(states)
     if not np.isfinite(distances).all() or len(distances) == 0:
         raise ValueError("distances must be non-empty and finite")
-    dmax = float(distances.max())
-    rel = distances / dmax if dmax > 0 else np.zeros_like(distances)
+    # The caller supplies the axis. For the production analysis this is
+    # relative divergence depth = patristic distance / (2 * crown height).
+    rel = distances
     order = np.argsort(rel, kind="stable")
     groups = np.array_split(order, min(n_bins, len(order)))
     bins = []
@@ -125,6 +127,61 @@ def root_to_tip_cv(tree) -> float:
     vals = np.array([tree.distance(tree.root, tip) for tip in tree.get_terminals()], dtype=float)
     m = float(np.mean(vals))
     return float(np.std(vals, ddof=0) / m) if m > 0 else float("nan")
+
+
+def relative_divergence_time(tree, pairwise_patristic: np.ndarray, ultrametric_cv_max: float = 1e-8) -> np.ndarray:
+    """Express pairwise divergence as a fraction of the source-tree crown depth.
+
+    On an ultrametric tree, patristic distance between two tips is twice their
+    divergence age from the present. Dividing by 2 * crown height therefore
+    yields relative divergence depth in [0, 1]. This is not an absolute-time
+    calibration and must not be reported in Ma.
+    """
+    cv = root_to_tip_cv(tree)
+    if not np.isfinite(cv) or cv > ultrametric_cv_max:
+        raise ValueError(f"source tree is not sufficiently ultrametric: root-to-tip CV={cv}")
+    heights = np.array([tree.distance(tree.root, tip) for tip in tree.get_terminals()], dtype=float)
+    crown_height = float(np.mean(heights))
+    if crown_height <= 0:
+        raise ValueError("non-positive crown height")
+    rel = np.asarray(pairwise_patristic, dtype=float) / (2.0 * crown_height)
+    if np.nanmax(rel) > 1.0 + 1e-8 or np.nanmin(rel) < -1e-12:
+        raise ValueError("relative divergence depth outside [0,1]")
+    return rel
+
+
+def fine_only_eligibility(colors, minimum_tips: int = 20, minimum_fine_states: int = 2) -> tuple[bool, list[str]]:
+    """Eligibility for the flower-colour persistence analysis only.
+
+    Unlike the three-resolution comparison, this frame does not require
+    coarse or intermediate variation.
+    """
+    reasons = []
+    if len(colors) < minimum_tips:
+        reasons.append("COMMON_TIPS_LT_20")
+    if len(set(colors)) < minimum_fine_states:
+        reasons.append("FINE_STATES_LT_2")
+    return (not reasons), reasons
+
+
+def one_sample_direction_summary(values, favorable: str) -> dict:
+    x = np.asarray(values, dtype=float)
+    x = x[np.isfinite(x)]
+    if favorable == "negative":
+        alt = "less"
+        n_favorable = int(np.sum(x < 0))
+    elif favorable == "positive":
+        alt = "greater"
+        n_favorable = int(np.sum(x > 0))
+    else:
+        raise ValueError(favorable)
+    w = wilcoxon(x, alternative=alt, zero_method="wilcox")
+    return {
+        "n": int(len(x)),
+        "median": float(np.median(x)),
+        "favorable_count": n_favorable,
+        "wilcoxon_p_one_sided": float(w.pvalue),
+    }
 
 
 def _download(url: str, dest: Path) -> dict:
@@ -264,10 +321,11 @@ def analyse(csv_path: Path, trees_path: Path, outdir: Path, n_bins: int = 10) ->
         n = len(tips)
         ii, jj = np.triu_indices(n, 1)
         dist = np.array([tree.distance(tips[int(a)], tips[int(b)]) for a, b in zip(ii, jj)], dtype=float)
+        rel_time = relative_divergence_time(tree, dist)
 
         per_resolution = {}
         for res in RESOLUTIONS:
-            curve = persistence_curve(dist, ii, jj, states[res], n_bins=n_bins)
+            curve = persistence_curve(rel_time, ii, jj, states[res], n_bins=n_bins)
             per_resolution[res] = curve
             for b in curve["bins"]:
                 curve_rows.append(
@@ -289,8 +347,8 @@ def analyse(csv_path: Path, trees_path: Path, outdir: Path, n_bins: int = 10) ->
             "status": "PERSISTENCE_CURVE_COMPLETE",
             "eligible_tips": n,
             "root_to_tip_cv_full_tree": root_to_tip_cv(tree),
-            "pair_distance_max": float(dist.max()),
-            "pair_distance_median": float(np.median(dist)),
+            "relative_time_max": float(rel_time.max()),
+            "relative_time_median": float(np.median(rel_time)),
             "persistence_area_winner": winner,
             "resolutions": per_resolution,
         }
@@ -315,7 +373,7 @@ def analyse(csv_path: Path, trees_path: Path, outdir: Path, n_bins: int = 10) ->
         "median_root_to_tip_cv": float(np.nanmedian(cvs)) if len(cvs) else None,
         "max_root_to_tip_cv": float(np.nanmax(cvs)) if len(cvs) else None,
         "strictly_ultrametric_cv_le_1e_8": int(np.sum(cvs <= 1e-8)) if len(cvs) else 0,
-        "axis_label": "relative patristic/evolutionary distance; not absolute time unless source-tree calibration is independently established",
+        "axis_label": "relative phylogenetic divergence depth = patristic/(2*crown height); not absolute Ma",
         "median_curve_summaries": medians,
         "claim_boundary": "retrospective descriptive persistence analysis; no causal ecological or absolute-time claim",
     }
@@ -336,13 +394,85 @@ def analyse(csv_path: Path, trees_path: Path, outdir: Path, n_bins: int = 10) ->
                 "eligible_tips",
                 "distance_bin",
                 "n_pairs",
-                "mean_relative_patristic_distance",
+                "mean_relative_divergence_depth",
                 "p_same",
                 "baseline_same_probability",
                 "excess_retention",
             ]
         )
         w.writerows(curve_rows)
+    return out
+
+
+def analyse_fine_only(csv_path: Path, trees_path: Path, outdir: Path, n_bins: int = 10) -> dict:
+    rows_by_clade: dict[str, list[tuple[str, str]]] = collections.defaultdict(list)
+    with csv_path.open(newline="", encoding="utf-8-sig") as f:
+        for row in csv.DictReader(f):
+            rows_by_clade[row["clade"].strip()].append((row["species"].strip(), row["flower_color"].strip()))
+
+    z = zipfile.ZipFile(trees_path)
+    members = {
+        Path(m).stem.lower(): m for m in z.namelist()
+        if not m.endswith("/") and not m.startswith("__MACOSX/") and not m.endswith(".DS_Store")
+    }
+    details = {}
+    curves = []
+    for clade in sorted(rows_by_clade):
+        vals = rows_by_clade[clade]
+        counts = collections.Counter(color for _, color in vals)
+        rare = {state for state, n in counts.items() if n < 5}
+        retained = [(sp, color) for sp, color in vals if color not in rare]
+        colors = [color for _, color in retained]
+        ok, reasons = fine_only_eligibility(colors)
+        if not ok:
+            details[clade] = {"status": "HOLD_FINE_ONLY_FRAME", "reasons": reasons, "eligible_tips": len(retained)}
+            continue
+        tree = Phylo.read(io.StringIO(z.read(members[clade.lower()]).decode("utf-8-sig")), "newick")
+        by_tip = {norm_tip(sp): color for sp, color in retained}
+        tips = [t for t in tree.get_terminals() if norm_tip(t.name) in by_tip]
+        states = np.array([by_tip[norm_tip(t.name)] for t in tips], dtype=object)
+        ii, jj = np.triu_indices(len(tips), 1)
+        dist = np.array([tree.distance(tips[int(a)], tips[int(b)]) for a, b in zip(ii, jj)], dtype=float)
+        rel_time = relative_divergence_time(tree, dist)
+        curve = persistence_curve(rel_time, ii, jj, states, n_bins=n_bins)
+        details[clade] = {
+            "status": "FINE_VISIBLE_COLOR_PERSISTENCE_COMPLETE",
+            "eligible_tips": len(tips),
+            "fine_states": len(set(states.tolist())),
+            "root_to_tip_cv": root_to_tip_cv(tree),
+            "linear_decay_slope": curve["linear_decay_slope"],
+            "signed_excess_area": curve["signed_excess_area"],
+            "near_far_contrast": curve["near_far_contrast"],
+            "baseline_same_probability": curve["baseline_same_probability"],
+        }
+        for b in curve["bins"]:
+            curves.append({"clade": clade, **b})
+    z.close()
+
+    complete = {k: v for k, v in details.items() if v["status"] == "FINE_VISIBLE_COLOR_PERSISTENCE_COMPLETE"}
+    slopes = [v["linear_decay_slope"] for v in complete.values()]
+    areas = [v["signed_excess_area"] for v in complete.values()]
+    near_far = [v["near_far_contrast"] for v in complete.values()]
+    cvs = [v["root_to_tip_cv"] for v in complete.values()]
+    headline = {
+        "status": "FLOWERCLADES51_FINE_VISIBLE_COLOR_RELATIVE_TIME_PERSISTENCE",
+        "eligible_clades": len(complete),
+        "hold_clades": len(details) - len(complete),
+        "root_to_tip_cv_median": float(np.median(cvs)),
+        "root_to_tip_cv_max": float(np.max(cvs)),
+        "slope": one_sample_direction_summary(slopes, "negative"),
+        "area": one_sample_direction_summary(areas, "positive"),
+        "near_far": one_sample_direction_summary(near_far, "positive"),
+        "axis_label": "relative phylogenetic divergence depth; not absolute Ma",
+        "claim_boundary": "retrospective interspecific state persistence, not within-population polymorphism and not independent of the existing pairwise AUC",
+    }
+    out = {"version": "v0.1", "headline": headline, "results": details}
+    (outdir / "fine_only_summary.json").write_text(json.dumps(out, indent=2, sort_keys=True) + "\n")
+    with (outdir / "fine_only_curves.csv").open("w", newline="") as f:
+        if curves:
+            w = csv.DictWriter(f, fieldnames=list(curves[0]))
+            w.writeheader()
+            w.writerows(curves)
     return out
 
 
@@ -375,9 +505,11 @@ def main() -> None:
     if sha256_file(csv_path) != CSV_SHA or sha256_file(trees_path) != TREES_SHA:
         raise SystemExit("source hash mismatch")
     out = analyse(csv_path, trees_path, args.outdir, n_bins=args.bins)
+    fine = analyse_fine_only(csv_path, trees_path, args.outdir, n_bins=args.bins)
+    out["fine_only_headline"] = fine["headline"]
     out["download_diagnostics"] = diagnostics
     (args.outdir / "summary.json").write_text(json.dumps(out, indent=2, sort_keys=True) + "\n")
-    print(json.dumps(out["headline"], indent=2))
+    print(json.dumps({"common_frame": out["headline"], "fine_only": fine["headline"]}, indent=2))
 
 
 if __name__ == "__main__":
