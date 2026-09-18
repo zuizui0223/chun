@@ -1,0 +1,74 @@
+{
+  "version": "v0.1",
+  "status": "FLOWERCLADES51_RELATIVE_TIME_PERSISTENCE_SPIKE_COMPLETE",
+  "source_sha256": {
+    "final_dataset.csv": "a253308785e4cbd0e361b3ca04cdfdae29c523eefa843375cebf8030ee0874af",
+    "trees.zip": "ae5c82945e5bf9c29bcabc52d6029acd8d4f5be1fe9141fad95918eacb4f674d"
+  },
+  "completed_clades": 28,
+  "hold_clades": 23,
+  "ultrametric_diagnostic": {
+    "all_completed_clades_root_to_tip_cv_le_1e-8": true,
+    "n_le_1e-8": 28,
+    "median_root_to_tip_cv": 2.1428151529687383e-16,
+    "max_root_to_tip_cv": 2.9814575189447324e-11,
+    "interpretation": "All completed trees are numerically ultrametric. Within-clade normalized patristic distance can therefore be interpreted as relative divergence depth/time, not calibrated absolute time."
+  },
+  "cross_clade_persistence": {
+    "coarse": {
+      "positive_near_minus_far_clades": 20,
+      "total_clades": 28,
+      "sign_test_one_sided_p": 0.017849069088697433,
+      "median_near_minus_far_excess_retention": 0.17220153734149343,
+      "wilcoxon_near_minus_far_greater_zero_p": 0.010204706341028214,
+      "negative_linear_decay_slope_clades": 19,
+      "median_linear_decay_slope": -0.2620268795575308,
+      "wilcoxon_negative_slope_p": 0.021304193884134293
+    },
+    "intermediate": {
+      "positive_near_minus_far_clades": 21,
+      "total_clades": 28,
+      "sign_test_one_sided_p": 0.006270475685596466,
+      "median_near_minus_far_excess_retention": 0.15239742763289768,
+      "wilcoxon_near_minus_far_greater_zero_p": 0.004112333059310913,
+      "negative_linear_decay_slope_clades": 21,
+      "median_linear_decay_slope": -0.3065201382693531,
+      "wilcoxon_negative_slope_p": 0.002203386276960373
+    },
+    "fine": {
+      "positive_near_minus_far_clades": 19,
+      "total_clades": 28,
+      "sign_test_one_sided_p": 0.04357927665114403,
+      "median_near_minus_far_excess_retention": 0.15131481892684762,
+      "wilcoxon_near_minus_far_greater_zero_p": 0.0035355985164642334,
+      "negative_linear_decay_slope_clades": 20,
+      "median_linear_decay_slope": -0.2253887774768423,
+      "wilcoxon_negative_slope_p": 0.0014509931206703186
+    }
+  },
+  "resolution_comparison": {
+    "claim": "All three resolutions show cross-clade decay of same-state retention with relative divergence depth; no resolution shows a robustly stronger persistence profile than the others.",
+    "paired_near_far_tests": {
+      "coarse_vs_intermediate": {
+        "median_difference_near_far": 0.0,
+        "wilcoxon_two_sided_p": 0.5277266198659963
+      },
+      "coarse_vs_fine": {
+        "median_difference_near_far": 0.0,
+        "wilcoxon_two_sided_p": 0.6893679346514224
+      },
+      "intermediate_vs_fine": {
+        "median_difference_near_far": 0.0,
+        "wilcoxon_two_sided_p": 0.7221076526150257
+      }
+    }
+  },
+  "claim_boundary": [
+    "retrospective extension of the already-opened Flower-clades-51 dataset",
+    "clade is the inferential replication unit; species pairs are not treated as independent replicates",
+    "relative ultrametric divergence depth only; no million-year or absolute-time claim",
+    "does not identify ecological causes of persistence or turnover"
+  ],
+  "paper1_science_changed": false,
+  "el_v0_2_science_changed": false
+}
