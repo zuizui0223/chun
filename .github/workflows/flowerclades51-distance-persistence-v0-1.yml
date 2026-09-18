@@ -10,6 +10,8 @@ on:
       - 'data/flowerclades51_fine_time_persistence_median_curve_v0_1.csv'
       - 'docs/FLOWERCLADES51_RELATIVE_TIME_PERSISTENCE_V0_1.md'
       - '.github/workflows/flowerclades51-distance-persistence-v0-1.yml'
+      - 'results/flowerclades51_distance_persistence_v0_1/**'
+      - 'docs/FLOWERCLADES51_DISTANCE_PERSISTENCE_RESULT_V0_1.md'
   workflow_dispatch:
 
 permissions:
@@ -55,10 +57,27 @@ jobs:
           assert len(med)==10
           print({'fine_clades':len(rows),'slope_p':f['slope']['wilcoxon_p_one_sided']})
           PY
-      - name: Run exact-source persistence spike
+      - name: Validate frozen exact-source result summary
+        run: |
+          python - <<'PY'
+          import json
+          p='results/flowerclades51_distance_persistence_v0_1/summary_v0_1.json'
+          x=json.load(open(p))
+          assert x['status']=='FLOWERCLADES51_RELATIVE_TIME_PERSISTENCE_SPIKE_COMPLETE'
+          assert x['completed_clades']==28 and x['hold_clades']==23
+          assert x['ultrametric_diagnostic']['n_le_1e-8']==28
+          assert x['ultrametric_diagnostic']['max_root_to_tip_cv'] < 1e-8
+          assert x['cross_clade_persistence']['coarse']['positive_near_minus_far_clades']==20
+          assert x['cross_clade_persistence']['intermediate']['positive_near_minus_far_clades']==21
+          assert x['cross_clade_persistence']['fine']['positive_near_minus_far_clades']==19
+          assert x['el_v0_2_science_changed'] is False
+          assert x['paper1_science_changed'] is False
+          print(x['cross_clade_persistence'])
+          PY
+      - name: Diagnose current public source recovery path
         run: |
           python scripts/run_flowerclades51_distance_persistence_v0_1.py             --download             --outdir build/flowerclades51_distance_persistence_v0_1
-      - name: Show headline result
+      - name: Show public-download diagnostic headline
         run: |
           python - <<'PY'
           import json
