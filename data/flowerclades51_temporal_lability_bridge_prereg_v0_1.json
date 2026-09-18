@@ -1,0 +1,55 @@
+{
+  "version": "v0.1",
+  "status": "FROZEN_BEFORE_CLADE_LEVEL_LABILITY_VALUE_EXTRACTION",
+  "source_article_doi": "10.1002/ajb2.70146",
+  "source_dataset_doi": "10.5061/dryad.r4xgxd2sc",
+  "source_appendix": "Appendix S2",
+  "analysis_role": "RETROSPECTIVE_BIOLOGICAL_MODERATOR_BRIDGE",
+  "biological_question": "Does flower-color evolutionary lability predict which phenotypic resolution retains phylogenetic same-state structure across clades?",
+  "prior_exposure": {
+    "aggregate_source_result_known": true,
+    "chun_resolution_profile_outcomes_known": true,
+    "clade_level_source_lability_values_opened_before_this_freeze": false,
+    "prospective_status": "NOT_PROSPECTIVE"
+  },
+  "primary_predictor": "source_stochastic_map_mean_flower_transition_count",
+  "predictor_extraction": {
+    "allowed_source": "exact clade-level values reported by Sinnott-Armstrong et al. (2026) Appendix S2 or an exact machine-readable companion object traceable to that appendix",
+    "no_reestimation_substitution": true,
+    "no_manual_visual_digitization_without_separate_frozen_protocol": true,
+    "ambiguity_or_missing_exact_value": "HOLD_SOURCE_LABILITY_VALUE_UNRESOLVED"
+  },
+  "analysis_frame": {
+    "response_source": "results/flowerclades51_resolution_profile_v0_1/flowerclades51_resolution_profile_batch_result_v0_1.json",
+    "eligible_units": "clades with completed exact CHUN resolution profiles and exact source flower-transition counts",
+    "biological_replication_unit": "clade",
+    "shared_source_dependence_must_be_reported": true
+  },
+  "primary_outcomes": [
+    "AUC_intermediate_minus_AUC_coarse",
+    "AUC_fine_minus_AUC_intermediate"
+  ],
+  "model": "one_predictor_plus_intercept",
+  "predictor_transform": "log1p_then_zscore_within_training_frame",
+  "qualification_rule": {
+    "validation": "leave_one_clade_out",
+    "baseline": "intercept_only",
+    "metric": "RMSE",
+    "must_improve_both_independent_contrasts": true,
+    "derived_fine_minus_coarse_is_diagnostic_only": true
+  },
+  "directional_claim": {
+    "frozen_sign_required": false,
+    "rationale": "The primary question is whether source-estimated temporal lability has out-of-sample explanatory value for the full two-contrast resolution profile; no post-outcome sign is required for qualification."
+  },
+  "secondary_analyses": {
+    "raw_transition_count_without_log_transform": "sensitivity_only",
+    "source_transition_rate_if_exactly_reported": "secondary_only",
+    "individual_AUCs": "descriptive_only"
+  },
+  "post_hoc_predictor_switch_forbidden": true,
+  "larger_multivariable_model_forbidden_in_v0_1": true,
+  "prospective_claim_allowed": false,
+  "manuscript_upgrade_rule": "Do not alter the Evolution Letters central claim unless this frozen bridge is executed and its qualification status is recorded.",
+  "paper1_science_changed": false
+}
