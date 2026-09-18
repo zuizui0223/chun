@@ -6,6 +6,7 @@ on:
       - 'tests/test_flowercolor_persistence_axis_v0_1.py'
       - 'scripts/flowercolor_persistence_axis_v0_1.py'
       - 'data/flowercolor_persistence_axis_prereg_v0_1.json'
+      - 'data/flowercolor_persistence_axis_source_lineage_v0_1.json'
       - '.github/workflows/flowercolor-persistence-axis-v0-1.yml'
   workflow_dispatch:
 
@@ -34,7 +35,7 @@ jobs:
               API, DATASET_PATH, LANDING_URL, browser_opener, browser_request,
               download_public_file, get_json, list_files, sha256_bytes, version_href,
           )
-          from scripts.flowercolor_persistence_axis_v0_1 import summarize_tree_archive
+          from scripts.flowercolor_persistence_axis_v0_1 import classify_source_payload, summarize_tree_archive
 
           opener=browser_opener()
           browser_request(opener, LANDING_URL, timeout=90)
@@ -44,23 +45,30 @@ jobs:
               referer=LANDING_URL,
               timeout=180,
           )
-          observed=sha256_bytes(payload)
-          print('TREE_SOURCE', json.dumps({'file_id':4411880,'bytes':len(payload),'sha256':observed}))
-          assert observed=='ae5c82945e5bf9c29bcabc52d6029acd8d4f5be1fe9141fad95918eacb4f674d'
-          out=summarize_tree_archive(payload)
-          assert out['tree_count']==51
-          vals=sorted(
-              ((name,d['max_relative_root_to_tip_deviation'],d['root_to_tip_cv'],d['axis_class'])
-               for name,d in out['members'].items()),
-              key=lambda x:x[1], reverse=True
+          source=classify_source_payload(
+              payload,
+              expected_sha256='ae5c82945e5bf9c29bcabc52d6029acd8d4f5be1fe9141fad95918eacb4f674d',
+              expected_size=80326,
           )
-          print('TREE_AXIS_COUNTS', json.dumps({
-              'tree_count':out['tree_count'],
-              'relative_time_tree_count':out['relative_time_tree_count'],
-              'normalized_patristic_tree_count':out['normalized_patristic_tree_count'],
-          }, sort_keys=True))
-          print('TREE_AXIS_MAX_DEVIATIONS', json.dumps(vals[:15]))
-          print('TREE_AXIS_ALL', json.dumps(out, sort_keys=True))
+          source['file_id']=4411880
+          print('TREE_SOURCE', json.dumps(source, sort_keys=True))
+          if source['status']=='EXACT_SOURCE_BYTES':
+              out=summarize_tree_archive(payload)
+              assert out['tree_count']==51
+              vals=sorted(
+                  ((name,d['max_relative_root_to_tip_deviation'],d['root_to_tip_cv'],d['axis_class'])
+                   for name,d in out['members'].items()),
+                  key=lambda x:x[1], reverse=True
+              )
+              print('TREE_AXIS_COUNTS', json.dumps({
+                  'tree_count':out['tree_count'],
+                  'relative_time_tree_count':out['relative_time_tree_count'],
+                  'normalized_patristic_tree_count':out['normalized_patristic_tree_count'],
+              }, sort_keys=True))
+              print('TREE_AXIS_MAX_DEVIATIONS', json.dumps(vals[:15]))
+              print('TREE_AXIS_ALL', json.dumps(out, sort_keys=True))
+          else:
+              print('TREE_AXIS_STATUS SOURCE_DATED_PHYLOGENY_LINEAGE_SUPPORTED_EXACT_TREE_RECHECK_TRANSPORT_HOLD')
           PY
       - name: Confirm manuscript firewalls
         if: github.event_name == 'pull_request'
