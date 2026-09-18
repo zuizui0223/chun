@@ -3,7 +3,11 @@ from __future__ import annotations
 
 from typing import Any
 
+import io
+import zipfile
+
 import numpy as np
+from Bio import Phylo
 
 ULTRAMETRIC_MAX_REL_DEV = 1e-5
 
@@ -76,3 +80,26 @@ def persistence_curve(
             }
         )
     return rows
+
+
+def summarize_tree_archive(zip_bytes: bytes) -> dict[str, Any]:
+    members: dict[str, dict[str, Any]] = {}
+    with zipfile.ZipFile(io.BytesIO(zip_bytes)) as zf:
+        names = [
+            n for n in zf.namelist()
+            if not n.endswith("/") and "__MACOSX" not in n and not n.endswith(".DS_Store")
+        ]
+        for name in sorted(names):
+            raw = zf.read(name)
+            tree = Phylo.read(io.StringIO(raw.decode("utf-8-sig")), "newick")
+            members[name] = tree_axis_diagnostics(tree)
+    return {
+        "tree_count": len(members),
+        "relative_time_tree_count": sum(
+            d["axis_class"] == "RELATIVE_DIVERGENCE_TIME" for d in members.values()
+        ),
+        "normalized_patristic_tree_count": sum(
+            d["axis_class"] == "NORMALIZED_PATRISTIC_DISTANCE" for d in members.values()
+        ),
+        "members": members,
+    }
