@@ -1,0 +1,32 @@
+{
+  "version": "v0.1",
+  "status": "HOLD_PHAIDRA_SOURCE_METADATA_UNAVAILABLE",
+  "article_doi": "10.1002/ajb2.70044",
+  "tested_root_candidates": [
+    {
+      "pid": "o:2098641",
+      "provenance": "article_data_availability_statement",
+      "root_metadata_ready": false,
+      "member_count": 0
+    },
+    {
+      "pid": "o:2322953",
+      "provenance": "current_university_publication_record",
+      "root_metadata_ready": false,
+      "member_count": 0
+    }
+  ],
+  "diagnostic_summary": "Both candidate PHAIDRA roots returned no usable public object metadata and no collection member inventory through the tested public object-info, collection-members, and Solr membership routes. Download HEAD probes were non-diagnostic. No file contents or environmental rows were opened.",
+  "primary_memory_moderator_fit": false,
+  "hold_interpretation": "source-access limitation; not evidence against an abiotic heterogeneity effect",
+  "forbidden_rescue": [
+    "fresh GBIF reconstruction within this frozen test",
+    "post-hoc replacement environmental source selected using memory outcomes"
+  ],
+  "outcome_firewall": {
+    "environmental_rows_opened": false,
+    "flower_memory_outcome_fit": false
+  },
+  "paper1_science_changed": false,
+  "el_v0_2_science_changed": false
+}

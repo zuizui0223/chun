@@ -1,0 +1,21 @@
+{
+  "version": "v0.1",
+  "status": "SOURCE_IDENTITY_ERRATUM_FROZEN_BEFORE_ENVIRONMENTAL_DATA_INGESTION",
+  "article_doi": "10.1002/ajb2.70044",
+  "article_data_availability_pid": "o:2098641",
+  "current_university_publication_record_pid": "o:2322953",
+  "reason": "The published article data-availability statement names o:2098641, while the current University of Vienna publication record links o:2322953. The original PID currently returns no usable public object metadata or member inventory through the tested API routes.",
+  "resolution_rule": {
+    "probe_both_pids_metadata_only": true,
+    "accept_only_if_metadata_or_member_inventory_identifies_article_relevant_data_or_code": true,
+    "do_not_open_member_file_contents_during_identity_resolution": true,
+    "do_not_treat_newer_pid_as_data_source_without_metadata_evidence": true,
+    "no_fresh_gbif_substitution": true
+  },
+  "outcome_firewall": {
+    "environmental_rows_opened": false,
+    "memory_outcome_refit": false
+  },
+  "paper1_science_changed": false,
+  "el_v0_2_science_changed": false
+}

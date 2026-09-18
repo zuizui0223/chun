@@ -1,0 +1,54 @@
+{
+  "version": "v0.1",
+  "status": "FROZEN_BEFORE_PHAIDRA_ABIOTIC_DATA_INGESTION",
+  "programme_role": "RETROSPECTIVE_ECOLOGICAL_MODERATOR_TEST",
+  "memory_outcome_already_known": true,
+  "source": {
+    "article_doi": "10.1002/ajb2.70044",
+    "phaidra_collection": "o:2098641",
+    "reported_clades": 51,
+    "reported_species": 2815,
+    "reported_occurrences_after_filtering": 4757769,
+    "environmental_axes": ["mean annual temperature", "aridity", "UV-B"]
+  },
+  "source_firewall": {
+    "first_step_inventory_only": true,
+    "do_not_fit_memory_outcome_during_source_inventory": true,
+    "no_new_gbif_redownload_if_phaidra_source_is_unavailable": true
+  },
+  "species_environment_summary": {
+    "unit": "species",
+    "occurrence_weighting": "equal species weighting at clade stage",
+    "species_axis_summary": "median environmental value across retained occurrences"
+  },
+  "clade_environment_heterogeneity": {
+    "standardization": "z-score each environmental axis across all matched species before clade aggregation",
+    "centroid": "coordinate-wise clade median in standardized 3-axis space",
+    "metric": "median Euclidean distance of species environmental centroids from clade centroid",
+    "minimum_matched_fraction_of_memory_frame": 0.8,
+    "hold_if_below_fraction": true
+  },
+  "primary_test": {
+    "outcome": "fine visible flower-color signed excess-retention area",
+    "predictor": "clade abiotic niche heterogeneity",
+    "expected_direction": "negative",
+    "statistic": "Spearman rho",
+    "permutations": 99999,
+    "seed": 20260918,
+    "pass_rule": "rho < 0 and one-sided permutation p <= 0.05"
+  },
+  "secondary_diagnostics": [
+    "fine visible flower-color decay slope versus abiotic heterogeneity",
+    "axis-specific heterogeneity for temperature, aridity, and UV-B",
+    "leave-one-clade-out sign stability",
+    "matched-species fraction"
+  ],
+  "claim_boundary": [
+    "retrospective moderator analysis because memory outcomes are already known",
+    "association does not establish abiotic selection as causal",
+    "no pollinator or disperser mechanism is inferred",
+    "secondary axes cannot rescue a failed primary composite test"
+  ],
+  "paper1_science_changed": false,
+  "el_v0_2_science_changed": false
+}
