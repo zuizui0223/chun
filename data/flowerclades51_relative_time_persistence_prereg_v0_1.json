@@ -1,0 +1,60 @@
+{
+  "version": "v0.1",
+  "status": "PRE_OUTCOME_CONTRACT_MATERIALIZED_AFTER_OUTCOME_EXPOSURE",
+  "contract_provenance": {
+    "pre_outcome_test_commit": "82aacf4281d64587eec58d21eee595a483fbe252",
+    "pre_outcome_pr": 300,
+    "contract_frozen_before_flowerclades51_relative_time_result": true,
+    "note": "The exact model form, source hashes, 28-clade common frame, lambda and half-depth outputs, and absolute-time prohibition were committed in the failing contract test before PR #299 froze persistence outcomes. This JSON was materialized later and is therefore not described as a prospective preregistration."
+  },
+  "source_hashes": {
+    "final_dataset.csv": "a253308785e4cbd0e361b3ca04cdfdae29c523eefa843375cebf8030ee0874af",
+    "trees.zip": "ae5c82945e5bf9c29bcabc52d6029acd8d4f5be1fe9141fad95918eacb4f674d"
+  },
+  "analysis_role": "RETROSPECTIVE_RELATIVE_PHYLOGENETIC_TIME_PERSISTENCE",
+  "tree_preflight": {
+    "all_51_ultrametric_within_cv_threshold": true,
+    "root_to_tip_cv_threshold": 1e-8
+  },
+  "common_frame": {
+    "reuse_existing_28_completed_clade_frames": true,
+    "rare_fine_state_minimum_tips": 5,
+    "minimum_common_tips": 20,
+    "minimum_states_each_resolution": 2,
+    "same_tips_all_resolutions": true
+  },
+  "distance_scale": "pairwise_patristic_distance_divided_by_twice_clade_root_to_tip_depth",
+  "primary_model": {
+    "form": "p_same(d)=q+(1-q)*exp(-lambda*d)",
+    "q": "finite_sample_same_state_probability_from_observed_state_counts",
+    "fit": "maximize Bernoulli pairwise pseudo_log_likelihood with q fixed",
+    "optimization": "bounded scalar optimization on log(lambda) from log(1e-4) to log(1e4)",
+    "pair_independence_for_inference": false
+  },
+  "primary_outputs": ["lambda", "half_depth_ln2_over_lambda"],
+  "half_depth_interpretation": "relative divergence depth at which modelled excess same-state retention above q falls to one half of its d=0 value",
+  "cross_resolution_summary": {
+    "unit": "clade",
+    "primary_descriptive": "median half_depth_ln2_over_lambda at coarse, intermediate and fine resolution",
+    "omnibus_test": "Friedman paired test across 28 clades",
+    "pairwise_followup": "two-sided paired Wilcoxon only if Friedman p<=0.05",
+    "winner_count": "resolution with largest half_depth within each clade; ties retained",
+    "directional_prediction": null
+  },
+  "boundary_handling": {
+    "lambda_lower": 0.0001,
+    "lambda_upper": 10000.0,
+    "upper_boundary_means": "decay indistinguishable from effectively immediate loss on the normalized scale; retain as boundary estimate rather than dropping clade",
+    "lower_boundary_means": "memory remains effectively undiminished across the normalized crown-depth range; retain as boundary estimate"
+  },
+  "absolute_time_claim_allowed": false,
+  "primary_cross_resolution_question": "does relative state-persistence timescale vary among coarse_intermediate_fine representations across clades",
+  "claim_boundary": [
+    "relative crown-depth scale only, not millions of years",
+    "pairwise pseudo-likelihood is an estimand fit; species pairs are not independent inferential replicates",
+    "this analysis reuses the same source states and trees as AUC/persistence analyses and is not independent replication",
+    "the pre-outcome contract predates PR #299 but the machine-readable preregistration object was materialized after outcome exposure"
+  ],
+  "paper1_science_changed": false,
+  "el_v0_2_science_changed": false
+}
