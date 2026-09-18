@@ -1,0 +1,71 @@
+{
+  "version": "v0.1",
+  "status": "STRESS_COLOR_MEMORY_FAIL",
+  "decision": "FAIL",
+  "source_sha256": {
+    "final_dataset.csv": "a253308785e4cbd0e361b3ca04cdfdae29c523eefa843375cebf8030ee0874af",
+    "trees.zip": "ae5c82945e5bf9c29bcabc52d6029acd8d4f5be1fe9141fad95918eacb4f674d"
+  },
+  "stress_colors": ["pink", "red", "purple", "yellow"],
+  "reference_color": "white",
+  "paired_clades": 27,
+  "primary_test": {
+    "n": 27,
+    "median_contrast": -0.005381140204185397,
+    "negative_count": 17,
+    "positive_count": 10,
+    "zero_count": 0,
+    "wilcoxon_p_one_sided": 0.08876001089811325,
+    "sign_p_one_sided": 0.12389428168535233
+  },
+  "secondary_individual_colors": {
+    "pink": {
+      "n": 11,
+      "median_contrast": -0.022284935550850635,
+      "negative_count": 8,
+      "positive_count": 3,
+      "wilcoxon_p_one_sided": 0.0615234375,
+      "sign_p_one_sided": 0.11328125
+    },
+    "red": {
+      "n": 8,
+      "median_contrast": -0.016805255904220703,
+      "negative_count": 5,
+      "positive_count": 3,
+      "wilcoxon_p_one_sided": 0.15625,
+      "sign_p_one_sided": 0.36328125
+    },
+    "purple": {
+      "n": 3,
+      "median_contrast": -0.07089802867578122,
+      "negative_count": 3,
+      "positive_count": 0,
+      "wilcoxon_p_one_sided": 0.125,
+      "sign_p_one_sided": 0.125
+    },
+    "yellow": {
+      "n": 21,
+      "median_contrast": 0.00041875655964647397,
+      "negative_count": 10,
+      "positive_count": 11,
+      "wilcoxon_p_one_sided": 0.44586610794067383,
+      "sign_p_one_sided": 0.6681880950927734
+    }
+  },
+  "leave_one_clade_out": {
+    "negative_median_count": 27,
+    "total": 27,
+    "p_below_0_05_count": 3,
+    "interpretation": "The negative median direction is leave-one-clade-out stable, but inferential significance is not."
+  },
+  "interpretation": "Stress-associated colors show a small directionally negative memory contrast relative to white, but the preregistered paired test does not pass the frozen alpha threshold. The simple repeated-abiotic-convergence prediction therefore fails; secondary color-specific patterns cannot rescue it.",
+  "claim_boundary": [
+    "retrospective derived analysis on already-opened color outcomes",
+    "published environment-color associations are not re-estimated here",
+    "the negative but non-significant primary contrast is not a positive ecological result",
+    "individual-color secondary tests cannot rescue the failed primary test",
+    "a FAIL does not reject the published environment-color associations"
+  ],
+  "paper1_science_changed": false,
+  "el_v0_2_science_changed": false
+}

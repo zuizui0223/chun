@@ -1,0 +1,52 @@
+name: Stress-associated flower-color memory v0.1
+
+on:
+  pull_request:
+    paths:
+      - 'data/stress_color_memory_prereg_v0_1.json'
+      - 'docs/STRESS_COLOR_MEMORY_PREREG_V0_1.md'
+      - 'scripts/run_stress_color_memory_v0_1.py'
+      - 'tests/test_stress_color_memory_v0_1.py'
+      - 'results/stress_color_memory_v0_1/**'
+      - '.github/workflows/stress-color-memory-v0-1.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install runtime
+        run: pip install numpy scipy biopython pytest
+      - name: Unit tests
+        run: pytest -q tests/test_stress_color_memory_v0_1.py
+      - name: Validate prereg
+        run: |
+          python - <<'PY'
+          import json
+          x=json.load(open('data/stress_color_memory_prereg_v0_1.json'))
+          assert x['status']=='FROZEN_BEFORE_COLOR_SPECIFIC_MEMORY_COMPUTATION'
+          assert x['ecological_anchor']['stress_associated_flower_colors']==['pink','red','purple','yellow']
+          assert x['ecological_anchor']['reference_color']=='white'
+          assert x['primary_test']['expected_contrast']=='negative'
+          assert x['paper1_science_changed'] is False
+          assert x['el_v0_2_science_changed'] is False
+          PY
+      - name: Validate result if present
+        run: |
+          if [ -f results/stress_color_memory_v0_1/result_v0_1.json ]; then
+            python - <<'PY'
+          import json
+          x=json.load(open('results/stress_color_memory_v0_1/result_v0_1.json'))
+          assert x['status'] in ['STRESS_COLOR_MEMORY_PASS','STRESS_COLOR_MEMORY_FAIL','HOLD_INSUFFICIENT_PAIRED_CLADES']
+          assert x['paper1_science_changed'] is False
+          assert x['el_v0_2_science_changed'] is False
+          print(x['primary_test'])
+          PY
+          fi
