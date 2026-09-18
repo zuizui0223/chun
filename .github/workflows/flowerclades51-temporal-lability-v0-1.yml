@@ -1,0 +1,23 @@
+name: Flowerclades51 temporal lability bridge v0.1
+
+on:
+  push:
+    branches:
+      - analysis/flowerclades51-temporal-lability-v0-1
+  pull_request:
+    paths:
+      - 'data/flowerclades51_temporal_lability_bridge_prereg_v0_1.json'
+      - 'docs/FLOWERCLADES51_TEMPORAL_LABILITY_BRIDGE_PREREG_V0_1.md'
+      - 'tests/test_flowerclades51_temporal_lability_bridge_prereg_v0_1.py'
+      - '.github/workflows/flowerclades51-temporal-lability-v0-1.yml'
+
+jobs:
+  validate-prereg:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Validate frozen temporal-lability bridge contract
+        run: python -m pytest -q tests/test_flowerclades51_temporal_lability_bridge_prereg_v0_1.py
