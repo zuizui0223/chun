@@ -1,0 +1,51 @@
+name: Flower-fruit memory tradeoff v0.1
+
+on:
+  pull_request:
+    paths:
+      - 'data/flower_fruit_memory_tradeoff_prereg_v0_1.json'
+      - 'docs/FLOWER_FRUIT_MEMORY_TRADEOFF_PREREG_V0_1.md'
+      - 'scripts/run_flower_fruit_memory_tradeoff_v0_1.py'
+      - 'tests/test_flower_fruit_memory_tradeoff_v0_1.py'
+      - 'results/flower_fruit_memory_tradeoff_v0_1/**'
+      - '.github/workflows/flower-fruit-memory-tradeoff-v0-1.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install runtime
+        run: pip install numpy scipy biopython pytest
+      - name: Unit tests
+        run: pytest -q tests/test_flower_fruit_memory_tradeoff_v0_1.py
+      - name: Validate prereg
+        run: |
+          python - <<'PY'
+          import json
+          x=json.load(open('data/flower_fruit_memory_tradeoff_prereg_v0_1.json'))
+          assert x['status']=='FROZEN_BEFORE_FRUIT_MEMORY_CURVE_COMPUTATION'
+          assert x['primary_test']['direction']=='negative'
+          assert x['primary_test']['permutations']==99999
+          assert x['paper1_science_changed'] is False
+          assert x['el_v0_2_science_changed'] is False
+          PY
+      - name: Validate result if present
+        run: |
+          if [ -f results/flower_fruit_memory_tradeoff_v0_1/result_v0_1.json ]; then
+            python - <<'PY'
+          import json
+          x=json.load(open('results/flower_fruit_memory_tradeoff_v0_1/result_v0_1.json'))
+          assert x['status'] in ['FLOWER_FRUIT_MEMORY_TRADEOFF_PASS','FLOWER_FRUIT_MEMORY_TRADEOFF_FAIL']
+          assert x['paper1_science_changed'] is False
+          assert x['el_v0_2_science_changed'] is False
+          print(x['primary_test'])
+          PY
+          fi
