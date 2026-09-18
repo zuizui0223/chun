@@ -5,6 +5,9 @@ on:
     paths:
       - 'data/flower_memory_abiotic_moderator_prereg_v0_1.json'
       - 'docs/FLOWER_MEMORY_ABIOTIC_MODERATOR_PREREG_V0_1.md'
+      - 'data/phaidra_abiotic_source_identity_resolution_v0_1.json'
+      - 'data/flower_memory_abiotic_source_gate_result_v0_1.json'
+      - 'docs/FLOWER_MEMORY_ABIOTIC_SOURCE_GATE_RESULT_V0_1.md'
       - 'scripts/probe_phaidra_abiotic_source_v0_1.py'
       - 'tests/test_probe_phaidra_abiotic_source_v0_1.py'
       - '.github/workflows/phaidra-abiotic-source-gate-v0-1.yml'
@@ -34,6 +37,20 @@ jobs:
           assert x['primary_test']['expected_direction']=='negative'
           assert x['source_firewall']['no_new_gbif_redownload_if_phaidra_source_is_unavailable'] is True
           PY
+      - name: Validate frozen source-gate decision if present
+        run: |
+          if [ -f data/flower_memory_abiotic_source_gate_result_v0_1.json ]; then
+            python - <<'PY'
+          import json
+          x=json.load(open('data/flower_memory_abiotic_source_gate_result_v0_1.json'))
+          assert x['status']=='HOLD_PHAIDRA_SOURCE_METADATA_UNAVAILABLE'
+          assert x['primary_memory_moderator_fit'] is False
+          assert x['outcome_firewall']['environmental_rows_opened'] is False
+          assert x['paper1_science_changed'] is False
+          assert x['el_v0_2_science_changed'] is False
+          print(x['status'])
+          PY
+          fi
       - name: Inventory PHAIDRA source without opening data rows
         run: python scripts/probe_phaidra_abiotic_source_v0_1.py --out build/phaidra_abiotic_inventory_v0_1.json
       - uses: actions/upload-artifact@v4
