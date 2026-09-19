@@ -8,6 +8,8 @@ on:
       - 'scripts/build_cross_radiation_evolution_letters_figures_v0_3_temporal_memory.py'
       - 'data/flowerclades51_fine_time_persistence_median_curve_v0_1.csv'
       - 'data/flowerclades51_relative_time_persistence_result_v0_1.json'
+      - 'data/cross_radiation_el_v0_3_extra_reference_manifest_v0_1.json'
+      - 'docs/EL_V0_3_HOSTILE_NOVELTY_AUDIT_20260919.md'
       - '.github/workflows/cross-radiation-evolution-letters-v0-3-temporal-memory.yml'
   workflow_dispatch:
 
