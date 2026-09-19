@@ -7,6 +7,7 @@ from pathlib import Path
 ROOT=Path(__file__).resolve().parents[1]
 REG=ROOT/'data/cross_radiation_evolution_letters_claim_registry_v0_1.json'
 REFS=ROOT/'data/cross_radiation_el_reference_manifest_v0_1.json'
+EXTRA_REFS=ROOT/'data/cross_radiation_el_v0_3_extra_reference_manifest_v0_1.json'
 GATE=ROOT/'data/cross_radiation_evolution_letters_submission_gate_v0_2.json'
 MAN=ROOT/'manuscript/CROSS_RADIATION_EVOLUTION_LETTERS_V0_3_TEMPORAL_MEMORY_CANDIDATE.md'
 PERSIST=ROOT/'data/flowerclades51_relative_time_persistence_result_v0_1.json'\nHALFDEPTH=ROOT/'results/flowerclades51_relative_time_halfdepth_v0_1/result_v0_1.json'
@@ -35,6 +36,7 @@ def subsection(text:str, heading:str)->str:
 def main():
     reg=json.loads(REG.read_text())
     refs=json.loads(REFS.read_text())
+    extra_refs=json.loads(EXTRA_REFS.read_text())
     gate=json.loads(GATE.read_text())
     text=MAN.read_text()
     low=text.lower()
@@ -42,6 +44,9 @@ def main():
     assert reg['status']=='CROSS_RADIATION_EVOLUTION_LETTERS_CLAIM_REGISTRY'
     assert refs['status']=='CROSS_RADIATION_EL_REFERENCES_VERIFIED'
     assert refs['paper1_science_changed'] is False
+    assert extra_refs['status']=='CROSS_RADIATION_EL_V0_3_EXTRA_REFERENCES_VERIFIED'
+    assert extra_refs['paper1_science_changed'] is False
+    assert extra_refs['el_v0_2_science_changed'] is False
     assert gate['status']=='SCIENCE_AND_JOURNAL_FORMAT_READY_METADATA_HOLD'
     assert gate['target_journal']=='Evolution Letters'
     assert gate['article_type']=='Letter'
@@ -86,6 +91,9 @@ def main():
 
     # References are bound to a verified manifest and data sources are explicitly tagged.
     for r in refs['references']:
+        token=r.get('doi') or r.get('identifier')
+        assert token and token.lower() in references.lower(), r['key']
+    for r in extra_refs['references']:
         token=r.get('doi') or r.get('identifier')
         assert token and token.lower() in references.lower(), r['key']
     for token in gate['required_reference_identifiers']:
