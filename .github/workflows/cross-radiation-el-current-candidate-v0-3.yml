@@ -1,0 +1,60 @@
+name: Cross-radiation EL current candidate v0.3
+
+on:
+  pull_request:
+    paths:
+      - 'data/cross_radiation_evolution_letters_submission_gate_v0_3.json'
+      - 'submission/CROSS_RADIATION_EL_SUBMISSION_METADATA_V0_2.json'
+      - 'scripts/validate_cross_radiation_el_submission_metadata_v0_2.py'
+      - 'tests/test_cross_radiation_el_submission_metadata_v0_2.py'
+      - 'docs/CROSS_RADIATION_EL_CURRENT_SUBMISSION_CANDIDATE_V0_3.md'
+      - '.github/workflows/cross-radiation-el-current-candidate-v0-3.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install tests
+        run: pip install pytest matplotlib numpy pandas
+      - name: Metadata validator tests
+        run: pytest -q tests/test_cross_radiation_el_submission_metadata_v0_2.py
+      - name: Validate v0.3 science candidate
+        run: python scripts/validate_cross_radiation_evolution_letters_v0_3_temporal_memory.py
+      - name: Validate v0.3 metadata scaffold
+        run: |
+          python scripts/validate_cross_radiation_el_submission_metadata_v0_2.py \
+            --input submission/CROSS_RADIATION_EL_SUBMISSION_METADATA_V0_2.json \
+            --summary build/cross_radiation_el_submission_metadata_v0_2_summary.json
+      - name: Validate promotion gate
+        run: |
+          python - <<'PY'
+          import json
+          x=json.load(open('data/cross_radiation_evolution_letters_submission_gate_v0_3.json'))
+          assert x['status']=='CURRENT_EL_SUBMISSION_CANDIDATE_METADATA_HOLD'
+          assert x['target_journal']=='Evolution Letters'
+          assert x['current_candidate']['version']=='v0.3'
+          assert x['fallback_candidate']['version']=='v0.2'
+          assert x['fallback_candidate']['preserved'] is True
+          assert x['human_metadata_state']=='AWAITING_PHASE1_AUTHOR_IDENTITY'
+          assert x['paper1_science_changed'] is False
+          assert x['el_v0_2_changed'] is False
+          print(x['current_candidate'])
+          PY
+      - name: Confirm frozen v0.2 fallback files unchanged
+        if: github.event_name == 'pull_request'
+        run: |
+          git diff --exit-code ${{ github.event.pull_request.base.sha }}...HEAD -- \
+            manuscript/CROSS_RADIATION_EVOLUTION_LETTERS_V0_2.md \
+            data/cross_radiation_evolution_letters_submission_gate_v0_2.json \
+            submission/CROSS_RADIATION_EL_SUBMISSION_METADATA_V0_1.json \
+            scripts/validate_cross_radiation_el_submission_metadata_v0_1.py

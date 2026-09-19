@@ -1,0 +1,53 @@
+{
+  "version": "v0.3",
+  "status": "CURRENT_EL_SUBMISSION_CANDIDATE_METADATA_HOLD",
+  "target_journal": "Evolution Letters",
+  "article_type": "Letter",
+  "promoted_on": "2026-09-19",
+  "human_metadata_state": "AWAITING_PHASE1_AUTHOR_IDENTITY",
+  "current_candidate": {
+    "version": "v0.3",
+    "role": "CURRENT_FIRST_SUBMISSION_CANDIDATE",
+    "manuscript": "manuscript/CROSS_RADIATION_EVOLUTION_LETTERS_V0_3_TEMPORAL_MEMORY_CANDIDATE.md",
+    "science_validator": "scripts/validate_cross_radiation_evolution_letters_v0_3_temporal_memory.py",
+    "metadata": "submission/CROSS_RADIATION_EL_SUBMISSION_METADATA_V0_2.json",
+    "metadata_validator": "scripts/validate_cross_radiation_el_submission_metadata_v0_2.py",
+    "figure_builder": "scripts/build_cross_radiation_evolution_letters_figures_v0_3_temporal_memory.py",
+    "extra_reference_manifest": "data/cross_radiation_el_v0_3_extra_reference_manifest_v0_1.json",
+    "novelty_audit": "docs/EL_V0_3_HOSTILE_NOVELTY_AUDIT_20260919.md",
+    "temporal_memory_result": "data/flowerclades51_relative_time_persistence_result_v0_1.json",
+    "halfdepth_result": "results/flowerclades51_relative_time_halfdepth_v0_1/result_v0_1.json"
+  },
+  "fallback_candidate": {
+    "version": "v0.2",
+    "role": "VALIDATED_REPRESENTATION_CENTERED_FALLBACK",
+    "manuscript": "manuscript/CROSS_RADIATION_EVOLUTION_LETTERS_V0_2.md",
+    "submission_gate": "data/cross_radiation_evolution_letters_submission_gate_v0_2.json",
+    "metadata": "submission/CROSS_RADIATION_EL_SUBMISSION_METADATA_V0_1.json",
+    "preserved": true
+  },
+  "promotion_basis": [
+    "v0.3 retains the prospective Iris falsification and standardized 51-clade no-universal-scale result",
+    "relative-divergence persistence adds biological interpretation without being counted as independent replication",
+    "hostile novelty audit explicitly treats prior flower-color phylogenetic signal as prior art",
+    "v0.3 manuscript and figures pass the Evolution Letters format/science validator",
+    "v0.2 and Camellia Paper 1 firewalls remain unchanged"
+  ],
+  "claim_ceiling": [
+    "do not claim first demonstration of flower-color phylogenetic signal",
+    "do not claim first demonstration that flower-color similarity declines with evolutionary distance",
+    "persistence and half-depth are derived interpretations of the same pairwise source information, not independent replication",
+    "no absolute-time persistence duration in Ma",
+    "no causal ecological moderator has qualified",
+    "no universal coarse/intermediate/fine privileged scale is supported"
+  ],
+  "submission_metadata_holds": [
+    "author names, affiliations, ORCIDs and corresponding-author contact must be confirmed",
+    "CRediT author contributions must be completed",
+    "funding and grant numbers must be completed",
+    "acknowledgements must be completed or explicitly omitted",
+    "submission-specific CHUN code snapshot must receive a persistent archive identifier"
+  ],
+  "paper1_science_changed": false,
+  "el_v0_2_changed": false
+}
