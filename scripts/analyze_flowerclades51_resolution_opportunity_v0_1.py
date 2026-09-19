@@ -145,6 +145,9 @@ def main()->int:
         "version":"v0.1",
         "status":"FLOWERCLADES51_RESOLUTION_OPPORTUNITY_EXPLORATORY_RESULT",
         "analysis_role":"EL_V0_5_EXTENSION_NOT_EL_V0_3_MODIFICATION",
+        "n_clades":a["n_clades"],
+        "zero_opportunity":a["zero_opportunity"],
+        "opportunity":a["opportunity"],
         "source_provenance":{
             "final_dataset_sha256":"a253308785e4cbd0e361b3ca04cdfdae29c523eefa843375cebf8030ee0874af",
             "memory_architecture_merge_commit":"b54758a958542647d828d77e28327723d4d08287",
