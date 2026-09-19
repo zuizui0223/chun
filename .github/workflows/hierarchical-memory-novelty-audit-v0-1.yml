@@ -1,0 +1,41 @@
+name: Hierarchical memory novelty audit v0.1
+
+on:
+  pull_request:
+    paths:
+      - 'data/hierarchical_memory_novelty_audit_v0_1.json'
+      - 'docs/HIERARCHICAL_MEMORY_NOVELTY_AUDIT_V0_1.md'
+      - '.github/workflows/hierarchical-memory-novelty-audit-v0-1.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Validate novelty ceiling
+        run: |
+          python - <<'PY'
+          import json
+          x=json.load(open('data/hierarchical_memory_novelty_audit_v0_1.json'))
+          assert x['status']=='HIERARCHICAL_MEMORY_NOVELTY_CEILING_FROZEN'
+          dois={r['doi'] for r in x['prior_art']}
+          assert '10.1111/nph.13576' in dois
+          assert '10.1111/evo.13589' in dois
+          assert '10.1093/sysbio/syaa036' in dois
+          assert len(x['retained_novelty_candidate'])>=5
+          assert x['prospective_status']['result_available'] is False
+          assert x['el_v0_3_science_changed'] is False
+          assert x['paper1_science_changed'] is False
+          print(x['strongest_allowed_novelty_wording'])
+          PY
+      - name: Confirm authoritative synthesis and frozen v0.3
+        run: |
+          test -f data/hierarchical_evolutionary_memory_synthesis_v0_1.json
+          python scripts/validate_cross_radiation_el_v0_3_science_freeze_v0_1.py
