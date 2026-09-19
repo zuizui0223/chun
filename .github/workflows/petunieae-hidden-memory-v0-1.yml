@@ -3,6 +3,7 @@ name: Petunieae hidden biochemical memory v0.1
 on:
   pull_request:
     paths:
+      - 'data/petunieae_hidden_memory_design_v0_1.json'
       - 'scripts/analyze_petunieae_hidden_memory_v0_1.py'
       - 'tests/test_petunieae_hidden_memory_v0_1.py'
       - 'results/petunieae_hidden_memory_v0_1/**'
