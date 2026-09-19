@@ -1,0 +1,48 @@
+name: Flower-clades-51 hierarchical hidden memory v0.1
+
+on:
+  pull_request:
+    paths:
+      - 'data/flowerclades51_hidden_fine_memory_design_v0_1.json'
+      - 'data/flowerclades51_hidden_fine_memory_clades_v0_1.csv'
+      - 'scripts/analyze_flowerclades51_hidden_fine_memory_v0_1.py'
+      - 'tests/test_flowerclades51_hidden_fine_memory_v0_1.py'
+      - 'results/flowerclades51_hidden_fine_memory_v0_1/**'
+      - 'docs/FLOWERCLADES51_HIDDEN_FINE_MEMORY_RESULT_V0_1.md'
+      - '.github/workflows/flowerclades51-hidden-fine-memory-v0-1.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install runtime
+        run: pip install numpy scipy biopython pandas pytest
+      - name: Unit tests
+        run: pytest -q tests/test_flowerclades51_hidden_fine_memory_v0_1.py
+      - name: Validate frozen result if present
+        run: |
+          if [ -f results/flowerclades51_hidden_fine_memory_v0_1/summary_v0_1.json ]; then
+            python - <<'PY'
+          import json, math
+          x=json.load(open('results/flowerclades51_hidden_fine_memory_v0_1/summary_v0_1.json'))
+          assert x['status']=='FLOWERCLADES51_HIERARCHICAL_HIDDEN_FINE_MEMORY_EXPLORATORY_RESULT'
+          assert x['n_clades']==21
+          assert x['positive_effect_clades']==18
+          assert math.isclose(x['median_centered_auc_effect'],0.02700779596581926,abs_tol=1e-12)
+          assert x['wilcoxon_effect_gt_zero_p'] < 0.001
+          assert x['sign_effect_gt_zero_p'] < 0.001
+          assert x['el_v0_3_science_changed'] is False
+          assert x['paper1_science_changed'] is False
+          print(x['headline'])
+          PY
+          fi
+      - name: Confirm frozen EL v0.3 science
+        run: python scripts/validate_cross_radiation_el_v0_3_science_freeze_v0_1.py

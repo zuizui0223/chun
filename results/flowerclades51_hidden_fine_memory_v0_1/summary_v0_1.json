@@ -1,0 +1,52 @@
+{
+  "version": "v0.1",
+  "status": "FLOWERCLADES51_HIERARCHICAL_HIDDEN_FINE_MEMORY_EXPLORATORY_RESULT",
+  "analysis_role": "EL_V0_6_EXTENSION_NOT_EL_V0_3_MODIFICATION",
+  "source_sha256": {
+    "final_dataset.csv": "a253308785e4cbd0e361b3ca04cdfdae29c523eefa843375cebf8030ee0874af",
+    "trees.zip": "ae5c82945e5bf9c29bcabc52d6029acd8d4f5be1fe9141fad95918eacb4f674d"
+  },
+  "permutations": 9999,
+  "seed": 20260920,
+  "n_clades": 21,
+  "positive_effect_clades": 18,
+  "median_centered_auc_effect": 0.02700779596581926,
+  "bootstrap95_median_effect": [
+    0.008423793684682324,
+    0.0452722553357634
+  ],
+  "wilcoxon_effect_gt_zero_p": 0.00003337860107421875,
+  "sign_effect_gt_zero_p": 0.0007448196411132812,
+  "per_clade_p_le_0_05": 6,
+  "secondary_relations": {
+    "hidden_effect_vs_scale_tilt": {
+      "rho": 0.11038961038961038,
+      "p_two_sided": 0.6338228017857539
+    },
+    "hidden_effect_vs_amplitude": {
+      "rho": 0.13116883116883118,
+      "p_two_sided": 0.5708891960684089
+    },
+    "positive_global_tilt_clades": {
+      "n": 15,
+      "positive_hidden_effect": 13,
+      "median_hidden_effect": 0.029028911322673823
+    },
+    "negative_global_tilt_clades": {
+      "n": 6,
+      "positive_hidden_effect": 5,
+      "median_hidden_effect": 0.01771579482525079
+    }
+  },
+  "headline": "Fine flower-color states retain phylogenetic organization inside coarse color states in most opportunity clades: 18/21 permutation-centered conditional AUC effects are positive, with median +0.0270 AUC.",
+  "interpretation": "Global coarse-versus-fine winner status hides nested organization. Fine-state phylogenetic memory can persist within a coarse phenotype even when the global profile tilts toward coarse resolution.",
+  "claim_boundary": [
+    "post-outcome pilot-exposed exploratory analysis",
+    "permutation-centering is required because the conditional null AUC need not equal 0.5",
+    "hidden fine memory is distinct from global scale tilt and overall memory amplitude",
+    "not independent replication of the source data",
+    "frozen EL v0.3 remains unchanged"
+  ],
+  "el_v0_3_science_changed": false,
+  "paper1_science_changed": false
+}
