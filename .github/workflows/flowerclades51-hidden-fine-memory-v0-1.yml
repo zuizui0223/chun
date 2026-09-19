@@ -24,7 +24,7 @@ jobs:
         with:
           python-version: '3.12'
       - name: Install runtime
-        run: pip install numpy scipy biopython pytest
+        run: pip install numpy scipy biopython pandas pytest
       - name: Unit tests
         run: pytest -q tests/test_flowerclades51_hidden_fine_memory_v0_1.py
       - name: Validate frozen result if present
