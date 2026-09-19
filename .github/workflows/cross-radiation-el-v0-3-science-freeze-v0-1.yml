@@ -1,0 +1,59 @@
+name: Cross-radiation EL v0.3 science freeze
+
+on:
+  pull_request:
+    paths:
+      - 'manuscript/CROSS_RADIATION_EVOLUTION_LETTERS_V0_3_TEMPORAL_MEMORY_CANDIDATE.md'
+      - 'scripts/validate_cross_radiation_evolution_letters_v0_3_temporal_memory.py'
+      - 'scripts/build_cross_radiation_evolution_letters_figures_v0_3_temporal_memory.py'
+      - 'scripts/validate_cross_radiation_el_v0_3_science_freeze_v0_1.py'
+      - 'data/cross_radiation_evolution_letters_claim_registry_v0_1.json'
+      - 'data/cross_radiation_el_reference_manifest_v0_1.json'
+      - 'data/cross_radiation_el_v0_3_extra_reference_manifest_v0_1.json'
+      - 'data/cross_radiation_evolution_letters_submission_gate_v0_2.json'
+      - 'data/cross_radiation_evolution_letters_submission_gate_v0_3.json'
+      - 'data/flowerclades51_relative_time_persistence_result_v0_1.json'
+      - 'data/flowerclades51_fine_time_persistence_clades_v0_1.csv'
+      - 'data/flowerclades51_fine_time_persistence_median_curve_v0_1.csv'
+      - 'data/resolution_profile_moderator_qualification_v0_1.json'
+      - 'data/flowerclades51_tree_moderator_candidates_v0_1.csv'
+      - 'data/petunieae_biochemical_resolution_profile_result_v0_1.json'
+      - 'data/resolution_profile_representation_identifiability_v0_1.json'
+      - 'results/iris_intermediate_resolution_v0_1/iris_intermediate_resolution_result_v0_1.json'
+      - 'results/flowerclades51_resolution_profile_v0_1/flowerclades51_resolution_profile_batch_result_v0_1.json'
+      - 'results/flowerclades51_resolution_profile_v0_1/flowerclades51_resolution_profile_summary_v0_1.csv'
+      - 'results/flowerclades51_relative_time_halfdepth_v0_1/result_v0_1.json'
+      - 'docs/EL_V0_3_HOSTILE_NOVELTY_AUDIT_20260919.md'
+      - 'data/cross_radiation_el_v0_3_science_freeze_v0_1.json'
+      - 'tests/test_cross_radiation_el_v0_3_science_freeze_v0_1.py'
+      - '.github/workflows/cross-radiation-el-v0-3-science-freeze-v0-1.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install tests
+        run: pip install pytest
+      - name: Freeze validator tests
+        run: pytest -q tests/test_cross_radiation_el_v0_3_science_freeze_v0_1.py
+      - name: Validate frozen science assets
+        run: python scripts/validate_cross_radiation_el_v0_3_science_freeze_v0_1.py
+      - name: Prevent future freeze-manifest rewriting
+        if: github.event_name == 'pull_request'
+        run: |
+          BASE=${{ github.event.pull_request.base.sha }}
+          if git cat-file -e "$BASE:data/cross_radiation_el_v0_3_science_freeze_v0_1.json" 2>/dev/null; then
+            git diff --exit-code "$BASE"...HEAD -- data/cross_radiation_el_v0_3_science_freeze_v0_1.json
+          else
+            echo "Initial freeze-manifest creation; no prior manifest to compare."
+          fi
