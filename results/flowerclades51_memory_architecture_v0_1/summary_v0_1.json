@@ -1,0 +1,77 @@
+{
+  "version": "v0.1",
+  "status": "FLOWERCLADES51_MEMORY_ARCHITECTURE_EXPLORATORY_RESULT",
+  "analysis_role": "EL_V0_4_EXTENSION_NOT_EL_V0_3_MODIFICATION",
+  "n_clades": 28,
+  "coordinates": {
+    "amplitude": "(AUC_coarse + AUC_intermediate + AUC_fine)/3 - 0.5",
+    "scale_tilt": "AUC_fine - AUC_coarse",
+    "intermediate_curvature": "AUC_intermediate - (AUC_coarse + AUC_fine)/2"
+  },
+  "variance_share": {
+    "amplitude": 0.9065164172071694,
+    "scale_tilt": 0.06489560338813366,
+    "intermediate_curvature": 0.0285879794046969
+  },
+  "variance_share_bootstrap95": {
+    "amplitude": [
+      0.7911406509718273,
+      0.9618620288461747
+    ],
+    "scale_tilt": [
+      0.02546243358677559,
+      0.14596043784441823
+    ],
+    "intermediate_curvature": [
+      0.008713948939452541,
+      0.07088695524613094
+    ]
+  },
+  "geometry": {
+    "median_absolute_scale_tilt": 0.017770714950750666,
+    "median_absolute_intermediate_curvature": 0.008992754851663398,
+    "wilcoxon_abs_tilt_greater_than_abs_curvature_p": 0.0010488062193479482,
+    "median_scale_tilt": 0.0009251275656806945,
+    "positive_tilt_clades": 15,
+    "negative_tilt_clades": 6,
+    "zero_tilt_clades": 7,
+    "median_intermediate_curvature": 0,
+    "curvature_vs_zero_p_two_sided": 0.37544507472938493
+  },
+  "temporal_bridge": {
+    "amplitude_vs_slope": {
+      "rho": -0.7728516694033934,
+      "p_two_sided": 0.0000014355470571413012
+    },
+    "amplitude_vs_area": {
+      "rho": 0.6611932129173508,
+      "p_two_sided": 0.00012782146735713527
+    },
+    "amplitude_vs_near_far": {
+      "rho": 0.6414887794198139,
+      "p_two_sided": 0.00023426163752856072
+    },
+    "scale_tilt_vs_slope": {
+      "rho": -0.26145291384480046,
+      "p_two_sided": 0.1789749687753034
+    },
+    "scale_tilt_vs_area": {
+      "rho": 0.005515884258329124,
+      "p_two_sided": 0.9777764134977882
+    },
+    "amplitude_vs_scale_tilt": {
+      "rho": -0.017099241200820285,
+      "p_two_sided": 0.9311790024817015
+    }
+  },
+  "interpretation": "Cross-radiation resolution profiles are better described by two largely independent biological coordinates than by a three-way winner taxonomy: overall evolutionary-memory amplitude and a smaller coarse-to-fine scale tilt. Intermediate-specific curvature is minor. Memory amplitude tracks relative-time persistence, whereas scale tilt is largely independent of memory strength.",
+  "claim_boundary": [
+    "post-outcome exploratory reparameterization",
+    "not prospective",
+    "not independent replication",
+    "fixed coordinates are descriptive axes, not latent causal mechanisms",
+    "frozen EL v0.3 is unchanged"
+  ],
+  "el_v0_3_science_changed": false,
+  "paper1_science_changed": false
+}
