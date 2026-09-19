@@ -1,0 +1,60 @@
+{
+  "version": "v0.3",
+  "status": "HOLD_SOURCE_ACCESS_STILL_BLOCKED_OUTCOMES_UNOPENED",
+  "checked_on": "2026-09-19",
+  "trait_source": {
+    "doi": "10.1111/plb.12649",
+    "file": "plb12649-sup-0002-TableS3.docx",
+    "publisher_listing_verified": true,
+    "publisher_reported_size": "35.9 KB",
+    "route_http_statuses": [
+      403,
+      403,
+      403,
+      403,
+      403
+    ],
+    "genuine_docx_recovered": false,
+    "species_identifiers_recovered": 0
+  },
+  "primary_tree": {
+    "doi": "10.5061/dryad.8cz8w9grq",
+    "file": "1_WP_RAxML.tre",
+    "file_id": 1853438,
+    "publisher_listing_verified": true,
+    "publisher_reported_size": "13.10 KB",
+    "expected_sha256": "784011d0e2e17df9ea21eb22d31197bad29219a37ac213fda013766e29b51362",
+    "attempts": [
+      {
+        "route": "https://datadryad.org/api/v2/files/1853438/download",
+        "http_status": 401,
+        "digest_match": false,
+        "treeish_payload": false
+      },
+      {
+        "route": "https://datadryad.org/stash/downloads/file_stream/1853438",
+        "http_status": 200,
+        "digest_match": false,
+        "treeish_payload": false
+      }
+    ],
+    "recovered": false
+  },
+  "crosswalk_exact_matches": 0,
+  "outcome_firewall": {
+    "table_s1_chemistry_downloaded": false,
+    "row_level_anthocyanin_values_accessed": false,
+    "flower_colour_values_accessed": false,
+    "CIELAB_values_accessed": false,
+    "compound_presence_states_computed": false,
+    "state_frequencies_computed": false,
+    "AUC_computed": false,
+    "winner_computed": false
+  },
+  "chemistry_opened": false,
+  "profile_auc_computed": false,
+  "decision": "STOP_HOLD_DO_NOT_OPEN_TABLE_S1_CHEMISTRY",
+  "scientific_interpretation": "Exact source files are publicly listed but their bytes remain unavailable to the reproducible hosted retrieval paths. This is a source-transport HOLD, not a biological negative.",
+  "el_v0_3_science_changed": false,
+  "paper1_science_changed": false
+}

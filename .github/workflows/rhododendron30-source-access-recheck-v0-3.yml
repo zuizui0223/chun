@@ -1,0 +1,61 @@
+name: Rhododendron30 source access recheck v0.3
+
+on:
+  pull_request:
+    paths:
+      - 'scripts/recheck_rhododendron30_source_access_v0_3.py'
+      - 'tests/test_rhododendron30_source_access_recheck_v0_3.py'
+      - 'data/rhododendron30_source_access_recheck_v0_3.json'
+      - 'docs/RHODODENDRON30_SOURCE_ACCESS_RECHECK_V0_3.md'
+      - '.github/workflows/rhododendron30-source-access-recheck-v0-3.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  recheck:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install runtime
+        run: pip install biopython pytest
+      - name: Unit tests
+        run: pytest -q tests/test_rhododendron30_source_access_recheck_v0_3.py
+      - name: Confirm chemistry outcome remains unopened
+        run: test ! -e results/rhododendron30_biochemical_resolution_profile_v0_1
+      - name: Recheck exact source transport
+        run: |
+          python scripts/recheck_rhododendron30_source_access_v0_3.py \
+            --out build/rhododendron30_source_access_recheck_v0_3.json
+      - name: Enforce source-only firewall
+        run: |
+          python - <<'PY'
+          import json
+          x=json.load(open('build/rhododendron30_source_access_recheck_v0_3.json'))
+          assert x['primary_tree']['file_id']==1853438
+          assert x['primary_tree']['expected_sha256']=='784011d0e2e17df9ea21eb22d31197bad29219a37ac213fda013766e29b51362'
+          assert x['chemistry_opened'] is False
+          assert x['profile_auc_computed'] is False
+          assert all(v is False for v in x['outcome_firewall'].values())
+          assert x['status'] in {
+              'SOURCE_ACCESS_AND_CROSSWALK_PASS_CHEMISTRY_STILL_UNOPENED',
+              'HOLD_SOURCE_ACCESS_STILL_BLOCKED_OUTCOMES_UNOPENED',
+              'HOLD_CROSSWALK_OR_TREE_COVERAGE_OUTCOMES_UNOPENED'
+          }
+          print(json.dumps({k:x[k] for k in ['status','decision']},indent=2))
+          PY
+      - name: Confirm frozen EL v0.3 science
+        run: python scripts/validate_cross_radiation_el_v0_3_science_freeze_v0_1.py
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: rhododendron30-source-access-recheck-v0-3
+          path: build/
+          if-no-files-found: warn
+          retention-days: 90
