@@ -1,0 +1,100 @@
+{
+  "version": "v0.1",
+  "status": "HIERARCHICAL_EVOLUTIONARY_MEMORY_SYNTHESIS_READY",
+  "programme_role": "POST_V0_3_EXTENSION_SYNTHESIS",
+  "candidate_headline": "Evolutionary memory is hierarchical rather than scale-optimal.",
+  "conceptual_claim": "Coarse phenotype states can retain broad historical structure while finer states preserve additional phylogenetic organization inside those coarse states; consequently no single global resolution must maximize evolutionary signal.",
+  "evidence_tiers": {
+    "tier_A_standardized_visible_same_estimand": {
+      "source": "results/flowerclades51_hidden_fine_memory_v0_1/summary_v0_1.json",
+      "unit": "Flower-clades-51 completed opportunity clades",
+      "n_clades": 21,
+      "positive_effect_clades": 18,
+      "median_centered_auc_effect": 0.02700779596581926,
+      "bootstrap95_median_effect": [
+        0.008423793684682324,
+        0.0452722553357634
+      ],
+      "wilcoxon_p": 0.00003337860107421875,
+      "sign_p": 0.0007448196411132812,
+      "estimator": "within-coarse same-fine ROC_AUC centered on within-coarse label-permutation null",
+      "inference": "strong standardized within-representation evidence",
+      "limitations": [
+        "post-outcome pilot-exposed",
+        "shared source and visible-color ontology"
+      ]
+    },
+    "tier_B_biochemical_same_estimand": {
+      "source": "results/petunieae_hidden_memory_v0_1/summary_v0_1.json",
+      "system": "PETUNIEAE",
+      "eligible_tips": 47,
+      "conditional_auc": 0.7017960709376782,
+      "null_mean_auc": 0.5138525137672505,
+      "centered_auc_effect": 0.18794355717042766,
+      "p_one_sided": 0.0001,
+      "estimator": "same within-coarse conditional ROC_AUC and fine-label permutation logic",
+      "inference": "cross-representation biochemical concordance under the same conceptual estimand",
+      "limitations": [
+        "one biochemical radiation",
+        "retrospective same-source extension",
+        "not independent of existing Petunieae profile"
+      ]
+    },
+    "tier_C_external_independent_conditional_radiations": {
+      "source": "data/cross_radiation_hierarchical_rule_v0_2.json",
+      "supporting_radiations": [
+        "LINOIDEAE",
+        "ANGRAECINAE",
+        "ANTIRRHINEAE"
+      ],
+      "supporting_n": 3,
+      "testable_n": 3,
+      "dimensions": [
+        "HUE",
+        "FLORAL_ORGAN_CONFIGURATION",
+        "PIGMENT_CLASS"
+      ],
+      "estimator_family": "conditional fine-state phylogenetic organization with system-specific source-faithful statistics",
+      "inference": "independent radiation-level qualitative replication of conditional fine-state organization",
+      "limitations": [
+        "different estimators from tier A/B",
+        "retrospective",
+        "do not pool p-values or sensitivity trees as independent biological units"
+      ]
+    },
+    "tier_D_prospective_falsification_gate": {
+      "source": "data/ruellia51_hidden_memory_prediction_v0_1.json",
+      "system": "RUELLIA",
+      "status": "FROZEN_BEFORE_RUELLIA51_HPLC_OUTCOME_OPENING",
+      "prediction": "if fine-to-coarse opportunity exists, fine biochemical states will show positive within-coarse hidden memory under 9999 frozen permutations",
+      "pass_rule": "observed conditional AUC > permutation mean and one-sided permutation p <= 0.05",
+      "current_blocker": "HOLD_AUTHORITATIVE_2023_TREE_BYTES_OR_EXACT_RECONSTRUCTION_SOURCE_UNAVAILABLE_OUTCOMES_UNOPENED",
+      "outcome_opened": false,
+      "inference": "prospective generalization remains genuinely unresolved"
+    }
+  },
+  "relation_to_memory_architecture": {
+    "amplitude": "how much evolutionary history remains overall",
+    "global_scale_tilt": "where that history is most visible under global coarse-versus-fine comparison",
+    "hierarchical_hidden_memory": "whether fine identity retains additional phylogenetic organization after coarse membership is fixed",
+    "key_result": "hidden memory is empirically distinct from both amplitude and global scale tilt"
+  },
+  "explains_prior_negative_results": [
+    "The failed universal intermediate optimum does not imply absence of structure; intermediate curvature is a minor profile axis.",
+    "No universal coarse/fine winner is expected if global scale tilt and hidden within-state organization are separate quantities.",
+    "A clade can be globally coarse-tilted yet retain positive fine-level memory within coarse states.",
+    "Representation opportunity determines whether hidden fine structure can exist, while phylogenetic realization determines whether it is actually organized."
+  ],
+  "strongest_current_positive_statement": "Flower-color evolution repeatedly preserves nested historical information: finer phenotype identity can remain phylogenetically organized within coarser states across standardized visible-color clades, a biochemical Petunieae hierarchy, and three independent external radiations, although prospective cross-representation validation is still pending.",
+  "not_allowed": [
+    "universal fine-resolution optimum",
+    "one universal privileged coarse boundary",
+    "pooled significance across nonexchangeable evidence tiers",
+    "claim that retrospective Petunieae or external systems are prospective validation",
+    "claim that hierarchical memory has one ecological or molecular cause",
+    "modification of frozen EL v0.3 in place"
+  ],
+  "next_gate": "Resolve the Ruellia authoritative-tree provenance without opening HPLC outcomes, then execute the already-frozen prospective hidden-memory test unchanged.",
+  "el_v0_3_science_changed": false,
+  "paper1_science_changed": false
+}
