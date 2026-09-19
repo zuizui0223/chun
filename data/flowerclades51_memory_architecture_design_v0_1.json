@@ -1,0 +1,60 @@
+{
+  "version": "v0.1",
+  "status": "POST_OUTCOME_EXPLORATORY_MEMORY_ARCHITECTURE_REPARAMETERIZATION",
+  "programme_role": "EL_V0_4_EXTENSION_NOT_EL_V0_3_MODIFICATION",
+  "inputs": {
+    "resolution_profiles": "results/flowerclades51_resolution_profile_v0_1/flowerclades51_resolution_profile_summary_v0_1.csv",
+    "temporal_persistence": "data/flowerclades51_fine_time_persistence_clades_v0_1.csv",
+    "completed_common_frame_clades": 28
+  },
+  "exposure_boundary": {
+    "resolution_outcomes_already_known": true,
+    "persistence_outcomes_already_known": true,
+    "preregistered": false,
+    "prospective_claim_allowed": false
+  },
+  "biological_reparameterization": {
+    "amplitude": "(AUC_coarse + AUC_intermediate + AUC_fine)/3 - 0.5",
+    "scale_tilt": "AUC_fine - AUC_coarse",
+    "intermediate_curvature": "AUC_intermediate - (AUC_coarse + AUC_fine)/2",
+    "interpretation": {
+      "amplitude": "how much same-state phylogenetic memory is retained overall across resolutions",
+      "scale_tilt": "whether retained memory is displaced toward fine versus coarse phenotype representation",
+      "intermediate_curvature": "whether the intermediate representation contributes a distinct bulge beyond the coarse-fine line"
+    }
+  },
+  "orthogonal_variance_basis": {
+    "amplitude_axis": "(C+I+F)/sqrt(3)",
+    "tilt_axis": "(F-C)/sqrt(2)",
+    "curvature_axis": "(2I-C-F)/sqrt(6)",
+    "primary_summary": "fraction of centered between-clade sum of squares on each fixed axis",
+    "bootstrap": {
+      "replicates": 10000,
+      "seed": 20260919,
+      "resampling_unit": "clade"
+    }
+  },
+  "temporal_bridge": {
+    "tests": [
+      "Spearman amplitude versus fine-color persistence slope",
+      "Spearman amplitude versus fine-color persistence area",
+      "Spearman scale_tilt versus fine-color persistence slope",
+      "Spearman scale_tilt versus fine-color persistence area",
+      "Spearman amplitude versus scale_tilt"
+    ],
+    "interpretation_rule": "amplitude may be called a temporal-memory-strength axis only if it has the expected negative association with decay slope and positive association with persistence area; scale_tilt is interpreted as a separate axis only if it is not comparably coupled to those temporal summaries"
+  },
+  "secondary_geometry": {
+    "paired_test": "Wilcoxon |scale_tilt| > |intermediate_curvature|",
+    "purpose": "test whether profile shape varies more along coarse-fine tilt than through an intermediate-specific bulge"
+  },
+  "claim_boundary": [
+    "exploratory reparameterization of already-opened outcomes",
+    "does not add independent biological replication",
+    "does not alter frozen EL v0.3",
+    "fixed axes are algebraic coordinates, not latent causes",
+    "temporal correlations reuse the same source states and phylogenies"
+  ],
+  "el_v0_3_science_changed": false,
+  "paper1_science_changed": false
+}
