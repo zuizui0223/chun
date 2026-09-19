@@ -1,0 +1,84 @@
+{
+  "version": "v0.1",
+  "status": "FLOWERCLADES51_RESOLUTION_OPPORTUNITY_EXPLORATORY_RESULT",
+  "analysis_role": "EL_V0_5_EXTENSION_NOT_EL_V0_3_MODIFICATION",
+  "source_provenance": {
+    "final_dataset_sha256": "a253308785e4cbd0e361b3ca04cdfdae29c523eefa843375cebf8030ee0874af",
+    "memory_architecture_merge_commit": "b54758a958542647d828d77e28327723d4d08287"
+  },
+  "n_clades": 28,
+  "zero_opportunity": {
+    "n_clades": 7,
+    "clades": [
+      "Asparagus",
+      "Capparis",
+      "Cordia",
+      "Cornus",
+      "Ocotea",
+      "Prunus",
+      "Rubus"
+    ],
+    "all_scale_tilt_zero": true
+  },
+  "opportunity": {
+    "n_clades": 21,
+    "positive_tilt_clades": 15,
+    "negative_tilt_clades": 6,
+    "zero_tilt_clades": 0,
+    "median_scale_tilt": 0.019982107998884002,
+    "wilcoxon_tilt_gt_zero_p": 0.019218921661376953,
+    "sign_tilt_gt_zero_p": 0.03917694091796875
+  },
+  "compression_magnitude": {
+    "state_collapse_count": {
+      "vs_signed_tilt": {
+        "rho": 0.2928967347326847,
+        "p_two_sided": 0.19756736859445595
+      },
+      "vs_absolute_tilt": {
+        "rho": 0.2096221728969214,
+        "p_two_sided": 0.3617798226807359
+      }
+    },
+    "entropy_loss": {
+      "vs_signed_tilt": {
+        "rho": 0.22597402597402597,
+        "p_two_sided": 0.32464763262834334
+      },
+      "vs_absolute_tilt": {
+        "rho": 0.34285714285714286,
+        "p_two_sided": 0.12813141007326184
+      }
+    },
+    "pair_collision_gain": {
+      "vs_signed_tilt": {
+        "rho": 0.20649350649350648,
+        "p_two_sided": 0.3691521306594588
+      },
+      "vs_absolute_tilt": {
+        "rho": 0.4077922077922078,
+        "p_two_sided": 0.06650304724796141
+      }
+    }
+  },
+  "specificity": {
+    "fine_state_count_vs_scale_tilt_all": {
+      "rho": 0.4219769741493821,
+      "p_two_sided": 0.025304257880434892
+    },
+    "fine_state_count_vs_amplitude_all": {
+      "rho": 0.005743908768462539,
+      "p_two_sided": 0.9768579367258825
+    }
+  },
+  "interpretation": "Compression opportunity is a structural gate for coarse-fine scale tilt, but the amount of compression does not determine realized tilt among clades where opportunity exists. Overall memory amplitude is essentially unrelated to fine-state richness. The hierarchy therefore separates structural opportunity from phylogenetic realization.",
+  "claim_boundary": [
+    "post-outcome pilot-exposed exploratory analysis",
+    "not prospective or confirmatory",
+    "fine-state-richness versus tilt across all clades partly reflects the deterministic zero-opportunity subset",
+    "no ecological or causal mechanism inferred",
+    "frozen EL v0.3 unchanged"
+  ],
+  "el_v0_3_science_changed": false,
+  "paper1_science_changed": false
+}
