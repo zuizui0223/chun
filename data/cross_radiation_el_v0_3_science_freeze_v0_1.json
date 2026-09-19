@@ -1,0 +1,117 @@
+{
+  "version": "v0.1",
+  "status": "EL_V0_3_SCIENCE_FROZEN",
+  "frozen_on": "2026-09-19",
+  "frozen_from_main_commit": "64943a1a1dda98c8863d9b2fcd7b70715e9cda4b",
+  "current_candidate": "Evolution Letters v0.3",
+  "fallback_candidate": "Evolution Letters v0.2",
+  "science_changes_require_new_candidate_version": true,
+  "new_science_target_if_reopened": "v0.4_or_later",
+  "protected_assets": [
+    {
+      "path": "manuscript/CROSS_RADIATION_EVOLUTION_LETTERS_V0_3_TEMPORAL_MEMORY_CANDIDATE.md",
+      "git_blob_sha": "f7f2762ecf57a937aaa8dc753688083899ea6abb"
+    },
+    {
+      "path": "scripts/validate_cross_radiation_evolution_letters_v0_3_temporal_memory.py",
+      "git_blob_sha": "638a7939f5f435a062905d579c06393d5c909509"
+    },
+    {
+      "path": "scripts/build_cross_radiation_evolution_letters_figures_v0_3_temporal_memory.py",
+      "git_blob_sha": "71ab11cb695d3097aacdfecd87a3b8668a43b663"
+    },
+    {
+      "path": "data/cross_radiation_evolution_letters_claim_registry_v0_1.json",
+      "git_blob_sha": "f93ab9da48c93c983cae5597a67f6a4c86a39d07"
+    },
+    {
+      "path": "data/cross_radiation_el_reference_manifest_v0_1.json",
+      "git_blob_sha": "1b5a3f6a3a7471a26382341c68d4f1d79474cded"
+    },
+    {
+      "path": "data/cross_radiation_el_v0_3_extra_reference_manifest_v0_1.json",
+      "git_blob_sha": "997d438a521d5489665af76b223b86f33eb1d929"
+    },
+    {
+      "path": "docs/EL_V0_3_HOSTILE_NOVELTY_AUDIT_20260919.md",
+      "git_blob_sha": "1f83c1a33717ecd25b5665d291c21ec86c2e60e7"
+    },
+    {
+      "path": "data/cross_radiation_evolution_letters_submission_gate_v0_2.json",
+      "git_blob_sha": "c65194e774a17cc32835e09807742bbdbe33a2f6"
+    },
+    {
+      "path": "data/cross_radiation_evolution_letters_submission_gate_v0_3.json",
+      "git_blob_sha": "1da8c7b562a38d57d2d9edb893992635112b6d41"
+    },
+    {
+      "path": "results/iris_intermediate_resolution_v0_1/iris_intermediate_resolution_result_v0_1.json",
+      "git_blob_sha": "530726b2e2099bc556c8a981b8c0713b9b579c37"
+    },
+    {
+      "path": "results/flowerclades51_resolution_profile_v0_1/flowerclades51_resolution_profile_batch_result_v0_1.json",
+      "git_blob_sha": "baf0cf7fe5edc2fb8b77f161cfd262f8ddc07daf"
+    },
+    {
+      "path": "results/flowerclades51_resolution_profile_v0_1/flowerclades51_resolution_profile_summary_v0_1.csv",
+      "git_blob_sha": "9a8394c89403cfdaa9a83740a12f1c3d56bad0d5"
+    },
+    {
+      "path": "data/resolution_profile_moderator_qualification_v0_1.json",
+      "git_blob_sha": "00b07834321dacffe3ea28bf75b06d3771aabd97"
+    },
+    {
+      "path": "data/flowerclades51_tree_moderator_candidates_v0_1.csv",
+      "git_blob_sha": "f5366af6a9bad49b9b6ec56b861da95867b64c48"
+    },
+    {
+      "path": "data/petunieae_biochemical_resolution_profile_result_v0_1.json",
+      "git_blob_sha": "7e97b1894af06a6729e1acfdcab082d9c4f285cb"
+    },
+    {
+      "path": "data/resolution_profile_representation_identifiability_v0_1.json",
+      "git_blob_sha": "b7c1dcd505bb8b277339768bdea8ebfce70374e9"
+    },
+    {
+      "path": "data/flowerclades51_relative_time_persistence_result_v0_1.json",
+      "git_blob_sha": "d96fc2a4560e3d75628427a0297aa587cd719585"
+    },
+    {
+      "path": "data/flowerclades51_fine_time_persistence_clades_v0_1.csv",
+      "git_blob_sha": "1c368082ec02763357cf4cecdbdbfe0c6ab77ddb"
+    },
+    {
+      "path": "data/flowerclades51_fine_time_persistence_median_curve_v0_1.csv",
+      "git_blob_sha": "988b3c5790dc913b81c69b1e0651be744b99f9ca"
+    },
+    {
+      "path": "results/flowerclades51_relative_time_halfdepth_v0_1/result_v0_1.json",
+      "git_blob_sha": "027e577a7f2eb862d827496992b90633da625549"
+    }
+  ],
+  "allowed_mutable_submission_assets": [
+    "submission/CROSS_RADIATION_EL_SUBMISSION_METADATA_V0_2.json",
+    "docs/CROSS_RADIATION_EL_CURRENT_SUBMISSION_CANDIDATE_V0_3.md"
+  ],
+  "allowed_postfreeze_change_classes": [
+    "author identity and order",
+    "affiliations and ORCIDs",
+    "corresponding-author contact",
+    "CRediT roles",
+    "funding and acknowledgements",
+    "persistent archive DOI/version/URL",
+    "submission-system administrative metadata",
+    "non-scientific typo corrections only after explicitly opening a new candidate version or updating this governance under a separate decision"
+  ],
+  "forbidden_in_place_changes": [
+    "new biological analyses",
+    "new moderators or subgroup tests",
+    "numeric result changes",
+    "claim-ceiling expansion",
+    "title or framing changes that alter scientific interpretation",
+    "replacement of v0.3 science assets while retaining the same frozen candidate label"
+  ],
+  "note": "Any new science discovered after this freeze belongs in v0.4 or a separate extension. v0.3 remains the current first-submission candidate; v0.2 remains the validated fallback.",
+  "paper1_science_changed": false,
+  "el_v0_2_changed": false
+}
