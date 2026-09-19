@@ -1,0 +1,32 @@
+name: Ruellia51 hidden-memory prospective test v0.1
+
+on:
+  pull_request:
+    paths:
+      - 'data/ruellia51_hidden_memory_prediction_v0_1.json'
+      - 'docs/RUELLIA51_HIDDEN_MEMORY_PREDICTION_V0_1.md'
+      - 'tests/test_ruellia51_hidden_memory_prediction_v0_1.py'
+      - '.github/workflows/ruellia51-hidden-memory-prediction-v0-1.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  freeze:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install tests
+        run: pip install pytest
+      - name: Validate hidden-memory prediction
+        run: pytest -q tests/test_ruellia51_hidden_memory_prediction_v0_1.py
+      - name: Assert Ruellia outcomes remain unopened
+        run: |
+          test ! -e results/ruellia51_hplc_resolution_profile_v0_1
+          test ! -e data/ruellia51_hplc_row_level_v0_1.csv
+      - name: Confirm frozen EL v0.3 science
+        run: python scripts/validate_cross_radiation_el_v0_3_science_freeze_v0_1.py
