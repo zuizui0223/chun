@@ -32,12 +32,21 @@ jobs:
             --profiles results/flowerclades51_resolution_profile_v0_1/flowerclades51_resolution_profile_summary_v0_1.csv \
             --persistence data/flowerclades51_fine_time_persistence_clades_v0_1.csv \
             --out results/flowerclades51_memory_architecture_v0_1/result_v0_1.json
-      - name: Show headline
+      - name: Validate frozen exploratory summary
         run: |
           python - <<'PY'
-          import json
-          x=json.load(open('results/flowerclades51_memory_architecture_v0_1/result_v0_1.json'))
-          print(json.dumps(x['headline'],indent=2))
+          import json, math
+          full=json.load(open('results/flowerclades51_memory_architecture_v0_1/result_v0_1.json'))
+          frozen=json.load(open('results/flowerclades51_memory_architecture_v0_1/summary_v0_1.json'))
+          assert full['status']==frozen['status']
+          assert full['profile_architecture']['n_clades']==frozen['n_clades']==28
+          for k,v in frozen['variance_share'].items():
+              assert math.isclose(full['profile_architecture']['variance_share'][k],v,rel_tol=0,abs_tol=1e-12)
+          assert math.isclose(full['temporal_bridge']['amplitude_vs_slope']['rho'],frozen['temporal_bridge']['amplitude_vs_slope']['rho'],abs_tol=1e-12)
+          assert math.isclose(full['temporal_bridge']['amplitude_vs_area']['rho'],frozen['temporal_bridge']['amplitude_vs_area']['rho'],abs_tol=1e-12)
+          assert frozen['el_v0_3_science_changed'] is False
+          assert frozen['paper1_science_changed'] is False
+          print(json.dumps(full['headline'],indent=2))
           PY
       - uses: actions/upload-artifact@v4
         with:
