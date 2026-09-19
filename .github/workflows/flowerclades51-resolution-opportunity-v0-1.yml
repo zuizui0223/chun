@@ -1,0 +1,51 @@
+name: Flower-clades-51 resolution opportunity v0.1
+
+on:
+  pull_request:
+    paths:
+      - 'data/flowerclades51_resolution_opportunity_design_v0_1.json'
+      - 'data/flowerclades51_resolution_opportunity_metrics_v0_1.csv'
+      - 'scripts/analyze_flowerclades51_resolution_opportunity_v0_1.py'
+      - 'tests/test_flowerclades51_resolution_opportunity_v0_1.py'
+      - 'results/flowerclades51_resolution_opportunity_v0_1/**'
+      - 'docs/FLOWERCLADES51_RESOLUTION_OPPORTUNITY_RESULT_V0_1.md'
+      - '.github/workflows/flowerclades51-resolution-opportunity-v0-1.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  analyze:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install runtime
+        run: pip install numpy pandas scipy pytest
+      - name: Unit tests
+        run: pytest -q tests/test_flowerclades51_resolution_opportunity_v0_1.py
+      - name: Analyze frozen derived metrics
+        run: |
+          python scripts/analyze_flowerclades51_resolution_opportunity_v0_1.py \
+            --metrics data/flowerclades51_resolution_opportunity_metrics_v0_1.csv \
+            --out results/flowerclades51_resolution_opportunity_v0_1/result_v0_1.json
+      - name: Validate frozen summary
+        run: |
+          python - <<'PY'
+          import json, math
+          x=json.load(open('results/flowerclades51_resolution_opportunity_v0_1/result_v0_1.json'))
+          s=json.load(open('results/flowerclades51_resolution_opportunity_v0_1/summary_v0_1.json'))
+          assert x['status']==s['status']=='FLOWERCLADES51_RESOLUTION_OPPORTUNITY_EXPLORATORY_RESULT'
+          assert x['n_clades']==s['n_clades']==28
+          assert x['zero_opportunity']['n_clades']==s['zero_opportunity']['n_clades']==7
+          assert x['opportunity']['n_clades']==s['opportunity']['n_clades']==21
+          assert math.isclose(x['opportunity']['median_scale_tilt'],s['opportunity']['median_scale_tilt'],abs_tol=1e-12)
+          assert math.isclose(x['opportunity']['wilcoxon_tilt_gt_zero_p'],s['opportunity']['wilcoxon_tilt_gt_zero_p'],abs_tol=1e-12)
+          assert math.isclose(x['analysis']['compression_magnitude']['entropy_loss_fine_to_coarse']['vs_signed_tilt']['rho'],s['compression_magnitude']['entropy_loss']['vs_signed_tilt']['rho'],abs_tol=1e-12)
+          assert x['el_v0_3_science_changed'] is False
+          assert x['paper1_science_changed'] is False
+          print(json.dumps(x['headline'],indent=2))
+          PY
