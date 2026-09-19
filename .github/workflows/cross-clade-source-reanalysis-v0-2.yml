@@ -1,0 +1,28 @@
+name: Cross-clade source reanalysis v0.2
+on:
+  pull_request:
+    paths:
+      - 'data/cross_clade_source_reanalysis_registry_v0_2.csv'
+      - 'data/cross_clade_source_reanalysis_summary_v0_2.json'
+      - 'scripts/summarize_cross_clade_source_reanalysis_v0_2.py'
+      - '.github/workflows/cross-clade-source-reanalysis-v0-2.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Recompute current cross-clade synthesis
+        run: |
+          mkdir -p build/cross_clade_source_reanalysis_v0_2
+          python scripts/summarize_cross_clade_source_reanalysis_v0_2.py --registry data/cross_clade_source_reanalysis_registry_v0_2.csv --out build/cross_clade_source_reanalysis_v0_2/summary.json
+      - name: Check frozen summary
+        run: diff -u data/cross_clade_source_reanalysis_summary_v0_2.json build/cross_clade_source_reanalysis_v0_2/summary.json
+      - name: Report
+        run: cat build/cross_clade_source_reanalysis_v0_2/summary.json >> "$GITHUB_STEP_SUMMARY"
