@@ -1,0 +1,67 @@
+name: Petunieae hidden biochemical memory v0.1
+
+on:
+  pull_request:
+    paths:
+      - 'data/petunieae_hidden_memory_design_v0_1.json'
+      - 'scripts/analyze_petunieae_hidden_memory_v0_1.py'
+      - 'tests/test_petunieae_hidden_memory_v0_1.py'
+      - 'results/petunieae_hidden_memory_v0_1/**'
+      - 'docs/PETUNIEAE_HIDDEN_MEMORY_RESULT_V0_1.md'
+      - '.github/workflows/petunieae-hidden-memory-v0-1.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  actions: read
+
+jobs:
+  analyze:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install runtime
+        run: pip install numpy pandas scipy biopython pytest
+      - name: Unit tests
+        run: pytest -q tests/test_petunieae_hidden_memory_v0_1.py
+      - name: Try live audited OSF acquisition
+        id: live_source
+        continue-on-error: true
+        run: python scripts/ingest_petunieae_osf_v0_1.py --out-dir build/petunieae_source
+      - name: Clear partial live source before fallback
+        if: steps.live_source.outcome == 'failure'
+        run: rm -rf build/petunieae_source
+      - name: Recover frozen audited source artifact
+        if: steps.live_source.outcome == 'failure'
+        uses: actions/download-artifact@v4
+        with:
+          name: petunieae-prospective-osf-v0-1
+          github-token: ${{ github.token }}
+          repository: ${{ github.repository }}
+          run-id: 34182646549
+          path: build/petunieae_source
+      - name: Run hidden-memory estimator
+        run: |
+          python scripts/analyze_petunieae_hidden_memory_v0_1.py \
+            --source build/petunieae_source \
+            --out build/petunieae_hidden_memory_v0_1.json
+      - name: Validate frozen result if present
+        run: |
+          if [ -f results/petunieae_hidden_memory_v0_1/summary_v0_1.json ]; then
+            cmp build/petunieae_hidden_memory_v0_1.json results/petunieae_hidden_memory_v0_1/summary_v0_1.json
+          else
+            cat build/petunieae_hidden_memory_v0_1.json
+          fi
+      - name: Confirm frozen EL v0.3 science
+        run: python scripts/validate_cross_radiation_el_v0_3_science_freeze_v0_1.py
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: petunieae-hidden-memory-v0-1
+          path: build/petunieae_hidden_memory_v0_1.json
+          if-no-files-found: error

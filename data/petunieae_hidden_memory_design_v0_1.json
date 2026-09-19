@@ -1,0 +1,41 @@
+{
+  "version": "v0.1",
+  "status": "POST_OUTCOME_CROSS_REPRESENTATION_HIDDEN_MEMORY",
+  "programme_role": "EL_V0_8_EXTENSION_NOT_EL_V0_3_MODIFICATION",
+  "source": {
+    "source_osf_node": "zg9cu",
+    "source_doi": "10.1098/rspb.2023.0275",
+    "processed_table_sha256": "5843d4cd4eb253046f97349fa6bd285ca77e43e7a9c3aaa0e78fae3e8e391edd",
+    "tree_sha256": "95b4a688d3d71417b712b37a2b04cdc22a9431be3172d6509def4435f5fd8614",
+    "source_defined_outgroup": "BROW"
+  },
+  "inherited_frame": {
+    "base_result": "data/petunieae_biochemical_resolution_profile_result_v0_1.json",
+    "eligible_tips": 47,
+    "rare_fine_state_minimum_tips": 5,
+    "exact_same_retained_frame": true,
+    "coarse": "ANY_ANTHOCYANIDIN_PRESENT versus NONE",
+    "fine": "six-bit Pel/Cyan/Peon/Del/Pet/Malv presence pattern"
+  },
+  "estimand": {
+    "pair_universe": "unordered retained-tip pairs sharing the same frozen coarse anthocyanidin-presence state",
+    "binary_outcome": "pair shares the same frozen six-compound fine state",
+    "score": "negative patristic distance",
+    "metric": "ROC_AUC",
+    "null": "permute fine-state labels within each coarse group while preserving fine-state counts",
+    "permutations": 9999,
+    "seed": 20260920,
+    "primary_effect": "observed conditional AUC minus mean within-coarse permutation AUC",
+    "p_value": "(1 + null AUC >= observed count)/(9999 + 1)"
+  },
+  "interpretation_role": "retrospective same-estimand cross-representation bridge to Flower-clades-51 hierarchical hidden-memory result",
+  "claim_boundary": [
+    "retrospective; Petunieae source values were already open for prior analyses",
+    "one biochemical system cannot establish universal biochemical hierarchical memory",
+    "same source as the existing Petunieae fine-profile result, so not independent replication of Petunieae itself",
+    "cross-representation concordance may be discussed only as a bridge, not a prospective validation",
+    "frozen EL v0.3 remains unchanged"
+  ],
+  "el_v0_3_science_changed": false,
+  "paper1_science_changed": false
+}
