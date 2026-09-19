@@ -1,0 +1,53 @@
+name: Hierarchical evolutionary memory synthesis v0.1
+
+on:
+  pull_request:
+    paths:
+      - 'data/hierarchical_evolutionary_memory_synthesis_v0_1.json'
+      - 'docs/HIERARCHICAL_EVOLUTIONARY_MEMORY_SYNTHESIS_V0_1.md'
+      - '.github/workflows/hierarchical-evolutionary-memory-synthesis-v0-1.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Validate synthesis against authoritative receipts
+        run: |
+          python - <<'PY'
+          import json
+          syn=json.load(open('data/hierarchical_evolutionary_memory_synthesis_v0_1.json'))
+          vis=json.load(open('results/flowerclades51_hidden_fine_memory_v0_1/summary_v0_1.json'))
+          pet=json.load(open('results/petunieae_hidden_memory_v0_1/summary_v0_1.json'))
+          ext=json.load(open('data/cross_radiation_hierarchical_rule_v0_2.json'))
+          rue=json.load(open('data/ruellia51_hidden_memory_prediction_v0_1.json'))
+          assert syn['status']=='HIERARCHICAL_EVOLUTIONARY_MEMORY_SYNTHESIS_READY'
+          A=syn['evidence_tiers']['tier_A_standardized_visible_same_estimand']
+          assert A['n_clades']==vis['n_clades']==21
+          assert A['positive_effect_clades']==vis['positive_effect_clades']==18
+          assert A['median_centered_auc_effect']==vis['median_centered_auc_effect']
+          B=syn['evidence_tiers']['tier_B_biochemical_same_estimand']
+          assert B['eligible_tips']==pet['eligible_tips']==47
+          assert B['centered_auc_effect']==pet['centered_auc_effect']
+          assert B['p_one_sided']==pet['p_one_sided']==0.0001
+          C=syn['evidence_tiers']['tier_C_external_independent_conditional_radiations']
+          h=ext['hierarchical_fine_state_rule']
+          assert C['supporting_n']==h['supporting_external_radiations']==3
+          assert C['testable_n']==h['testable_external_radiations']==3
+          assert C['supporting_radiations']==h['supporting_ids']
+          D=syn['evidence_tiers']['tier_D_prospective_falsification_gate']
+          assert D['status']==rue['status']=='FROZEN_BEFORE_RUELLIA51_HPLC_OUTCOME_OPENING'
+          assert D['outcome_opened'] is False
+          assert syn['el_v0_3_science_changed'] is False
+          assert syn['paper1_science_changed'] is False
+          print(syn['candidate_headline'])
+          PY
+      - name: Confirm frozen EL v0.3 science
+        run: python scripts/validate_cross_radiation_el_v0_3_science_freeze_v0_1.py
