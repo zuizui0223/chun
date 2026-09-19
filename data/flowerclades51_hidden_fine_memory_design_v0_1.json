@@ -1,0 +1,56 @@
+{
+  "version": "v0.1",
+  "status": "POST_OUTCOME_PILOT_EXPOSED_HIERARCHICAL_HIDDEN_MEMORY",
+  "programme_role": "EL_V0_6_EXTENSION_NOT_EL_V0_3_MODIFICATION",
+  "source": {
+    "final_dataset_sha256": "a253308785e4cbd0e361b3ca04cdfdae29c523eefa843375cebf8030ee0874af",
+    "trees_sha256": "ae5c82945e5bf9c29bcabc52d6029acd8d4f5be1fe9141fad95918eacb4f674d",
+    "common_frame_source": "same frozen Flower-clades-51 retained-tip frames used by the three-resolution profile",
+    "opportunity_source": "data/flowerclades51_resolution_opportunity_metrics_v0_1.csv"
+  },
+  "exposure_boundary": {
+    "resolution_profile_outcomes_known": true,
+    "memory_architecture_outcomes_known": true,
+    "resolution_opportunity_outcomes_known": true,
+    "conditional_hidden_memory_pilot_seen_before_machine_readable_design": true,
+    "prospective_claim_allowed": false
+  },
+  "target_clades": {
+    "rule": "use only completed common-frame clades with fine_state_count > coarse_state_count",
+    "expected_n": 21
+  },
+  "estimand": {
+    "pair_universe": "unordered retained-tip pairs sharing the same frozen coarse flower-color state",
+    "binary_outcome": "pair shares the same frozen fine flower-color state",
+    "score": "negative patristic distance",
+    "metric": "ROC_AUC",
+    "null": "independently permute fine-state labels within each coarse-state group while preserving fine-state counts and coarse membership",
+    "permutations": 9999,
+    "seed": 20260920,
+    "primary_effect": "observed conditional AUC minus mean conditional-permutation AUC",
+    "reason_for_permutation_centering": "conditional null AUC need not equal 0.5 when coarse groups differ in fine-state diversity and phylogenetic distance distributions"
+  },
+  "cross_clade_summary": {
+    "unit": "clade",
+    "summaries": [
+      "median permutation-centered hidden-memory AUC effect",
+      "one-sided Wilcoxon effect > 0",
+      "one-sided sign test for positive clade effects",
+      "bootstrap 95% interval for median effect"
+    ]
+  },
+  "secondary_relations": [
+    "hidden-memory effect versus memory-architecture scale tilt",
+    "hidden-memory effect versus memory amplitude",
+    "hidden-memory effect stratified by positive versus negative global scale tilt"
+  ],
+  "claim_boundary": [
+    "post-outcome pilot-exposed exploratory analysis",
+    "not independent replication of the source data",
+    "within-coarse permutation isolates hierarchical organization beyond coarse membership but does not identify ecological cause",
+    "global scale tilt and hidden fine memory are not assumed to be the same quantity",
+    "frozen EL v0.3 remains unchanged"
+  ],
+  "el_v0_3_science_changed": false,
+  "paper1_science_changed": false
+}
