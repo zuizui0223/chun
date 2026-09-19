@@ -98,7 +98,8 @@ def main():
     for cite in (
         'Ng & Smith, 2016','Rausher, 2008','Sobel & Streisfeld, 2013','Wessinger & Rausher, 2012',
         'Tarasov, 2019','Vera-Ruiz et al., 2022','Roguz et al., 2020',
-        'Sinnott-Armstrong et al. (2025, 2026)','Wheeler et al. (2023a, 2023b)','Dellinger et al., 2026'):
+        'Sinnott-Armstrong et al. (2025, 2026)','Wheeler et al. (2023a, 2023b)','Dellinger et al., 2026',
+        'McEwen & Vamosi, 2010','Shrestha et al., 2014'):
         assert cite in text, cite
 
     iris=json.loads((ROOT/reg['authoritative_sources']['iris']).read_text())
@@ -174,6 +175,11 @@ def main():
     assert '10.1002/ajb2.70044' in references
     assert 'temperature, aridity, and UV-B' in discussion\n    assert 'half-depth' in methods.lower()\n    assert '0.0060' in results and '0.0107' in results and '0.0104' in results\n    assert 'P = 0.443' in results or 'P = 0.443' in discussion\n    assert 'restrictive exponential' in discussion.lower()
     assert 'does not test' in discussion.lower() and 'memory' in discussion.lower()
+    assert 'not to establish that flower color has phylogenetic signal' in intro.lower()
+    assert 'not the novelty claim' in discussion.lower()
+    assert 'prospective' in discussion.lower() and 'standardized 51-clade' in discussion.lower()
+    assert '10.1098/rspb.2010.0501' in references
+    assert '10.1111/1365-2745.12185' in references
 
     print(json.dumps({
       'status':'EL_V0_3_TEMPORAL_MEMORY_CANDIDATE_VALID',
