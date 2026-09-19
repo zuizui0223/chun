@@ -1,0 +1,42 @@
+{
+  "version": "v0.1",
+  "status": "POST_OUTCOME_PILOT_EXPOSED_RESOLUTION_OPPORTUNITY_ANALYSIS",
+  "programme_role": "EL_V0_5_EXTENSION_NOT_EL_V0_3_MODIFICATION",
+  "source_provenance": {
+    "final_dataset_sha256": "a253308785e4cbd0e361b3ca04cdfdae29c523eefa843375cebf8030ee0874af",
+    "memory_architecture_merge_commit": "b54758a958542647d828d77e28327723d4d08287",
+    "completed_common_frame_clades": 28
+  },
+  "exposure_boundary": {
+    "memory_architecture_outcomes_known": true,
+    "pilot_compression_correlations_inspected_before_this_machine_readable_design": true,
+    "confirmatory_claim_allowed": false,
+    "interpretation": "exploratory mechanism decomposition only"
+  },
+  "definitions": {
+    "compression_opportunity": "fine_state_count > coarse_state_count on the frozen common frame",
+    "state_collapse_count": "fine_state_count - coarse_state_count",
+    "entropy_loss": "Shannon_entropy(fine) - Shannon_entropy(coarse)",
+    "pair_collision_gain": "q_coarse - q_fine, where q is exact without-replacement same-state pair probability",
+    "realized_scale_tilt": "AUC_fine - AUC_coarse"
+  },
+  "questions": [
+    "Is zero compression opportunity sufficient to force zero scale tilt?",
+    "Among clades with compression opportunity, is realized tilt systematically positive?",
+    "Among opportunity clades, does the magnitude of state compression determine signed or absolute tilt?",
+    "Does fine-state richness affect scale tilt without affecting overall memory amplitude?"
+  ],
+  "primary_descriptive_tests": {
+    "opportunity_subset_tilt": "one-sided Wilcoxon and sign test of scale_tilt > 0 among opportunity clades",
+    "compression_magnitude_associations": "Spearman correlations within opportunity clades",
+    "amplitude_specificity": "Spearman fine_state_count vs memory amplitude across all 28 clades"
+  },
+  "claim_boundary": [
+    "post-outcome and pilot-exposed exploratory analysis",
+    "no prospective or preregistered claim",
+    "compression opportunity is a structural prerequisite, not a causal ecological mechanism",
+    "frozen EL v0.3 remains unchanged"
+  ],
+  "el_v0_3_science_changed": false,
+  "paper1_science_changed": false
+}
