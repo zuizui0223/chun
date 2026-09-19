@@ -1,0 +1,51 @@
+{
+  "version": "v0.1",
+  "status": "HIERARCHICAL_MEMORY_NOVELTY_CEILING_FROZEN",
+  "audited_on": "2026-09-20",
+  "prior_art": [
+    {
+      "key": "NG_SMITH_2016",
+      "doi": "10.1111/nph.13576",
+      "title": "Widespread flower color convergence in Solanaceae via alternate biochemical pathways",
+      "prior_result": "Among convergently red-flowered Solanaceae, pigment pathway use shows phylogenetic signal; closely related red-flowered species tend to use the same underlying pathway.",
+      "consequence": "Do not claim first demonstration that hidden developmental or biochemical identity can retain phylogenetic signal within one coarse visible phenotype."
+    },
+    {
+      "key": "NG_FREITAS_SMITH_2018",
+      "doi": "10.1111/evo.13589",
+      "title": "Stepwise evolution of floral pigmentation predicted by biochemical pathway structure",
+      "prior_result": "Anthocyanin phenotype transitions are structured by biochemical pathway architecture and often proceed stepwise through intermediate pigment states.",
+      "consequence": "Do not claim first evidence that flower-color phenotype space is constrained or hierarchical because of biochemical pathway structure."
+    },
+    {
+      "key": "WEBER_PERRON_CASEY_2021",
+      "doi": "10.1093/sysbio/syaa036",
+      "title": "Ambiguity Coding Allows Accurate Inference of Evolutionary Parameters from Alignments in an Aggregated State-Space",
+      "prior_result": "Phylogenetic inference can change with aggregation of a richer state space; mappings between fine and aggregated states are a recognized statistical issue.",
+      "consequence": "Do not claim first recognition that state aggregation or representation granularity can hide phylogenetic information."
+    }
+  ],
+  "retained_novelty_candidate": [
+    "A standardized within-coarse permutation estimand applied across 21 independent clades under one visible-color ontology, showing positive hidden fine-memory effects in 18/21 clades.",
+    "Explicit decomposition of cross-radiation phenotype history into memory amplitude, global scale tilt, and hierarchical hidden memory, with hidden memory empirically distinct from amplitude and global winner status.",
+    "Same conceptual conditional-AUC bridge from visible flower color to biochemical compound composition in Petunieae.",
+    "Evidence-tier synthesis that keeps standardized same-estimand evidence separate from three external source-faithful conditional-hierarchy radiations instead of pooling nonexchangeable statistics.",
+    "A prospectively frozen held-out biochemical Ruellia hidden-memory prediction that can falsify cross-representation generalization if authoritative tree provenance is recovered."
+  ],
+  "strongest_allowed_novelty_wording": "The programme generalizes isolated observations of within-phenotype mechanistic phylogenetic structure into a cross-radiation architecture: fine phenotype identity often retains additional historical organization after coarse state membership is fixed, and this hierarchical memory is distinct from both overall memory strength and the globally best phenotype resolution.",
+  "prohibited_wording": [
+    "first evidence that closely related species use the same pigment pathway within the same flower color",
+    "first demonstration that developmental pathways have phylogenetic signal",
+    "first demonstration that phenotype state aggregation affects phylogenetic inference",
+    "universal fine-resolution law",
+    "universal hierarchical-memory law before the held-out Ruellia gate is resolved"
+  ],
+  "prospective_status": {
+    "ruellia_hidden_memory_prediction": "FROZEN_BEFORE_RUELLIA51_HPLC_OUTCOME_OPENING",
+    "result_available": false,
+    "blocker": "authoritative 2023-derived timed tree provenance"
+  },
+  "literature_search_boundary": "Targeted searches for hierarchical/conditional/nested phylogenetic signal did not identify a directly comparable multi-radiation standardized within-coarse phenotype-memory analysis. This is not treated as proof of absolute priority.",
+  "el_v0_3_science_changed": false,
+  "paper1_science_changed": false
+}
