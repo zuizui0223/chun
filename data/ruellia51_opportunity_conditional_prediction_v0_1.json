@@ -1,0 +1,88 @@
+{
+  "version": "v0.1",
+  "status": "FROZEN_BEFORE_RUELLIA51_HPLC_OUTCOME_OPENING",
+  "analysis_role": "PROSPECTIVE_HELD_OUT_OPPORTUNITY_REALIZATION_TEST",
+  "frozen_on": "2026-09-19",
+  "base_preregistration": "data/ruellia51_hplc_resolution_profile_prereg_v0_1.json",
+  "tree_provenance_gate": "data/ruellia51_tree_provenance_hold_v0_1.json",
+  "training_origin": {
+    "source": "Flower-clades-51 visible-color batch",
+    "training_result": "results/flowerclades51_resolution_opportunity_v0_1/summary_v0_1.json",
+    "training_status": "POST_OUTCOME_PILOT_EXPOSED_EXPLORATORY",
+    "observed_training_pattern": "15 of 21 clades with fine-to-coarse compression opportunity had positive AUC_fine - AUC_coarse; median tilt +0.01998",
+    "role": "hypothesis_generation_only"
+  },
+  "held_out_system": {
+    "system": "Ruellia",
+    "source_article_doi": "10.1002/ajb2.70149",
+    "source_data_doi": "10.6084/m9.figshare.30282448",
+    "phenotype_axis": "six-anthocyanidin HPLC composition presence",
+    "representation_type": "BIOCHEMICAL_NONVISIBLE",
+    "independent_from_training_batch": true,
+    "literature_blinded": false,
+    "CHUN_row_level_state_patterns_opened_at_freeze": false,
+    "CHUN_AUCs_opened_at_freeze": false
+  },
+  "inherits_existing_hierarchy_without_change": true,
+  "frozen_hierarchy": {
+    "coarse": "ANY_ANTHOCYANIDIN_PRESENT versus NONE",
+    "intermediate": "three-bit source-pathway-branch presence pattern PEL/CYA/DEL",
+    "fine": "six-bit anthocyanidin presence pattern in fixed order Pelargonidin/Cyanidin/Peonidin/Delphinidin/Petunidin/Malvidin"
+  },
+  "common_frame_inherited_without_change": true,
+  "opportunity_rule": "fine_state_count > coarse_state_count on the frozen common frame",
+  "sequential_outcome_opening": [
+    "clear exact source and authoritative-tree provenance gate",
+    "freeze exact tree bytes/hash, phylo_ID crosswalk and sample-to-species rule",
+    "open HPLC rows only under the existing preregistration and construct the frozen common frame",
+    "record retained fine/intermediate/coarse state counts and determine compression opportunity before computing any AUC",
+    "only then compute the already-frozen AUC and joint-permutation statistics"
+  ],
+  "terminal_states_before_AUC": {
+    "insufficient_common_frame": "HOLD_INSUFFICIENT_COMMON_FRAME_OR_STATE_VARIATION",
+    "no_compression_opportunity": "STRUCTURAL_ZERO_TILT_EXPECTATION_NO_BIOLOGICAL_SUCCESS",
+    "compression_opportunity": "OPEN_PROSPECTIVE_FINE_GT_COARSE_TEST"
+  },
+  "prediction_if_no_opportunity": {
+    "expected_tilt": 0,
+    "rationale": "identical fine and coarse partitions on the retained tips necessarily yield identical same-state labels and AUCs",
+    "biological_success_counted": false,
+    "inferential_test_required": false
+  },
+  "prediction_if_opportunity": {
+    "contrast": "AUC_fine - AUC_coarse",
+    "direction": "positive",
+    "null": "AUC_fine <= AUC_coarse under joint state-triplet permutation",
+    "pass_rule": "observed contrast > 0 and one-sided joint-permutation p <= 0.05",
+    "fail_rule": "compression opportunity exists but the pass rule is not met",
+    "intermediate_AUC_used_for_this_prediction": false
+  },
+  "permutations": 9999,
+  "seed": 20260913,
+  "permutation_unit": "jointly permute each species complete coarse/intermediate/fine state triplet across retained tips",
+  "primary_decision_labels": {
+    "pass": "PROSPECTIVE_OPPORTUNITY_REALIZED_FINE_TILT",
+    "fail": "PROSPECTIVE_OPPORTUNITY_FINE_TILT_FAIL",
+    "structural": "STRUCTURAL_ZERO_TILT_NO_OPPORTUNITY",
+    "hold": "HOLD_COMMON_FRAME_OR_SOURCE"
+  },
+  "no_post_hoc_rescue": [
+    "do not change presence threshold",
+    "do not merge or split compound states after outcome opening",
+    "do not relax the rare fine-state minimum of 5",
+    "do not change the common retained-tip frame",
+    "do not substitute visible hue or continuous HPLC magnitude",
+    "do not substitute a non-authoritative phylogeny",
+    "do not change from fine-versus-coarse to another contrast after seeing AUCs"
+  ],
+  "claim_if_pass": "In one held-out biochemical radiation with pre-existing representation opportunity, fine compound identity preserves more same-state phylogenetic structure than the coarse any-pigment partition under the frozen estimator.",
+  "claim_if_fail": "The retrospective visible-color opportunity-to-fine-tilt tendency does not prospectively generalize to this held-out biochemical radiation under the frozen estimator.",
+  "claim_ceiling": [
+    "one Ruellia result cannot establish a universal fine-resolution rule",
+    "a PASS validates the conditional opportunity-realization prediction, not the earlier intermediate-optimum hypothesis",
+    "a structural zero-opportunity outcome is not a biological negative or success",
+    "a source/tree/common-frame HOLD is not a biological negative"
+  ],
+  "el_v0_3_science_changed": false,
+  "paper1_science_changed": false
+}
