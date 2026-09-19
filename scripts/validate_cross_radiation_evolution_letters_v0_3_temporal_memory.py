@@ -7,9 +7,11 @@ from pathlib import Path
 ROOT=Path(__file__).resolve().parents[1]
 REG=ROOT/'data/cross_radiation_evolution_letters_claim_registry_v0_1.json'
 REFS=ROOT/'data/cross_radiation_el_reference_manifest_v0_1.json'
+EXTRA_REFS=ROOT/'data/cross_radiation_el_v0_3_extra_reference_manifest_v0_1.json'
 GATE=ROOT/'data/cross_radiation_evolution_letters_submission_gate_v0_2.json'
 MAN=ROOT/'manuscript/CROSS_RADIATION_EVOLUTION_LETTERS_V0_3_TEMPORAL_MEMORY_CANDIDATE.md'
-PERSIST=ROOT/'data/flowerclades51_relative_time_persistence_result_v0_1.json'\nHALFDEPTH=ROOT/'results/flowerclades51_relative_time_halfdepth_v0_1/result_v0_1.json'
+PERSIST=ROOT/'data/flowerclades51_relative_time_persistence_result_v0_1.json'
+HALFDEPTH=ROOT/'results/flowerclades51_relative_time_halfdepth_v0_1/result_v0_1.json'
 
 
 def words(s:str)->int:
@@ -35,6 +37,7 @@ def subsection(text:str, heading:str)->str:
 def main():
     reg=json.loads(REG.read_text())
     refs=json.loads(REFS.read_text())
+    extra_refs=json.loads(EXTRA_REFS.read_text())
     gate=json.loads(GATE.read_text())
     text=MAN.read_text()
     low=text.lower()
@@ -42,6 +45,9 @@ def main():
     assert reg['status']=='CROSS_RADIATION_EVOLUTION_LETTERS_CLAIM_REGISTRY'
     assert refs['status']=='CROSS_RADIATION_EL_REFERENCES_VERIFIED'
     assert refs['paper1_science_changed'] is False
+    assert extra_refs['status']=='CROSS_RADIATION_EL_V0_3_EXTRA_REFERENCES_VERIFIED'
+    assert extra_refs['paper1_science_changed'] is False
+    assert extra_refs['el_v0_2_science_changed'] is False
     assert gate['status']=='SCIENCE_AND_JOURNAL_FORMAT_READY_METADATA_HOLD'
     assert gate['target_journal']=='Evolution Letters'
     assert gate['article_type']=='Letter'
@@ -88,6 +94,9 @@ def main():
     for r in refs['references']:
         token=r.get('doi') or r.get('identifier')
         assert token and token.lower() in references.lower(), r['key']
+    for r in extra_refs['references']:
+        token=r.get('doi') or r.get('identifier')
+        assert token and token.lower() in references.lower(), r['key']
     for token in gate['required_reference_identifiers']:
         assert token.lower() in text.lower(), token
     assert references.count('[dataset]')==2
@@ -98,7 +107,8 @@ def main():
     for cite in (
         'Ng & Smith, 2016','Rausher, 2008','Sobel & Streisfeld, 2013','Wessinger & Rausher, 2012',
         'Tarasov, 2019','Vera-Ruiz et al., 2022','Roguz et al., 2020',
-        'Sinnott-Armstrong et al. (2025, 2026)','Wheeler et al. (2023a, 2023b)','Dellinger et al., 2026'):
+        'Sinnott-Armstrong et al. (2025, 2026)','Wheeler et al. (2023a, 2023b)','Dellinger et al., 2026',
+        'McEwen & Vamosi, 2010','Shrestha et al., 2014'):
         assert cite in text, cite
 
     iris=json.loads((ROOT/reg['authoritative_sources']['iris']).read_text())
@@ -107,7 +117,8 @@ def main():
     pet=json.loads((ROOT/reg['authoritative_sources']['petunieae']).read_text())
     ident=json.loads((ROOT/reg['authoritative_sources']['representation_identifiability']).read_text())
     frontier=json.loads((ROOT/reg['authoritative_sources']['frontier']).read_text())
-    persistence=json.loads(PERSIST.read_text())\n    halfdepth=json.loads(HALFDEPTH.read_text())
+    persistence=json.loads(PERSIST.read_text())
+    halfdepth=json.loads(HALFDEPTH.read_text())
     c=reg['frozen_numeric_claims']
 
     assert iris['decision']==c['iris']['decision']=='FAIL'
@@ -150,7 +161,18 @@ def main():
     assert persistence['time_axis']['absolute_time_units'] is False
     assert persistence['common_three_resolution_frame']['eligible_clades']==28
     assert all(v['p_two_sided'] > 0.05 for v in persistence['common_three_resolution_frame']['area_difference_tests'].values())
-    assert persistence['paper1_science_changed'] is False\n\n    # Model-based half-depth is a secondary time-scale sensitivity, not independent evidence.\n    assert halfdepth['status']=='FLOWERCLADES51_RELATIVE_TIME_HALFDEPTH_RESULT'\n    assert halfdepth['completed_clades']==28\n    hd=halfdepth['cross_resolution']\n    assert abs(hd['median_half_depth']['coarse']-0.006001067773893024) < 1e-12\n    assert abs(hd['median_half_depth']['intermediate']-0.010674325269028593) < 1e-12\n    assert abs(hd['median_half_depth']['fine']-0.010427830520070024) < 1e-12\n    assert abs(hd['friedman']['p_value']-0.44295561125456395) < 1e-12\n    assert halfdepth['absolute_time_claim_allowed'] is False\n    assert halfdepth['independent_replication'] is False
+    assert persistence['paper1_science_changed'] is False
+
+    # Model-based half-depth is a secondary time-scale sensitivity, not independent evidence.
+    assert halfdepth['status']=='FLOWERCLADES51_RELATIVE_TIME_HALFDEPTH_RESULT'
+    assert halfdepth['completed_clades']==28
+    hd=halfdepth['cross_resolution']
+    assert abs(hd['median_half_depth']['coarse']-0.006001067773893024) < 1e-12
+    assert abs(hd['median_half_depth']['intermediate']-0.010674325269028593) < 1e-12
+    assert abs(hd['median_half_depth']['fine']-0.010427830520070024) < 1e-12
+    assert abs(hd['friedman']['p_value']-0.44295561125456395) < 1e-12
+    assert halfdepth['absolute_time_claim_allowed'] is False
+    assert halfdepth['independent_replication'] is False
 
     # The submission must define the estimand narrowly enough that "predictability"
     # cannot be read as transition forecasting.
@@ -172,8 +194,17 @@ def main():
     assert 'not absolute' in low or 'not calibrated' in low
     assert '23/32' in text or '23 of 32' in text
     assert '10.1002/ajb2.70044' in references
-    assert 'temperature, aridity, and UV-B' in discussion\n    assert 'half-depth' in methods.lower()\n    assert '0.0060' in results and '0.0107' in results and '0.0104' in results\n    assert 'P = 0.443' in results or 'P = 0.443' in discussion\n    assert 'restrictive exponential' in discussion.lower()
+    assert 'temperature, aridity, and UV-B' in discussion
+    assert 'half-depth' in methods.lower()
+    assert '0.0060' in results and '0.0107' in results and '0.0104' in results
+    assert 'P = 0.443' in results or 'P = 0.443' in discussion
+    assert 'restrictive exponential' in discussion.lower()
     assert 'does not test' in discussion.lower() and 'memory' in discussion.lower()
+    assert 'not to establish that flower color has phylogenetic signal' in intro.lower()
+    assert 'not the novelty claim' in discussion.lower()
+    assert 'prospective' in discussion.lower() and 'standardized 51-clade' in discussion.lower()
+    assert '10.1098/rspb.2010.0501' in references
+    assert '10.1111/1365-2745.12185' in references
 
     print(json.dumps({
       'status':'EL_V0_3_TEMPORAL_MEMORY_CANDIDATE_VALID',

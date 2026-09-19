@@ -1,0 +1,34 @@
+{
+  "version": "v0.1",
+  "status": "CROSS_RADIATION_EL_V0_3_EXTRA_REFERENCES_VERIFIED",
+  "verified_on": "2026-09-19",
+  "manuscript": "manuscript/CROSS_RADIATION_EVOLUTION_LETTERS_V0_3_TEMPORAL_MEMORY_CANDIDATE.md",
+  "references": [
+    {
+      "key": "MCEWEN_VAMOSI_2010",
+      "authors": "McEwen, J. R.; Vamosi, J. C.",
+      "year": 2010,
+      "title": "Floral colour versus phylogeny in structuring subalpine flowering communities",
+      "journal": "Proceedings of the Royal Society B: Biological Sciences",
+      "volume": "277(1696)",
+      "pages_or_article": "2957-2965",
+      "doi": "10.1098/rspb.2010.0501",
+      "role": "prior_art_flower_color_phylogenetic_signal",
+      "verification": "Royal Society / PubMed"
+    },
+    {
+      "key": "SHRESTHA_ET_AL_2014",
+      "authors": "Shrestha, M.; Dyer, A. G.; Bhattarai, P.; Burd, M.",
+      "year": 2014,
+      "title": "Flower colour and phylogeny along an altitudinal gradient in the Himalayas of Nepal",
+      "journal": "Journal of Ecology",
+      "volume": "102(1)",
+      "pages_or_article": "126-135",
+      "doi": "10.1111/1365-2745.12185",
+      "role": "prior_art_relatedness_flower_color_similarity",
+      "verification": "Journal of Ecology / Monash University metadata"
+    }
+  ],
+  "paper1_science_changed": false,
+  "el_v0_2_science_changed": false
+}
