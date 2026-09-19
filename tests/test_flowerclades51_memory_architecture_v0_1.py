@@ -63,6 +63,7 @@ def test_temporal_bridge_joins_by_clade_not_row_order():
         "clade":["C","A","B"],
         "slope":[-0.9,-0.1,-0.5],
         "area":[0.9,0.1,0.5],
+        "near_far":[0.8,0.0,0.4],
     })
     out=mod.temporal_bridge(profiles,persistence)
     assert out["n_clades"]==3
