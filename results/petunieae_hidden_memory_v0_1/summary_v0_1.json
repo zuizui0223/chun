@@ -1,0 +1,48 @@
+{
+  "analysis_role": "RETROSPECTIVE_CROSS_REPRESENTATION_HIDDEN_MEMORY",
+  "centered_auc_effect": 0.18794355717042766,
+  "coarse_state_counts": {
+    "0": 6,
+    "1": 41
+  },
+  "conditional_auc": 0.7017960709376782,
+  "different_fine_negative_pairs": 652,
+  "do_not_count_as_new_prospective_replication": true,
+  "el_v0_3_science_changed": false,
+  "eligible_tips": 47,
+  "fine_state_counts": {
+    "000000": 6,
+    "000010": 6,
+    "000011": 6,
+    "000100": 10,
+    "000110": 6,
+    "000111": 13
+  },
+  "interpretation": "fine biochemical compound identity retains phylogenetic organization within the frozen coarse anthocyanidin-presence states if the centered effect is positive; this is retrospective same-source evidence",
+  "null_mean_auc": 0.5138525137672505,
+  "null_q025": 0.47978037312682287,
+  "null_q975": 0.570865181534748,
+  "p_one_sided": 0.0001,
+  "paper1_science_changed": false,
+  "permutations": 9999,
+  "rare_fine_states_excluded": [
+    "000101",
+    "001111",
+    "010000",
+    "010110",
+    "011111",
+    "100011",
+    "100111",
+    "101111",
+    "110100"
+  ],
+  "same_coarse_pairs": 835,
+  "same_fine_positive_pairs": 183,
+  "seed": 20260920,
+  "source_defined_outgroup_key_used": "BROW",
+  "source_osf_node": "zg9cu",
+  "source_table_sha256": "5843d4cd4eb253046f97349fa6bd285ca77e43e7a9c3aaa0e78fae3e8e391edd",
+  "source_tree_sha256": "95b4a688d3d71417b712b37a2b04cdc22a9431be3172d6509def4435f5fd8614",
+  "status": "PETUNIEAE_HIERARCHICAL_HIDDEN_MEMORY_RETROSPECTIVE_RESULT",
+  "version": "v0.1"
+}
