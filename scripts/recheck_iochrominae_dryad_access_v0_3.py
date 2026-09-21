@@ -40,8 +40,11 @@ def collect_candidate_urls(x:Any)->list[str]:
     def walk(v:Any):
         if isinstance(v,dict):
             for k,z in v.items():
-                if k=="href" and isinstance(z,str) and z.startswith(("http://","https://")):
-                    found.append(z)
+                if k=="href" and isinstance(z,str):
+                    if z.startswith(("http://","https://")):
+                        found.append(z)
+                    elif z.startswith("/"):
+                        found.append("https://datadryad.org"+z)
                 walk(z)
         elif isinstance(v,list):
             for z in v: walk(z)
@@ -65,7 +68,16 @@ def exact_match(meta:dict,body:bytes)->bool:
 
 
 def file_id(meta:dict)->int:
-    for u in collect_candidate_urls(meta):
+    candidates=[]
+    def walk(v:Any):
+        if isinstance(v,str):
+            candidates.append(v)
+        elif isinstance(v,dict):
+            for z in v.values(): walk(z)
+        elif isinstance(v,list):
+            for z in v: walk(z)
+    walk(meta)
+    for u in candidates:
         m=re.search(r"/files/(\d+)(?:$|[/?#])",u)
         if m: return int(m.group(1))
     raise ValueError("cannot infer file id")
