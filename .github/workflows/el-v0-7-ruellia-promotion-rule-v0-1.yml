@@ -1,0 +1,30 @@
+name: EL v0.7 Ruellia promotion rule v0.1
+
+on:
+  pull_request:
+    paths:
+      - 'data/el_v0_7_ruellia_promotion_rule_v0_1.json'
+      - 'docs/EL_V0_7_RUELLIA_PROMOTION_RULE_V0_1.md'
+      - 'tests/test_el_v0_7_ruellia_promotion_rule_v0_1.py'
+      - '.github/workflows/el-v0-7-ruellia-promotion-rule-v0-1.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  freeze:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install tests
+        run: pip install pytest
+      - name: Promotion-rule tests
+        run: pytest -q tests/test_el_v0_7_ruellia_promotion_rule_v0_1.py
+      - name: Confirm v0.7 candidate still pending
+        run: python scripts/validate_cross_radiation_el_v0_7_hierarchical_memory.py
+      - name: Confirm frozen v0.3 science
+        run: python scripts/validate_cross_radiation_el_v0_3_science_freeze_v0_1.py

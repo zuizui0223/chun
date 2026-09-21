@@ -1,0 +1,56 @@
+{
+  "version": "v0.1",
+  "status": "FROZEN_BEFORE_RUELLIA51_HIDDEN_MEMORY_OUTCOME",
+  "frozen_on": "2026-09-21",
+  "current_submission_before_outcome": "Evolution Letters v0.3",
+  "candidate_under_test": "Evolution Letters v0.7 hierarchical memory",
+  "prospective_source": "data/ruellia51_hidden_memory_prediction_v0_1.json",
+  "primary_gate": {
+    "pass_label": "PROSPECTIVE_HIDDEN_MEMORY_CONFIRMED",
+    "required_conditions": [
+      "compression opportunity exists on the frozen common frame",
+      "observed within-coarse conditional AUC exceeds the within-coarse permutation mean",
+      "one-sided permutation p <= 0.05 under 9999 frozen permutations"
+    ],
+    "consequence": "EL v0.7 becomes SCIENCE_ELIGIBLE_FOR_PROMOTION subject only to normal format/reference/submission checks; v0.3 remains fallback until promotion completes."
+  },
+  "fail_gate": {
+    "labels": [
+      "PROSPECTIVE_HIDDEN_MEMORY_FAIL",
+      "PROSPECTIVE_OPPORTUNITY_HIDDEN_MEMORY_FAIL"
+    ],
+    "consequence": "Do not promote v0.7 as a cross-representation hierarchical-memory generalization. Keep v0.3 as current submission. Any revised hierarchical manuscript must explicitly incorporate the failed held-out test."
+  },
+  "structural_gate": {
+    "labels": [
+      "STRUCTURAL_NO_HIDDEN_MEMORY_TEST",
+      "STRUCTURAL_ZERO_TILT_NO_OPPORTUNITY"
+    ],
+    "consequence": "Treat as uninformative for the biological generalization. Do not count as PASS or FAIL and do not promote v0.7 on this basis; keep v0.3 current."
+  },
+  "hold_gate": {
+    "labels": [
+      "HOLD_COMMON_FRAME_OR_SOURCE",
+      "HOLD_INSUFFICIENT_COMMON_FRAME_OR_STATE_VARIATION",
+      "HOLD_AUTHORITATIVE_TREE"
+    ],
+    "consequence": "No biological decision. v0.7 remains a non-current candidate and v0.3 remains current."
+  },
+  "independence_rule": {
+    "global_tilt_prediction": "data/ruellia51_opportunity_conditional_prediction_v0_1.json",
+    "hidden_memory_prediction": "data/ruellia51_hidden_memory_prediction_v0_1.json",
+    "rule": "The global fine-minus-coarse tilt test and the within-coarse hidden-memory test are distinct. One cannot rescue failure of the other after outcome opening.",
+    "promotion_primary": "within-coarse hidden-memory test"
+  },
+  "prohibited_after_outcome": [
+    "changing the hidden-memory p-value threshold",
+    "changing the fine-state support threshold",
+    "switching to global tilt if hidden-memory fails",
+    "switching to hidden-memory if the pre-frozen hidden-memory opportunity gate is not satisfied",
+    "changing the tree or common frame because the prospective result is unfavorable",
+    "calling a source/common-frame HOLD a biological success",
+    "promoting v0.7 after a prospective FAIL without a new explicitly revised candidate version"
+  ],
+  "el_v0_3_science_changed": false,
+  "paper1_science_changed": false
+}
