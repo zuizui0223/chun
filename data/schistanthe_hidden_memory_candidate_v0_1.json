@@ -1,0 +1,43 @@
+{
+  "version": "v0.1",
+  "status": "ADMIT_SOURCE_COMPLETE_PENDING_ROWLEVEL_STATE_SUPPORT_GATE",
+  "candidate": "RHODODENDRON_SECT_SCHISTANTHE",
+  "article_doi": "10.1111/nph.18083",
+  "source_doi": "10.5061/dryad.47d7wm3f4",
+  "reported_taxa": 114,
+  "exact_files": {
+    "color": {
+      "path": "Vireya_RADsamples_tiplabels_ingroup_color_clade.csv",
+      "file_id": 3623568,
+      "size": 6182,
+      "digest_type": "sha-256",
+      "digest": "266045976d6d0b78a74bcf43c90a30a9e52848d0f25cc4a3b96997b080581e4e"
+    },
+    "chronogram": {
+      "path": "VireyaRADd10m5c91R1_0717_Rdref_min4_raxml_treePLCIs.mean.newick.named",
+      "file_id": 3623564,
+      "size": 9700,
+      "digest_type": "sha-256",
+      "digest": "41bc04cdc63032086485c1ce6daf6dedc72fe582e142f7970b72d3143056390b"
+    }
+  },
+  "frozen_trait_semantics": {
+    "fine": "exact source flower-color string after trim/lowercase/collapse whitespace; no semantic merging",
+    "coarse": "WHITE iff normalized exact string equals 'white'; otherwise NONWHITE for each nonmissing exact source string",
+    "ambiguous_or_composite_label_rule": "HOLD_SCHEMA rather than reinterpret after row-level opening",
+    "minimum_fine_state_support": 5,
+    "minimum_common_tips": 20
+  },
+  "outcome_firewall": {
+    "row_level_color_values_opened": false,
+    "state_frequencies_computed": false,
+    "tree_body_opened": false,
+    "tree_tip_labels_opened": false,
+    "hidden_memory_auc_computed": false
+  },
+  "next_gate": "RECOVER_EXACT_BYTES_THEN_FREEZE_IDENTIFIER_ONLY_CROSSWALK_BEFORE_COLOR_STATE_SUPPORT",
+  "probe_workflow_run": 35549990580,
+  "paper1_science_changed": false,
+  "el_v0_3_science_changed": false,
+  "v0_7_promotion_state_changed": false
+}
