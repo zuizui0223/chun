@@ -5,6 +5,7 @@ import argparse
 import csv
 import io
 import json
+import hashlib
 from collections import Counter
 from pathlib import Path
 
@@ -65,23 +66,28 @@ def main()->int:
         status="HOLD_DUPLICATE_IDENTIFIER"
     elif cw["exact_matches"]<20:
         status="HOLD_CROSSWALK_LT_20"
-    elif cw["trait_only"]:
-        status="HOLD_TRAIT_IDENTIFIER_NOT_ON_TREE"
     else:
-        status="IDENTIFIER_CROSSWALK_FROZEN_COLOR_STATE_SUPPORT_PENDING"
+        status=("IDENTIFIER_CROSSWALK_FROZEN_EXACT_INTERSECTION_COLOR_STATE_SUPPORT_PENDING"
+                if cw["trait_only"] else
+                "IDENTIFIER_CROSSWALK_FROZEN_COLOR_STATE_SUPPORT_PENDING")
 
+    retained=sorted(set(trait)&set(tree))
+    retained_sha=hashlib.sha256(("\n".join(retained)+"\n").encode()).hexdigest()
     out={
         "version":"v0.1",
         "status":status,
         "candidate":"RHODODENDRON_SECT_SCHISTANTHE",
         "identifier_column":"Tip_Label",
         "crosswalk":cw,
-        "crosswalk_rule":"exact Tip_Label equality after outer whitespace trim only; no synonym or fuzzy repair",
+        "crosswalk_rule":"retain exact Tip_Label intersection after outer whitespace trim only; unmatched trait rows are excluded before phenotype opening; no synonym or fuzzy repair",
+        "retained_exact_match_count":len(retained),
+        "retained_exact_match_sha256":retained_sha,
+        "excluded_trait_identifiers":cw["trait_only"],
         "flower_color_values_opened":False,
         "state_frequencies_computed":False,
         "hidden_memory_auc_computed":False,
         "next_gate":("OPEN_FROZEN_FLOWER_COLOR_COLUMN_FOR_SCHEMA_AND_STATE_SUPPORT_ONLY"
-                     if status=="IDENTIFIER_CROSSWALK_FROZEN_COLOR_STATE_SUPPORT_PENDING" else "STOP_HOLD"),
+                     if status.startswith("IDENTIFIER_CROSSWALK_FROZEN") else "STOP_HOLD"),
         "el_v0_3_science_changed":False,
         "v0_7_promotion_state_changed":False,
         "paper1_science_changed":False,
