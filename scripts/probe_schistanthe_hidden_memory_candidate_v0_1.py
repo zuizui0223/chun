@@ -5,8 +5,8 @@ import argparse, json, re, urllib.error, urllib.parse, urllib.request
 from pathlib import Path
 
 DOI="10.5061/dryad.47d7wm3f4"
-COLOR_FILE="Vireya_RADsamples_tiplabels_ingroup_color_clade.xls"
-TREE_FILE="VireyaRADd10m5c91R1_0717_Rdref_min4_raxml_treePLCIs.mean.newick"
+COLOR_FILE="Vireya_RADsamples_tiplabels_ingroup_color_clade.csv"
+TREE_FILE="VireyaRADd10m5c91R1_0717_Rdref_min4_raxml_treePLCIs.mean.newick.named"
 API="https://datadryad.org/api/v2"
 UA="CHUN-Schistanthe-heldout-screen/0.1"
 REPORTED_TAXA=114
