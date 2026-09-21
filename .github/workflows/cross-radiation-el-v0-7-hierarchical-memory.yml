@@ -1,0 +1,31 @@
+name: Cross-radiation EL v0.7 hierarchical-memory candidate
+
+on:
+  pull_request:
+    paths:
+      - 'manuscript/CROSS_RADIATION_EVOLUTION_LETTERS_V0_7_HIERARCHICAL_MEMORY_CANDIDATE.md'
+      - 'data/cross_radiation_evolution_letters_v0_7_hierarchical_memory_gate.json'
+      - 'scripts/validate_cross_radiation_el_v0_7_hierarchical_memory.py'
+      - 'tests/test_cross_radiation_el_v0_7_hierarchical_memory.py'
+      - '.github/workflows/cross-radiation-el-v0-7-hierarchical-memory.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install tests
+        run: pip install pytest
+      - name: Candidate tests
+        run: pytest -q tests/test_cross_radiation_el_v0_7_hierarchical_memory.py
+      - name: Validate candidate
+        run: python scripts/validate_cross_radiation_el_v0_7_hierarchical_memory.py
+      - name: Confirm frozen v0.3 science
+        run: python scripts/validate_cross_radiation_el_v0_3_science_freeze_v0_1.py

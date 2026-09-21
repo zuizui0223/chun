@@ -1,0 +1,46 @@
+{
+  "version": "v0.7",
+  "status": "HIERARCHICAL_MEMORY_CANDIDATE_PENDING_PROSPECTIVE_RUELLIA",
+  "target_journal": "Evolution Letters",
+  "current_submission_remains": "Evolution Letters v0.3",
+  "manuscript": "manuscript/CROSS_RADIATION_EVOLUTION_LETTERS_V0_7_HIERARCHICAL_MEMORY_CANDIDATE.md",
+  "ruellia_prediction": "data/ruellia51_hidden_memory_prediction_v0_1.json",
+  "ruellia_result_available": false,
+  "promotion_allowed_before_ruellia": false,
+  "candidate_headline": "Evolutionary memory is hierarchical rather than scale-optimal.",
+  "required_evidence": {
+    "visible_hidden_memory": {
+      "clades": 21,
+      "positive": 18,
+      "median_effect": 0.02700779596581926
+    },
+    "memory_architecture": {
+      "amplitude_variance_share": 0.9065164172071694,
+      "tilt_variance_share": 0.06489560338813366,
+      "curvature_variance_share": 0.0285879794046969
+    },
+    "petunieae_hidden_memory": {
+      "centered_effect": 0.18794355717042766,
+      "p_one_sided": 0.0001
+    },
+    "external_conditional_radiations": {
+      "supporting": 3,
+      "testable": 3
+    }
+  },
+  "promotion_rule": {
+    "if_ruellia_pass": "Candidate may be considered for promotion after full format/reference/submission audit.",
+    "if_ruellia_fail": "Do not claim cross-representation prospective generalization; revise candidate around retrospective hierarchical architecture only.",
+    "if_ruellia_hold": "Keep v0.7 as non-current candidate and retain v0.3 as current submission."
+  },
+  "novelty_ceiling": "Generalize isolated within-phenotype pathway signal into a cross-radiation architecture in which fine identity often retains additional historical organization after coarse membership is fixed, distinct from overall memory amplitude and the globally best resolution.",
+  "prohibited": [
+    "first evidence that pigment pathways have phylogenetic signal",
+    "first recognition that state aggregation changes phylogenetic information",
+    "universal fine-resolution optimum",
+    "universal hierarchical-memory law before prospective Ruellia outcome",
+    "pooling nonexchangeable external-radiation p-values"
+  ],
+  "el_v0_3_science_changed": false,
+  "paper1_science_changed": false
+}
