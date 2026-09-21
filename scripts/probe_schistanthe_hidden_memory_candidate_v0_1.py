@@ -73,6 +73,15 @@ def main()->int:
 
     color=by.get(COLOR_FILE)
     tree=by.get(TREE_FILE)
+    available_file_metadata=[
+      {
+        "path":q.get("path"),
+        "keys":sorted(q.keys()),
+        "size":q.get("size"),
+        "mimeType":q.get("mimeType"),
+      }
+      for q in files[:200]
+    ]
     source_complete=color is not None and tree is not None
     status=("ADMIT_SOURCE_COMPLETE_PENDING_ROWLEVEL_STATE_SUPPORT_GATE"
             if source_complete and REPORTED_TAXA>=20
@@ -90,6 +99,8 @@ def main()->int:
         "color":summarize(color) if color else None,
         "chronogram":summarize(tree) if tree else None,
       },
+      "metadata_file_count":len(files),
+      "available_file_metadata":available_file_metadata,
       "trait_semantics_frozen_before_row_values":{
         "fine":"exact source flower-color string after trim/lowercase/collapse whitespace; no semantic merging",
         "coarse":"exact normalized string WHITE if and only if source value equals 'white'; every other nonmissing exact string -> NONWHITE",
