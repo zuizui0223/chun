@@ -24,12 +24,14 @@ COLOR={
     "file_id":3623568,
     "size":6182,
     "sha256":"266045976d6d0b78a74bcf43c90a30a9e52848d0f25cc4a3b96997b080581e4e",
+    "mirror_urls":["https://zenodo.org/records/6640376/files/Vireya_RADsamples_tiplabels_ingroup_color_clade.csv?download=1"],
 }
 TREE={
     "name":"VireyaRADd10m5c91R1_0717_Rdref_min4_raxml_treePLCIs.mean.newick.named",
     "file_id":3623564,
     "size":9700,
     "sha256":"41bc04cdc63032086485c1ce6daf6dedc72fe582e142f7970b72d3143056390b",
+    "mirror_urls":["https://zenodo.org/records/6640376/files/VireyaRADd10m5c91R1_0717_Rdref_min4_raxml_treePLCIs.mean.newick.named?download=1"],
 }
 
 
@@ -115,6 +117,7 @@ def recover_one(spec:dict)->tuple[bytes|None,list[dict],dict|None]:
         f"https://datadryad.org/stash/downloads/file_stream/{fid}",
         f"https://datadryad.org/downloads/file_stream/{fid}",
     ]
+    urls += list(spec.get("mirror_urls",[]))
     urls=list(dict.fromkeys(urls))
     attempts=[]
     for u in urls:
