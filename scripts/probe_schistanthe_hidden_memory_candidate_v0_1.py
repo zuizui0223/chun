@@ -67,7 +67,9 @@ def main()->int:
     vurl=vh if vh.startswith("http") else API+vh.removeprefix("/api/v2")
     listing=req_json(vurl.rstrip("/")+"/files?per_page=500")
     files=listing.get("_embedded",{}).get("stash:files",[])
-    by={f.get("path"):f for f in files}
+    def basename(x):
+        return str(x or "").replace("\\\\","/").split("/")[-1]
+    by={basename(f.get("path")):f for f in files}
 
     color=by.get(COLOR_FILE)
     tree=by.get(TREE_FILE)
