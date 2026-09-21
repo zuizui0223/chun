@@ -1,0 +1,44 @@
+name: Schistanthe held-out hidden-memory candidate probe v0.1
+
+on:
+  pull_request:
+    paths:
+      - 'scripts/probe_schistanthe_hidden_memory_candidate_v0_1.py'
+      - 'tests/test_probe_schistanthe_hidden_memory_candidate_v0_1.py'
+      - 'data/schistanthe_hidden_memory_candidate_v0_1.json'
+      - 'docs/SCHISTANTHE_HIDDEN_MEMORY_CANDIDATE_V0_1.md'
+      - '.github/workflows/schistanthe-hidden-memory-candidate-v0-1.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  probe:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install tests
+        run: pip install pytest
+      - name: Unit tests
+        run: pytest -q tests/test_probe_schistanthe_hidden_memory_candidate_v0_1.py
+      - name: Probe Dryad metadata only
+        run: python scripts/probe_schistanthe_hidden_memory_candidate_v0_1.py --out build/schistanthe_candidate_probe_v0_1.json
+      - name: Validate no target outcome opening
+        run: |
+          python - <<'PY'
+          import json
+          x=json.load(open('build/schistanthe_candidate_probe_v0_1.json'))
+          assert x['row_level_color_values_opened'] is False
+          assert x['state_frequencies_computed'] is False
+          assert x['hidden_memory_auc_computed'] is False
+          print(x['status'])
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: schistanthe-hidden-memory-candidate-probe-v0-1
+          path: build/
