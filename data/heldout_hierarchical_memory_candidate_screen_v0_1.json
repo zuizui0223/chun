@@ -1,0 +1,58 @@
+{
+  "version": "v0.1",
+  "status": "FROZEN_BEFORE_NEW_HELDOUT_CANDIDATE_SCREEN",
+  "programme_role": "POST_V0_7_PROSPECTIVE_HIERARCHICAL_MEMORY_REPLICATION_SEARCH",
+  "search_goal": "Identify one independent radiation that can test within-coarse hidden fine phylogenetic organization without opening target outcome values before admission.",
+  "hard_admission_criteria": {
+    "independent_radiation": true,
+    "minimum_species_with_joint_trait_tree_frame": 20,
+    "trait_source_public_exact_object_required": true,
+    "phylogeny_public_exact_object_required": true,
+    "branch_lengths_required": true,
+    "coarse_fine_nesting_source_defined_or_deterministic_preoutcome": true,
+    "fine_state_minimum_tips": 5,
+    "minimum_fine_states_after_filter": 2,
+    "minimum_coarse_states_after_filter": 2,
+    "exact_one_to_one_or_predeclared_identifier_crosswalk_required": true,
+    "target_hidden_memory_outcome_unopened_before_admission": true
+  },
+  "preferred_representation_priority": [
+    "biochemical composition",
+    "developmental/pigment mechanism",
+    "spectral/perceptual phenotype with source-defined nested categories"
+  ],
+  "metadata_only_screen_allowed": [
+    "article title/abstract/methods",
+    "sample/species count",
+    "file names and archive metadata",
+    "trait column names",
+    "tree file identity/tip count",
+    "source-defined phenotype definitions",
+    "DOIs and repository identifiers"
+  ],
+  "forbidden_before_admission": [
+    "row-level target phenotype states",
+    "state frequencies",
+    "within-coarse conditional AUC",
+    "fine-minus-coarse AUC contrast",
+    "target result tables that reveal the same CHUN estimand"
+  ],
+  "prospective_test_if_admitted": {
+    "opportunity_gate": "fine_state_count > coarse_state_count on frozen retained frame",
+    "estimand": "within-coarse hidden fine memory",
+    "score": "negative patristic distance",
+    "metric": "conditional ROC_AUC",
+    "null": "permute fine labels within coarse groups preserving fine-state counts",
+    "permutations": 9999,
+    "pass_rule": "observed conditional AUC > within-coarse permutation mean and one-sided P <= 0.05"
+  },
+  "no_posthoc_candidate_switching": "Candidate identity is chosen from metadata/source-availability criteria only; target phenotype outcomes cannot be used to rank admitted candidates.",
+  "current_blocked_candidates_not_rescued": [
+    "Ruellia exact author tree unresolved",
+    "Rhododendron exact Table S3/tree transport blocked",
+    "Iochrominae exact Dryad bytes transport blocked"
+  ],
+  "el_v0_3_science_changed": false,
+  "v0_7_promotion_state_changed": false,
+  "paper1_science_changed": false
+}
