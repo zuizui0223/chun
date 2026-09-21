@@ -1,0 +1,44 @@
+{
+  "version": "v0.3",
+  "source_doi": "10.5061/dryad.p5dq84v",
+  "status": "HOLD_DRYAD_SOURCE_BYTES_STILL_UNAVAILABLE_PROFILE_UNCOMPUTED",
+  "exact_objects": {
+    "readme": {
+      "filename": "README_for_Larter et al 2019 Dvdy Iochrominae development evolution DATA.txt",
+      "file_id": 108458,
+      "size_bytes": 4072,
+      "digest_type": "md5",
+      "digest": "2e4a251725ad4c13975fc09481da302d",
+      "recovered": false,
+      "metadata_candidate_urls_tested": 7
+    },
+    "archive": {
+      "filename": "Larter et al 2019 Dvdy Iochrominae development evolution DATA.rar",
+      "file_id": 108456,
+      "size_bytes": 3054999,
+      "digest_type": "md5",
+      "digest": "76b46e384fb7c9bf1ef3fbd7d1e5d2f0",
+      "recovered": false,
+      "metadata_candidate_urls_tested": 7
+    }
+  },
+  "recheck": {
+    "workflow_run_id": 35548348296,
+    "artifact_id": 10618005360,
+    "artifact_sha256": "68b3f497741a12a8d4ced040a1e07939e269fc33df21b74b0980cce16e5dad0d",
+    "strategy": "enumerate current Dryad file-metadata hrefs including relative links, then try metadata-provided and legacy API/file-stream routes; accept only exact size+digest matches"
+  },
+  "outcome_firewall": {
+    "archive_data_rows_opened": false,
+    "archive_member_names_inspected": false,
+    "profile_state_mapping_frozen": false,
+    "profile_states_computed": false,
+    "patristic_distances_computed": false,
+    "profile_auc_computed": false,
+    "winner_computed": false
+  },
+  "interpretation": "Current Dryad metadata exposes exact object identity but none of the currently advertised/legacy public routes yielded bytes matching the frozen size and MD5. This remains a source-transport HOLD, not a biological negative.",
+  "next_gate": "Authenticated or otherwise exact recovery of both frozen objects; only then inspect README and archive member names before any row-level profile mapping.",
+  "el_v0_3_science_changed": false,
+  "paper1_science_changed": false
+}
