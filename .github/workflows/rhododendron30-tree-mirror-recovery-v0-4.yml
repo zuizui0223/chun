@@ -22,7 +22,7 @@ jobs:
         with:
           python-version: '3.12'
       - name: Install tests
-        run: pip install pytest
+        run: pip install pytest biopython
       - name: Unit tests
         run: pytest -q tests/test_recover_rhododendron30_tree_from_zenodo_v0_4.py
       - name: Recover exact tree only
