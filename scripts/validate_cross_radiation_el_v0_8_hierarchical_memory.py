@@ -12,7 +12,8 @@ PET=ROOT/"results"/"petunieae_hidden_memory_v0_1"/"summary_v0_1.json"
 EXT=ROOT/"data"/"cross_radiation_hierarchical_rule_v0_2.json"
 SCH=ROOT/"results"/"schistanthe_hidden_memory_v0_1"/"result_v0_1.json"
 RUE=ROOT/"data"/"ruellia51_hidden_memory_prediction_v0_1.json"
-V07=ROOT/"data"/"cross_radiation_el_v0_7_ruellia_promotion_rule_v0_1.json"
+V07_GATE=ROOT/"data"/"cross_radiation_evolution_letters_v0_7_hierarchical_memory_gate.json"
+V07_PROMO=ROOT/"data"/"el_v0_7_ruellia_promotion_rule_v0_1.json"
 SYN=ROOT/"data"/"hierarchical_evolutionary_memory_synthesis_v0_2.json"
 
 TITLE="Flower-color evolutionary memory is hierarchically retained across phenotype scales"
@@ -36,7 +37,8 @@ def validate_candidate()->dict:
     ext=json.loads(EXT.read_text())
     sch=json.loads(SCH.read_text())
     rue=json.loads(RUE.read_text())
-    v07=json.loads(V07.read_text())
+    v07_gate=json.loads(V07_GATE.read_text())
+    v07_promo=json.loads(V07_PROMO.read_text())
     syn=json.loads(SYN.read_text())
 
     assert gate["status"]=="HIERARCHICAL_MEMORY_V0_8_CANDIDATE_WITH_PROSPECTIVE_VISIBLE_VALIDATION_BIOCHEMICAL_GATE_PENDING"
@@ -45,7 +47,9 @@ def validate_candidate()->dict:
     assert gate["prospective_biochemical_validation_available"] is False
     assert gate["promotion_allowed_before_biochemical_prospective_validation"] is False
     assert gate["v0_7_ruellia_promotion_rule_changed"] is False
-    assert v07["promotion_allowed_before_ruellia"] is False
+    assert v07_gate["promotion_allowed_before_ruellia"] is False
+    assert v07_promo["status"]=="FROZEN_BEFORE_RUELLIA51_HIDDEN_MEMORY_OUTCOME"
+    assert v07_promo["independence_rule"]["promotion_primary"]=="within-coarse hidden-memory test"
 
     assert vis["n_clades"]==21 and vis["positive_effect_clades"]==18
     assert abs(vis["median_centered_auc_effect"]-0.02700779596581926)<1e-12
