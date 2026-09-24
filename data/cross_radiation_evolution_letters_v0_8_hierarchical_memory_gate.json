@@ -1,0 +1,58 @@
+{
+  "version": "v0.8",
+  "status": "HIERARCHICAL_MEMORY_V0_8_CANDIDATE_WITH_PROSPECTIVE_VISIBLE_VALIDATION_BIOCHEMICAL_GATE_PENDING",
+  "target_journal": "Evolution Letters",
+  "current_submission_remains": "Evolution Letters v0.3",
+  "manuscript": "manuscript/CROSS_RADIATION_EVOLUTION_LETTERS_V0_8_HIERARCHICAL_MEMORY_SCHISTANTHE_CANDIDATE.md",
+  "candidate_headline": "Flower-color evolutionary memory is hierarchically retained across phenotype scales",
+  "schistanthe_result": "results/schistanthe_hidden_memory_v0_1/result_v0_1.json",
+  "schistanthe_status": "PROSPECTIVE_SCHISTANTHE_HIDDEN_MEMORY_PASS",
+  "prospective_visible_validation_available": true,
+  "ruellia_prediction": "data/ruellia51_hidden_memory_prediction_v0_1.json",
+  "ruellia_result_available": false,
+  "prospective_biochemical_validation_available": false,
+  "promotion_allowed_before_biochemical_prospective_validation": false,
+  "v0_7_ruellia_promotion_rule_changed": false,
+  "required_evidence": {
+    "visible_hidden_memory": {
+      "clades": 21,
+      "positive": 18,
+      "median_effect": 0.02700779596581926
+    },
+    "memory_architecture": {
+      "amplitude_variance_share": 0.9065164172071694,
+      "tilt_variance_share": 0.06489560338813366,
+      "curvature_variance_share": 0.0285879794046969
+    },
+    "petunieae_hidden_memory": {
+      "centered_effect": 0.18794355717042766,
+      "p_one_sided": 0.0001
+    },
+    "external_conditional_radiations": {
+      "supporting": 3,
+      "testable": 3
+    },
+    "schistanthe_prospective": {
+      "retained_tips": 129,
+      "conditional_auc": 0.5964615306397943,
+      "null_mean_auc": 0.5323035395744721,
+      "centered_effect": 0.06415799106532227,
+      "p_one_sided": 0.0033
+    }
+  },
+  "candidate_claim_ceiling": "Hierarchical hidden memory has standardized retrospective prevalence and independent prospective visible-color validation; prospective biochemical cross-representation generalization remains unresolved.",
+  "promotion_rule": {
+    "if_future_biochemical_pass": "Candidate may undergo a separate promotion audit; no automatic replacement of v0.3.",
+    "if_future_biochemical_fail": "Retain prospective visible validation but do not claim prospective cross-representation generality.",
+    "if_future_biochemical_hold": "Keep v0.8 non-current and v0.3 current."
+  },
+  "prohibited": [
+    "universal hierarchical-memory law",
+    "claim that Schistanthe is biochemical validation",
+    "claim that retrospective Petunieae is prospective",
+    "rewrite of the pre-frozen v0.7 Ruellia promotion rule",
+    "pooling nonexchangeable evidence-tier p-values"
+  ],
+  "el_v0_3_science_changed": false,
+  "paper1_science_changed": false
+}
