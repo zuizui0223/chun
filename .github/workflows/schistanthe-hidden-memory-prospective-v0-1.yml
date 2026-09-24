@@ -32,7 +32,7 @@ jobs:
         run: |
           python - <<'PY'
           import json, math
-          x=json.load(open('results/schistanthe_hidden_memory_v0_1/result_v0_1.json'))
+          x=json.load(open('build/schistanthe_hidden_memory_v0_1.json'))
           assert x['status']=='PROSPECTIVE_SCHISTANTHE_HIDDEN_MEMORY_PASS'
           assert x['retained_tips']==129
           assert x['fine_state_counts']=={'red':63,'white':36,'yellow':30}
