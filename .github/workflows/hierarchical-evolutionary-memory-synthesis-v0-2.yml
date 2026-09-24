@@ -30,7 +30,8 @@ jobs:
           ext=json.load(open('data/cross_radiation_hierarchical_rule_v0_2.json'))
           sch=json.load(open('results/schistanthe_hidden_memory_v0_1/result_v0_1.json'))
           rue=json.load(open('data/ruellia51_hidden_memory_prediction_v0_1.json'))
-          gate=json.load(open('data/cross_radiation_el_v0_7_ruellia_promotion_rule_v0_1.json'))
+          gate=json.load(open('data/cross_radiation_evolution_letters_v0_7_hierarchical_memory_gate.json'))
+          promo=json.load(open('data/el_v0_7_ruellia_promotion_rule_v0_1.json'))
           assert syn['status']=='HIERARCHICAL_EVOLUTIONARY_MEMORY_SYNTHESIS_V0_2_READY'
           A=syn['evidence_tiers']['tier_A_standardized_visible_same_estimand']
           assert A['n_clades']==vis['n_clades']==21
@@ -49,6 +50,8 @@ jobs:
           assert syn['relation_to_v0_7']['v0_7_candidate_strengthened_by_schistanthe'] is True
           assert syn['relation_to_v0_7']['pre_frozen_ruellia_promotion_rule_changed'] is False
           assert gate['promotion_allowed_before_ruellia'] is False
+          assert promo['status']=='FROZEN_BEFORE_RUELLIA51_HIDDEN_MEMORY_OUTCOME'
+          assert promo['independence_rule']['promotion_primary']=='within-coarse hidden-memory test'
           assert syn['el_v0_3_science_changed'] is False
           assert syn['paper1_science_changed'] is False
           print(syn['strongest_current_positive_statement'])
