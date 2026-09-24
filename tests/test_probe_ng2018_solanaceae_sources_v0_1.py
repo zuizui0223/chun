@@ -24,3 +24,9 @@ def test_treebase_candidate_endpoints_include_nexml():
 def test_xlsx_signature_rejects_html():
     assert mod.xlsxish(b"PK\x03\x04abc")
     assert not mod.xlsxish(b"<html>blocked</html>")
+
+
+def test_treebase_candidates_include_official_download_a_study_route():
+    urls=mod.treebase_candidate_urls("S23063")
+    assert any("search/downloadAStudy.html?id=23063&format=nexml" in u for u in urls)
+    assert any("search/downloadAStudy.html?id=23063&format=nexus" in u for u in urls)
