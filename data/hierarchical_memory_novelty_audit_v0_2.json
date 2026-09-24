@@ -1,0 +1,23 @@
+{
+  "version": "v0.2",
+  "status": "HIERARCHICAL_MEMORY_NOVELTY_CEILING_WITH_PROSPECTIVE_VISIBLE_VALIDATION",
+  "prior_audit": "data/hierarchical_memory_novelty_audit_v0_1.json",
+  "new_evidence": "results/schistanthe_hidden_memory_v0_1/result_v0_1.json",
+  "retained_novelty": [
+    "standardized cross-clade within-coarse hidden-memory prevalence",
+    "explicit decomposition into amplitude, global scale tilt, and hierarchical hidden memory",
+    "retrospective biochemical same-estimand bridge in Petunieae",
+    "independent prospective validation in Schistanthe selected before target color outcomes were opened"
+  ],
+  "strongest_allowed_wording": "The programme generalizes isolated within-phenotype phylogenetic structure into a cross-radiation hierarchical-memory architecture and prospectively validates that architecture in an independently admitted visible-color radiation; prospective biochemical generalization remains an open falsification test.",
+  "prohibited_wording": [
+    "first evidence that hidden mechanisms or finer states have phylogenetic signal",
+    "universal hierarchical-memory law",
+    "prospective biochemical validation",
+    "Schistanthe replaces the pre-frozen Ruellia promotion gate"
+  ],
+  "current_submission_remains": "Evolution Letters v0.3",
+  "v0_7_promotion_rule_changed": false,
+  "el_v0_3_science_changed": false,
+  "paper1_science_changed": false
+}

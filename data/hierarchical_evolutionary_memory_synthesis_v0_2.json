@@ -1,0 +1,98 @@
+{
+  "version": "v0.2",
+  "status": "HIERARCHICAL_EVOLUTIONARY_MEMORY_SYNTHESIS_V0_2_READY",
+  "programme_role": "POST_V0_3_EXTENSION_SYNTHESIS_WITH_INDEPENDENT_PROSPECTIVE_VISIBLE_VALIDATION",
+  "candidate_headline": "Evolutionary memory is hierarchical rather than scale-optimal.",
+  "conceptual_claim": "Coarse phenotype states can retain broad historical structure while finer states preserve additional phylogenetic organization inside those coarse states; consequently no single global resolution must maximize evolutionary signal.",
+  "evidence_tiers": {
+    "tier_A_standardized_visible_same_estimand": {
+      "source": "results/flowerclades51_hidden_fine_memory_v0_1/summary_v0_1.json",
+      "n_clades": 21,
+      "positive_effect_clades": 18,
+      "median_centered_auc_effect": 0.02700779596581926,
+      "wilcoxon_p": 0.00003337860107421875,
+      "sign_p": 0.0007448196411132812,
+      "role": "standardized cross-clade prevalence",
+      "prospective": false
+    },
+    "tier_B_biochemical_same_estimand": {
+      "source": "results/petunieae_hidden_memory_v0_1/summary_v0_1.json",
+      "system": "PETUNIEAE",
+      "eligible_tips": 47,
+      "centered_auc_effect": 0.18794355717042766,
+      "p_one_sided": 0.0001,
+      "role": "retrospective cross-representation biochemical bridge",
+      "prospective": false
+    },
+    "tier_C_external_independent_conditional_radiations": {
+      "source": "data/cross_radiation_hierarchical_rule_v0_2.json",
+      "supporting_radiations": [
+        "LINOIDEAE",
+        "ANGRAECINAE",
+        "ANTIRRHINEAE"
+      ],
+      "supporting_n": 3,
+      "testable_n": 3,
+      "role": "independent qualitative cross-radiation concordance under nonexchangeable estimators",
+      "prospective": false,
+      "pooled_significance_forbidden": true
+    },
+    "tier_D_independent_prospective_visible_validation": {
+      "source": "results/schistanthe_hidden_memory_v0_1/result_v0_1.json",
+      "system": "RHODODENDRON_SECT_SCHISTANTHE",
+      "status": "PROSPECTIVE_SCHISTANTHE_HIDDEN_MEMORY_PASS",
+      "retained_tips": 129,
+      "fine_state_counts": {
+        "red": 63,
+        "white": 36,
+        "yellow": 30
+      },
+      "coarse_state_counts": {
+        "NONWHITE": 93,
+        "WHITE": 36
+      },
+      "conditional_auc": 0.5964615306397943,
+      "null_mean_auc": 0.5323035395744721,
+      "centered_auc_effect": 0.06415799106532227,
+      "p_one_sided": 0.0033,
+      "role": "independent prospective validation of within-coarse hidden memory in a held-out visible-color radiation",
+      "prospective": true,
+      "outcome_gating": [
+        "candidate admission frozen before row-level color opening",
+        "identifier-only crosswalk frozen before state support",
+        "state support and compression opportunity frozen before AUC"
+      ]
+    },
+    "tier_E_prospective_biochemical_falsification_gate": {
+      "source": "data/ruellia51_hidden_memory_prediction_v0_1.json",
+      "system": "RUELLIA",
+      "status": "FROZEN_BEFORE_RUELLIA51_HPLC_OUTCOME_OPENING",
+      "prediction": "if fine-to-coarse opportunity exists, exact fine HPLC composition will retain positive within-coarse phylogenetic organization",
+      "pass_rule": "observed conditional AUC > within-coarse permutation mean and one-sided P <= 0.05",
+      "current_blocker": "authoritative 2023-derived timed tree provenance",
+      "outcome_opened": false,
+      "role": "still-unopened prospective cross-representation biochemical falsification"
+    }
+  },
+  "updated_inference": [
+    "Hierarchical hidden memory is no longer supported only retrospectively: Schistanthe prospectively validates the architecture in an independent visible-color radiation.",
+    "The Schistanthe result does not substitute for the pre-frozen Ruellia biochemical gate.",
+    "Cross-representation generalization remains bounded because the only completed biochemical same-estimand system, Petunieae, is retrospective.",
+    "The visible prospective PASS strengthens the architecture claim but does not establish a universal law."
+  ],
+  "strongest_current_positive_statement": "Fine flower-color identity repeatedly retains additional historical organization after coarse state membership is fixed across standardized visible-color clades, retrospective biochemical Petunieae, three independent external radiations, and now one independently admitted prospective visible-color radiation; prospective biochemical generalization remains unresolved.",
+  "novelty_ceiling": [
+    "do not claim first observation of pathway-level phylogenetic signal inside a visible phenotype",
+    "do not claim universal hierarchical-memory law",
+    "do not claim prospective biochemical validation before Ruellia or another admitted non-visible system is completed",
+    "do not pool nonexchangeable evidence-tier p-values"
+  ],
+  "relation_to_v0_7": {
+    "v0_7_candidate_strengthened_by_schistanthe": true,
+    "pre_frozen_ruellia_promotion_rule_changed": false,
+    "current_submission_remains": "Evolution Letters v0.3"
+  },
+  "next_gate": "Resolve the already-frozen Ruellia biochemical test or admit another outcome-blind non-visible radiation under the frozen held-out screen; do not rewrite v0.7 promotion criteria using the favorable Schistanthe result.",
+  "el_v0_3_science_changed": false,
+  "paper1_science_changed": false
+}

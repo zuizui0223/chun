@@ -1,0 +1,72 @@
+name: Hierarchical evolutionary memory synthesis v0.2
+
+on:
+  pull_request:
+    paths:
+      - 'data/hierarchical_evolutionary_memory_synthesis_v0_2.json'
+      - 'data/hierarchical_memory_novelty_audit_v0_2.json'
+      - 'docs/HIERARCHICAL_EVOLUTIONARY_MEMORY_SYNTHESIS_V0_2.md'
+      - '.github/workflows/hierarchical-evolutionary-memory-synthesis-v0-2.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Validate synthesis against frozen receipts
+        run: |
+          python - <<'PY'
+          import json, math
+          syn=json.load(open('data/hierarchical_evolutionary_memory_synthesis_v0_2.json'))
+          vis=json.load(open('results/flowerclades51_hidden_fine_memory_v0_1/summary_v0_1.json'))
+          pet=json.load(open('results/petunieae_hidden_memory_v0_1/summary_v0_1.json'))
+          ext=json.load(open('data/cross_radiation_hierarchical_rule_v0_2.json'))
+          sch=json.load(open('results/schistanthe_hidden_memory_v0_1/result_v0_1.json'))
+          rue=json.load(open('data/ruellia51_hidden_memory_prediction_v0_1.json'))
+          gate=json.load(open('data/cross_radiation_evolution_letters_v0_7_hierarchical_memory_gate.json'))
+          promo=json.load(open('data/el_v0_7_ruellia_promotion_rule_v0_1.json'))
+          assert syn['status']=='HIERARCHICAL_EVOLUTIONARY_MEMORY_SYNTHESIS_V0_2_READY'
+          A=syn['evidence_tiers']['tier_A_standardized_visible_same_estimand']
+          assert A['n_clades']==vis['n_clades']==21
+          assert A['positive_effect_clades']==vis['positive_effect_clades']==18
+          B=syn['evidence_tiers']['tier_B_biochemical_same_estimand']
+          assert math.isclose(B['centered_auc_effect'],pet['centered_auc_effect'],abs_tol=1e-12)
+          C=syn['evidence_tiers']['tier_C_external_independent_conditional_radiations']
+          assert C['supporting_radiations']==ext['hierarchical_fine_state_rule']['supporting_ids']
+          D=syn['evidence_tiers']['tier_D_independent_prospective_visible_validation']
+          assert D['status']==sch['status']=='PROSPECTIVE_SCHISTANTHE_HIDDEN_MEMORY_PASS'
+          assert math.isclose(D['centered_auc_effect'],sch['centered_auc_effect'],abs_tol=1e-12)
+          assert math.isclose(D['p_one_sided'],sch['p_one_sided'],abs_tol=1e-12)
+          E=syn['evidence_tiers']['tier_E_prospective_biochemical_falsification_gate']
+          assert E['status']==rue['status']=='FROZEN_BEFORE_RUELLIA51_HPLC_OUTCOME_OPENING'
+          assert E['outcome_opened'] is False
+          assert syn['relation_to_v0_7']['v0_7_candidate_strengthened_by_schistanthe'] is True
+          assert syn['relation_to_v0_7']['pre_frozen_ruellia_promotion_rule_changed'] is False
+          assert gate['promotion_allowed_before_ruellia'] is False
+          assert promo['status']=='FROZEN_BEFORE_RUELLIA51_HIDDEN_MEMORY_OUTCOME'
+          assert promo['independence_rule']['promotion_primary']=='within-coarse hidden-memory test'
+          assert syn['el_v0_3_science_changed'] is False
+          assert syn['paper1_science_changed'] is False
+          print(syn['strongest_current_positive_statement'])
+          PY
+      - name: Validate novelty ceiling
+        run: |
+          python - <<'PY'
+          import json
+          x=json.load(open('data/hierarchical_memory_novelty_audit_v0_2.json'))
+          assert x['status']=='HIERARCHICAL_MEMORY_NOVELTY_CEILING_WITH_PROSPECTIVE_VISIBLE_VALIDATION'
+          assert x['v0_7_promotion_rule_changed'] is False
+          assert x['current_submission_remains']=='Evolution Letters v0.3'
+          assert x['el_v0_3_science_changed'] is False
+          assert x['paper1_science_changed'] is False
+          print(x['strongest_allowed_wording'])
+          PY
+      - name: Confirm frozen EL v0.3 science
+        run: python scripts/validate_cross_radiation_el_v0_3_science_freeze_v0_1.py
