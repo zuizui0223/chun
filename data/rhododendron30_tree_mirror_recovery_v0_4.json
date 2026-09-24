@@ -1,0 +1,36 @@
+{
+  "version": "v0.4",
+  "status": "RHODODENDRON30_PRIMARY_TREE_RECOVERED_EXACT_MIRROR",
+  "checked_on": "2026-09-24",
+  "primary_tree": {
+    "source_doi": "10.5061/dryad.8cz8w9grq",
+    "file": "1_WP_RAxML.tre",
+    "dryad_file_id": 1853438,
+    "size_bytes": 13100,
+    "sha256": "784011d0e2e17df9ea21eb22d31197bad29219a37ac213fda013766e29b51362",
+    "mirror": "https://zenodo.org/records/7149402",
+    "mirror_exact_size_and_sha_match": true,
+    "tip_count": 164,
+    "duplicate_tip_labels": 0,
+    "all_nonroot_branch_lengths_present": true
+  },
+  "outcome_firewall": {
+    "table_s3_opened": false,
+    "table_s1_s2_chemistry_opened": false,
+    "row_level_anthocyanin_values_accessed": false,
+    "species_crosswalk_frozen": false,
+    "compound_presence_states_computed": false,
+    "profile_auc_computed": false
+  },
+  "remaining_source_gate": [
+    "recover exact plb12649-sup-0002-TableS3.docx or another identity-verifiable source for the 30 study species identifiers",
+    "recover exact plb12649-sup-0001-TableS1-S2.xlsx before any row-level chemistry/state construction"
+  ],
+  "interpretation": "The primary phylogeny source hold is cleared. Rhododendron30 remains outcome-unopened and blocked only by the trait/species supplementary-source layer.",
+  "workflow_run_id": 36070968782,
+  "artifact_id": 10838191814,
+  "artifact_sha256": "7bfa6142898b32e39075e6eec7cb3ceb9831940be1033c2da77188d64e7a933c",
+  "el_v0_3_science_changed": false,
+  "v0_8_promotion_state_changed": false,
+  "paper1_science_changed": false
+}
