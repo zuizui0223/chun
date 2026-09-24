@@ -4,6 +4,7 @@ on:
   pull_request:
     paths:
       - 'scripts/run_schistanthe_hidden_memory_prospective_v0_1.py'
+      - 'scripts/recover_schistanthe_source_bytes_v0_1.py'
       - 'tests/test_schistanthe_hidden_memory_prospective_v0_1.py'
       - 'results/schistanthe_hidden_memory_v0_1/**'
       - 'docs/SCHISTANTHE_HIDDEN_MEMORY_RESULT_V0_1.md'
@@ -25,9 +26,14 @@ jobs:
         run: pip install numpy scipy biopython pytest
       - name: Unit tests
         run: pytest -q tests/test_schistanthe_hidden_memory_prospective_v0_1.py
+      - name: Recover exact mirrored source bytes
+        run: python scripts/recover_schistanthe_source_bytes_v0_1.py --outdir build/schistanthe_source_v0_1
       - name: Run prospective result from exact mirrored bytes
         run: |
-          python scripts/run_schistanthe_hidden_memory_prospective_v0_1.py             --out results/schistanthe_hidden_memory_v0_1/result_v0_1.json
+          python scripts/run_schistanthe_hidden_memory_prospective_v0_1.py \
+            --color build/schistanthe_source_v0_1/Vireya_RADsamples_tiplabels_ingroup_color_clade.csv \
+            --tree build/schistanthe_source_v0_1/VireyaRADd10m5c91R1_0717_Rdref_min4_raxml_treePLCIs.mean.newick.named \
+            --out build/schistanthe_hidden_memory_v0_1.json
       - name: Validate frozen result
         run: |
           python - <<'PY'
