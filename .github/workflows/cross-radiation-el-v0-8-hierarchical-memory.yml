@@ -1,0 +1,36 @@
+name: Cross-radiation EL v0.8 hierarchical-memory Schistanthe candidate
+
+on:
+  pull_request:
+    paths:
+      - 'manuscript/CROSS_RADIATION_EVOLUTION_LETTERS_V0_8_HIERARCHICAL_MEMORY_SCHISTANTHE_CANDIDATE.md'
+      - 'data/cross_radiation_evolution_letters_v0_8_hierarchical_memory_gate.json'
+      - 'scripts/validate_cross_radiation_el_v0_8_hierarchical_memory.py'
+      - '.github/workflows/cross-radiation-el-v0-8-hierarchical-memory.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Validate v0.8 candidate
+        run: python scripts/validate_cross_radiation_el_v0_8_hierarchical_memory.py
+      - name: Confirm v0.7 Ruellia promotion rule unchanged
+        run: |
+          python - <<'PY'
+          import json
+          gate=json.load(open('data/cross_radiation_evolution_letters_v0_7_hierarchical_memory_gate.json'))
+          promo=json.load(open('data/el_v0_7_ruellia_promotion_rule_v0_1.json'))
+          assert gate['promotion_allowed_before_ruellia'] is False
+          assert promo['status']=='FROZEN_BEFORE_RUELLIA51_HIDDEN_MEMORY_OUTCOME'
+          assert promo['independence_rule']['promotion_primary']=='within-coarse hidden-memory test'
+          PY
+      - name: Confirm frozen EL v0.3 science
+        run: python scripts/validate_cross_radiation_el_v0_3_science_freeze_v0_1.py
