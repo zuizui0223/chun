@@ -1,0 +1,44 @@
+name: Rhododendron30 tree mirror recovery v0.4
+
+on:
+  pull_request:
+    paths:
+      - 'scripts/recover_rhododendron30_tree_from_zenodo_v0_4.py'
+      - 'tests/test_recover_rhododendron30_tree_from_zenodo_v0_4.py'
+      - 'data/rhododendron30_tree_mirror_recovery_v0_4.json'
+      - 'docs/RHODODENDRON30_TREE_MIRROR_RECOVERY_V0_4.md'
+      - '.github/workflows/rhododendron30-tree-mirror-recovery-v0-4.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  recover:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install tests
+        run: pip install pytest biopython
+      - name: Unit tests
+        run: pytest -q tests/test_recover_rhododendron30_tree_from_zenodo_v0_4.py
+      - name: Recover exact tree only
+        run: python scripts/recover_rhododendron30_tree_from_zenodo_v0_4.py --out build/rhododendron30_tree_recovery_v0_4.json
+      - name: Assert chemistry firewall
+        run: |
+          python - <<'PY'
+          import json
+          x=json.load(open('build/rhododendron30_tree_recovery_v0_4.json'))
+          assert x['chemistry_opened'] is False
+          assert x['table_s3_opened'] is False
+          assert x['profile_auc_computed'] is False
+          print(x['status'])
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: rhododendron30-tree-mirror-recovery-v0-4
+          path: build/
