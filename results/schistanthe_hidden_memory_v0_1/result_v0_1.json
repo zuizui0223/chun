@@ -1,0 +1,46 @@
+{
+  "version": "v0.1",
+  "status": "PROSPECTIVE_SCHISTANTHE_HIDDEN_MEMORY_PASS",
+  "analysis_role": "INDEPENDENT_PROSPECTIVE_VISIBLE_RADIATION_VALIDATION",
+  "candidate": "RHODODENDRON_SECT_SCHISTANTHE",
+  "source_doi": "10.5061/dryad.47d7wm3f4",
+  "source_sha256": {
+    "color": "266045976d6d0b78a74bcf43c90a30a9e52848d0f25cc4a3b96997b080581e4e",
+    "chronogram": "41bc04cdc63032086485c1ce6daf6dedc72fe582e142f7970b72d3143056390b"
+  },
+  "crosswalk_rule": "exact Tip_Label intersection only; unmatched trait row excluded before phenotype opening; no alias/fuzzy repair",
+  "retained_tips": 129,
+  "fine_state_counts": {
+    "red": 63,
+    "white": 36,
+    "yellow": 30
+  },
+  "coarse_state_counts": {
+    "NONWHITE": 93,
+    "WHITE": 36
+  },
+  "compression_opportunity": true,
+  "same_coarse_pairs": 4908,
+  "same_fine_pairs_within_coarse": 3018,
+  "different_fine_pairs_within_coarse": 1890,
+  "conditional_auc": 0.5964615306397943,
+  "null_mean_auc": 0.5323035395744721,
+  "null_q025": 0.49901282779513395,
+  "null_median": 0.5305296965999418,
+  "null_q975": 0.5767832949393585,
+  "centered_auc_effect": 0.06415799106532227,
+  "p_one_sided": 0.0033,
+  "permutations": 9999,
+  "seed": 20260920,
+  "prospective_contract": {
+    "candidate_admission_frozen_before_row_level_color_opening": true,
+    "crosswalk_frozen_before_color_state_support": true,
+    "state_support_and_opportunity_frozen_before_auc": true,
+    "pass_rule": "observed conditional AUC > permutation mean and one-sided P <= 0.05"
+  },
+  "interpretation": "In an independent held-out visible-color radiation, exact fine flower-color identity retains additional phylogenetic organization after coarse WHITE/NONWHITE membership is fixed.",
+  "promotion_boundary": "This PASS strengthens the hierarchical-memory model but does not alter the pre-frozen Ruellia-specific EL v0.7 promotion rule.",
+  "el_v0_3_science_changed": false,
+  "v0_7_promotion_state_changed": false,
+  "paper1_science_changed": false
+}

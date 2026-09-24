@@ -1,0 +1,50 @@
+name: Schistanthe identifier crosswalk v0.1
+
+on:
+  pull_request:
+    paths:
+      - 'scripts/preflight_schistanthe_identifier_crosswalk_v0_1.py'
+      - 'tests/test_schistanthe_identifier_crosswalk_v0_1.py'
+      - 'data/schistanthe_identifier_crosswalk_v0_1.json'
+      - 'docs/SCHISTANTHE_IDENTIFIER_CROSSWALK_V0_1.md'
+      - '.github/workflows/schistanthe-identifier-crosswalk-v0-1.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  crosswalk:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install runtime
+        run: pip install pytest biopython
+      - name: Unit tests
+        run: pytest -q tests/test_schistanthe_identifier_crosswalk_v0_1.py
+      - name: Recover exact source
+        run: python scripts/recover_schistanthe_source_bytes_v0_1.py --outdir build/schistanthe_source_v0_1
+      - name: Freeze identifier-only crosswalk
+        run: |
+          python scripts/preflight_schistanthe_identifier_crosswalk_v0_1.py \
+            --color build/schistanthe_source_v0_1/Vireya_RADsamples_tiplabels_ingroup_color_clade.csv \
+            --tree build/schistanthe_source_v0_1/VireyaRADd10m5c91R1_0717_Rdref_min4_raxml_treePLCIs.mean.newick.named \
+            --out build/schistanthe_identifier_crosswalk_v0_1.json
+      - name: Assert color outcome remains unopened
+        run: |
+          python - <<'PY'
+          import json
+          x=json.load(open('build/schistanthe_identifier_crosswalk_v0_1.json'))
+          assert x['flower_color_values_opened'] is False
+          assert x['state_frequencies_computed'] is False
+          assert x['hidden_memory_auc_computed'] is False
+          print(x['status'],x['crosswalk']['exact_matches'])
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: schistanthe-identifier-crosswalk-v0-1
+          path: build/

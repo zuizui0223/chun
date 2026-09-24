@@ -1,0 +1,47 @@
+{
+  "version": "v0.1",
+  "status": "SCHISTANTHE_STATE_SUPPORT_PASS_OPPORTUNITY_CONFIRMED_AUC_UNOPENED",
+  "candidate": "RHODODENDRON_SECT_SCHISTANTHE",
+  "source_doi": "10.5061/dryad.47d7wm3f4",
+  "exact_source_sha256": {
+    "color": "266045976d6d0b78a74bcf43c90a30a9e52848d0f25cc4a3b96997b080581e4e",
+    "chronogram": "41bc04cdc63032086485c1ce6daf6dedc72fe582e142f7970b72d3143056390b"
+  },
+  "crosswalk": {
+    "rule": "exact Tip_Label intersection after outer whitespace trim; no alias/fuzzy repair",
+    "retained_tips": 129,
+    "excluded_trait_identifier": "R.javanicum_ javanicum_RBGE19812954"
+  },
+  "fine_state_rule": "exact normalized source Flower_Color string; trim/lowercase/collapse whitespace only",
+  "coarse_state_rule": "WHITE iff fine state == 'white'; otherwise NONWHITE",
+  "fine_state_counts": {
+    "red": 63,
+    "white": 36,
+    "yellow": 30
+  },
+  "coarse_state_counts": {
+    "NONWHITE": 93,
+    "WHITE": 36
+  },
+  "missing_color_values": 0,
+  "ambiguous_or_composite_labels": [],
+  "minimum_fine_state_support": 5,
+  "all_fine_states_pass_support": true,
+  "fine_state_count": 3,
+  "coarse_state_count": 2,
+  "compression_opportunity": true,
+  "prospective_hidden_memory_test": {
+    "estimand": "conditional ROC_AUC among same-coarse pairs",
+    "score": "negative patristic distance",
+    "outcome": "same fine state",
+    "null": "permute fine labels within coarse groups preserving fine-state counts",
+    "permutations": 9999,
+    "seed": 20260920,
+    "pass_rule": "observed conditional AUC > permutation mean and one-sided P <= 0.05"
+  },
+  "hidden_memory_auc_computed": false,
+  "null_distribution_computed": false,
+  "current_v0_7_promotion_rule_changed": false,
+  "el_v0_3_science_changed": false,
+  "paper1_science_changed": false
+}

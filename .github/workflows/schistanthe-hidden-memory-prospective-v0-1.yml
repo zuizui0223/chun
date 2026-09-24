@@ -1,0 +1,61 @@
+name: Schistanthe prospective hidden-memory test v0.1
+
+on:
+  pull_request:
+    paths:
+      - 'scripts/run_schistanthe_hidden_memory_prospective_v0_1.py'
+      - 'scripts/recover_schistanthe_source_bytes_v0_1.py'
+      - 'tests/test_schistanthe_hidden_memory_prospective_v0_1.py'
+      - 'results/schistanthe_hidden_memory_v0_1/**'
+      - 'docs/SCHISTANTHE_HIDDEN_MEMORY_RESULT_V0_1.md'
+      - '.github/workflows/schistanthe-hidden-memory-prospective-v0-1.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install runtime
+        run: pip install numpy scipy biopython pytest
+      - name: Unit tests
+        run: pytest -q tests/test_schistanthe_hidden_memory_prospective_v0_1.py
+      - name: Recover exact mirrored source bytes
+        run: python scripts/recover_schistanthe_source_bytes_v0_1.py --outdir build/schistanthe_source_v0_1
+      - name: Run prospective result from exact mirrored bytes
+        run: |
+          python scripts/run_schistanthe_hidden_memory_prospective_v0_1.py \
+            --color build/schistanthe_source_v0_1/Vireya_RADsamples_tiplabels_ingroup_color_clade.csv \
+            --tree build/schistanthe_source_v0_1/VireyaRADd10m5c91R1_0717_Rdref_min4_raxml_treePLCIs.mean.newick.named \
+            --out build/schistanthe_hidden_memory_v0_1.json
+      - name: Validate frozen result
+        run: |
+          python - <<'PY'
+          import json, math
+          x=json.load(open('build/schistanthe_hidden_memory_v0_1.json'))
+          frozen=json.load(open('results/schistanthe_hidden_memory_v0_1/result_v0_1.json'))
+          assert x['status']==frozen['status']=='PROSPECTIVE_SCHISTANTHE_HIDDEN_MEMORY_PASS'
+          assert x['retained_tips']==129
+          assert x['fine_state_counts']=={'red':63,'white':36,'yellow':30}
+          assert x['coarse_state_counts']=={'NONWHITE':93,'WHITE':36}
+          assert math.isclose(x['conditional_auc'],0.5964615306397943,abs_tol=1e-12)
+          assert math.isclose(x['null_mean_auc'],0.5323035395744721,abs_tol=1e-12)
+          assert math.isclose(x['centered_auc_effect'],0.06415799106532227,abs_tol=1e-12)
+          assert math.isclose(x['p_one_sided'],0.0033,abs_tol=1e-12)
+          assert x['permutations']==9999
+          assert x['seed']==20260920
+          for k in ['conditional_auc','null_mean_auc','centered_auc_effect','p_one_sided']:
+              assert math.isclose(x[k],frozen[k],rel_tol=0,abs_tol=1e-12), (k,x[k],frozen[k])
+          assert x['el_v0_3_science_changed'] is False
+          assert x['v0_7_promotion_state_changed'] is False
+          assert frozen['paper1_science_changed'] is False
+          print(json.dumps(x,indent=2))
+          PY
+      - name: Confirm frozen EL v0.3
+        run: python scripts/validate_cross_radiation_el_v0_3_science_freeze_v0_1.py
