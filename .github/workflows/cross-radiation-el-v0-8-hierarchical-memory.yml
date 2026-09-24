@@ -26,8 +26,11 @@ jobs:
         run: |
           python - <<'PY'
           import json
-          x=json.load(open('data/cross_radiation_el_v0_7_ruellia_promotion_rule_v0_1.json'))
-          assert x['promotion_allowed_before_ruellia'] is False
+          gate=json.load(open('data/cross_radiation_evolution_letters_v0_7_hierarchical_memory_gate.json'))
+          promo=json.load(open('data/el_v0_7_ruellia_promotion_rule_v0_1.json'))
+          assert gate['promotion_allowed_before_ruellia'] is False
+          assert promo['status']=='FROZEN_BEFORE_RUELLIA51_HIDDEN_MEMORY_OUTCOME'
+          assert promo['independence_rule']['promotion_primary']=='within-coarse hidden-memory test'
           PY
       - name: Confirm frozen EL v0.3 science
         run: python scripts/validate_cross_radiation_el_v0_3_science_freeze_v0_1.py
