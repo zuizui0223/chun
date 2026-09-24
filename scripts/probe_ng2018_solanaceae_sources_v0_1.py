@@ -53,11 +53,16 @@ def extract_supplement_urls(body:bytes)->list[str]:
 def treebase_candidate_urls(study_id:str)->list[str]:
     tb=f"TB2:{study_id}"
     q=urllib.parse.quote(tb,safe=":")
+    numeric=re.sub(r"^[Ss]","",study_id)
     return [
       f"https://treebase.org/treebase-web/phylows/study/{q}?format=nexml",
       f"https://treebase.org/treebase-web/phylows/study/{q}?format=nexus",
-      f"http://purl.org/phylo/treebase/phylows/study/{q}?format=nexml",
-      f"http://purl.org/phylo/treebase/phylows/study/{q}?format=nexus",
+      f"https://purl.org/phylo/treebase/phylows/study/{q}?format=nexml",
+      f"https://purl.org/phylo/treebase/phylows/study/{q}?format=nexus",
+      f"https://treebase.org/treebase-web/search/downloadAStudy.html?id={numeric}&format=nexml",
+      f"https://treebase.org/treebase-web/search/downloadAStudy.html?id={numeric}&format=nexus",
+      f"https://www.treebase.org/treebase-web/search/downloadAStudy.html?id={numeric}&format=nexml",
+      f"https://www.treebase.org/treebase-web/search/downloadAStudy.html?id={numeric}&format=nexus",
     ]
 
 
