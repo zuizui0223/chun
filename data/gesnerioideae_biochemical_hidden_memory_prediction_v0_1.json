@@ -1,0 +1,109 @@
+{
+  "version": "v0.1",
+  "status": "FROZEN_BEFORE_GESNERIOIDEAE_BIOCHEMICAL_ROW_OUTCOME_INGESTION",
+  "analysis_role": "PROSPECTIVE_TARGET_ESTIMAND_NOT_LITERATURE_BLINDED",
+  "source": {
+    "article_doi": "10.3389/fpls.2020.604389",
+    "pmcid": "PMC7767864",
+    "workbook": "Table_1.xlsx",
+    "workbook_sha256": "a84abf67da0afb8c0bafd4c1251dbcbb6dc48eb286dca788e6e88ce0176ccbc8",
+    "sheet": "FINAL SAMPLE LIST",
+    "header_row": 3,
+    "tree_doi": "10.5061/dryad.m7589",
+    "tree_filename": "Gesne_Ago8_simple_combined_CA.tre",
+    "tree_sha256": "0aac94ddfad56cff759eb0352aeaebb61b5bd4ebb60fa8c0db857b7f93ab0d50",
+    "tree_ntax": 595
+  },
+  "old_three_level_hold": {
+    "status": "HOLD_SCHEMA_SOURCE_AXES_NOT_NESTED",
+    "unchanged": true,
+    "reason": "The old test mixed pigment chemistry with visible reflectance. This new estimand uses a different two-level hierarchy entirely within biochemical composition."
+  },
+  "sample_unit": {
+    "unit": "species",
+    "duplicate_rule": "within each normalized species binomial retain first source-table row in original Table_1 row order",
+    "outcome_independent": true
+  },
+  "fine_state": {
+    "definition": "exact 13-bit detected-compound presence pattern in frozen source-column order",
+    "columns": [
+      "Pelargonidin-3-rutinoside",
+      "Pelargonidin-7-glucoside",
+      "Pelargonidin-3-sambubioside",
+      "Cyanidin-3- rutinoside",
+      "Cyanidin-3- glucoside",
+      "Peonidin-3-rutinoside (or isomer)",
+      "Delphinidin-3-glucoside (or isomer)",
+      "Delphinidin- rhamnose-glucose",
+      "Malvidin-3- rutinoside",
+      "Apigenidinin-5-glucoside",
+      "Luteolidinin-5-glucoside",
+      "Trihydroxymethoxyl flavylium-glucuronide",
+      "Unknown glycosylated anthocyanin"
+    ],
+    "detection_rule": "numeric concentration > 0 => 1; numeric 0 or blank source cell => 0; any other nonnumeric/nonblank token => HOLD_SCHEMA before AUC",
+    "excluded_derived_or_aggregate_columns": [
+      "Total anthocyanin concentration (µg/ml)",
+      "Total HYD",
+      "Total DEO",
+      "Dominant Anthocyanin"
+    ]
+  },
+  "coarse_state": {
+    "definition": "ANY_ANTHOCYANIN_PRESENT versus NONE",
+    "rule": "PRESENT iff at least one of the 13 frozen fine-state bits is 1; NONE iff all 13 are 0",
+    "deterministically_nested": true
+  },
+  "common_frame": {
+    "minimum_common_tips": 20,
+    "rare_fine_state_minimum_tips": 5,
+    "rule": "resolve species representative and tree crosswalk first; then remove fine states represented by fewer than 5 retained species; use exactly the same tips for coarse and fine estimands",
+    "minimum_states_after_filter": {
+      "coarse": 2,
+      "fine": 2
+    }
+  },
+  "opportunity_gate": {
+    "rule": "fine_state_count > coarse_state_count on the frozen common frame",
+    "no_opportunity_terminal": "STRUCTURAL_NO_HIDDEN_MEMORY_TEST",
+    "no_opportunity_is_biological_fail": false
+  },
+  "hidden_memory_test": {
+    "pair_universe": "unordered retained-tip pairs sharing the same coarse biochemical state",
+    "score": "negative patristic distance",
+    "binary_outcome": "same fine 13-bit biochemical composition state",
+    "metric": "conditional ROC_AUC",
+    "null": "permute fine-state labels within coarse groups, preserving fine-state counts and coarse membership",
+    "permutations": 9999,
+    "seed": 20260920,
+    "primary_effect": "observed conditional AUC minus permutation-null mean",
+    "pass_rule": "compression opportunity exists, observed effect > 0, and one-sided permutation P <= 0.05",
+    "fail_rule": "compression opportunity exists but pass rule is not met"
+  },
+  "promotion_role": {
+    "prospective_biochemical_validation_candidate": true,
+    "v0_8_gate_not_rewritten": true,
+    "outcome_if_pass": "A new v0.9 science/promotion audit may be opened; current v0.3 is not automatically replaced.",
+    "outcome_if_fail": "Do not claim prospective biochemical generalization from this system; current v0.3 remains current.",
+    "outcome_if_hold": "No biological decision."
+  },
+  "exposure_boundary": {
+    "source_article_biochemical_aggregate_results_known": true,
+    "row_level_13_compound_states_opened_by_CHUN_at_freeze": false,
+    "state_frequencies_computed_by_CHUN_at_freeze": false,
+    "hidden_memory_auc_computed_by_CHUN_at_freeze": false,
+    "prospective_label": "TARGET_ESTIMAND_PROSPECTIVE_NOT_LITERATURE_BLINDED"
+  },
+  "no_posthoc_rescue": [
+    "do not alter the 13 compound columns after row opening",
+    "do not use Dominant Anthocyanin instead of the frozen exact composition",
+    "do not use visible Color/Color code/reflectance as the fine state",
+    "do not alter >0 detection rule",
+    "do not change rare-state minimum of 5",
+    "do not change common-frame minimum of 20",
+    "do not change tree after outcome opening",
+    "do not change P threshold or permutation scheme"
+  ],
+  "paper1_science_changed": false,
+  "el_v0_3_science_changed": false
+}
