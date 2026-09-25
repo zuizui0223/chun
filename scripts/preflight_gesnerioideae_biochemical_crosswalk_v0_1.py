@@ -2,7 +2,6 @@
 from __future__ import annotations
 
 import argparse
-import copy
 import hashlib
 import io
 import json
@@ -118,7 +117,6 @@ def main()->int:
     ap=argparse.ArgumentParser()
     ap.add_argument("--tree",type=Path,required=True)
     ap.add_argument("--out-json",type=Path,required=True)
-    ap.add_argument("--out-tree",type=Path,required=True)
     a=ap.parse_args()
 
     wb=exact_workbook()
@@ -134,16 +132,6 @@ def main()->int:
     else:
         status="GESNERIOIDEAE_BIOCHEMICAL_CROSSWALK_FROZEN_CHEMISTRY_UNOPENED"
 
-    retained={x["tree_tip"] for x in cw["matches"]}
-    pruned=copy.deepcopy(tree)
-    for tip in list(pruned.get_terminals()):
-        if str(tip.name).strip() not in retained:
-            pruned.prune(tip)
-
-    a.out_json.parent.mkdir(parents=True,exist_ok=True)
-    a.out_tree.parent.mkdir(parents=True,exist_ok=True)
-    Phylo.write(pruned,str(a.out_tree),"newick")
-    pbytes=a.out_tree.read_bytes()
 
     out={
       "version":"v0.1",
@@ -153,8 +141,6 @@ def main()->int:
       "staged_tree_note":"Input staging text was reconstructed from the separately exact-byte-verified Library source; analysis uses its parsed topology and branch lengths.",
       **cw,
       "crosswalk_rule":"first source row per normalized genus+species; accept exactly one tree tip matching genus_species exactly, genus_species_*, or genus_species followed by uppercase/digit voucher suffix; exclude unmatched source species before chemistry opening; any multiple tree candidates -> HOLD",
-      "pruned_tree_tip_count":len(pruned.get_terminals()),
-      "pruned_tree_sha256":sha256(pbytes),
       "chemistry_values_opened":False,
       "state_frequencies_computed":False,
       "hidden_memory_auc_computed":False,
@@ -173,8 +159,6 @@ def main()->int:
       "matched_species":cw["matched_species"],
       "unmatched_source_count":len(cw["unmatched_source_keys"]),
       "ambiguous_source_keys":cw["ambiguous_source_keys"],
-      "pruned_tree_tip_count":out["pruned_tree_tip_count"],
-      "pruned_tree_sha256":out["pruned_tree_sha256"],
     },indent=2))
     return 0
 
