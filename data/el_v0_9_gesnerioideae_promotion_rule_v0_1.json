@@ -1,0 +1,52 @@
+{
+  "version": "v0.1",
+  "status": "FROZEN_BEFORE_GESNERIOIDEAE_BIOCHEMICAL_HIDDEN_MEMORY_OUTCOME",
+  "current_submission": "Evolution Letters v0.3",
+  "current_noncurrent_candidate": "Evolution Letters v0.8 hierarchical-memory candidate",
+  "new_candidate_if_pass": "Evolution Letters v0.9 hierarchical-memory cross-representation candidate",
+  "target_test": "Gesnerioideae two-level biochemical within-coarse hidden-memory test",
+  "target_prediction": "Fine exact biochemical composition retains additional phylogenetic organization after coarse anthocyanin presence/absence is fixed.",
+  "promotion_decision": {
+    "pass": {
+      "required": [
+        "frozen common frame has genuine fine-to-coarse compression opportunity",
+        "observed conditional AUC exceeds within-coarse permutation-null mean",
+        "one-sided 9,999-permutation P <= 0.05"
+      ],
+      "consequence": "v0.9 becomes science-eligible for a separate hostile novelty, format, reference, and submission promotion audit; no automatic replacement of v0.3"
+    },
+    "fail": {
+      "definition": "opportunity exists but PASS criteria are not met",
+      "consequence": "do not promote a prospective biochemical cross-representation generalization; v0.8 may retain Schistanthe visible prospective support but remains noncurrent"
+    },
+    "no_opportunity": {
+      "consequence": "structurally uninformative; neither success nor biological failure; no v0.9 promotion"
+    },
+    "hold": {
+      "consequence": "source/crosswalk/schema/common-frame HOLD; no biological decision and no v0.9 promotion"
+    }
+  },
+  "independence_from_existing_ruellia_rule": {
+    "ruellia_v0_7_v0_8_rule_changed": false,
+    "gesnerioideae_cannot_retroactively_satisfy_ruellia_specific_gate": true,
+    "rationale": "This is a separately frozen forward v0.9 rule established before Gesnerioideae row-level biochemical outcomes are opened."
+  },
+  "no_posthoc_rescue": [
+    "no P-threshold change",
+    "no compound-column change",
+    "no coarse-state change",
+    "no rare-state threshold change",
+    "no common-frame threshold change",
+    "no tree replacement after outcome opening",
+    "no alternate biochemical summary may rescue a failed exact-composition test",
+    "no pooling with Petunieae or Schistanthe P values to rescue FAIL"
+  ],
+  "outcome_exposure_at_freeze": {
+    "gesnerioideae_row_level_13_compound_values_opened": false,
+    "gesnerioideae_state_frequencies_computed": false,
+    "gesnerioideae_hidden_memory_auc_computed": false,
+    "ruellia_hplc_outcome_opened": false
+  },
+  "paper1_science_changed": false,
+  "el_v0_3_science_changed": false
+}
