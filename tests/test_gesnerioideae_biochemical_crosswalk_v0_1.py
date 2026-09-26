@@ -34,6 +34,27 @@ def test_unique_crosswalk_excludes_unmatched_and_flags_ambiguity():
     assert out["ambiguous_source_keys"]==["b_b"]
 
 
+def test_identifier_resolver_uses_voucher_before_living_collection():
+    cand=["A_a_JLC_6974_ITS","A_a_P246"]
+    chosen,field=mod.resolve_candidate_by_source_identifiers(
+        cand,{"voucher":"JLC 6974","living_collection_id":"P246"}
+    )
+    assert chosen=="A_a_JLC_6974_ITS"
+    assert field=="voucher"
+
+
+def test_build_crosswalk_resolves_species_ambiguity_by_source_identifier():
+    source=["A a"]
+    tips=["A_a_X1","A_a_P230"]
+    out=mod.build_crosswalk(
+        source,tips,{"a_a":{"voucher":None,"living_collection_id":"P230"}}
+    )
+    assert out["matched_species"]==1
+    assert out["ambiguous_source_keys"]==[]
+    assert out["identifier_resolved_species"]==["a_a"]
+    assert out["matches"][0]["tree_tip"]=="A_a_P230"
+
+
 def test_pruned_tree_keeps_exact_matched_tip_set():
     tree=Phylo.read(io.StringIO("((A_a_X:1,B_b1:1):1,C_c_X:1);"),"newick")
     out=mod.pruned_tree(tree,["A_a_X","C_c_X"])
