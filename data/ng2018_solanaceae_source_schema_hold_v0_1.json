@@ -1,0 +1,69 @@
+{
+  "version": "v0.1",
+  "status": "HOLD_NG2018_TABLE_S1_SOURCE_ONLY_NO_TRAIT_MATRIX",
+  "candidate": "Ng_Freitas_Smith_2018_Solanaceae",
+  "article_doi": "10.1111/evo.13589",
+  "analysis_role": "PROSPECTIVE_ANALYSIS_NOT_LITERATURE_BLINDED_BIOCHEMICAL_HIDDEN_MEMORY",
+  "frozen_design_preserved": true,
+  "trait_source": {
+    "supplement": "evo13589-sup-0002-TableS1.xlsx",
+    "sha256": "237652d0ea6d726bf55a0b5b8bf191691e6bc326bb8bf14dfb025b04374a0df5",
+    "bytes": 13137,
+    "sheet": "TableS1-Samples",
+    "dimensions": {
+      "rows": 87,
+      "columns": 2
+    },
+    "schema_boundary": {
+      "rows_1_to_5": "single-cell preamble by value-blind XLSX XML structure",
+      "row_6": "empty",
+      "first_two_value_cell_row": 7,
+      "row_7_style": 4,
+      "rows_8_to_78": "two-cell data-shaped rows by value-blind XLSX XML structure"
+    },
+    "header_row_predeclared_before_opening": 7,
+    "opened_header": [
+      "Species",
+      "Source"
+    ],
+    "trait_columns_matching_frozen_schema": [],
+    "rows_8_plus_opened": false
+  },
+  "phylogeny_source": {
+    "repository": "TreeBASE",
+    "submission_id": "S23063",
+    "tree_id": "Tr113072",
+    "tree_count": 1,
+    "terminal_node_count": 84,
+    "raw_response_sha256_frozen": false,
+    "raw_response_transport_note": "Repeated TreeBASE NeXML retrievals differed by one byte and raw SHA-256 while preserving submission, unique tree identifier, node/edge counts, and terminal count; semantic identity is therefore recorded instead of a raw-response digest."
+  },
+  "public_supplement_inventory": {
+    "FigS1": "transition-rate posterior figure",
+    "TableS1": "species and source inventory",
+    "TableS2": "model comparison table",
+    "species_level_pigment_matrix_public_supplement_found": false
+  },
+  "terminal_reason": "The frozen hidden-memory estimand requires a species-level biochemical state matrix. The exact public Table S1 contains only Species and Source columns, so the required trait matrix is not present in the frozen source. Opening or digitizing Figure 2, substituting another publication, or redefining the source after this discovery would be a post-freeze source substitution.",
+  "biological_decision": "NONE_SOURCE_SCHEMA_HOLD",
+  "outcome_firewall": {
+    "trait_data_rows_opened": 0,
+    "trait_state_frequencies_computed": false,
+    "tree_trait_crosswalk_computed": false,
+    "conditional_auc_computed": false,
+    "permutation_null_computed": false,
+    "pass_fail_assigned": false
+  },
+  "consequences": {
+    "counts_as_biological_fail": false,
+    "counts_as_replication": false,
+    "changes_schistanthe_pass": false,
+    "changes_gesnerioideae_fail": false,
+    "changes_ruellia_specific_gate": false,
+    "changes_current_el_v0_3": false,
+    "opens_el_v0_9_promotion": false
+  },
+  "paper1_science_changed": false,
+  "el_v0_3_science_changed": false,
+  "v0_8_promotion_state_changed": false
+}
