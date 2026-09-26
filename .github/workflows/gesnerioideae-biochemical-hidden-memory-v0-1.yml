@@ -9,6 +9,8 @@ on:
       - 'tests/test_gesnerioideae_biochemical_crosswalk_v0_1.py'
       - 'tests/test_gesnerioideae_biochemical_state_support_v0_1.py'
       - 'tests/test_gesnerioideae_biochemical_hidden_memory_v0_1.py'
+      - 'results/gesnerioideae_biochemical_hidden_memory_v0_1/**'
+      - 'docs/GESNERIOIDEAE_BIOCHEMICAL_HIDDEN_MEMORY_RESULT_V0_1.md'
       - 'tmp/gesnerioideae_verified_source_tree_v0_1.nex'
       - '.github/workflows/gesnerioideae-biochemical-hidden-memory-v0-1.yml'
   workflow_dispatch:
@@ -60,19 +62,25 @@ jobs:
             --frame build/gesnerioideae_biochemical_state_frame_v0_1.json \
             --tree build/gesnerioideae_biochemical_pruned_tree_v0_1.newick \
             --out build/gesnerioideae_biochemical_hidden_memory_v0_1.json
-      - name: Report terminal state
+      - name: Validate frozen terminal result
         run: |
           python - <<'PY'
           import json, pathlib
           gate=json.load(open('build/gesnerioideae_biochemical_state_support_v0_1.json'))
-          p=pathlib.Path('build/gesnerioideae_biochemical_hidden_memory_v0_1.json')
-          if p.exists():
-              out=json.load(open(p))
-              assert out['hidden_memory_auc_computed'] is True
-              print(out['status'])
-              print('AUC',out['conditional_auc'],'null',out['null_mean_auc'],'effect',out['centered_auc_effect'],'P',out['p_one_sided'])
+          generated=pathlib.Path('build/gesnerioideae_biochemical_hidden_memory_v0_1.json')
+          frozen=pathlib.Path('results/gesnerioideae_biochemical_hidden_memory_v0_1/summary_v0_1.json')
+          if gate['status']=='GESNERIOIDEAE_BIOCHEMICAL_HIDDEN_MEMORY_OPPORTUNITY_CONFIRMED':
+              assert generated.exists()
+              assert frozen.exists()
+              g=json.load(open(generated))
+              f=json.load(open(frozen))
+              assert g==f, (g,f)
+              assert g['status']=='PROSPECTIVE_GESNERIOIDEAE_BIOCHEMICAL_HIDDEN_MEMORY_FAIL'
+              assert g['promotion_gate_pass'] is False
+              print(g['status'])
+              print('AUC',g['conditional_auc'],'null',g['null_mean_auc'],'effect',g['centered_auc_effect'],'P',g['p_one_sided'])
           else:
-              assert gate['status']!='GESNERIOIDEAE_BIOCHEMICAL_HIDDEN_MEMORY_OPPORTUNITY_CONFIRMED'
+              assert not generated.exists()
               assert gate['hidden_memory_auc_computed'] is False
               print(gate['status'],'AUC_UNOPENED')
           PY
