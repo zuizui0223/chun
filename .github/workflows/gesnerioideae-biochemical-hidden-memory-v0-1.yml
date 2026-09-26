@@ -1,0 +1,83 @@
+name: Gesnerioideae biochemical hidden memory v0.1
+
+on:
+  pull_request:
+    paths:
+      - 'scripts/preflight_gesnerioideae_biochemical_crosswalk_v0_1.py'
+      - 'scripts/gate_gesnerioideae_biochemical_state_support_v0_1.py'
+      - 'scripts/analyze_gesnerioideae_biochemical_hidden_memory_v0_1.py'
+      - 'tests/test_gesnerioideae_biochemical_crosswalk_v0_1.py'
+      - 'tests/test_gesnerioideae_biochemical_state_support_v0_1.py'
+      - 'tests/test_gesnerioideae_biochemical_hidden_memory_v0_1.py'
+      - 'tmp/gesnerioideae_verified_source_tree_v0_1.nex'
+      - '.github/workflows/gesnerioideae-biochemical-hidden-memory-v0-1.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  analyze:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install runtime
+        run: pip install pytest openpyxl biopython numpy scipy
+      - name: Unit tests
+        run: |
+          pytest -q tests/test_gesnerioideae_biochemical_crosswalk_v0_1.py
+          pytest -q tests/test_gesnerioideae_biochemical_state_support_v0_1.py
+          pytest -q tests/test_gesnerioideae_biochemical_hidden_memory_v0_1.py
+      - name: Rebuild frozen identifier frame
+        run: |
+          python scripts/preflight_gesnerioideae_biochemical_crosswalk_v0_1.py \
+            --tree tmp/gesnerioideae_verified_source_tree_v0_1.nex \
+            --out-json build/gesnerioideae_biochemical_crosswalk_v0_1.json \
+            --out-tree build/gesnerioideae_biochemical_pruned_tree_v0_1.newick
+      - name: Open frozen state-support gate
+        run: |
+          python scripts/gate_gesnerioideae_biochemical_state_support_v0_1.py \
+            --crosswalk-json build/gesnerioideae_biochemical_crosswalk_v0_1.json \
+            --out build/gesnerioideae_biochemical_state_support_v0_1.json \
+            --frame-out build/gesnerioideae_biochemical_state_frame_v0_1.json
+      - name: Run AUC only if prospective opportunity gate is open
+        run: |
+          STATUS=$(python - <<'PY'
+          import json
+          print(json.load(open('build/gesnerioideae_biochemical_state_support_v0_1.json'))['status'])
+          PY
+          )
+          echo "state_support_status=$STATUS"
+          if [ "$STATUS" != "GESNERIOIDEAE_BIOCHEMICAL_HIDDEN_MEMORY_OPPORTUNITY_CONFIRMED" ]; then
+            echo "Prospective AUC remains unopened because opportunity gate is not open."
+            exit 0
+          fi
+          python scripts/analyze_gesnerioideae_biochemical_hidden_memory_v0_1.py \
+            --gate build/gesnerioideae_biochemical_state_support_v0_1.json \
+            --frame build/gesnerioideae_biochemical_state_frame_v0_1.json \
+            --tree build/gesnerioideae_biochemical_pruned_tree_v0_1.newick \
+            --out build/gesnerioideae_biochemical_hidden_memory_v0_1.json
+      - name: Report terminal state
+        run: |
+          python - <<'PY'
+          import json, pathlib
+          gate=json.load(open('build/gesnerioideae_biochemical_state_support_v0_1.json'))
+          p=pathlib.Path('build/gesnerioideae_biochemical_hidden_memory_v0_1.json')
+          if p.exists():
+              out=json.load(open(p))
+              assert out['hidden_memory_auc_computed'] is True
+              print(out['status'])
+              print('AUC',out['conditional_auc'],'null',out['null_mean_auc'],'effect',out['centered_auc_effect'],'P',out['p_one_sided'])
+          else:
+              assert gate['status']!='GESNERIOIDEAE_BIOCHEMICAL_HIDDEN_MEMORY_OPPORTUNITY_CONFIRMED'
+              assert gate['hidden_memory_auc_computed'] is False
+              print(gate['status'],'AUC_UNOPENED')
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: gesnerioideae-biochemical-hidden-memory-v0-1
+          path: build/
