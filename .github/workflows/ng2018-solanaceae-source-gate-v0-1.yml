@@ -1,0 +1,56 @@
+name: Ng2018 Solanaceae biochemical source gate v0.1
+
+on:
+  pull_request:
+    paths:
+      - 'data/ng2018_solanaceae_hidden_memory_design_v0_1.json'
+      - 'scripts/probe_ng2018_solanaceae_sources_v0_1.py'
+      - 'tests/test_probe_ng2018_solanaceae_sources_v0_1.py'
+      - 'data/ng2018_solanaceae_source_probe_v0_1.json'
+      - 'docs/NG2018_SOLANACEAE_SOURCE_PROBE_V0_1.md'
+      - '.github/workflows/ng2018-solanaceae-source-gate-v0-1.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  probe:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install tests
+        run: pip install pytest
+      - name: Unit tests
+        run: pytest -q tests/test_probe_ng2018_solanaceae_sources_v0_1.py
+      - name: Validate pre-row design
+        run: |
+          python - <<'PY'
+          import json
+          x=json.load(open('data/ng2018_solanaceae_hidden_memory_design_v0_1.json'))
+          assert x['status']=='FROZEN_BEFORE_NG2018_SOLANACEAE_ROWLEVEL_OUTCOME_OPENING'
+          assert x['literature_boundary']['CHUN_within_coarse_hidden_memory_statistic_opened'] is False
+          assert x['hierarchy_frozen_before_rows']['no_visible_color_used'] is True
+          assert x['hidden_memory_test_if_opportunity']['permutations']==9999
+          assert x['hidden_memory_test_if_opportunity']['seed']==20260925
+          PY
+      - name: Probe exact public sources without opening rows
+        run: python scripts/probe_ng2018_solanaceae_sources_v0_1.py --out build/ng2018_source_probe_v0_1.json
+      - name: Assert outcome firewall
+        run: |
+          python - <<'PY'
+          import json
+          x=json.load(open('build/ng2018_source_probe_v0_1.json'))
+          assert x['trait_rows_opened'] is False
+          assert x['trait_state_frequencies_computed'] is False
+          assert x['hidden_memory_auc_computed'] is False
+          print(x['status'])
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: ng2018-solanaceae-source-probe-v0-1
+          path: build/
