@@ -43,7 +43,7 @@ jobs:
           assert x['analysis_included_ambiguous_keys']==[]
           assert x['matched_species'] >= 20
           assert x['pruned_tree_tips']==x['matched_species']
-          print(x['status'],x['matched_species'],x['unmatched_source_count'],len(x['excluded_ambiguous_source_keys']))
+          print(x['status'],x['matched_species'],len(x['unmatched_source_keys']),len(x['excluded_ambiguous_source_keys']))
           PY
       - uses: actions/upload-artifact@v4
         if: always()
