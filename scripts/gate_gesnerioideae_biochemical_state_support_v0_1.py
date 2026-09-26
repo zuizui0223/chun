@@ -5,6 +5,7 @@ import argparse
 import importlib.util
 import io
 import json
+import re
 from collections import Counter, OrderedDict
 from pathlib import Path
 
@@ -35,6 +36,10 @@ FINE_COLUMNS=[
 ]
 RARE_MIN=5
 MIN_COMMON=20
+
+
+def canonical_header(v)->str:
+    return "" if v is None else re.sub(r"\s+"," ",str(v).strip())
 
 
 def bit_from_cell(v)->int:
@@ -77,11 +82,13 @@ def extract_first_rows(body:bytes,crosswalk:dict)->list[dict]:
     matches={m["source_key"]:m["tree_tip"] for m in crosswalk["matches"]}
     wb=load_workbook(io.BytesIO(body),read_only=True,data_only=True)
     ws=wb[SHEET]
-    header=[str(c.value).strip() if c.value is not None else "" for c in ws[HEADER_ROW]]
+    header=[canonical_header(c.value) for c in ws[HEADER_ROW]]
+    if len(set(x for x in header if x)) != len([x for x in header if x]):
+        raise ValueError("duplicate canonicalized source headers")
     required=["Species",*FINE_COLUMNS]
     missing=[x for x in required if x not in header]
     if missing:
-        raise ValueError(f"frozen chemistry headers missing: {missing}")
+        raise ValueError(f"frozen chemistry headers missing after canonicalization: {missing}")
     col={x:header.index(x)+1 for x in required}
 
     first=OrderedDict()
@@ -148,6 +155,7 @@ def main()->int:
       "version":"v0.1",
       "status":status,
       "source_crosswalk_version":cw.get("version"),
+      "header_normalization":"strip + collapse Unicode/ASCII whitespace to one ASCII space, identical to pre-outcome header probe",
       "frozen_compound_columns":FINE_COLUMNS,
       "detection_rule":"numeric >0 => 1; numeric 0 or blank => 0; any other nonblank/nonnumeric token => HOLD",
       "rare_fine_state_minimum_tips":RARE_MIN,
