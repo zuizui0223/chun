@@ -1,0 +1,48 @@
+name: Ng2018 row3 structure gate v0.1
+
+on:
+  pull_request:
+    paths:
+      - 'scripts/probe_ng2018_solanaceae_sources_v0_1.py'
+      - 'scripts/preflight_ng2018_schema_tree_v0_1.py'
+      - 'scripts/preflight_ng2018_row3_structure_v0_1.py'
+      - 'tests/test_preflight_ng2018_row3_structure_v0_1.py'
+      - '.github/workflows/ng2018-row3-structure-gate-v0-1.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  structure:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install runtime
+        run: pip install pytest openpyxl
+      - name: Unit tests
+        run: pytest -q tests/test_preflight_ng2018_row3_structure_v0_1.py
+      - name: Inspect workbook XML structure without decoding row values
+        run: python scripts/preflight_ng2018_row3_structure_v0_1.py --out build/ng2018_row3_structure_v0_1.json
+      - name: Assert no trait values opened
+        run: |
+          python - <<'PY'
+          import json
+          x=json.load(open('build/ng2018_row3_structure_v0_1.json'))
+          assert x['shared_string_values_opened'] is False
+          assert x['inline_string_values_opened'] is False
+          assert x['trait_data_values_opened'] is False
+          assert x['trait_state_frequencies_computed'] is False
+          assert x['hidden_memory_auc_computed'] is False
+          print(x['status'])
+          print(x['rows'])
+          print(x['merged_ranges'])
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: ng2018-row3-structure-gate-v0-1
+          path: build/
