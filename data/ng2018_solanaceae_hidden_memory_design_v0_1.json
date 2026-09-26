@@ -1,0 +1,79 @@
+{
+  "version": "v0.1",
+  "status": "FROZEN_BEFORE_NG2018_SOLANACEAE_ROWLEVEL_OUTCOME_OPENING",
+  "analysis_role": "PROSPECTIVE_ANALYSIS_NOT_LITERATURE_BLINDED_BIOCHEMICAL_HIDDEN_MEMORY",
+  "candidate": "NG_FREITAS_SMITH_2018_SOLANACEAE",
+  "article_doi": "10.1111/evo.13589",
+  "phylogeny_source": {
+    "repository": "TreeBASE",
+    "submission_id": "S23063",
+    "expected_role": "time-calibrated MCC tree used in the published comparative analyses"
+  },
+  "trait_source": {
+    "publisher": "Oxford Academic / Evolution",
+    "expected_supplement_label": "evo13589-sup-0002-TableS1",
+    "expected_format": "xlsx",
+    "expected_role": "study species and floral anthocyanin information/source"
+  },
+  "literature_boundary": {
+    "published_stepwise_transition_result_known": true,
+    "literature_blinded": false,
+    "CHUN_within_coarse_hidden_memory_statistic_opened": false,
+    "CHUN_permutation_null_opened": false,
+    "consequence": "Any future result is analysis-prospective but not literature-blinded; published transition results are prior context, not independent surprise."
+  },
+  "hierarchy_frozen_before_rows": {
+    "coarse": "ANTHOCYANIN_PRESENT versus NONE",
+    "fine": "predominant major anthocyanin class PELARGONIDIN/CYANIDIN/DELPHINIDIN, plus NONE when no anthocyanin is present",
+    "grouping": {
+      "PELARGONIDIN": "pelargonidin-derived pigments",
+      "CYANIDIN": "cyanidin-derived pigments including peonidin",
+      "DELPHINIDIN": "delphinidin-derived pigments including petunidin and malvidin",
+      "NONE": "no floral anthocyanin detected"
+    },
+    "if_source_has_published_discrete_predominant_state": "use that source-defined state without recoding beyond the frozen grouping",
+    "if_source_has_only_quantitative_proportions": "sum within the three frozen major types and use the unique maximum among positive types; total zero -> NONE; exact maximum tie -> HOLD_TIE for that species",
+    "no_visible_color_used": true
+  },
+  "common_frame": {
+    "tree_trait_identifier_intersection_frozen_before_trait_values": true,
+    "minimum_common_tips": 20,
+    "minimum_fine_state_tips": 5,
+    "remove_rare_fine_states_before_coarse_and_fine_test": true,
+    "require_fine_states_at_least": 2,
+    "require_coarse_states_at_least": 2,
+    "opportunity_rule": "retained fine_state_count > retained coarse_state_count"
+  },
+  "hidden_memory_test_if_opportunity": {
+    "pair_universe": "retained unordered pairs sharing the same coarse state",
+    "score": "negative patristic distance",
+    "binary_outcome": "same retained fine state",
+    "metric": "conditional ROC_AUC",
+    "null": "permute fine labels within each coarse group preserving retained fine-state counts",
+    "permutations": 9999,
+    "seed": 20260925,
+    "primary_effect": "observed conditional AUC minus permutation-null mean",
+    "pass_rule": "primary_effect > 0 and one-sided permutation p <= 0.05"
+  },
+  "terminal_states": {
+    "source_hold": "HOLD_EXACT_TRAIT_OR_TREE_SOURCE",
+    "crosswalk_hold": "HOLD_IDENTIFIER_CROSSWALK",
+    "schema_hold": "HOLD_TRAIT_SCHEMA",
+    "support_hold": "HOLD_COMMON_FRAME_OR_STATE_SUPPORT",
+    "no_opportunity": "STRUCTURAL_NO_HIDDEN_MEMORY_TEST",
+    "pass": "PROSPECTIVE_ANALYSIS_NG2018_BIOCHEMICAL_HIDDEN_MEMORY_PASS",
+    "fail": "PROSPECTIVE_ANALYSIS_NG2018_BIOCHEMICAL_HIDDEN_MEMORY_FAIL"
+  },
+  "no_posthoc_rescue": [
+    "do not substitute visible flower color",
+    "do not redefine Pel/Cya/Del grouping after row opening",
+    "do not change rare-state threshold",
+    "do not choose a Solanaceae subclade based on the hidden-memory outcome",
+    "do not replace TreeBASE S23063 with a different phylogeny after outcome opening",
+    "do not change the one-sided P threshold or permutation scheme"
+  ],
+  "relation_to_el_v0_8": "Independent future biochemical validation candidate. A PASS can inform a separate promotion audit but does not automatically replace current EL v0.3 or rewrite the frozen Ruellia-specific v0.7 gate.",
+  "el_v0_3_science_changed": false,
+  "v0_8_promotion_state_changed": false,
+  "paper1_science_changed": false
+}

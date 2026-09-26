@@ -1,0 +1,58 @@
+name: Ng2018 Solanaceae schema-tree preflight v0.1
+
+on:
+  pull_request:
+    paths:
+      - 'scripts/probe_ng2018_solanaceae_sources_v0_1.py'
+      - 'scripts/preflight_ng2018_schema_tree_v0_1.py'
+      - 'tests/test_probe_ng2018_solanaceae_sources_v0_1.py'
+      - 'tests/test_preflight_ng2018_schema_tree_v0_1.py'
+      - 'data/ng2018_solanaceae_source_schema_hold_v0_1.json'
+      - '.github/workflows/ng2018-solanaceae-schema-tree-preflight-v0-1.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  preflight:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install runtime
+        run: pip install pytest openpyxl
+      - name: Unit tests
+        run: pytest -q tests/test_probe_ng2018_solanaceae_sources_v0_1.py tests/test_preflight_ng2018_schema_tree_v0_1.py
+      - name: Validate terminal source-schema HOLD without re-opening transient sources
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+
+          receipt=Path('data/ng2018_solanaceae_source_schema_hold_v0_1.json')
+          if receipt.exists():
+              x=json.load(receipt.open())
+              assert x['status']=='HOLD_NG2018_TABLE_S1_SOURCE_ONLY_NO_TRAIT_MATRIX'
+              assert x['trait_source']['header_row_predeclared_before_opening']==7
+              assert x['trait_source']['opened_header']==['Species','Source']
+              assert x['trait_source']['rows_8_plus_opened'] is False
+              f=x['outcome_firewall']
+              assert f['trait_data_rows_opened']==0
+              assert f['trait_state_frequencies_computed'] is False
+              assert f['tree_trait_crosswalk_computed'] is False
+              assert f['conditional_auc_computed'] is False
+              assert f['permutation_null_computed'] is False
+              assert f['pass_fail_assigned'] is False
+              tree=x['phylogeny_source']
+              assert tree['repository']=='TreeBASE'
+              assert tree['submission_id']=='S23063'
+              assert tree['tree_id']=='Tr113072'
+              assert tree['terminal_node_count']==84
+              print(x['status'])
+              print('terminal HOLD receipt validated; live TreeBASE re-fetch intentionally skipped')
+          else:
+              raise SystemExit('terminal HOLD receipt missing')
+          PY
