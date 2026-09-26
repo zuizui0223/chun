@@ -13,17 +13,34 @@ mod=importlib.util.module_from_spec(spec)
 spec.loader.exec_module(mod)
 
 
-def test_workbook_header_metadata_reads_header_only():
+def test_workbook_header_metadata_reads_title_then_row2_header_only():
     wb=Workbook()
     ws=wb.active
     ws.title="Table S1"
-    ws.append(["Species","Pelargonidin","Cyanidin","Delphinidin"])
-    ws.append(["SHOULD_NOT_BE_INTERPRETED",1,2,3])
+    ws.append(["Table S1 title",""])
+    ws.append(["Species","Anthocyanin source"])
+    ws.append(["SHOULD_NOT_BE_INTERPRETED","value"])
     b=io.BytesIO()
     wb.save(b)
     out=mod.workbook_header_metadata(b.getvalue())
+    sheet=out["sheets"][0]
     assert out["sheet_count"]==1
-    assert out["sheets"][0]["header"]==["Species","Pelargonidin","Cyanidin","Delphinidin"]
+    assert sheet["title_values"]==["Table S1 title",""]
+    assert sheet["header"]==["Species","Anthocyanin source"]
+    assert sheet["header_has_species"] is True
+    assert sheet["header_has_trait_column"] is True
+
+
+def test_source_only_header_has_no_trait_column():
+    wb=Workbook()
+    ws=wb.active
+    ws.append(["Table S1 title",""])
+    ws.append(["Species","Source"])
+    b=io.BytesIO()
+    wb.save(b)
+    sheet=mod.workbook_header_metadata(b.getvalue())["sheets"][0]
+    assert sheet["header_has_species"] is True
+    assert sheet["header_has_trait_column"] is False
 
 
 def test_tree_metadata_selects_unique_tree():
