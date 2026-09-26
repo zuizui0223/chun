@@ -19,7 +19,6 @@ spec.loader.exec_module(preflight)
 
 NS_MAIN="http://schemas.openxmlformats.org/spreadsheetml/2006/main"
 NS_REL="http://schemas.openxmlformats.org/officeDocument/2006/relationships"
-NS_PKG="http://schemas.openxmlformats.org/package/2006/relationships"
 
 
 def q(ns:str,tag:str)->str:
@@ -44,42 +43,50 @@ def first_sheet_xml_path(z:zipfile.ZipFile)->str:
     return posixpath.normpath(posixpath.join("xl",target))
 
 
-def sheet_structure(body:bytes,rows=(1,2,3,4))->dict:
+def sheet_structure(body:bytes)->dict:
     with zipfile.ZipFile(io.BytesIO(body)) as z:
         path=first_sheet_xml_path(z)
         root=ET.fromstring(z.read(path))
         sheet_data=root.find(q(NS_MAIN,"sheetData"))
-        by_row={}
+        summaries=[]
         for row in sheet_data.findall(q(NS_MAIN,"row")):
             r=int(row.attrib["r"])
-            if r not in rows:
-                continue
             cells=[]
             for cell in row.findall(q(NS_MAIN,"c")):
+                has_value=cell.find(q(NS_MAIN,"v")) is not None or cell.find(q(NS_MAIN,"is")) is not None
                 cells.append({
                     "ref":cell.attrib.get("r"),
                     "style_id":int(cell.attrib.get("s","0")),
                     "cell_type":cell.attrib.get("t"),
                     "has_formula":cell.find(q(NS_MAIN,"f")) is not None,
-                    "has_value_slot":cell.find(q(NS_MAIN,"v")) is not None or cell.find(q(NS_MAIN,"is")) is not None,
+                    "has_value_slot":has_value,
                 })
-            by_row[str(r)]={"row":r,"cell_count":len(cells),"cells":cells}
+            summaries.append({
+                "row":r,
+                "stored_cell_count":len(cells),
+                "occupied_cell_count":sum(1 for c in cells if c["has_value_slot"]),
+                "style_ids":sorted({c["style_id"] for c in cells}),
+                "cell_types":sorted({str(c["cell_type"]) for c in cells}),
+            })
         merge=root.find(q(NS_MAIN,"mergeCells"))
         merged=[x.attrib.get("ref") for x in list(merge)] if merge is not None else []
 
-    for r in rows:
-        by_row.setdefault(str(r),{"row":r,"cell_count":0,"cells":[]})
-
-    r1=by_row["1"]["cell_count"]
-    r2=by_row["2"]["cell_count"]
-    r3=by_row["3"]["cell_count"]
-    row3_candidate=bool(r3>=2 and r1<=1 and r2<=1)
+    occupied={x["row"]:x["occupied_cell_count"] for x in summaries}
+    multi=[r for r,n in occupied.items() if n>=2]
+    first_multi=min(multi) if multi else None
+    preceding_single_or_empty=bool(
+        first_multi is not None
+        and all(occupied.get(r,0)<=1 for r in range(1,first_multi))
+    )
+    header_candidate=first_multi if preceding_single_or_empty else None
     return {
         "worksheet_xml_path":path,
-        "rows":by_row,
+        "row_structure":summaries,
         "merged_ranges":merged,
-        "row3_header_candidate_by_structure":row3_candidate,
-        "candidate_rule":"row3 has >=2 stored cells while rows1-2 each have <=1 stored cell; no shared-string or inline-string text is decoded",
+        "first_multi_value_cell_row":first_multi,
+        "all_preceding_rows_single_or_empty":preceding_single_or_empty,
+        "predeclared_header_candidate_row":header_candidate,
+        "candidate_rule":"first row with >=2 value-bearing cells after only <=1-value-cell preamble rows; shared-string and inline-string contents are never decoded",
     }
 
 
@@ -91,13 +98,14 @@ def main()->int:
 
     body,url=preflight.recover_trait_source()
     structure=sheet_structure(body)
+    candidate=structure["predeclared_header_candidate_row"]
     status=(
-        "NG2018_ROW3_SCHEMA_OPENING_PREDECLARED"
-        if structure["row3_header_candidate_by_structure"]
-        else "HOLD_NG2018_ROW3_NOT_STRUCTURALLY_IDENTIFIED_AS_HEADER"
+        "NG2018_SCHEMA_ROW_OPENING_PREDECLARED"
+        if candidate is not None
+        else "HOLD_NG2018_HEADER_NOT_STRUCTURALLY_IDENTIFIED"
     )
     out={
-        "version":"v0.1",
+        "version":"v0.2",
         "status":status,
         "trait_source_url":url,
         "trait_source_sha256":hashlib.sha256(body).hexdigest(),
@@ -109,8 +117,8 @@ def main()->int:
         "trait_state_frequencies_computed":False,
         "hidden_memory_auc_computed":False,
         "next_gate":(
-            "OPEN_ROW3_VALUES_AS_SCHEMA_ONLY"
-            if status=="NG2018_ROW3_SCHEMA_OPENING_PREDECLARED"
+            f"OPEN_ROW_{candidate}_VALUES_AS_SCHEMA_ONLY"
+            if candidate is not None
             else "STOP_HOLD"
         ),
     }
