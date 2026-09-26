@@ -1,0 +1,59 @@
+name: Gesnerioideae biochemical state support v0.1
+
+on:
+  pull_request:
+    paths:
+      - 'scripts/preflight_gesnerioideae_biochemical_crosswalk_v0_1.py'
+      - 'scripts/gate_gesnerioideae_biochemical_state_support_v0_1.py'
+      - 'tests/test_gesnerioideae_biochemical_crosswalk_v0_1.py'
+      - 'tests/test_gesnerioideae_biochemical_state_support_v0_1.py'
+      - 'tmp/gesnerioideae_verified_source_tree_v0_1.nex'
+      - '.github/workflows/gesnerioideae-biochemical-state-support-v0-1.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  state-support:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install runtime
+        run: pip install pytest openpyxl biopython
+      - name: Unit tests
+        run: |
+          pytest -q tests/test_gesnerioideae_biochemical_crosswalk_v0_1.py
+          pytest -q tests/test_gesnerioideae_biochemical_state_support_v0_1.py
+      - name: Rebuild frozen pre-outcome crosswalk
+        run: |
+          python scripts/preflight_gesnerioideae_biochemical_crosswalk_v0_1.py \
+            --tree tmp/gesnerioideae_verified_source_tree_v0_1.nex \
+            --out-json build/gesnerioideae_biochemical_crosswalk_v0_1.json \
+            --out-tree build/gesnerioideae_biochemical_pruned_tree_v0_1.newick
+      - name: Open frozen chemistry columns for support only
+        run: |
+          python scripts/gate_gesnerioideae_biochemical_state_support_v0_1.py \
+            --crosswalk-json build/gesnerioideae_biochemical_crosswalk_v0_1.json \
+            --out build/gesnerioideae_biochemical_state_support_v0_1.json \
+            --frame-out build/gesnerioideae_biochemical_state_frame_v0_1.json
+      - name: Assert AUC remains unopened
+        run: |
+          python - <<'PY'
+          import json
+          x=json.load(open('build/gesnerioideae_biochemical_state_support_v0_1.json'))
+          assert x['chemistry_values_opened'] is True
+          assert x['state_frequencies_computed'] is True
+          assert x['hidden_memory_auc_computed'] is False
+          print(x['status'])
+          print('common',x['common_frame_tips'],'fine',x['retained_fine_state_count'],'coarse',x['retained_coarse_state_count'])
+          print('opportunity',x['compression_opportunity'])
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: gesnerioideae-biochemical-state-support-v0-1
+          path: build/
