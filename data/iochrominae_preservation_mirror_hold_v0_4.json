@@ -1,0 +1,47 @@
+{
+  "version": "v0.4",
+  "status": "HOLD_IOCHROMINAE_PRESERVATION_MIRRORS_NO_EXACT_BYTES",
+  "source_doi": "10.5061/dryad.p5dq84v",
+  "analysis_role": "RETROSPECTIVE_SECOND_BIOCHEMICAL_ANCHOR_NOT_PROSPECTIVE_REPLICATION",
+  "objects": {
+    "readme": {
+      "file_id": 108458,
+      "filename": "README_for_Larter et al 2019 Dvdy Iochrominae development evolution DATA.txt",
+      "expected_size": 4072,
+      "expected_md5": "2e4a251725ad4c13975fc09481da302d",
+      "exact_bytes_recovered": false,
+      "zenodo_query_hit_counts": [0, 0, 0],
+      "wayback_snapshot_counts_for_dryad_routes": [0, 0, 0]
+    },
+    "archive": {
+      "file_id": 108456,
+      "filename": "Larter et al 2019 Dvdy Iochrominae development evolution DATA.rar",
+      "expected_size": 3054999,
+      "expected_md5": "76b46e384fb7c9bf1ef3fbd7d1e5d2f0",
+      "exact_bytes_recovered": false,
+      "zenodo_query_hit_counts": [0, 0, 0],
+      "wayback_snapshot_counts_for_dryad_routes": [0, 0, 0]
+    }
+  },
+  "terminal_reason": "Current Dryad routes remained non-recovering; exact DOI, filename and MD5 searches returned no Zenodo records; the three frozen Dryad routes for each object returned no preserved Wayback snapshots. No exact-size plus exact-MD5 object was recovered.",
+  "biological_decision": "NONE_SOURCE_TRANSPORT_HOLD",
+  "outcome_firewall": {
+    "readme_text_opened": false,
+    "archive_member_names_opened": false,
+    "archive_data_rows_opened": false,
+    "profile_state_mapping_computed": false,
+    "profile_states_computed": false,
+    "patristic_distances_computed": false,
+    "profile_auc_computed": false,
+    "hidden_memory_auc_computed": false,
+    "pass_fail_assigned": false
+  },
+  "consequences": {
+    "counts_as_completed_second_biochemical_anchor": false,
+    "counts_as_prospective_replication": false,
+    "changes_current_el_v0_3": false,
+    "changes_v0_8_promotion_state": false
+  },
+  "paper1_science_changed": false,
+  "el_v0_3_science_changed": false
+}
