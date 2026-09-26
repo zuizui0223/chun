@@ -2,7 +2,6 @@ from __future__ import annotations
 
 import importlib.util
 import io
-import zipfile
 from pathlib import Path
 
 from openpyxl import Workbook
@@ -24,39 +23,43 @@ def workbook_bytes(rows):
     return b.getvalue()
 
 
-def test_structure_predeclares_row3_after_two_single_cell_preamble_rows():
+def test_structure_finds_first_multi_cell_boundary_after_preamble():
     body=workbook_bytes([
         ["title"],
         ["explanation"],
+        ["another explanation"],
         ["header1","header2"],
         ["data1","data2"],
     ])
     out=mod.sheet_structure(body)
-    assert out["rows"]["1"]["cell_count"]==1
-    assert out["rows"]["2"]["cell_count"]==1
-    assert out["rows"]["3"]["cell_count"]==2
-    assert out["row3_header_candidate_by_structure"] is True
+    assert out["first_multi_value_cell_row"]==4
+    assert out["all_preceding_rows_single_or_empty"] is True
+    assert out["predeclared_header_candidate_row"]==4
 
 
-def test_structure_holds_when_row3_is_not_two_cell_boundary():
+def test_structure_holds_without_multi_cell_boundary():
     body=workbook_bytes([
         ["title"],
         ["explanation"],
         ["only one"],
     ])
     out=mod.sheet_structure(body)
-    assert out["row3_header_candidate_by_structure"] is False
+    assert out["first_multi_value_cell_row"] is None
+    assert out["predeclared_header_candidate_row"] is None
 
 
-def test_structure_does_not_decode_cell_text():
+def test_structure_does_not_decode_cell_text_anywhere():
     body=workbook_bytes([
         ["SECRET_TITLE"],
         ["SECRET_EXPLANATION"],
+        ["SECRET_MORE"],
         ["SECRET_HEADER_A","SECRET_HEADER_B"],
+        ["SECRET_DATA_A","SECRET_DATA_B"],
     ])
     out=mod.sheet_structure(body)
     text=repr(out)
-    assert "SECRET_TITLE" not in text
-    assert "SECRET_EXPLANATION" not in text
-    assert "SECRET_HEADER_A" not in text
-    assert "SECRET_HEADER_B" not in text
+    for secret in [
+        "SECRET_TITLE","SECRET_EXPLANATION","SECRET_MORE",
+        "SECRET_HEADER_A","SECRET_HEADER_B","SECRET_DATA_A","SECRET_DATA_B"
+    ]:
+        assert secret not in text
