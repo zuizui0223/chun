@@ -40,9 +40,10 @@ jobs:
           assert x['chemistry_values_opened'] is False
           assert x['state_frequencies_computed'] is False
           assert x['hidden_memory_auc_computed'] is False
-          assert x['ambiguous_source_keys']==[]
+          assert x['analysis_included_ambiguous_keys']==[]
           assert x['matched_species'] >= 20
-          print(x['status'],x['matched_species'],x['unmatched_source_count'])
+          assert x['pruned_tree_tips']==x['matched_species']
+          print(x['status'],x['matched_species'],x['unmatched_source_count'],len(x['excluded_ambiguous_source_keys']))
           PY
       - uses: actions/upload-artifact@v4
         if: always()
