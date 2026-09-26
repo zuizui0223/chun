@@ -113,11 +113,27 @@ def build_crosswalk(source_species:list[str],tree_tips:list[str])->dict:
     }
 
 
+def pruned_tree(tree, matched_tree_tips:list[str]):
+    keep=set(matched_tree_tips)
+    for terminal in list(tree.get_terminals()):
+        if terminal.name not in keep:
+            tree.prune(terminal)
+    remaining={str(t.name).strip() for t in tree.get_terminals()}
+    if remaining != keep:
+        missing=sorted(keep-remaining)
+        extra=sorted(remaining-keep)
+        raise RuntimeError(f"pruned-tree tip mismatch: missing={missing}, extra={extra}")
+    return tree
+
+
 def main()->int:
     ap=argparse.ArgumentParser()
     ap.add_argument("--tree",type=Path,required=True)
     ap.add_argument("--out-json",type=Path,required=True)
+    ap.add_argument("--out-tree",type=Path,required=True)
     a=ap.parse_args()
+    a.out_json.parent.mkdir(parents=True,exist_ok=True)
+    a.out_tree.parent.mkdir(parents=True,exist_ok=True)
 
     wb=exact_workbook()
     source_species=source_species_first_rows(wb)
@@ -132,6 +148,9 @@ def main()->int:
     else:
         status="GESNERIOIDEAE_BIOCHEMICAL_CROSSWALK_FROZEN_CHEMISTRY_UNOPENED"
 
+    matched_tree_tips=[m["tree_tip"] for m in cw["matches"]]
+    tree_for_analysis=pruned_tree(tree,matched_tree_tips)
+    Phylo.write(tree_for_analysis,str(a.out_tree),"newick")
 
     out={
       "version":"v0.1",
@@ -140,6 +159,8 @@ def main()->int:
       "source_tree_exact_sha256":"0aac94ddfad56cff759eb0352aeaebb61b5bd4ebb60fa8c0db857b7f93ab0d50",
       "staged_tree_note":"Input staging text was reconstructed from the separately exact-byte-verified Library source; analysis uses its parsed topology and branch lengths.",
       **cw,
+      "pruned_tree_path":str(a.out_tree),
+      "pruned_tree_tips":len(tree_for_analysis.get_terminals()),
       "crosswalk_rule":"first source row per normalized genus+species; accept exactly one tree tip matching genus_species exactly, genus_species_*, or genus_species followed by uppercase/digit voucher suffix; exclude unmatched source species before chemistry opening; any multiple tree candidates -> HOLD",
       "chemistry_values_opened":False,
       "state_frequencies_computed":False,
@@ -157,6 +178,7 @@ def main()->int:
       "source_unique_species":cw["source_unique_species"],
       "tree_tips":cw["tree_tips"],
       "matched_species":cw["matched_species"],
+      "pruned_tree_tips":len(tree_for_analysis.get_terminals()),
       "unmatched_source_count":len(cw["unmatched_source_keys"]),
       "ambiguous_source_keys":cw["ambiguous_source_keys"],
     },indent=2))
