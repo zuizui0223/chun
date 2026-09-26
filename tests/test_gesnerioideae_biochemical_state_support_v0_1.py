@@ -10,6 +10,11 @@ mod=importlib.util.module_from_spec(spec)
 spec.loader.exec_module(mod)
 
 
+def test_header_canonicalization_matches_preflight_probe():
+    assert mod.canonical_header(" Cyanidin-3-\n  rutinoside ")=="Cyanidin-3- rutinoside"
+    assert mod.canonical_header("Delphinidin-\t rhamnose-glucose")=="Delphinidin- rhamnose-glucose"
+
+
 def test_bit_from_cell_rule():
     assert mod.bit_from_cell(None)==0
     assert mod.bit_from_cell("")==0
