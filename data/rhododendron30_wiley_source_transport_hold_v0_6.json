@@ -1,0 +1,59 @@
+{
+  "version": "v0.6",
+  "status": "HOLD_RHODODENDRON30_WILEY_SUPPLEMENTS_STILL_UNAVAILABLE",
+  "candidate": "Du_et_al_2018_Rhododendron30",
+  "article_doi": "10.1111/plb.12649",
+  "expected_public_supplements": {
+    "chemistry": {
+      "filename": "plb12649-sup-0001-TableS1-S2.xlsx",
+      "publisher_size_label": "19.5 KB",
+      "required_role": "30-species anthocyanin quantitative matrix"
+    },
+    "species": {
+      "filename": "plb12649-sup-0002-TableS3.docx",
+      "publisher_size_label": "35.9 KB",
+      "required_role": "30-species identity and colour table"
+    }
+  },
+  "transport_result": {
+    "chemistry_direct_http_statuses": [403, 403, 403],
+    "chemistry_wayback_cdx_http_status": 200,
+    "chemistry_wayback_snapshot_rows": 0,
+    "species_direct_http_statuses": [403, 403, 403],
+    "species_wayback_cdx_http_status": 200,
+    "species_wayback_snapshot_rows": 0,
+    "genuine_chemistry_xlsx_recovered": false,
+    "genuine_species_docx_recovered": false
+  },
+  "primary_tree": {
+    "already_recovered_exact": true,
+    "file": "1_WP_RAxML.tre",
+    "dryad_file_id": 1853438,
+    "bytes": 13100,
+    "sha256": "784011d0e2e17df9ea21eb22d31197bad29219a37ac213fda013766e29b51362",
+    "tip_count": 164,
+    "duplicate_tip_labels": 0,
+    "all_nonroot_branch_lengths_present": true
+  },
+  "terminal_reason": "The two exact publisher-listed phenotype supplements remain inaccessible through bounded current Wiley routes and have no snapshots in the queried Wayback CDX canonical supplement URLs. The preregistered phenotype hierarchy cannot be evaluated without substituting or reconstructing the frozen source.",
+  "biological_decision": "NONE_SOURCE_TRANSPORT_HOLD",
+  "outcome_firewall": {
+    "species_rows_opened": false,
+    "chemistry_workbook_opened": false,
+    "row_level_anthocyanin_values_opened": false,
+    "compound_states_computed": false,
+    "state_frequencies_computed": false,
+    "tree_trait_crosswalk_computed": false,
+    "profile_auc_computed": false,
+    "hidden_memory_auc_computed": false,
+    "pass_fail_assigned": false
+  },
+  "consequences": {
+    "counts_as_biological_fail": false,
+    "counts_as_replication": false,
+    "changes_current_el_v0_3": false,
+    "changes_v0_8_promotion_state": false
+  },
+  "paper1_science_changed": false,
+  "el_v0_3_science_changed": false
+}
