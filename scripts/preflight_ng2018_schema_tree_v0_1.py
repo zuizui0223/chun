@@ -6,6 +6,7 @@ import hashlib
 import importlib.util
 import io
 import json
+import re
 import xml.etree.ElementTree as ET
 from pathlib import Path
 
@@ -17,8 +18,10 @@ spec=importlib.util.spec_from_file_location("source_probe",PROBE_PATH)
 probe=importlib.util.module_from_spec(spec)
 spec.loader.exec_module(probe)
 
-HEADER_ROW=1
+TITLE_ROW=1
+HEADER_ROW=2
 TREE_KEYWORDS=("mcc","maximum clade credibility","treeannotator","beast")
+TRAIT_HEADER_TERMS=("pelargonidin","cyanidin","delphinidin","anthocyanin","pigment","proportion","predominant")
 
 
 def recover_trait_source()->tuple[bytes,str]:
@@ -48,20 +51,29 @@ def recover_tree_source()->tuple[bytes,str]:
     raise RuntimeError("TreeBASE S23063 source no longer recoverable")
 
 
+def row_values(ws,row:int)->list[str]:
+    return ["" if c.value is None else str(c.value).strip() for c in ws[row]]
+
+
 def workbook_header_metadata(body:bytes)->dict:
     wb=load_workbook(io.BytesIO(body),read_only=True,data_only=False)
     sheets=[]
     for ws in wb.worksheets:
-        header=[
-            "" if c.value is None else str(c.value).strip()
-            for c in ws[HEADER_ROW]
-        ]
+        title=row_values(ws,TITLE_ROW)
+        header=row_values(ws,HEADER_ROW)
+        norm=[re.sub(r"\s+"," ",x.lower()).strip() for x in header]
+        has_species=any(x=="species" or x.startswith("species ") for x in norm)
+        has_trait_header=any(term in x for x in norm for term in TRAIT_HEADER_TERMS)
         sheets.append({
             "title":ws.title,
             "max_row":ws.max_row,
             "max_column":ws.max_column,
+            "title_row":TITLE_ROW,
+            "title_values":title,
             "header_row":HEADER_ROW,
             "header":header,
+            "header_has_species":has_species,
+            "header_has_trait_column":has_trait_header,
         })
     return {"sheet_count":len(sheets),"sheets":sheets}
 
@@ -136,15 +148,21 @@ def main()->int:
     wbmeta=workbook_header_metadata(trait_body)
     tmeta=tree_metadata(tree_body)
 
+    only_sheet=wbmeta["sheets"][0] if wbmeta["sheet_count"]==1 else None
     if wbmeta["sheet_count"]!=1:
         status="HOLD_NG2018_WORKBOOK_SHEET_SELECTION_PRE_TRAIT"
     elif tmeta["selected_tree_id"] is None:
         status="HOLD_NG2018_TREE_SELECTION_PRE_TRAIT"
+    elif not only_sheet["header_has_species"]:
+        status="HOLD_NG2018_HEADER_ROW_NOT_RECOGNIZED_STOP_BEFORE_FURTHER_ROWS"
+    elif not only_sheet["header_has_trait_column"]:
+        status="HOLD_NG2018_TABLE_S1_SOURCE_ONLY_NO_TRAIT_COLUMNS"
     else:
         status="NG2018_SCHEMA_TREE_METADATA_PREFLIGHT_READY"
 
+    row2_recognized_header=bool(only_sheet and only_sheet["header_has_species"])
     out={
-        "version":"v0.1",
+        "version":"v0.2",
         "status":status,
         "trait_source":{
             "url":trait_url,
@@ -158,8 +176,9 @@ def main()->int:
             "sha256":hashlib.sha256(tree_body).hexdigest(),
             **tmeta,
         },
-        "trait_header_rows_opened":1,
-        "trait_data_rows_opened":0,
+        "schema_probe_rows_opened":[1,2],
+        "row2_recognized_as_header":row2_recognized_header,
+        "trait_data_rows_opened":0 if row2_recognized_header else None,
         "trait_state_frequencies_computed":False,
         "tree_tip_labels_crosswalked_to_traits":False,
         "hidden_memory_auc_computed":False,
