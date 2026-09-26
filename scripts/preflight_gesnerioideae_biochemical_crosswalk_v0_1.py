@@ -18,7 +18,7 @@ EPMC="https://www.ebi.ac.uk/europepmc/webservices/rest/PMC7767864/supplementaryF
 WORKBOOK_SHA="a84abf67da0afb8c0bafd4c1251dbcbb6dc48eb286dca788e6e88ce0176ccbc8"
 SHEET="FINAL SAMPLE LIST"
 HEADER_ROW=3
-UA="CHUN-Gesnerioideae-crosswalk/0.2"
+UA="CHUN-Gesnerioideae-crosswalk/0.3"
 
 
 def sha256(b:bytes)->str:
@@ -103,8 +103,6 @@ def tip_matches_key(tip:str,key:str)->bool:
 
 
 def resolve_candidate_by_source_identifiers(candidates:list[str], identifiers:dict)->tuple[str|None,str|None]:
-    # Outcome-independent priority frozen before chemistry opening:
-    # source voucher first, then living-collection identifier.
     for field in ("voucher","living_collection_id"):
         token=identifier_token(identifiers.get(field))
         if len(token)<3:
@@ -196,9 +194,9 @@ def main()->int:
     tips=[str(t.name).strip() for t in tree.get_terminals()]
     cw=build_crosswalk(source_species,tips,identifier_map)
 
-    if cw["ambiguous_source_keys"]:
-        status="HOLD_AMBIGUOUS_IDENTIFIER_CROSSWALK"
-    elif cw["matched_species"]<20:
+    # Pre-outcome conservative rule: never choose among unresolved multiple tree tips.
+    # Such species are excluded from the analysis frame exactly like unmatched species.
+    if cw["matched_species"]<20:
         status="HOLD_CROSSWALK_LT_20"
     else:
         status="GESNERIOIDEAE_BIOCHEMICAL_CROSSWALK_FROZEN_CHEMISTRY_UNOPENED"
@@ -212,17 +210,19 @@ def main()->int:
     }
 
     out={
-      "version":"v0.2",
+      "version":"v0.3",
       "status":status,
       "source_workbook_sha256":WORKBOOK_SHA,
       "source_tree_exact_sha256":"0aac94ddfad56cff759eb0352aeaebb61b5bd4ebb60fa8c0db857b7f93ab0d50",
       "staged_tree_note":"Input staging text was reconstructed from the separately exact-byte-verified Library source; analysis uses its parsed topology and branch lengths.",
       **cw,
+      "excluded_ambiguous_source_keys":cw["ambiguous_source_keys"],
+      "analysis_included_ambiguous_keys":[],
       "unresolved_source_identifiers":unresolved_identifier_context,
       "pruned_tree_path":str(a.out_tree),
       "pruned_tree_tips":len(tree_for_analysis.get_terminals()),
-      "crosswalk_rule":"first source row per normalized genus+species; accept one species-matching tree tip directly; if multiple tips match the species key, resolve only by exact normalized source Voucher suffix, then Living collection ID suffix; otherwise HOLD; unmatched source species are excluded before chemistry opening",
-      "crosswalk_rule_refinement_note":"v0.1 stopped before chemistry because four species had multiple tree candidates. v0.2 adds a source-identifier-only resolver while chemistry values, state frequencies, and AUC remain unopened.",
+      "crosswalk_rule":"first source row per normalized genus+species; accept one species-matching tree tip directly; if multiple tips match, resolve only by exact normalized source Voucher suffix then Living collection ID suffix; if still unresolved, exclude the species rather than selecting a tip; unmatched source species are also excluded; all decisions occur before chemistry opening",
+      "crosswalk_rule_refinement_note":"v0.1 stopped on four unresolved multiple-tip species; v0.2 showed source-side identifiers use a different identifier system and cannot resolve them. v0.3 therefore excludes those four unresolved species conservatively. Chemistry values, state frequencies, and AUC remain unopened.",
       "chemistry_values_opened":False,
       "state_frequencies_computed":False,
       "hidden_memory_auc_computed":False,
@@ -242,9 +242,8 @@ def main()->int:
       "identifier_resolved_species":cw["identifier_resolved_species"],
       "pruned_tree_tips":len(tree_for_analysis.get_terminals()),
       "unmatched_source_count":len(cw["unmatched_source_keys"]),
-      "ambiguous_source_keys":cw["ambiguous_source_keys"],
-      "ambiguous_candidates":cw["ambiguous_candidates"],
-      "unresolved_source_identifiers":unresolved_identifier_context,
+      "excluded_ambiguous_source_keys":cw["ambiguous_source_keys"],
+      "analysis_included_ambiguous_keys":[],
     },indent=2,default=str))
     return 0
 
