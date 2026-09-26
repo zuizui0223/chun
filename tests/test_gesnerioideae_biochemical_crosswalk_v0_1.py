@@ -1,7 +1,10 @@
 from __future__ import annotations
 
 import importlib.util
+import io
 from pathlib import Path
+
+from Bio import Phylo
 
 ROOT=Path(__file__).resolve().parents[1]
 SCRIPT=ROOT/"scripts"/"preflight_gesnerioideae_biochemical_crosswalk_v0_1.py"
@@ -29,3 +32,9 @@ def test_unique_crosswalk_excludes_unmatched_and_flags_ambiguity():
     assert out["matched_species"]==1
     assert out["unmatched_source_keys"]==["c_c"]
     assert out["ambiguous_source_keys"]==["b_b"]
+
+
+def test_pruned_tree_keeps_exact_matched_tip_set():
+    tree=Phylo.read(io.StringIO("((A_a_X:1,B_b1:1):1,C_c_X:1);"),"newick")
+    out=mod.pruned_tree(tree,["A_a_X","C_c_X"])
+    assert {t.name for t in out.get_terminals()}=={"A_a_X","C_c_X"}
