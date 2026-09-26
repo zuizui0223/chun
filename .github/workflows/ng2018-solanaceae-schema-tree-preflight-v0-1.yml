@@ -25,20 +25,25 @@ jobs:
         run: pip install pytest openpyxl
       - name: Unit tests
         run: pytest -q tests/test_probe_ng2018_solanaceae_sources_v0_1.py tests/test_preflight_ng2018_schema_tree_v0_1.py
-      - name: Open only workbook header and TreeBASE metadata
+      - name: Open only workbook title/schema rows and TreeBASE metadata
         run: python scripts/preflight_ng2018_schema_tree_v0_1.py --out build/ng2018_schema_tree_preflight_v0_1.json
       - name: Assert outcome firewall
         run: |
           python - <<'PY'
           import json
           x=json.load(open('build/ng2018_schema_tree_preflight_v0_1.json'))
-          assert x['trait_data_rows_opened']==0
+          assert x['schema_probe_rows_opened']==[1,2]
           assert x['trait_state_frequencies_computed'] is False
           assert x['tree_tip_labels_crosswalked_to_traits'] is False
           assert x['hidden_memory_auc_computed'] is False
+          if x['row2_recognized_as_header']:
+              assert x['trait_data_rows_opened']==0
+          else:
+              assert x['trait_data_rows_opened'] is None
+              assert x['status']=='HOLD_NG2018_HEADER_ROW_NOT_RECOGNIZED_STOP_BEFORE_FURTHER_ROWS'
           print(x['status'])
           print(x['trait_source']['sha256'], x['trait_source']['sheets'])
-          print(x['tree_source']['sha256'], x['tree_source']['tree_count'], x['tree_source']['selection_status'], x['tree_source']['selected_tree_id'])
+          print(x['tree_source']['tree_count'], x['tree_source']['selection_status'], x['tree_source']['selected_tree_id'])
           PY
       - uses: actions/upload-artifact@v4
         if: always()
