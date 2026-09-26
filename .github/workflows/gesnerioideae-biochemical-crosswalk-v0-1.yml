@@ -1,0 +1,52 @@
+name: Gesnerioideae biochemical identifier crosswalk v0.1
+
+on:
+  pull_request:
+    paths:
+      - 'tmp/gesnerioideae_verified_source_tree_v0_1.nex'
+      - 'scripts/preflight_gesnerioideae_biochemical_crosswalk_v0_1.py'
+      - 'tests/test_gesnerioideae_biochemical_crosswalk_v0_1.py'
+      - 'data/gesnerioideae_biochemical_crosswalk_v0_1.json'
+      - 'data/derived/gesnerioideae_biochemical_pruned_tree_v0_1.newick'
+      - '.github/workflows/gesnerioideae-biochemical-crosswalk-v0-1.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  crosswalk:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install runtime
+        run: pip install pytest openpyxl requests biopython
+      - name: Unit tests
+        run: pytest -q tests/test_gesnerioideae_biochemical_crosswalk_v0_1.py
+      - name: Freeze identifier-only crosswalk and pruned tree
+        run: |
+          python scripts/preflight_gesnerioideae_biochemical_crosswalk_v0_1.py \
+            --tree tmp/gesnerioideae_verified_source_tree_v0_1.nex \
+            --out-json build/gesnerioideae_biochemical_crosswalk_v0_1.json \
+            --out-tree build/gesnerioideae_biochemical_pruned_tree_v0_1.newick
+      - name: Assert chemistry outcome remains unopened
+        run: |
+          python - <<'PY'
+          import json
+          x=json.load(open('build/gesnerioideae_biochemical_crosswalk_v0_1.json'))
+          assert x['chemistry_values_opened'] is False
+          assert x['state_frequencies_computed'] is False
+          assert x['hidden_memory_auc_computed'] is False
+          assert x['analysis_included_ambiguous_keys']==[]
+          assert x['matched_species'] >= 20
+          assert x['pruned_tree_tips']==x['matched_species']
+          print(x['status'],x['matched_species'],len(x['unmatched_source_keys']),len(x['excluded_ambiguous_source_keys']))
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: gesnerioideae-biochemical-crosswalk-v0-1
+          path: build/
