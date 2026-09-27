@@ -4,6 +4,8 @@ on:
   pull_request:
     paths:
       - 'data/merianieae_hidden_memory_admission_v0_1.json'
+      - 'data/merianieae_prospective_terminal_v0_1.json'
+      - 'docs/MERIANIEAE_PROSPECTIVE_SCHEMA_HOLD_V0_1.md'
       - 'scripts/preflight_merianieae_source_v0_1.py'
       - 'scripts/preflight_merianieae_crosswalk_v0_1.py'
       - 'scripts/freeze_merianieae_pollinator_frame_v0_1.py'
@@ -236,6 +238,32 @@ jobs:
           python scripts/finalize_merianieae_prospective_v0_1.py \
             --receipts build/receipts \
             --out build/receipts/final.json
+
+      - name: Validate frozen Merianieae terminal
+        if: always()
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          expected=json.load(open('data/merianieae_prospective_terminal_v0_1.json'))
+          final=json.load(open('build/receipts/final.json'))
+          support=json.load(open('build/receipts/state_support.json'))
+          assert support['status']=='HOLD_MERIANIEAE_COROLLA_COLOUR_NUMERIC_CODE_SCHEMA'
+          assert support['numeric_code_schema'] is True
+          assert support['coarse_state_counts']=={}
+          assert support['compression_opportunity'] is False
+          assert final['status']==expected['status']
+          assert final['biological_decision']==expected['biological_decision']=='NONE_SCHEMA_HOLD'
+          assert final['observed_hidden_memory_auc_opened'] is False
+          assert not Path('build/receipts/informativeness.json').exists()
+          assert not Path('build/receipts/hidden_memory_result.json').exists()
+          assert not Path('build/receipts/temporal_prediction.json').exists()
+          assert not Path('build/receipts/pollinator_conditioned.json').exists()
+          assert expected['schema_gate']['post_outcome_code_decoding_attempted'] is False
+          assert expected['schema_gate']['white_nonwhite_mapping_applied_to_numeric_codes'] is False
+          assert expected['hidden_memory_decision']=='UNOPENED'
+          print(final)
+          PY
 
       - name: Validate frozen EL v0.3 science
         if: always()
