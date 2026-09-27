@@ -154,6 +154,25 @@ def resolve_file_inventory()->tuple[list[dict],dict]:
 def file_name(o:dict)->str:
     return str(o.get("path") or o.get("filename") or o.get("file_name") or o.get("name") or "")
 
+def file_identity_key(o:dict)->tuple:
+    fid=o.get("id") or o.get("file_id")
+    url=file_download_url(o)
+    dig=json.dumps(metadata_digest(o),sort_keys=True,default=str)
+    size=o.get("size") or o.get("file_size") or o.get("bytes")
+    return (str(fid or ""),str(url or ""),str(size or ""),dig)
+
+
+def dedupe_file_objects(objs:list[dict])->list[dict]:
+    out=[]
+    seen=set()
+    for o in objs:
+        k=file_identity_key(o)
+        if k in seen:
+            continue
+        seen.add(k)
+        out.append(o)
+    return out
+
 def file_download_url(o:dict)->str|None:
     # Search nested metadata for URLs that look like a file content/download endpoint.
     urls=[absolute_dryad(u) for u in collect_urls(o)]
@@ -274,18 +293,36 @@ def main()->int:
         out={
           "version":"v0.1","status":"HOLD_ERYSIMUM_DRYAD_METADATA_UNAVAILABLE",
           "error":f"{type(e).__name__}: {e}",
-          "outcome_firewall":{"archive_downloaded":False,"trait_rows_opened":False,"colour_values_opened":False,"tree_tip_labels_emitted":False},
+          "outcome_firewall":{
+            "archive_downloaded":False,
+            "archive_member_names_opened":False,
+            "author_code_opened":False,
+            "trait_data_rows_opened":False,
+            "species_level_colour_values_opened":False,
+            "colour_state_frequencies_computed":False,
+            "tree_tip_labels_emitted":False,
+            "hidden_memory_auc_computed":False
+          },
           "next_gate":"STOP_HOLD","paper1_science_changed":False,"el_v0_3_science_changed":False
         }
         a.out.write_text(json.dumps(out,indent=2,sort_keys=True)+"\n"); print(json.dumps(out,indent=2)); return 0
 
-    matches=[o for o in inventory if file_name(o)==PACKAGE]
+    matches=dedupe_file_objects([o for o in inventory if file_name(o)==PACKAGE])
     if len(matches)!=1:
         out={
           "version":"v0.1","status":"HOLD_ERYSIMUM_EXACT_PACKAGE_METADATA_NOT_UNIQUE",
           "package_matches":[{"name":file_name(o),"metadata":o} for o in matches],
           "diagnostics":diagnostics,
-          "outcome_firewall":{"archive_downloaded":False,"trait_rows_opened":False,"colour_values_opened":False,"tree_tip_labels_emitted":False},
+          "outcome_firewall":{
+            "archive_downloaded":False,
+            "archive_member_names_opened":False,
+            "author_code_opened":False,
+            "trait_data_rows_opened":False,
+            "species_level_colour_values_opened":False,
+            "colour_state_frequencies_computed":False,
+            "tree_tip_labels_emitted":False,
+            "hidden_memory_auc_computed":False
+          },
           "next_gate":"STOP_HOLD","paper1_science_changed":False,"el_v0_3_science_changed":False
         }
         a.out.write_text(json.dumps(out,indent=2,sort_keys=True)+"\n"); print(json.dumps({"status":out["status"],"n_matches":len(matches)},indent=2)); return 0
