@@ -4,7 +4,7 @@
 
 Merianieae is selected as the next independent visible-flower-colour radiation before CHUN opens any row-level corolla-colour values.
 
-The public source metadata reports a 139-species Merianieae floral-trait frame, an explicit corolla.colour field, an x field matching phylogeny tip labels, and an author-used phylogenetic hypothesis. The linked Zenodo record contains the author analysis bundle.
+The public source metadata reports a 139-species Merianieae floral-trait frame, an explicit corolla.colour field, an x field matching phylogeny tip labels, and an author-used phylogenetic hypothesis. The linked Zenodo record contains the author analysis bundle. Its archive preview shows two same-named tree copies in different analysis folders, so before any row-level colour opening the source identity is refined to the matched pair 1_morphospaces_disparity/floraltraits.csv and 1_morphospaces_disparity/Marcelo_Meris.tre. No tree from a different analysis folder may substitute.
 
 ## Frozen hierarchy
 
