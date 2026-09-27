@@ -6,6 +6,7 @@ on:
       - 'data/source_first_hidden_memory_candidate_screen_v0_1.json'
       - 'data/source_first_hidden_memory_candidate_screen_v0_1.csv'
       - 'scripts/screen_hedychium_source_first_v0_1.py'
+      - 'scripts/screen_hedychium_schema_metadata_v0_2.py'
       - '.github/workflows/source-first-hedychium-screen-v0-1.yml'
   workflow_dispatch:
 
@@ -52,6 +53,21 @@ jobs:
           print(x['hard_checks'])
           print(x['tree_metadata'])
           print(x['mapping_colour_tokens_found'])
+          PY
+      - name: Inspect Hedychium pre-row schema mapping metadata
+        run: python scripts/screen_hedychium_schema_metadata_v0_2.py --out build/hedychium_schema_metadata_v0_2.json
+      - name: Assert schema inspection firewall
+        run: |
+          python - <<'PY'
+          import json
+          x=json.load(open('build/hedychium_schema_metadata_v0_2.json'))
+          assert x['outcome_firewall']['species_rows_parsed'] is False
+          assert x['outcome_firewall']['species_level_colour_values_opened'] is False
+          assert x['outcome_firewall']['colour_state_frequencies_computed'] is False
+          assert x['outcome_firewall']['hidden_memory_auc_computed'] is False
+          print(x['status'])
+          print(x['trait_header'])
+          print(x['mapping_evaluation'])
           PY
       - uses: actions/upload-artifact@v4
         if: always()
