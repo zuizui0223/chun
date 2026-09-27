@@ -9,6 +9,8 @@ on:
       - 'scripts/freeze_merianieae_pollinator_frame_v0_1.py'
       - 'scripts/gate_merianieae_state_support_v0_1.py'
       - 'scripts/gate_merianieae_informativeness_v0_1.py'
+      - 'scripts/predict_merianieae_temporal_realization_v0_1.py'
+      - 'scripts/evaluate_merianieae_temporal_realization_v0_1.py'
       - 'scripts/analyze_merianieae_pollinator_conditioned_memory_v0_1.py'
       - 'scripts/analyze_merianieae_hidden_memory_v0_1.py'
       - 'scripts/finalize_merianieae_prospective_v0_1.py'
@@ -16,6 +18,7 @@ on:
       - 'tests/test_preflight_merianieae_crosswalk_v0_1.py'
       - 'tests/test_gate_merianieae_state_support_v0_1.py'
       - 'tests/test_merianieae_informativeness_v0_1.py'
+      - 'tests/test_merianieae_temporal_realization_v0_1.py'
       - 'tests/test_merianieae_pollinator_conditioned_memory_v0_1.py'
       - '.github/workflows/merianieae-hidden-memory-prospective-v0-1.yml'
   workflow_dispatch:
@@ -40,6 +43,7 @@ jobs:
             tests/test_preflight_merianieae_crosswalk_v0_1.py \
             tests/test_gate_merianieae_state_support_v0_1.py \
             tests/test_merianieae_informativeness_v0_1.py \
+            tests/test_merianieae_temporal_realization_v0_1.py \
             tests/test_merianieae_pollinator_conditioned_memory_v0_1.py
       - name: Validate admission was frozen before row-level colour
         run: |
@@ -53,6 +57,8 @@ jobs:
           assert x['hidden_memory_test']['pass_rule']=='centered conditional AUC > 0 and one-sided permutation P <= 0.05'
           assert x['ecological_secondary_frozen_before_colour']['predictor_column']=='estimated_pollinator'
           assert x['ecological_secondary_frozen_before_colour']['run_only_if_primary_hidden_memory_passes'] is True
+          assert x['temporal_realization_prediction_frozen_before_colour']['training_predictor_median']==0.022164300864659012
+          assert x['temporal_realization_prediction_frozen_before_colour']['training_hidden_effect_median']==0.02700779596581926
           PY
 
       - name: Exact source gate
@@ -136,6 +142,23 @@ jobs:
           print(x['status'],x.get('fine_state_counts'),x.get('coarse_state_counts'))
           PY
 
+      - name: Freeze pre-AUC temporal-realization prediction
+        if: steps.support_gate.outputs.ready == 'true'
+        run: |
+          python scripts/predict_merianieae_temporal_realization_v0_1.py \
+            --frame build/stage/state_frame.json \
+            --tree build/stage/merianieae_crosswalk_tree.newick \
+            --out build/receipts/temporal_prediction.json
+      - name: Assert temporal prediction does not open hidden AUC
+        if: steps.support_gate.outputs.ready == 'true'
+        run: |
+          python - <<'PY'
+          import json
+          x=json.load(open('build/receipts/temporal_prediction.json'))
+          assert x['hidden_memory_auc_computed'] is False
+          print(x['status'],x.get('fine_persistence_area'),x.get('predicted_hidden_effect_class'))
+          PY
+
       - name: Pre-AUC informativeness gate
         if: steps.support_gate.outputs.ready == 'true'
         run: |
@@ -179,6 +202,23 @@ jobs:
               f.write(f"passed={'true' if passed else 'false'}\n")
           print(x['status'],x['centered_auc_effect'],x['p_one_sided'])
           PY
+
+      - name: Evaluate pre-AUC temporal-realization prediction
+        if: steps.information_gate.outputs.ready == 'true'
+        run: |
+          if python - <<'PY'
+          import json
+          x=json.load(open('build/receipts/temporal_prediction.json'))
+          raise SystemExit(0 if x['status']=='MERIANIEAE_TEMPORAL_REALIZATION_PREDICTION_FROZEN_PRE_AUC' else 1)
+          PY
+          then
+            python scripts/evaluate_merianieae_temporal_realization_v0_1.py \
+              --prediction build/receipts/temporal_prediction.json \
+              --primary build/receipts/hidden_memory_result.json \
+              --out build/receipts/temporal_prediction_evaluation.json
+          else
+            echo "Temporal realization predictor structurally unavailable; primary remains valid."
+          fi
 
       - name: Pollinator-conditioned secondary diagnostic
         if: steps.primary_decision.outputs.passed == 'true' && steps.pollinator_gate.outputs.ready == 'true'
