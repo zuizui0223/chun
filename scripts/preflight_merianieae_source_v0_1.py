@@ -7,6 +7,8 @@ import hashlib
 import io
 import json
 import re
+import time
+import urllib.error
 import urllib.request
 import zipfile
 from pathlib import Path
@@ -23,9 +25,22 @@ UA="CHUN-Merianieae-source-gate/0.1"
 
 
 def fetch(url:str,accept:str="*/*")->bytes:
-    req=urllib.request.Request(url,headers={"User-Agent":UA,"Accept":accept})
-    with urllib.request.urlopen(req,timeout=120) as r:
-        return r.read()
+    last=None
+    for attempt in range(6):
+        req=urllib.request.Request(url,headers={"User-Agent":UA,"Accept":accept})
+        try:
+            with urllib.request.urlopen(req,timeout=120) as r:
+                return r.read()
+        except urllib.error.HTTPError as e:
+            last=e
+            if e.code not in {429,500,502,503,504} or attempt==5:
+                raise
+        except Exception as e:
+            last=e
+            if attempt==5:
+                raise
+        time.sleep(min(2**attempt,16))
+    raise RuntimeError(f"fetch failed: {last}")
 
 
 def md5(b:bytes)->str:
