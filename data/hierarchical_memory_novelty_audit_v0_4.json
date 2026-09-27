@@ -1,0 +1,34 @@
+{
+  "version": "v0.4",
+  "status": "HIERARCHICAL_MEMORY_NOVELTY_CEILING_AFTER_REALIZATION_DIAGNOSTICS",
+  "retained_novelty": [
+    "a standardized within-coarse estimator detects recurrent hidden fine-state lineage organization across visible-colour radiations",
+    "one independent prospective visible-colour radiation replicates the hidden-memory effect",
+    "hidden-memory realization is empirically separable from trivial fine-to-coarse collision geometry",
+    "unconditional global signal and nested within-coarse organization can disagree at the clade level",
+    "hidden-memory strength is not equivalent to a global fine-over-coarse persistence advantage",
+    "prospective biochemical evidence supplies a genuine negative boundary rather than only favorable examples"
+  ],
+  "strongest_allowed_wording": "Flower-colour evolutionary history is often hierarchical: fine states retain lineage organization inside broader phenotype classes, and this hidden organization is not a trivial consequence of state compression or simply the global winner among phenotype resolutions. The architecture prospectively replicates in visible colour but remains contingent across representations and mechanistically unresolved.",
+  "prohibited_wording": [
+    "universal hierarchical-memory law",
+    "prospective biochemical validation",
+    "cryptic hidden memory is proven in globally no-signal clades",
+    "temporal persistence significantly explains hidden memory in the current 21-clade test",
+    "bootstrap confidence interval rescues the frozen P=0.06147 primary",
+    "significant Wilcoxon rescues the frozen no-signal sign-test primary",
+    "hidden memory is caused by ecology, pollination, development or pigment chemistry",
+    "hidden memory is independent evidence when derived from the same source states and phylogenies"
+  ],
+  "current_explanatory_boundary": {
+    "trivial_compression": "REJECTED_AS_SUPPORTED_EXPLANATION",
+    "unconditional_global_signal": "NOT_EQUIVALENT_DESCRIPTIVELY",
+    "global_fine_resolution_advantage": "NOT_EQUIVALENT",
+    "absolute_fine_persistence": "PLAUSIBLE_DIRECTIONAL_HYPOTHESIS_NOT_CONFIRMED",
+    "biological_mechanism": "UNRESOLVED"
+  },
+  "next_confirmatory_rule": "Do not add more retrospective moderators to the same 21-clade outcome. Test one frozen biologically external realization predictor in a genuinely new eligible system or radiation set after its informativeness gate passes.",
+  "submission_state": "Evolution Letters v0.3 remains current and unchanged",
+  "paper1_science_changed": false,
+  "el_v0_3_science_changed": false
+}
