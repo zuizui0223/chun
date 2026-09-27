@@ -43,19 +43,21 @@ jobs:
             --frozen-result results/gesnerioideae_biochemical_hidden_memory_v0_1/summary_v0_1.json \
             --schistanthe-result results/schistanthe_hidden_memory_v0_1/result_v0_1.json \
             --out build/gesnerioideae_fail_informativeness_v0_1.json
-      - name: Validate diagnostic boundary
+      - name: Validate frozen diagnostic
         run: |
           python - <<'PY'
           import json
-          x=json.load(open('build/gesnerioideae_fail_informativeness_v0_1.json'))
-          assert x['prospective_terminal_status']=='PROSPECTIVE_GESNERIOIDEAE_BIOCHEMICAL_HIDDEN_MEMORY_FAIL'
-          assert x['prospective_terminal_status_changed'] is False
-          assert x['promotion_gate_pass_changed'] is False
-          assert x['no_posthoc_rescue'] is True
-          print('critical centered effect',x['one_sided_alpha_0_05_centered_effect_critical'])
-          print('observed effect',x['observed_centered_effect'])
-          print('Schistanthe effect',x['schistanthe_prospective_centered_effect'])
-          print('Schistanthe-sized point effect crosses threshold',x['schistanthe_sized_point_effect_would_cross_gesnerioideae_null_critical_value'])
+          g=json.load(open('build/gesnerioideae_fail_informativeness_v0_1.json'))
+          f=json.load(open('results/gesnerioideae_fail_informativeness_v0_1/summary_v0_1.json'))
+          assert g==f, (g,f)
+          assert g['prospective_terminal_status']=='PROSPECTIVE_GESNERIOIDEAE_BIOCHEMICAL_HIDDEN_MEMORY_FAIL'
+          assert g['prospective_terminal_status_changed'] is False
+          assert g['promotion_gate_pass_changed'] is False
+          assert g['no_posthoc_rescue'] is True
+          print('critical centered effect',g['one_sided_alpha_0_05_centered_effect_critical'])
+          print('observed effect',g['observed_centered_effect'])
+          print('Schistanthe effect',g['schistanthe_prospective_centered_effect'])
+          print('Schistanthe-sized point effect crosses threshold',g['schistanthe_sized_point_effect_would_cross_gesnerioideae_null_critical_value'])
           PY
       - uses: actions/upload-artifact@v4
         if: always()
