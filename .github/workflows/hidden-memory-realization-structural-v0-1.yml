@@ -1,0 +1,67 @@
+name: Hidden memory structural realization v0.1
+
+on:
+  pull_request:
+    paths:
+      - 'data/hidden_memory_realization_structural_predictors_design_v0_1.json'
+      - 'scripts/analyze_hidden_memory_realization_structural_predictors_v0_1.py'
+      - 'results/hidden_memory_realization_structural_predictors_v0_1/**'
+      - 'docs/HIDDEN_MEMORY_REALIZATION_STRUCTURAL_PREDICTORS_V0_1.md'
+      - '.github/workflows/hidden-memory-realization-structural-v0-1.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  analyze:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install runtime
+        run: pip install numpy scipy
+      - name: Validate frozen exploratory design
+        run: |
+          python - <<'PY'
+          import json
+          x=json.load(open('data/hidden_memory_realization_structural_predictors_design_v0_1.json'))
+          assert x['status']=='POST_OUTCOME_EXPLORATORY_STRUCTURAL_REALIZATION_TEST_FIXED_BEFORE_NEW_CALCULATION'
+          assert x['primary_hypothesis']['predictor']=='collision_gain_fine_to_coarse'
+          assert x['primary_hypothesis']['direction']=='positive'
+          assert x['primary_hypothesis']['test']=='Spearman rho with 99999 two-sided label permutations'
+          assert x['secondary_rule'].startswith('Report two-sided Spearman')
+          assert x['interpretation_rules']['causal_claim_allowed'] is False
+          assert x['el_v0_3_science_changed'] is False
+          PY
+      - name: Run structural realization analysis
+        run: python scripts/analyze_hidden_memory_realization_structural_predictors_v0_1.py --out build/hidden_memory_realization_structural_predictors_v0_1.json
+      - name: Validate boundaries
+        run: |
+          python - <<'PY'
+          import json
+          x=json.load(open('build/hidden_memory_realization_structural_predictors_v0_1.json'))
+          f=json.load(open('results/hidden_memory_realization_structural_predictors_v0_1/summary_v0_1.json'))
+          assert x==f, (x,f)
+          assert x['n_clades']==21
+          assert x['primary']['predictor']=='collision_gain_fine_to_coarse'
+          assert x['primary']['permutations']==99999
+          assert x['primary']['predicted_direction']=='positive'
+          assert x['primary']['supported'] is False
+          assert x['primary']['leave_one_clade_out']['negative_count']==21
+          assert x['paper1_science_changed'] is False
+          assert x['el_v0_3_science_changed'] is False
+          print(json.dumps({
+            'primary':x['primary'],
+            'secondary':x['secondary_descriptive'],
+            'interpretation':x['interpretation'],
+            'biological_implication':x['biological_implication']
+          },indent=2))
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: hidden-memory-realization-structural-v0-1
+          path: build/
