@@ -50,22 +50,37 @@ jobs:
           PY
       - name: Run frozen relation
         run: python scripts/analyze_hidden_memory_vs_relative_persistence_v0_1.py --out build/hidden_memory_vs_relative_persistence_v0_1.json
-      - name: Validate result boundary
+      - name: Validate frozen result and boundary
         run: |
           python - <<'PY'
-          import json
+          import json, math
           x=json.load(open('build/hidden_memory_vs_relative_persistence_v0_1.json'))
-          assert x['n_clades']==21
-          assert x['primary']['predictor']=='fine_area'
-          assert x['primary']['permutations']==99999
-          assert x['paper1_science_changed'] is False
-          assert x['el_v0_3_science_changed'] is False
+          f=json.load(open('results/hidden_memory_vs_relative_persistence_v0_1/summary_v0_1.json'))
+          assert x['n_clades']==f['n_clades']==21
+          assert x['primary']['predictor']==f['primary']['predictor']=='fine_area'
+          assert x['primary']['supported'] is False and f['primary']['supported'] is False
+          for k in ('rho','permutation_p_two_sided'):
+              assert math.isclose(x['primary'][k],f['primary'][k],rel_tol=0,abs_tol=1e-15)
+          for k in ('q025','median','q975','positive_fraction'):
+              assert math.isclose(x['primary']['bootstrap'][k],f['primary']['bootstrap'][k],rel_tol=0,abs_tol=1e-15)
+          for k in ('min_rho','max_rho'):
+              assert math.isclose(x['primary']['leave_one_clade_out'][k],f['primary']['leave_one_clade_out'][k],rel_tol=0,abs_tol=1e-15)
+          assert x['primary']['leave_one_clade_out']['positive_count']==f['primary']['leave_one_clade_out']['positive_count']==21
+          assert x['primary']['leave_one_clade_out']['negative_count']==f['primary']['leave_one_clade_out']['negative_count']==0
+          for name in f['secondary_descriptive']:
+              for k in ('rho','p_two_sided_asymptotic'):
+                  assert math.isclose(x['secondary_descriptive'][name][k],f['secondary_descriptive'][name][k],rel_tol=0,abs_tol=1e-15)
+          assert f['primary']['permutation_p_two_sided'] > 0.05
+          assert f['paper1_science_changed'] is False
+          assert f['el_v0_3_science_changed'] is False
           print(json.dumps({
-            'primary':x['primary'],
-            'secondary':x['secondary_descriptive'],
-            'interpretation':x['interpretation']
+            'primary':f['primary'],
+            'secondary':f['secondary_descriptive'],
+            'interpretation':f['interpretation']
           },indent=2))
           PY
+      - name: Validate frozen EL v0.3 science
+        run: python scripts/validate_cross_radiation_el_v0_3_science_freeze_v0_1.py
       - uses: actions/upload-artifact@v4
         if: always()
         with:
