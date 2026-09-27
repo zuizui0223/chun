@@ -15,7 +15,7 @@ from pathlib import Path
 
 from Bio import Phylo
 
-ZENODO_API="https://zenodo.org/api/records/7659158"
+ZENODO_API="https://zenodo.org/api/records/7659158"\nZENODO_DIRECT="https://zenodo.org/records/7659158/files/skripts.zip?download=1"
 ZENODO_RECORD=7659158
 BUNDLE="skripts.zip"
 BUNDLE_MD5="aab3192fa22e8562f93551dc18f040b7"
@@ -107,8 +107,12 @@ def main()->int:
     a.stage_dir.mkdir(parents=True,exist_ok=True)
 
     try:
-        meta=json.loads(fetch(ZENODO_API,"application/json").decode("utf-8"))
-        url=zenodo_bundle_url(meta)
+        try:
+            meta=json.loads(fetch(ZENODO_API,"application/json").decode("utf-8"))
+            url=zenodo_bundle_url(meta)
+        except Exception:
+            meta=None
+            url=ZENODO_DIRECT
         bundle=fetch(url)
         bundle_md5=md5(bundle)
         if bundle_md5!=BUNDLE_MD5:
