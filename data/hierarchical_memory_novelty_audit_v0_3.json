@@ -1,0 +1,41 @@
+{
+  "version": "v0.3",
+  "status": "HIERARCHICAL_MEMORY_NOVELTY_CEILING_AFTER_PROSPECTIVE_BIOCHEMICAL_FAIL",
+  "supersedes_for_extension_synthesis": "data/hierarchical_memory_novelty_audit_v0_2.json",
+  "retained_novelty": [
+    "one standardized within-coarse estimator shows positive hidden fine-state memory in 18 of 21 visible-colour opportunity clades",
+    "the programme separates overall memory amplitude, global scale tilt, and hidden within-coarse memory as distinct coordinates of evolutionary history",
+    "Schistanthe provides an independently admitted prospective visible-colour replication under a pre-outcome sequential gate",
+    "Petunieae provides strong retrospective same-estimand biochemical concordance",
+    "Gesnerioideae supplies a genuinely prospective biochemical falsification outcome rather than another favorable retrospective example",
+    "the combined evidence identifies a boundary: hierarchical memory is recurrent but a universal significant cross-representation rule is not supported"
+  ],
+  "strongest_allowed_wording": "Across flower-colour radiations, evolutionary history is often stored hierarchically: finer states retain lineage structure within broader phenotypic classes, and this pattern prospectively replicates in an independent visible-colour radiation. A prospectively frozen biochemical test fails, however, so the architecture is recurrent and contingent rather than a universal significant rule across representations.",
+  "important_asymmetry": {
+    "schistanthe": "independent prospective visible-colour PASS",
+    "gesnerioideae": "prospective biochemical FAIL",
+    "gesnerioideae_fail_resolution_boundary": "The exact 5% critical centered effect was +0.07199 AUC, larger than the Schistanthe point effect +0.06416; therefore the FAIL is not evidence that Schistanthe-sized effects are excluded by this 30-tip design.",
+    "petunieae": "retrospective biochemical support only",
+    "ng2018_and_iochrominae": "source/schema or source-transport HOLDs; no biological outcomes",
+    "ruellia": "outcome-unopened prospective biochemical test pending authoritative tree provenance"
+  },
+  "prohibited_wording": [
+    "universal hierarchical-memory law",
+    "prospective biochemical validation",
+    "biochemical representations lack hierarchical memory",
+    "Gesnerioideae proves absence of a Schistanthe-sized biological effect",
+    "source HOLDs count as negative replications",
+    "hierarchical memory is caused by ecology, pollination, pigment chemistry, or a molecular mechanism without a separate causal test",
+    "the post-outcome informativeness audit rescues the prospective Gesnerioideae FAIL"
+  ],
+  "journal_positioning": {
+    "current_submission": "Evolution Letters v0.3",
+    "current_submission_changed": false,
+    "noncurrent_hierarchical_extension": "scientifically stronger as a bounded architecture than v0.2, but not promoted under the frozen Ruellia-specific rule",
+    "promotion_rule_changed": false
+  },
+  "next_scientific_question": "What outcome-independent properties of a radiation or state space determine when hidden fine-state history is realized strongly enough to be detectable within a coarse phenotype?",
+  "next_confirmatory_gate": "Do not tune this question on Gesnerioideae. Freeze any moderator or mechanistic predictor before opening a new eligible held-out system; otherwise retain it as an exploratory interpretation only.",
+  "el_v0_3_science_changed": false,
+  "paper1_science_changed": false
+}
