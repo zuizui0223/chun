@@ -1,0 +1,50 @@
+{
+  "version": "v0.1",
+  "status": "POST_OUTCOME_EXPLORATORY_RELATIVE_PERSISTENCE_RELATION_FIXED_BEFORE_NEW_CALCULATION",
+  "analysis_role": "TEMPORAL_REALIZATION_DIAGNOSTIC_NOT_CONFIRMATORY_NOT_EL_V0_3_MODIFICATION",
+  "question": "Does among-radiation variation in hidden fine-state memory covary with how much exact fine flower-colour identity persists across relative evolutionary divergence?",
+  "analysis_frame": {
+    "hidden_memory_source": "data/flowerclades51_hidden_fine_memory_clades_v0_1.csv",
+    "persistence_source": "data/flowerclades51_relative_time_persistence_clade_metrics_historical_v0_1.csv",
+    "persistence_provenance": "data/flowerclades51_relative_time_persistence_clade_metrics_recovery_v0_1.json",
+    "unit": "one biological radiation/clade",
+    "included_units": "intersection of the 21 existing hidden-memory opportunity clades and the 28 historical common-frame persistence clades"
+  },
+  "primary_hypothesis": {
+    "predictor": "fine_area",
+    "outcome": "permutation-centered within-coarse hidden-memory AUC effect",
+    "expected_direction": "positive",
+    "rationale": "If stronger hidden fine-state organization reflects more persistent exact fine-colour identity through relative evolutionary divergence, clades with greater integrated fine-colour excess-retention area should show stronger hidden-memory effects.",
+    "test": "Spearman rho with 99999 two-sided label permutations",
+    "permutations": 99999,
+    "seed": 20260927
+  },
+  "robustness": {
+    "leave_one_clade_out": true,
+    "clade_bootstrap_replicates": 20000,
+    "bootstrap_seed": 20260927
+  },
+  "secondary_descriptive": [
+    "fine_slope",
+    "fine_near_far",
+    "fine_area_minus_coarse_area"
+  ],
+  "secondary_rule": "Secondary relations are descriptive only and cannot rescue a failed primary hypothesis or replace fine_area as the frozen primary predictor.",
+  "decision_rule": {
+    "supported": "primary rho > 0 and permutation P <= 0.05",
+    "not_supported": "otherwise"
+  },
+  "interpretation_if_supported": "Hierarchical hidden memory covaries with the relative evolutionary persistence of exact fine flower-colour identity, linking nested within-coarse organization to a temporal persistence axis.",
+  "interpretation_if_not_supported": "Hierarchical hidden memory is not reducible to greater integrated fine-colour persistence through relative divergence; within-coarse organization and global fine-state persistence remain separable evolutionary axes.",
+  "boundaries": [
+    "post-outcome exploratory because both component outcomes already exist",
+    "shared source states and phylogenies mean this is not independent replication",
+    "relative divergence depth only; no absolute-time claim",
+    "persistence area is a derived same-state summary, not a transition-rate estimate",
+    "secondary relations cannot replace the primary test",
+    "no ecological or molecular cause inferred",
+    "frozen EL v0.3 remains unchanged"
+  ],
+  "paper1_science_changed": false,
+  "el_v0_3_science_changed": false
+}
