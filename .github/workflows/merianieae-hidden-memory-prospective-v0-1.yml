@@ -1,0 +1,276 @@
+name: Merianieae prospective hidden-memory pipeline v0.1
+
+on:
+  pull_request:
+    paths:
+      - 'data/merianieae_hidden_memory_admission_v0_1.json'
+      - 'data/merianieae_prospective_terminal_v0_1.json'
+      - 'docs/MERIANIEAE_PROSPECTIVE_SCHEMA_HOLD_V0_1.md'
+      - 'scripts/preflight_merianieae_source_v0_1.py'
+      - 'scripts/preflight_merianieae_crosswalk_v0_1.py'
+      - 'scripts/freeze_merianieae_pollinator_frame_v0_1.py'
+      - 'scripts/gate_merianieae_state_support_v0_1.py'
+      - 'scripts/gate_merianieae_informativeness_v0_1.py'
+      - 'scripts/predict_merianieae_temporal_realization_v0_1.py'
+      - 'scripts/evaluate_merianieae_temporal_realization_v0_1.py'
+      - 'scripts/analyze_merianieae_pollinator_conditioned_memory_v0_1.py'
+      - 'scripts/analyze_merianieae_hidden_memory_v0_1.py'
+      - 'scripts/finalize_merianieae_prospective_v0_1.py'
+      - 'tests/test_preflight_merianieae_source_v0_1.py'
+      - 'tests/test_preflight_merianieae_crosswalk_v0_1.py'
+      - 'tests/test_gate_merianieae_state_support_v0_1.py'
+      - 'tests/test_merianieae_informativeness_v0_1.py'
+      - 'tests/test_merianieae_temporal_realization_v0_1.py'
+      - 'tests/test_merianieae_pollinator_conditioned_memory_v0_1.py'
+      - '.github/workflows/merianieae-hidden-memory-prospective-v0-1.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  prospective:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install runtime
+        run: pip install biopython scipy numpy pytest
+      - name: Unit tests
+        run: |
+          pytest -q \
+            tests/test_preflight_merianieae_source_v0_1.py \
+            tests/test_preflight_merianieae_crosswalk_v0_1.py \
+            tests/test_gate_merianieae_state_support_v0_1.py \
+            tests/test_merianieae_informativeness_v0_1.py \
+            tests/test_merianieae_temporal_realization_v0_1.py \
+            tests/test_merianieae_pollinator_conditioned_memory_v0_1.py
+      - name: Validate admission was frozen before row-level colour
+        run: |
+          python - <<'PY'
+          import json
+          x=json.load(open('data/merianieae_hidden_memory_admission_v0_1.json'))
+          assert x['status']=='FROZEN_BEFORE_MERIANIEAE_ROW_LEVEL_COROLLA_COLOUR_OPENING'
+          assert x['outcome_firewall_at_freeze']['corolla_colour_values_opened'] is False
+          assert x['crosswalk_rule']['fuzzy_or_alias_repair'] is False
+          assert x['informativeness_gate']=='data/future_hidden_memory_informativeness_gate_v0_1.json'
+          assert x['hidden_memory_test']['pass_rule']=='centered conditional AUC > 0 and one-sided permutation P <= 0.05'
+          assert x['ecological_secondary_frozen_before_colour']['predictor_column']=='estimated_pollinator'
+          assert x['ecological_secondary_frozen_before_colour']['run_only_if_primary_hidden_memory_passes'] is True
+          assert x['temporal_realization_prediction_frozen_before_colour']['training_predictor_median']==0.022164300864659012
+          assert x['temporal_realization_prediction_frozen_before_colour']['training_hidden_effect_median']==0.02700779596581926
+          PY
+
+      - name: Exact source gate
+        run: |
+          mkdir -p build/receipts build/stage
+          python scripts/preflight_merianieae_source_v0_1.py \
+            --out build/receipts/source.json \
+            --stage-dir build/stage
+      - id: source_gate
+        name: Read source terminal
+        run: |
+          python - <<'PY'
+          import json,os
+          x=json.load(open('build/receipts/source.json'))
+          ready=x['status']=='MERIANIEAE_EXACT_SOURCE_READY_COROLLA_COLOUR_UNOPENED'
+          with open(os.environ['GITHUB_OUTPUT'],'a') as f:
+              f.write(f"ready={'true' if ready else 'false'}\n")
+          print(x['status'])
+          PY
+
+      - name: Identifier-only crosswalk gate
+        if: steps.source_gate.outputs.ready == 'true'
+        run: |
+          python scripts/preflight_merianieae_crosswalk_v0_1.py \
+            --trait build/stage/floraltraits.csv \
+            --tree build/stage/Marcelo_Meris.tre \
+            --out build/receipts/crosswalk.json \
+            --out-tree build/stage/merianieae_crosswalk_tree.newick
+      - id: crosswalk_gate
+        name: Read crosswalk terminal
+        if: steps.source_gate.outputs.ready == 'true'
+        run: |
+          python - <<'PY'
+          import json,os
+          x=json.load(open('build/receipts/crosswalk.json'))
+          ready=x['status']=='MERIANIEAE_IDENTIFIER_CROSSWALK_FROZEN_COROLLA_COLOUR_UNOPENED'
+          with open(os.environ['GITHUB_OUTPUT'],'a') as f:
+              f.write(f"ready={'true' if ready else 'false'}\n")
+          print(x['status'],x['matched_count'])
+          PY
+
+      - name: Freeze source-defined pollinator frame before colour
+        if: steps.crosswalk_gate.outputs.ready == 'true'
+        run: |
+          python scripts/freeze_merianieae_pollinator_frame_v0_1.py \
+            --trait build/stage/floraltraits.csv \
+            --crosswalk build/receipts/crosswalk.json \
+            --out build/receipts/pollinator.json
+      - id: pollinator_gate
+        name: Read pollinator-frame terminal
+        if: steps.crosswalk_gate.outputs.ready == 'true'
+        run: |
+          python - <<'PY'
+          import json,os
+          x=json.load(open('build/receipts/pollinator.json'))
+          ready=x['status']=='MERIANIEAE_POLLINATOR_FRAME_FROZEN_COROLLA_COLOUR_UNOPENED'
+          with open(os.environ['GITHUB_OUTPUT'],'a') as f:
+              f.write(f"ready={'true' if ready else 'false'}\n")
+          assert x['corolla_colour_column_accessed'] is False
+          print(x['status'],x['pollinator_state_counts'])
+          PY
+
+      - name: State-support and compression gate
+        if: steps.crosswalk_gate.outputs.ready == 'true'
+        run: |
+          python scripts/gate_merianieae_state_support_v0_1.py \
+            --trait build/stage/floraltraits.csv \
+            --crosswalk build/receipts/crosswalk.json \
+            --out build/receipts/state_support.json \
+            --frame-out build/stage/state_frame.json
+      - id: support_gate
+        name: Read support terminal
+        if: steps.crosswalk_gate.outputs.ready == 'true'
+        run: |
+          python - <<'PY'
+          import json,os
+          x=json.load(open('build/receipts/state_support.json'))
+          ready=x['status']=='MERIANIEAE_STATE_SUPPORT_COMPRESSION_READY_PRE_INFORMATION_GATE'
+          with open(os.environ['GITHUB_OUTPUT'],'a') as f:
+              f.write(f"ready={'true' if ready else 'false'}\n")
+          print(x['status'],x.get('fine_state_counts'),x.get('coarse_state_counts'))
+          PY
+
+      - name: Freeze pre-AUC temporal-realization prediction
+        if: steps.support_gate.outputs.ready == 'true'
+        run: |
+          python scripts/predict_merianieae_temporal_realization_v0_1.py \
+            --frame build/stage/state_frame.json \
+            --tree build/stage/merianieae_crosswalk_tree.newick \
+            --out build/receipts/temporal_prediction.json
+      - name: Assert temporal prediction does not open hidden AUC
+        if: steps.support_gate.outputs.ready == 'true'
+        run: |
+          python - <<'PY'
+          import json
+          x=json.load(open('build/receipts/temporal_prediction.json'))
+          assert x['hidden_memory_auc_computed'] is False
+          print(x['status'],x.get('fine_persistence_area'),x.get('predicted_hidden_effect_class'))
+          PY
+
+      - name: Pre-AUC informativeness gate
+        if: steps.support_gate.outputs.ready == 'true'
+        run: |
+          python scripts/gate_merianieae_informativeness_v0_1.py \
+            --frame build/stage/state_frame.json \
+            --tree build/stage/merianieae_crosswalk_tree.newick \
+            --gate data/future_hidden_memory_informativeness_gate_v0_1.json \
+            --out build/receipts/informativeness.json
+      - id: information_gate
+        name: Read information terminal
+        if: steps.support_gate.outputs.ready == 'true'
+        run: |
+          python - <<'PY'
+          import json,os
+          x=json.load(open('build/receipts/informativeness.json'))
+          ready=x['status']=='PRE_AUC_INFORMATION_GATE_PASS_OPEN_OBSERVED_AUC'
+          with open(os.environ['GITHUB_OUTPUT'],'a') as f:
+              f.write(f"ready={'true' if ready else 'false'}\n")
+          assert x['observed_auc_computed'] is False
+          print(x['status'],x['centered_critical_effect'],x['benchmark_centered_effect'])
+          PY
+
+      - name: Open prospective hidden-memory outcome
+        if: steps.information_gate.outputs.ready == 'true'
+        run: |
+          python scripts/analyze_merianieae_hidden_memory_v0_1.py \
+            --frame build/stage/state_frame.json \
+            --tree build/stage/merianieae_crosswalk_tree.newick \
+            --info build/receipts/informativeness.json \
+            --out build/receipts/hidden_memory_result.json
+
+      - id: primary_decision
+        name: Read primary prospective decision
+        if: steps.information_gate.outputs.ready == 'true'
+        run: |
+          python - <<'PY'
+          import json,os
+          x=json.load(open('build/receipts/hidden_memory_result.json'))
+          passed=x['status']=='PROSPECTIVE_MERIANIEAE_VISIBLE_HIDDEN_MEMORY_PASS'
+          with open(os.environ['GITHUB_OUTPUT'],'a') as f:
+              f.write(f"passed={'true' if passed else 'false'}\n")
+          print(x['status'],x['centered_auc_effect'],x['p_one_sided'])
+          PY
+
+      - name: Evaluate pre-AUC temporal-realization prediction
+        if: steps.information_gate.outputs.ready == 'true'
+        run: |
+          if python - <<'PY'
+          import json
+          x=json.load(open('build/receipts/temporal_prediction.json'))
+          raise SystemExit(0 if x['status']=='MERIANIEAE_TEMPORAL_REALIZATION_PREDICTION_FROZEN_PRE_AUC' else 1)
+          PY
+          then
+            python scripts/evaluate_merianieae_temporal_realization_v0_1.py \
+              --prediction build/receipts/temporal_prediction.json \
+              --primary build/receipts/hidden_memory_result.json \
+              --out build/receipts/temporal_prediction_evaluation.json
+          else
+            echo "Temporal realization predictor structurally unavailable; primary remains valid."
+          fi
+
+      - name: Pollinator-conditioned secondary diagnostic
+        if: steps.primary_decision.outputs.passed == 'true' && steps.pollinator_gate.outputs.ready == 'true'
+        run: |
+          python scripts/analyze_merianieae_pollinator_conditioned_memory_v0_1.py \
+            --frame build/stage/state_frame.json \
+            --pollinator build/receipts/pollinator.json \
+            --tree build/stage/merianieae_crosswalk_tree.newick \
+            --primary build/receipts/hidden_memory_result.json \
+            --out build/receipts/pollinator_conditioned.json
+
+      - name: Finalize sequential terminal
+        if: always()
+        run: |
+          python scripts/finalize_merianieae_prospective_v0_1.py \
+            --receipts build/receipts \
+            --out build/receipts/final.json
+
+      - name: Validate frozen Merianieae terminal
+        if: always()
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          expected=json.load(open('data/merianieae_prospective_terminal_v0_1.json'))
+          final=json.load(open('build/receipts/final.json'))
+          support=json.load(open('build/receipts/state_support.json'))
+          assert support['status']=='HOLD_MERIANIEAE_COROLLA_COLOUR_NUMERIC_CODE_SCHEMA'
+          assert support['numeric_code_schema'] is True
+          assert support['coarse_state_counts']=={}
+          assert support['compression_opportunity'] is False
+          assert final['status']==expected['status']
+          assert final['biological_decision']==expected['biological_decision']=='NONE_SCHEMA_HOLD'
+          assert final['observed_hidden_memory_auc_opened'] is False
+          assert not Path('build/receipts/informativeness.json').exists()
+          assert not Path('build/receipts/hidden_memory_result.json').exists()
+          assert not Path('build/receipts/temporal_prediction.json').exists()
+          assert not Path('build/receipts/pollinator_conditioned.json').exists()
+          assert expected['schema_gate']['post_outcome_code_decoding_attempted'] is False
+          assert expected['schema_gate']['white_nonwhite_mapping_applied_to_numeric_codes'] is False
+          assert expected['hidden_memory_decision']=='UNOPENED'
+          print(final)
+          PY
+
+      - name: Validate frozen EL v0.3 science
+        if: always()
+        run: python scripts/validate_cross_radiation_el_v0_3_science_freeze_v0_1.py
+
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: merianieae-prospective-hidden-memory-v0-1
+          path: build/receipts/

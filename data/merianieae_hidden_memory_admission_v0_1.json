@@ -1,0 +1,127 @@
+{
+  "version": "v0.1",
+  "status": "FROZEN_BEFORE_MERIANIEAE_ROW_LEVEL_COROLLA_COLOUR_OPENING",
+  "programme_role": "NEW_INDEPENDENT_PROSPECTIVE_VISIBLE_HIDDEN_MEMORY_REPLICATION",
+  "candidate": "MERIANIEAE_MELASTOMATACEAE",
+  "selection_date": "2026-09-27",
+  "selection_basis": "Public source metadata only: a 139-species Merianieae floral-trait frame, explicit corolla.colour field, phylogeny tip-label field x, and author-provided branch-length phylogeny are documented before any row-level corolla colour is opened.",
+  "source_identity": {
+    "dryad_doi": "10.5061/dryad.bvq83bkdx",
+    "zenodo_record": "10.5281/zenodo.7659158",
+    "zenodo_record_id": 7659158,
+    "zenodo_bundle": "skripts.zip",
+    "zenodo_bundle_md5": "aab3192fa22e8562f93551dc18f040b7",
+    "expected_reported_species": 139,
+    "source_note": "The Dryad README states that floraltraits.csv contains floral traits for 139 Merianieae species, x contains phylogeny tip labels, corolla.colour is the colour field, and Marcelo_Meris.tre is the phylogenetic hypothesis. The linked Zenodo record is the author analysis package.",
+    "required_trait_archive_suffix": "1_morphospaces_disparity/floraltraits.csv",
+    "required_tree_archive_suffix": "1_morphospaces_disparity/Marcelo_Meris.tre"
+  },
+  "source_recovery_rule": {
+    "preferred": "Recover the exact Zenodo skripts.zip whose MD5 matches the frozen Zenodo record, then use only 1_morphospaces_disparity/floraltraits.csv and 1_morphospaces_disparity/Marcelo_Meris.tre from the same author analysis folder.",
+    "fallback": "No alternate same-name tree from another Zenodo analysis folder is substituted. If either required folder-specific member is absent, HOLD_SOURCE.",
+    "duplicate_member_rule": "Not applicable after folder-specific identity freeze; exact archive suffixes are required.",
+    "no_source_substitution": true
+  },
+  "trait_semantics": {
+    "identifier_column": "x",
+    "species_column": "species",
+    "fine_state": "exact nonmissing corolla.colour string after trim/lowercase/collapse-whitespace only; no synonym, hue, or semantic merging",
+    "coarse_state": "WHITE iff normalized fine string is exactly 'white'; otherwise NONWHITE",
+    "composite_or_ambiguous_label_rule": "Retain as its exact fine state; do not reinterpret semantically. If the source encoding is not a categorical string field, HOLD_SCHEMA.",
+    "fine_state_minimum_tips": 5,
+    "minimum_retained_tips": 20,
+    "minimum_fine_states": 2,
+    "minimum_coarse_states": 2
+  },
+  "crosswalk_rule": {
+    "method": "exact normalized intersection of floraltraits.csv x and source-tree tip labels",
+    "normalization": "trim, replace underscores with spaces, collapse whitespace, lowercase",
+    "fuzzy_or_alias_repair": false,
+    "unmatched_trait_rows": "exclude before colour-state opening",
+    "duplicate_identifier": "HOLD_CROSSWALK"
+  },
+  "sequential_gates": [
+    "EXACT_SOURCE_RECOVERY_AND_HEADER_TREE_METADATA_ONLY",
+    "IDENTIFIER_ONLY_CROSSWALK_FREEZE_WITH_COROLLA_COLOUR_UNOPENED",
+    "OUTCOME_INDEPENDENT_ESTIMATED_POLLINATOR_FRAME_FREEZE",
+    "COROLLA_COLOUR_STATE_SUPPORT_AND_COMPRESSION_OPPORTUNITY",
+    "PRE_AUC_TEMPORAL_REALIZATION_PREDICTION_FREEZE",
+    "FUTURE_HIDDEN_MEMORY_INFORMATIVENESS_GATE",
+    "OBSERVED_WITHIN_COARSE_HIDDEN_MEMORY_AUC"
+  ],
+  "hidden_memory_test": {
+    "opportunity_rule": "after rare fine-state filtering, retained fine-state count > retained coarse-state count and both coarse states are present",
+    "score": "negative patristic distance",
+    "metric": "ROC_AUC among pairs sharing the same coarse state",
+    "null": "permute retained fine labels within coarse groups, preserving fine-state counts",
+    "permutations": 9999,
+    "seed": 20260927,
+    "pass_rule": "centered conditional AUC > 0 and one-sided permutation P <= 0.05"
+  },
+  "informativeness_gate": "data/future_hidden_memory_informativeness_gate_v0_1.json",
+  "outcome_firewall_at_freeze": {
+    "zenodo_bundle_bytes_downloaded_by_chun": false,
+    "floraltraits_row_values_opened": false,
+    "x_identifier_values_opened": false,
+    "corolla_colour_values_opened": false,
+    "state_frequencies_computed": false,
+    "tree_body_opened": false,
+    "hidden_memory_auc_computed": false
+  },
+  "relation_to_existing_evidence": {
+    "independent_of_flowerclades51": true,
+    "independent_of_schistanthe": true,
+    "independent_of_gesnerioideae": true,
+    "changes_ruellia_promotion_rule": false,
+    "purpose": "additional future-facing replication under the v0.4 realization architecture; cannot retroactively rescue any prior FAIL"
+  },
+  "paper1_science_changed": false,
+  "el_v0_3_science_changed": false,
+  "source_identity_erratum": {
+    "status": "FROZEN_PRE_ROW_METADATA_ONLY_SOURCE_PATH_REFINEMENT",
+    "reason": "Zenodo archive preview exposes two non-identical Marcelo_Meris.tre copies in different analysis folders. The Dryad README states that folder 1_morphospaces_disparity contains floraltraits.csv and the Merianieae phylogeny used for floral-space analyses. The trait and tree are therefore frozen to that same folder before source bytes or row-level corolla colour are opened."
+  },
+  "ecological_secondary_frozen_before_colour": {
+    "predictor_column": "estimated_pollinator",
+    "opening_order": "identifier-only crosswalk first; then estimated_pollinator values may be opened and frozen before corolla.colour is accessed",
+    "normalization": "trim/lowercase/collapse whitespace only; missing tokens remain missing; no guild merging",
+    "frame": "intersection of primary retained colour frame and nonmissing estimated_pollinator",
+    "minimum_tips": 20,
+    "minimum_pollinator_states": 2,
+    "run_only_if_primary_hidden_memory_passes": true,
+    "diagnostic": "Compare the observed within-coarse phylogenetic AUC with (A) fine-label permutations within coarse state and (B) fine-label permutations within coarse x estimated_pollinator strata.",
+    "permutations": 9999,
+    "seed": 20260928,
+    "interpretation": {
+      "residual_pass": "If the pollinator-conditioned centered effect remains >0 with one-sided P<=0.05, nested lineage organization persists beyond the source-defined pollinator grouping.",
+      "attenuation_only": "If conditioning on pollinator grouping substantially raises the null expectation or removes residual significance, pollinator regime is compatible with accounting for part of the hidden organization.",
+      "causal_claim_allowed": false
+    },
+    "boundary": "secondary ecological diagnostic only; cannot rescue a failed primary hidden-memory test"
+  },
+  "temporal_realization_prediction_frozen_before_colour": {
+    "role": "SECONDARY_OUT_OF_SAMPLE_REALIZATION_PREDICTION_CANNOT_RESCUE_PRIMARY",
+    "training_sources": {
+      "persistence": "data/flowerclades51_relative_time_persistence_clade_metrics_historical_v0_1.csv",
+      "hidden_memory": "data/flowerclades51_hidden_fine_memory_clades_v0_1.csv",
+      "n_clades": 21
+    },
+    "predictor": "fine visible-colour signed excess-retention area over relative phylogenetic divergence depth",
+    "predictor_estimator": "same 10 equal-pair-count bin estimator as the Flower-clades-51 historical persistence analysis; relative depth = patristic/(2*crown height); exact finite-sample same-state baseline; trapezoidal signed excess area",
+    "source_tree_requirement": "root-to-tip CV <= 1e-8; otherwise temporal prediction is HOLD and primary hidden-memory test continues",
+    "training_predictor_median": 0.022164300864659012,
+    "training_hidden_effect_median": 0.02700779596581926,
+    "prediction_rule": "If Merianieae fine persistence area > 0.022164300864659012, predict centered hidden-memory AUC effect > 0.02700779596581926; otherwise predict centered hidden-memory effect <= 0.02700779596581926.",
+    "timing": "Compute and freeze Merianieae persistence area and the implied ABOVE/AT_OR_BELOW hidden-effect prediction after state support but before informativeness and observed hidden-memory AUC.",
+    "evaluation": "After hidden-memory AUC is opened, record DIRECTION_MATCH iff observed centered effect falls on the pre-frozen predicted side of the training hidden-effect median.",
+    "no_significance_claim": true,
+    "cannot_rescue_primary": true,
+    "causal_claim_allowed": false
+  },
+  "candidate_replacement_rule": {
+    "biological_pass_or_fail": "STOP_CANDIDATE_SWITCHING",
+    "source_schema_crosswalk_opportunity_or_informativeness_hold": "MAY_REOPEN_METADATA_ONLY_CANDIDATE_SCREEN_WITHOUT_USING_EXPOSED_MERIANIEAE_COLOUR_OR_AUC_TO_RANK_CANDIDATES",
+    "rule_frozen_before_merianieae_row_level_colour": true,
+    "Hakea_current_screen_note": "Not admitted for this categorical hidden-memory estimand because its public flower-colour analysis is principally continuous RGB/colour-distance rather than an already source-defined categorical fine-to-coarse hierarchy; do not invent post-outcome bins."
+  }
+}

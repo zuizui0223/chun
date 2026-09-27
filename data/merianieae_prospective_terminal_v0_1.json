@@ -1,0 +1,59 @@
+{
+  "version": "v0.1",
+  "status": "HOLD_MERIANIEAE_COROLLA_COLOUR_NUMERIC_CODE_SCHEMA",
+  "candidate": "MERIANIEAE_MELASTOMATACEAE",
+  "biological_decision": "NONE_SCHEMA_HOLD",
+  "source": {
+    "status": "MERIANIEAE_EXACT_SOURCE_READY_COROLLA_COLOUR_UNOPENED",
+    "trait_path": "1_morphospaces_disparity/floraltraits.csv",
+    "trait_sha256": "1f4fc947db34e31ed6f7e76642f19763d473419617aa6563c0f6421dc33394ae",
+    "tree_path": "1_morphospaces_disparity/Marcelo_Meris.tre",
+    "tree_sha256": "86d880f7dc1271e6a1b1fb6dfc99bc82d7da1d18e0aef5138a719fbc8d7b43d7",
+    "tree_tips": 141
+  },
+  "crosswalk": {
+    "status": "MERIANIEAE_IDENTIFIER_CROSSWALK_FROZEN_COROLLA_COLOUR_UNOPENED",
+    "source_identifier_rows": 145,
+    "tree_tip_count": 141,
+    "matched_count": 139,
+    "unmatched_source_count": 6,
+    "duplicate_source_keys": [],
+    "duplicate_tree_keys": []
+  },
+  "pre_colour_pollinator_frame": {
+    "status": "MERIANIEAE_POLLINATOR_FRAME_FROZEN_COROLLA_COLOUR_UNOPENED",
+    "nonmissing_pollinator_tips": 139,
+    "pollinator_state_counts": {
+      "bee": 98,
+      "mv": 21,
+      "passerine": 20
+    },
+    "ecological_outcome_tested": false
+  },
+  "schema_gate": {
+    "matched_rows": 139,
+    "nonmissing_corolla_colour_rows": 138,
+    "retained_rows_after_min5_code_support": 130,
+    "observed_code_counts": {
+      "0": 63,
+      "1": 17,
+      "2": 9,
+      "3": 10,
+      "4": 31
+    },
+    "reason": "The pre-frozen hierarchy required literal categorical colour strings so that exact 'white' could define WHITE versus NONWHITE. The exposed corolla.colour field is numeric-coded (0-4). Under the frozen admission rule, numeric-coded colour requires HOLD_SCHEMA. No post-outcome code-to-colour decoding or alternative coarse mapping is allowed.",
+    "post_outcome_code_decoding_attempted": false,
+    "white_nonwhite_mapping_applied_to_numeric_codes": false,
+    "compression_opportunity_decided": false
+  },
+  "sequential_gate_order_preserved": true,
+  "informativeness_gate_run": false,
+  "observed_hidden_memory_auc_opened": false,
+  "hidden_memory_decision": "UNOPENED",
+  "temporal_realization_prediction_run": false,
+  "pollinator_conditioned_memory_run": false,
+  "candidate_replacement_rule": "Metadata-only candidate screen may reopen because this is a schema HOLD, but exposed Merianieae colour codes or any uncomputed outcome may not be used to rank replacement candidates.",
+  "ruellia_specific_promotion_rule_changed": false,
+  "paper1_science_changed": false,
+  "el_v0_3_science_changed": false
+}
