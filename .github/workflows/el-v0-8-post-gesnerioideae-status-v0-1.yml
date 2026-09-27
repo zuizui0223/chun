@@ -1,0 +1,37 @@
+name: EL v0.8 post-Gesnerioideae status v0.1
+
+on:
+  pull_request:
+    paths:
+      - 'data/cross_radiation_el_v0_8_post_gesnerioideae_status_v0_1.json'
+      - 'docs/CROSS_RADIATION_EL_V0_8_POST_GESNERIOIDEAE_STATUS_V0_1.md'
+      - '.github/workflows/el-v0-8-post-gesnerioideae-status-v0-1.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Validate supersession receipt
+        run: |
+          python - <<'PY'
+          import json
+          x=json.load(open('data/cross_radiation_el_v0_8_post_gesnerioideae_status_v0_1.json'))
+          assert x['status']=='EL_V0_8_HIERARCHICAL_MEMORY_CANDIDATE_SUPERSEDED_FOR_SCIENTIFIC_USE_POST_GESNERIOIDEAE'
+          assert x['original_candidate_files_modified'] is False
+          assert x['current_use_rule']['use_v0_8_as_submission_candidate'] is False
+          assert x['current_use_rule']['use_v0_8_as_historical_snapshot'] is True
+          assert x['current_use_rule']['current_submission']=='Evolution Letters v0.3'
+          assert x['current_use_rule']['ruellia_specific_promotion_rule_changed'] is False
+          assert x['paper1_science_changed'] is False
+          assert x['el_v0_3_science_changed'] is False
+          PY
+      - name: Validate frozen EL v0.3 science
+        run: python scripts/validate_cross_radiation_el_v0_3_science_freeze_v0_1.py
