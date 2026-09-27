@@ -1,0 +1,45 @@
+name: Atlas actual public-source ingestion v0.5
+on:
+  pull_request:
+    paths:
+      - 'scripts/ingest_atlas_public_sources_v0_5.py'
+      - 'scripts/resolve_atlas_source_payloads_v0_5.py'
+      - 'scripts/analyze_atlas_ingested_sources_v0_5.py'
+      - 'docs/ATLAS_ACTUAL_INGESTION_V0_5_RESULT.md'
+      - '.github/workflows/atlas-public-source-ingestion-v0-5.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  ingest:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Test read-only source parser
+        run: python scripts/ingest_atlas_public_sources_v0_5.py --self-test
+      - name: Download, checksum and inventory real external files
+        run: python scripts/resolve_atlas_source_payloads_v0_5.py --out build/atlas_source_ingestion_v0_5
+      - name: Analyze source rows and reconcile voucher crosswalk
+        run: |
+          python scripts/analyze_atlas_ingested_sources_v0_5.py \
+            --source-dir build/atlas_source_ingestion_v0_5/epimedium \
+            --out build/atlas_source_ingestion_v0_5/results \
+            --fetch-source-figure
+      - name: Report actual source status and empirical audit
+        if: always()
+        run: |
+          for p in build/atlas_source_ingestion_v0_5/source_inventory.json build/atlas_source_ingestion_v0_5/results/epimedium_empirical_audit_v0_5.json; do
+            if [ -f "$p" ]; then cat "$p" >> "$GITHUB_STEP_SUMMARY"; fi
+          done
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: atlas-source-ingestion-v0-5
+          path: build/atlas_source_ingestion_v0_5/
+          if-no-files-found: error
