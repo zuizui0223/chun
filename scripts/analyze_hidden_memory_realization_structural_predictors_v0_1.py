@@ -8,7 +8,7 @@ import math
 from pathlib import Path
 
 import numpy as np
-from scipy.stats import spearmanr
+from scipy.stats import rankdata, spearmanr
 
 ROOT=Path(__file__).resolve().parents[1]
 HIDDEN=ROOT/"data"/"flowerclades51_hidden_fine_memory_clades_v0_1.csv"
@@ -34,14 +34,24 @@ def rho(x,y)->float:
 
 def perm_p_two_sided(x,y,observed:float,permutations:int=PERMUTATIONS,seed:int=SEED)->float:
     rng=np.random.default_rng(seed)
-    x=np.asarray(x,dtype=float)
-    y=np.asarray(y,dtype=float)
-    extreme=0
+    xr=rankdata(np.asarray(x,dtype=float),method="average")
+    yr=rankdata(np.asarray(y,dtype=float),method="average")
+    xr=(xr-xr.mean())/np.sqrt(np.sum((xr-xr.mean())**2))
+    yc=yr-yr.mean()
+    yden=np.sqrt(np.sum(yc**2))
     target=abs(observed)
-    for _ in range(permutations):
-        r=rho(x,rng.permutation(y))
-        if abs(r)>=target-1e-15:
-            extreme+=1
+    extreme=0
+    done=0
+    batch=2048
+    while done<permutations:
+        b=min(batch,permutations-done)
+        keys=rng.random((b,len(yr)))
+        order=np.argsort(keys,axis=1)
+        perm=yr[order]
+        pc=perm-perm.mean(axis=1,keepdims=True)
+        rr=(pc @ xr)/yden
+        extreme+=int(np.count_nonzero(np.abs(rr)>=target-1e-15))
+        done+=b
     return float((extreme+1)/(permutations+1))
 
 
