@@ -15,12 +15,13 @@ from pathlib import Path
 
 from Bio import Phylo
 
-ZENODO_API="https://zenodo.org/api/records/7659158"\nZENODO_DIRECT="https://zenodo.org/records/7659158/files/skripts.zip?download=1"
+ZENODO_API="https://zenodo.org/api/records/7659158"
+ZENODO_DIRECT="https://zenodo.org/records/7659158/files/skripts.zip?download=1"
 ZENODO_RECORD=7659158
 BUNDLE="skripts.zip"
 BUNDLE_MD5="aab3192fa22e8562f93551dc18f040b7"
-TRAIT_BASENAME="floraltraits.csv"
-TREE_BASENAME="marcelo_meris.tre"
+TRAIT_SUFFIX="1_morphospaces_disparity/floraltraits.csv"
+TREE_SUFFIX="1_morphospaces_disparity/marcelo_meris.tre"
 UA="CHUN-Merianieae-source-gate/0.1"
 
 
