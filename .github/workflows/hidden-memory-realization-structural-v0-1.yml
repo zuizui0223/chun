@@ -43,9 +43,14 @@ jobs:
           python - <<'PY'
           import json
           x=json.load(open('build/hidden_memory_realization_structural_predictors_v0_1.json'))
+          f=json.load(open('results/hidden_memory_realization_structural_predictors_v0_1/summary_v0_1.json'))
+          assert x==f, (x,f)
           assert x['n_clades']==21
           assert x['primary']['predictor']=='collision_gain_fine_to_coarse'
           assert x['primary']['permutations']==99999
+          assert x['primary']['predicted_direction']=='positive'
+          assert x['primary']['supported'] is False
+          assert x['primary']['leave_one_clade_out']['negative_count']==21
           assert x['paper1_science_changed'] is False
           assert x['el_v0_3_science_changed'] is False
           print(json.dumps({
