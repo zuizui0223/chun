@@ -6,6 +6,7 @@ on:
       - 'data/erysimum_hidden_memory_admission_v0_1.json'
       - 'docs/ERYSIMUM_HIDDEN_MEMORY_ADMISSION_V0_1.md'
       - 'scripts/preflight_erysimum_source_v0_1.py'
+      - 'scripts/recover_erysimum_exact_package_v0_1.py'
       - 'tests/test_preflight_erysimum_source_v0_1.py'
       - '.github/workflows/erysimum-hidden-memory-source-v0-1.yml'
   workflow_dispatch:
@@ -37,11 +38,31 @@ jobs:
           assert x['replacement_provenance']['previous_hidden_memory_auc_opened'] is False
           assert x['replacement_provenance']['exposed_merianieae_colour_codes_used_to_rank_replacement'] is False
           PY
-      - name: Resolve exact Dryad package and inspect source code only
+      - name: Bounded exact-identity package recovery
+        run: |
+          mkdir -p build
+          python scripts/recover_erysimum_exact_package_v0_1.py \
+            --out build/erysimum_exact_package_recovery_v0_1.json \
+            --exact-out build/erysimum_recovered_exact_package.zip
+      - name: Assert recovery firewall
+        run: |
+          python - <<'PY'
+          import json
+          x=json.load(open('build/erysimum_exact_package_recovery_v0_1.json'))
+          assert x['frozen_identity']['file_id']==89978
+          assert x['frozen_identity']['bytes']==1689978
+          assert x['frozen_identity']['md5']=='56003177c0bf87981e1afd0b24138461'
+          assert x['outcome_firewall']['trait_rows_opened'] is False
+          assert x['outcome_firewall']['species_level_colour_values_opened'] is False
+          assert x['outcome_firewall']['hidden_memory_auc_computed'] is False
+          print(x['status'],x.get('recovered_url'))
+          PY
+      - name: Resolve exact package and inspect source code only
         run: |
           python scripts/preflight_erysimum_source_v0_1.py \
             --out build/erysimum_source_inventory_v0_1.json \
-            --stage build/erysimum_exact_package.zip
+            --stage build/erysimum_exact_package.zip \
+            --package-path build/erysimum_recovered_exact_package.zip
       - name: Assert outcome firewall
         run: |
           python - <<'PY'
