@@ -4,6 +4,8 @@ on:
   pull_request:
     paths:
       - 'data/erysimum_hidden_memory_admission_v0_1.json'
+      - 'data/erysimum_source_transport_hold_v0_1.json'
+      - 'docs/ERYSIMUM_SOURCE_TRANSPORT_HOLD_V0_1.md'
       - 'docs/ERYSIMUM_HIDDEN_MEMORY_ADMISSION_V0_1.md'
       - 'scripts/preflight_erysimum_source_v0_1.py'
       - 'scripts/recover_erysimum_exact_package_v0_1.py'
@@ -78,6 +80,29 @@ jobs:
           print('trees',x.get('tree_candidates',[]))
           print('code files',[z['path'] for z in x.get('author_code_evidence',[])])
           PY
+      - name: Validate frozen source-HOLD receipt
+        run: |
+          python - <<'PY'
+          import json
+          r=json.load(open('data/erysimum_source_transport_hold_v0_1.json'))
+          rec=json.load(open('build/erysimum_exact_package_recovery_v0_1.json'))
+          src=json.load(open('build/erysimum_source_inventory_v0_1.json'))
+          assert r['status']=='HOLD_ERYSIMUM_EXACT_PACKAGE_NO_IDENTITY_VERIFIED_MIRROR'
+          assert rec['status']==r['status']
+          assert src['status']=='HOLD_ERYSIMUM_EXACT_PACKAGE_TRANSPORT_UNAVAILABLE'
+          assert r['frozen_source_identity']['file_id']==89978
+          assert r['frozen_source_identity']['bytes']==1689978
+          assert r['frozen_source_identity']['md5']=='56003177c0bf87981e1afd0b24138461'
+          assert r['bounded_recovery']['wayback_identity_candidates']==0
+          assert r['bounded_recovery']['zenodo_identity_candidates']==0
+          assert r['biological_decision']=='NONE_SOURCE_TRANSPORT_HOLD'
+          assert all(v is False for v in r['outcome_firewall'].values())
+          assert r['ruellia_specific_promotion_rule_changed'] is False
+          assert r['paper1_science_changed'] is False
+          assert r['el_v0_3_science_changed'] is False
+          PY
+      - name: Validate frozen EL v0.3 science
+        run: python scripts/validate_cross_radiation_el_v0_3_science_freeze_v0_1.py
       - uses: actions/upload-artifact@v4
         if: always()
         with:
