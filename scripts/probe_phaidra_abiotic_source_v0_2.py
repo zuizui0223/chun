@@ -22,7 +22,7 @@ ARTICLE_TITLE="Does the abiotic environment influence the distribution of flower
 UA="CHUN-PHAIDRA-abiotic-recovery/0.2"
 
 SEARCH_PATHS=("search/select","solr/select")
-MEMBERSHIP_FIELDS=("isPartOf","ismemberof")
+MEMBERSHIP_FIELDS=("ispartof","ismemberof","isPartOf")
 
 
 def get_json(url:str,timeout:int=60)->tuple[Any|None,dict]:
