@@ -45,6 +45,7 @@
     "IDENTIFIER_ONLY_CROSSWALK_FREEZE_WITH_COROLLA_COLOUR_UNOPENED",
     "OUTCOME_INDEPENDENT_ESTIMATED_POLLINATOR_FRAME_FREEZE",
     "COROLLA_COLOUR_STATE_SUPPORT_AND_COMPRESSION_OPPORTUNITY",
+    "PRE_AUC_TEMPORAL_REALIZATION_PREDICTION_FREEZE",
     "FUTURE_HIDDEN_MEMORY_INFORMATIVENESS_GATE",
     "OBSERVED_WITHIN_COARSE_HIDDEN_MEMORY_AUC"
   ],
@@ -97,5 +98,24 @@
       "causal_claim_allowed": false
     },
     "boundary": "secondary ecological diagnostic only; cannot rescue a failed primary hidden-memory test"
+  },
+  "temporal_realization_prediction_frozen_before_colour": {
+    "role": "SECONDARY_OUT_OF_SAMPLE_REALIZATION_PREDICTION_CANNOT_RESCUE_PRIMARY",
+    "training_sources": {
+      "persistence": "data/flowerclades51_relative_time_persistence_clade_metrics_historical_v0_1.csv",
+      "hidden_memory": "data/flowerclades51_hidden_fine_memory_clades_v0_1.csv",
+      "n_clades": 21
+    },
+    "predictor": "fine visible-colour signed excess-retention area over relative phylogenetic divergence depth",
+    "predictor_estimator": "same 10 equal-pair-count bin estimator as the Flower-clades-51 historical persistence analysis; relative depth = patristic/(2*crown height); exact finite-sample same-state baseline; trapezoidal signed excess area",
+    "source_tree_requirement": "root-to-tip CV <= 1e-8; otherwise temporal prediction is HOLD and primary hidden-memory test continues",
+    "training_predictor_median": 0.022164300864659012,
+    "training_hidden_effect_median": 0.02700779596581926,
+    "prediction_rule": "If Merianieae fine persistence area > 0.022164300864659012, predict centered hidden-memory AUC effect > 0.02700779596581926; otherwise predict centered hidden-memory effect <= 0.02700779596581926.",
+    "timing": "Compute and freeze Merianieae persistence area and the implied ABOVE/AT_OR_BELOW hidden-effect prediction after state support but before informativeness and observed hidden-memory AUC.",
+    "evaluation": "After hidden-memory AUC is opened, record DIRECTION_MATCH iff observed centered effect falls on the pre-frozen predicted side of the training hidden-effect median.",
+    "no_significance_claim": true,
+    "cannot_rescue_primary": true,
+    "causal_claim_allowed": false
   }
 }
