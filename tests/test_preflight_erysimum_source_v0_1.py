@@ -37,3 +37,15 @@ def test_verify_md5_metadata():
 def test_file_name_variants():
     assert mod.file_name({"path":"x.zip"})=="x.zip"
     assert mod.file_name({"filename":"y.zip"})=="y.zip"
+
+
+def test_dedupe_file_objects_collapses_same_identity():
+    o={
+      "path":mod.PACKAGE,
+      "id":123,
+      "size":456,
+      "digest":"md5:900150983cd24fb0d6963f7d28e17f72",
+      "_links":{"stash:download":{"href":"https://datadryad.org/api/v2/files/123/download"}}
+    }
+    out=mod.dedupe_file_objects([dict(o),dict(o),dict(o)])
+    assert len(out)==1
