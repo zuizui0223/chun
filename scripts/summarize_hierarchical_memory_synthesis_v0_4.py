@@ -24,7 +24,15 @@ def build()->dict:
     temp=load(TEMP)
     info=load(INFO)
 
+    visible=base["evidence"]["standardized_visible_batch"]
+    sch=base["evidence"]["schistanthe_prospective_visible"]
+    pet=base["evidence"]["petunieae_retrospective_biochemical"]
+    ges=base["evidence"]["gesnerioideae_prospective_biochemical"]
+
     assert base["status"]=="HIERARCHICAL_EVOLUTIONARY_MEMORY_SYNTHESIS_V0_3_POST_PROSPECTIVE_BIOCHEMICAL_FAIL"
+    assert visible["opportunity_clades"]==21 and visible["positive_clades"]==18
+    assert sch["status"]=="PROSPECTIVE_SCHISTANTHE_HIDDEN_MEMORY_PASS"
+    assert ges["status"]=="PROSPECTIVE_GESNERIOIDEAE_BIOCHEMICAL_HIDDEN_MEMORY_FAIL"
     assert struct["primary"]["supported"] is False
     assert struct["primary"]["rho"] < 0
     assert struct["primary"]["leave_one_clade_out"]["negative_count"]==21
@@ -40,7 +48,32 @@ def build()->dict:
       "version":"v0.4",
       "status":"HIERARCHICAL_EVOLUTIONARY_MEMORY_SYNTHESIS_V0_4_REALIZATION_ARCHITECTURE",
       "programme_role":"POST_V0_3_EXTENSION_SYNTHESIS_OF_HIDDEN_MEMORY_REALIZATION",
-      "candidate_headline":"Evolutionary memory is hierarchical, and its realization is a distinct axis of flower-colour history.",
+      "candidate_headline":"Hidden flower-colour history is a distinct evolutionary coordinate, not a by-product of phenotype compression.",
+      "foundation":{
+        "visible_standardized":{
+          "opportunity_clades":visible["opportunity_clades"],
+          "positive_clades":visible["positive_clades"],
+          "median_centered_auc_effect":visible["median_centered_auc_effect"],
+          "wilcoxon_p":visible["wilcoxon_p"],
+          "sign_p":visible["sign_p"]
+        },
+        "prospective_visible":{
+          "system":"Schistanthe",
+          "status":sch["status"],
+          "centered_auc_effect":sch["centered_auc_effect"],
+          "p_one_sided":sch["p_one_sided"],
+          "retained_tips":sch["retained_tips"]
+        },
+        "biochemical":{
+          "petunieae_role":"retrospective same-estimand support",
+          "petunieae_centered_effect":pet["centered_auc_effect"],
+          "petunieae_p":pet["p_one_sided"],
+          "gesnerioideae_status":ges["status"],
+          "gesnerioideae_centered_effect":ges["centered_auc_effect"],
+          "gesnerioideae_p":ges["p_one_sided"],
+          "generalization":"MIXED_NOT_PROSPECTIVELY_GENERALIZED"
+        }
+      },
       "core_architecture":{
         "opportunity":"Does the fine phenotype contain distinctions that are genuinely collapsed by the coarse representation?",
         "global_signal":"Does phenotype identity show detectable unconditional phylogenetic organization across the whole radiation?",
@@ -48,7 +81,7 @@ def build()->dict:
         "hidden_realization":"After coarse membership is held fixed, do finer states retain additional lineage organization?",
         "informativeness":"Can the frozen design resolve a benchmark-sized hidden-memory effect? This is a design property, not a biological axis."
       },
-      "new_realization_tests":{
+      "realization_tests":{
         "trivial_compression_explanation":{
           "source":"results/hidden_memory_realization_structural_predictors_v0_1/summary_v0_1.json",
           "frozen_prediction":"more fine-to-coarse pair-collision gain -> stronger hidden memory",
@@ -88,7 +121,7 @@ def build()->dict:
         "The fine-minus-coarse persistence advantage is almost unrelated to hidden-memory strength, reinforcing that global resolution winner and nested organization are different coordinates.",
         "The remaining among-radiation variation in hidden-memory realization is therefore biological structure to explain, not a representation-geometry artifact already accounted for by the current metrics."
       ],
-      "strongest_current_positive_statement":"Fine flower-colour states repeatedly retain lineage history inside broader phenotype classes, and that hidden organization is not a trivial consequence of coarse coding or equivalent to a global fine-resolution advantage. Its strength varies among radiations as a distinct evolutionary coordinate; a temporal-persistence link is directionally consistent but not yet confirmed.",
+      "strongest_current_positive_statement":"Fine flower-colour states repeatedly retain lineage history inside broader phenotype classes, including an independent prospective visible-colour replication. That hidden organization is not a trivial consequence of coarse coding and is not equivalent to a global fine-resolution advantage. Its strength varies among radiations as a distinct evolutionary coordinate; a temporal-persistence link is directionally consistent but not yet confirmed.",
       "biological_interpretation":"A coarse floral phenotype can function as an ecological or display category while containing finer lineage-specific histories. How strongly those histories remain organized is not fixed by the amount of state compression itself. This makes the realization of nested phenotypic history a property of radiation-specific evolutionary trajectories, potentially shaped by transition dynamics, lineage constraints or ecology, none of which is yet causally identified.",
       "current_unresolved_mechanism":{
         "abiotic_heterogeneity":"SOURCE_HOLD",
@@ -100,6 +133,7 @@ def build()->dict:
         "do_not_fit_more_retrospective_predictor_variants":True,
         "new_systems_use_informativeness_gate":"data/future_hidden_memory_informativeness_gate_v0_1.json",
         "next_clean_test":"Freeze one biologically external realization predictor before a genuinely new eligible radiation's hidden-memory outcome is opened.",
+        "specific_temporal_prediction":"In a future independent system, stronger absolute fine-state persistence should predict stronger hidden within-coarse memory; freeze this before the hidden-memory outcome is opened.",
         "ruellia_note":"Do not retrofit the new realization predictor onto the already-frozen Ruellia outcome gate."
       },
       "claim_boundary":[
