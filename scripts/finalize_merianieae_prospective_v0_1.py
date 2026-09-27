@@ -21,8 +21,10 @@ def main()->int:
     crosswalk=maybe(a.receipts/"crosswalk.json")
     pollinator=maybe(a.receipts/"pollinator.json")
     support=maybe(a.receipts/"state_support.json")
+    temporal_prediction=maybe(a.receipts/"temporal_prediction.json")
     info=maybe(a.receipts/"informativeness.json")
     result=maybe(a.receipts/"hidden_memory_result.json")
+    temporal_evaluation=maybe(a.receipts/"temporal_prediction_evaluation.json")
     ecology=maybe(a.receipts/"pollinator_conditioned.json")
 
     if result is not None:
@@ -60,8 +62,10 @@ def main()->int:
       "crosswalk_status":crosswalk["status"] if crosswalk else None,
       "pollinator_frame_status":pollinator["status"] if pollinator else None,
       "state_support_status":support["status"] if support else None,
+      "temporal_prediction_status":temporal_prediction["status"] if temporal_prediction else None,
       "informativeness_status":info["status"] if info else None,
       "hidden_memory_status":result["status"] if result else None,
+      "temporal_prediction_evaluation_status":temporal_evaluation["status"] if temporal_evaluation else None,
       "ecological_secondary_status":ecology["status"] if ecology else None,
       "sequential_gate_order_preserved":True,
       "ruellia_specific_promotion_rule_changed":False,
