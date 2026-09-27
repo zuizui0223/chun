@@ -1,0 +1,102 @@
+{
+  "candidate_headline": "Hierarchical evolutionary memory is recurrent but not universal across flower-colour representations.",
+  "conceptual_claim": "Broad phenotype classes can contain finer lineage-structured states, so evolutionary memory is often hierarchical rather than concentrated at one globally optimal resolution. That architecture recurs strongly in visible flower colour and prospectively replicates there, but it is not guaranteed to produce a significant hidden-memory signal in every biochemical representation.",
+  "ecological_evolutionary_implication": "Coarse ecological display classes need not erase lineage-specific evolutionary information: finer states can remain phylogenetically structured within the same broad phenotype. The amount of hidden history realized inside a coarse state varies among radiations and representations, making hierarchical state-space organization itself a biological axis of variation rather than a fixed optimal resolution.",
+  "el_v0_3_science_changed": false,
+  "evidence": {
+    "external_nonexchangeable_radiations": {
+      "role": "independent qualitative concordance; no pooled P value",
+      "source": "data/cross_radiation_hierarchical_rule_v0_2.json",
+      "supporting_n": 3,
+      "systems": [
+        "LINOIDEAE",
+        "ANGRAECINAE",
+        "ANTIRRHINEAE"
+      ],
+      "testable_n": 3
+    },
+    "gesnerioideae_fail_informativeness": {
+      "interpretive_role": "post-outcome diagnostic only; does not change FAIL and is not a power analysis",
+      "one_sided_alpha_0_05_centered_effect_critical": 0.07198529682028032,
+      "schistanthe_centered_effect": 0.06415799106532227,
+      "schistanthe_sized_point_effect_crosses_critical": false,
+      "source": "results/gesnerioideae_fail_informativeness_v0_1/summary_v0_1.json"
+    },
+    "gesnerioideae_prospective_biochemical": {
+      "centered_auc_effect": -0.007786782951799465,
+      "eligible_tips": 30,
+      "p_one_sided": 0.5005,
+      "role": "prospective biochemical FAIL under the frozen rule",
+      "source": "results/gesnerioideae_biochemical_hidden_memory_v0_1/summary_v0_1.json",
+      "status": "PROSPECTIVE_GESNERIOIDEAE_BIOCHEMICAL_HIDDEN_MEMORY_FAIL"
+    },
+    "petunieae_retrospective_biochemical": {
+      "centered_auc_effect": 0.18794355717042766,
+      "eligible_tips": 47,
+      "p_one_sided": 0.0001,
+      "role": "retrospective biochemical same-estimand support",
+      "source": "results/petunieae_hidden_memory_v0_1/summary_v0_1.json"
+    },
+    "schistanthe_prospective_visible": {
+      "centered_auc_effect": 0.06415799106532227,
+      "p_one_sided": 0.0033,
+      "retained_tips": 129,
+      "role": "independent prospective visible-colour PASS",
+      "source": "results/schistanthe_hidden_memory_v0_1/result_v0_1.json",
+      "status": "PROSPECTIVE_SCHISTANTHE_HIDDEN_MEMORY_PASS"
+    },
+    "standardized_visible_batch": {
+      "median_centered_auc_effect": 0.02700779596581926,
+      "opportunity_clades": 21,
+      "positive_clades": 18,
+      "role": "retrospective standardized prevalence",
+      "sign_p": 0.0007448196411132812,
+      "source": "results/flowerclades51_hidden_fine_memory_v0_1/summary_v0_1.json",
+      "wilcoxon_p": 0.00003337860107421875
+    }
+  },
+  "inference": {
+    "biochemical_cross_representation": "MIXED_AND_NOT_PROSPECTIVELY_GENERALIZED",
+    "universal_nonzero_biological_effect": "NOT_IDENTIFIED_BY_CURRENT_TESTS",
+    "universal_significant_hidden_memory_rule": "NOT_SUPPORTED_AFTER_PROSPECTIVE_GESNERIOIDEAE_FAIL",
+    "visible_colour": "SUPPORTED_RECURRENT_HIERARCHICAL_MEMORY_WITH_INDEPENDENT_PROSPECTIVE_PASS",
+    "why_fail_is_not_erased": "Gesnerioideae remains a prospective FAIL with a negative centered point effect and P=0.5005. The informativeness audit only shows that its 5% critical centered effect (+0.07199) exceeds the independently observed Schistanthe effect (+0.06416), limiting how strongly this 30-tip test can exclude Schistanthe-sized effects."
+  },
+  "next_gate": "Do not broaden candidate hunting. Reopen prospective biochemical generalization only if the already-frozen Ruellia authoritative tree gate clears or a currently blocked authoritative non-visible source becomes exactly recoverable under its frozen admission rule.",
+  "novelty_ceiling": [
+    "do not claim a universal hierarchical-memory law",
+    "do not claim prospective biochemical validation",
+    "do not relabel or rescue the Gesnerioideae prospective FAIL",
+    "do not treat source/schema HOLDs as biological negatives",
+    "do not pool P values across nonexchangeable evidence tiers",
+    "do not infer ecological or molecular cause from phylogenetic organization alone"
+  ],
+  "paper1_science_changed": false,
+  "programme_role": "POST_V0_3_EXTENSION_SYNTHESIS_WITH_PROSPECTIVE_VISIBLE_PASS_AND_PROSPECTIVE_BIOCHEMICAL_FAIL",
+  "prospective_nonvisible_frontier": {
+    "iochrominae": {
+      "biological_decision": "NONE_SOURCE_TRANSPORT_HOLD",
+      "counts_as_prospective_replication": false,
+      "status": "HOLD_IOCHROMINAE_PRESERVATION_MIRRORS_NO_EXACT_BYTES"
+    },
+    "ng2018": {
+      "biological_decision": "NONE_SOURCE_SCHEMA_HOLD",
+      "counts_as_replication": false,
+      "status": "HOLD_NG2018_TABLE_S1_SOURCE_ONLY_NO_TRAIT_MATRIX"
+    },
+    "ruellia": {
+      "current_blocker": "HOLD_AUTHORITATIVE_2023_TREE_BYTES_OR_EXACT_RECONSTRUCTION_SOURCE_UNAVAILABLE_OUTCOMES_UNOPENED",
+      "outcome_opened": false,
+      "status": "FROZEN_BEFORE_RUELLIA51_HPLC_OUTCOME_OPENING"
+    }
+  },
+  "status": "HIERARCHICAL_EVOLUTIONARY_MEMORY_SYNTHESIS_V0_3_POST_PROSPECTIVE_BIOCHEMICAL_FAIL",
+  "strongest_current_positive_statement": "Fine flower-colour states repeatedly retain lineage history inside broader phenotype classes, including an independent prospective visible-colour replication; however, the first completed prospective biochemical test failed, so hierarchical memory is best treated as a recurrent and contingent evolutionary architecture rather than a universal property of every representation.",
+  "submission_state": {
+    "current_submission": "Evolution Letters v0.3",
+    "current_submission_changed": false,
+    "ruellia_specific_promotion_rule_changed": false,
+    "v0_8_or_v0_9_promoted": false
+  },
+  "version": "v0.3"
+}

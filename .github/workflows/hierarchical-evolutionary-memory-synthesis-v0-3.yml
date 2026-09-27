@@ -1,0 +1,62 @@
+name: Hierarchical memory synthesis v0.3
+
+on:
+  pull_request:
+    paths:
+      - 'scripts/summarize_hierarchical_memory_synthesis_v0_3.py'
+      - 'data/hierarchical_evolutionary_memory_synthesis_v0_3.json'
+      - 'data/hierarchical_memory_novelty_audit_v0_3.json'
+      - 'docs/HIERARCHICAL_EVOLUTIONARY_MEMORY_SYNTHESIS_V0_3.md'
+      - '.github/workflows/hierarchical-evolutionary-memory-synthesis-v0-3.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  synthesize:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Regenerate v0.3 synthesis
+        run: python scripts/summarize_hierarchical_memory_synthesis_v0_3.py --out build/hierarchical_evolutionary_memory_synthesis_v0_3.json
+      - name: Compare frozen synthesis and validate claim boundary
+        run: |
+          python - <<'PY'
+          import json
+          g=json.load(open('build/hierarchical_evolutionary_memory_synthesis_v0_3.json'))
+          f=json.load(open('data/hierarchical_evolutionary_memory_synthesis_v0_3.json'))
+          assert g==f, (g,f)
+          assert f['evidence']['schistanthe_prospective_visible']['status']=='PROSPECTIVE_SCHISTANTHE_HIDDEN_MEMORY_PASS'
+          assert f['evidence']['gesnerioideae_prospective_biochemical']['status']=='PROSPECTIVE_GESNERIOIDEAE_BIOCHEMICAL_HIDDEN_MEMORY_FAIL'
+          assert f['evidence']['gesnerioideae_fail_informativeness']['schistanthe_sized_point_effect_crosses_critical'] is False
+          assert f['inference']['biochemical_cross_representation']=='MIXED_AND_NOT_PROSPECTIVELY_GENERALIZED'
+          assert f['submission_state']['current_submission']=='Evolution Letters v0.3'
+          assert f['submission_state']['current_submission_changed'] is False
+          assert f['submission_state']['ruellia_specific_promotion_rule_changed'] is False
+          print(f['strongest_current_positive_statement'])
+          PY
+      - name: Validate novelty ceiling
+        run: |
+          python - <<'PY'
+          import json
+          x=json.load(open('data/hierarchical_memory_novelty_audit_v0_3.json'))
+          assert x['status']=='HIERARCHICAL_MEMORY_NOVELTY_CEILING_AFTER_PROSPECTIVE_BIOCHEMICAL_FAIL'
+          assert 'universal hierarchical-memory law' in x['prohibited_wording']
+          assert 'prospective biochemical validation' in x['prohibited_wording']
+          assert x['journal_positioning']['current_submission']=='Evolution Letters v0.3'
+          assert x['journal_positioning']['current_submission_changed'] is False
+          assert x['journal_positioning']['promotion_rule_changed'] is False
+          assert x['el_v0_3_science_changed'] is False
+          assert x['paper1_science_changed'] is False
+          PY
+      - name: Validate frozen EL v0.3 science
+        run: python scripts/validate_cross_radiation_el_v0_3_science_freeze_v0_1.py
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: hierarchical-memory-synthesis-v0-3
+          path: build/
