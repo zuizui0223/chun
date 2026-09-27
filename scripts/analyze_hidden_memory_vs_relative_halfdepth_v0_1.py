@@ -6,6 +6,9 @@ import csv
 import importlib.util
 import json
 import math
+import http.cookiejar
+import shutil
+import urllib.request
 from pathlib import Path
 
 import numpy as np
@@ -77,6 +80,61 @@ def bootstrap_rho(x,y,n:int=BOOTSTRAPS,seed:int=SEED)->dict:
       "positive_fraction":float(np.mean(a>0)),
     }
 
+def recover_cookie_session_sources(work:Path)->tuple[Path|None,Path|None,list[dict]]:
+    work.mkdir(parents=True,exist_ok=True)
+    jar=http.cookiejar.CookieJar()
+    opener=urllib.request.build_opener(urllib.request.HTTPCookieProcessor(jar))
+    ua="Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"
+    base_headers={
+      "User-Agent":ua,
+      "Accept":"text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
+      "Accept-Language":"en-US,en;q=0.9",
+    }
+    diagnostics=[]
+    landing="https://datadryad.org/dataset/doi:10.5061/dryad.r4xgxd2sc"
+    try:
+        req=urllib.request.Request(landing,headers=base_headers)
+        with opener.open(req,timeout=90) as r:
+            body=r.read()
+            diagnostics.append({"stage":"landing_session","ok":True,"status":getattr(r,"status",200),"bytes":len(body),"cookies":len(jar)})
+    except Exception as e:
+        diagnostics.append({"stage":"landing_session","ok":False,"error":f"{type(e).__name__}: {e}","cookies":len(jar)})
+
+    expected={
+      "final_dataset.csv":(4411881,HALF.CSV_SHA),
+      "trees.zip":(4411880,HALF.TREES_SHA),
+    }
+    for name,(fid,digest) in expected.items():
+        dest=work/name
+        urls=[
+          f"https://datadryad.org/downloads/file_stream/{fid}",
+          f"https://datadryad.org/stash/downloads/file_stream/{fid}",
+          f"https://datadryad.org/api/v2/files/{fid}/download",
+        ]
+        for url in urls:
+            headers={**base_headers,"Accept":"*/*","Referer":landing}
+            try:
+                req=urllib.request.Request(url,headers=headers)
+                with opener.open(req,timeout=90) as r, dest.open("wb") as out:
+                    shutil.copyfileobj(r,out)
+                got=DIST.sha256_file(dest)
+                match=got==digest
+                diagnostics.append({
+                  "stage":"session_file","file":name,"url":url,"ok":True,
+                  "bytes":dest.stat().st_size,"sha256":got,"digest_match":match,
+                  "cookies":len(jar),
+                })
+                if match:
+                    break
+                dest.unlink(missing_ok=True)
+            except Exception as e:
+                dest.unlink(missing_ok=True)
+                diagnostics.append({"stage":"session_file","file":name,"url":url,"ok":False,"error":f"{type(e).__name__}: {e}","cookies":len(jar)})
+    csv_path=work/"final_dataset.csv"
+    trees_path=work/"trees.zip"
+    return (csv_path if csv_path.exists() else None,trees_path if trees_path.exists() else None,diagnostics)
+
+
 def read_hidden()->dict[str,dict]:
     with HIDDEN.open(newline="",encoding="utf-8") as f:
         return {r["clade"]:r for r in csv.DictReader(f)}
@@ -84,6 +142,9 @@ def read_hidden()->dict[str,dict]:
 def build(work:Path)->dict:
     design=json.loads(DESIGN.read_text())
     csv_path,trees_path,diagnostics=DIST.recover_exact_sources(work/"source")
+    if csv_path is None or trees_path is None:
+        csv_path,trees_path,session_diags=recover_cookie_session_sources(work/"source_session")
+        diagnostics=diagnostics+session_diags
     if csv_path is None or trees_path is None:
         return {
           "version":"v0.1",
