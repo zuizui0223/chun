@@ -1,0 +1,34 @@
+{
+  "version": "v0.1",
+  "status": "POST_OUTCOME_EXPLORATORY_CRYPTIC_MEMORY_TEST_FIXED_BEFORE_NEW_SUBGROUP_CALCULATION",
+  "analysis_role": "POSITIVE_ARCHITECTURE_DIAGNOSTIC_NOT_CONFIRMATORY_NOT_EL_V0_3_MODIFICATION",
+  "question": "Do radiations classified as having no detectable unconditional phylogenetic flower-colour signal still retain fine-state phylogenetic organization inside coarse colour states?",
+  "sources": {
+    "hidden_memory": "data/flowerclades51_hidden_fine_memory_clades_v0_1.csv",
+    "global_profile": "results/flowerclades51_resolution_profile_v0_1/flowerclades51_resolution_profile_summary_v0_1.csv"
+  },
+  "focal_frame": "Among the 21 already-fixed hidden-memory opportunity clades, retain only clades whose frozen global terminal class is PROFILE_NO_PHYLOGENETIC_SIGNAL.",
+  "primary_prediction": "The permutation-centered within-coarse hidden-memory effects in the focal frame are positive more often than expected under a 0.5 sign null.",
+  "primary_test": {
+    "statistic": "number of strictly positive centered hidden-memory effects among nonzero focal effects",
+    "test": "exact one-sided binomial sign test against p=0.5",
+    "support_rule": "median centered effect > 0 and one-sided exact sign P <= 0.05"
+  },
+  "secondary_fixed": {
+    "one_sided_wilcoxon": "report for continuity with the full 21-clade analysis; cannot rescue a failed sign-test primary",
+    "signalled_clades_comparison": "report n, positive fraction and median hidden effect for globally signalled focal-opportunity clades descriptively only; no between-group winner test"
+  },
+  "interpretation_if_supported": "A lack of detectable unconditional flower-colour signal does not imply loss of evolutionary history; fine-state history can persist cryptically inside broad phenotype classes.",
+  "interpretation_if_not_supported": "The globally no-signal subgroup does not pass the frozen exact prevalence threshold, so cryptic hidden memory is reported descriptively rather than promoted as a subgroup-level inferential result.",
+  "boundaries": [
+    "post-outcome exploratory subgroup analysis",
+    "same source data as both component analyses; not independent replication",
+    "no reclassification of global terminal classes",
+    "no removal of negative clades",
+    "Wilcoxon cannot rescue a failed exact sign-test primary",
+    "no causal ecological or molecular mechanism inferred",
+    "frozen EL v0.3 remains unchanged"
+  ],
+  "paper1_science_changed": false,
+  "el_v0_3_science_changed": false
+}

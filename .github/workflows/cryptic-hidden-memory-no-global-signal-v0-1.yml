@@ -1,0 +1,58 @@
+name: Cryptic hidden memory in no-global-signal clades v0.1
+
+on:
+  pull_request:
+    paths:
+      - 'data/cryptic_hidden_memory_no_global_signal_design_v0_1.json'
+      - 'scripts/analyze_cryptic_hidden_memory_no_global_signal_v0_1.py'
+      - 'results/cryptic_hidden_memory_no_global_signal_v0_1/**'
+      - 'docs/CRYPTIC_HIDDEN_MEMORY_NO_GLOBAL_SIGNAL_V0_1.md'
+      - '.github/workflows/cryptic-hidden-memory-no-global-signal-v0-1.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  analyze:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install runtime
+        run: pip install numpy scipy
+      - name: Validate frozen subgroup design
+        run: |
+          python - <<'PY'
+          import json
+          x=json.load(open('data/cryptic_hidden_memory_no_global_signal_design_v0_1.json'))
+          assert x['status']=='POST_OUTCOME_EXPLORATORY_CRYPTIC_MEMORY_TEST_FIXED_BEFORE_NEW_SUBGROUP_CALCULATION'
+          assert x['primary_test']['test']=='exact one-sided binomial sign test against p=0.5'
+          assert 'Wilcoxon cannot rescue' in ' '.join(x['boundaries'])
+          assert x['el_v0_3_science_changed'] is False
+          PY
+      - name: Analyze frozen no-signal subgroup
+        run: python scripts/analyze_cryptic_hidden_memory_no_global_signal_v0_1.py --out build/cryptic_hidden_memory_no_global_signal_v0_1.json
+      - name: Validate result boundary
+        run: |
+          python - <<'PY'
+          import json
+          x=json.load(open('build/cryptic_hidden_memory_no_global_signal_v0_1.json'))
+          assert x['opportunity_clades_total']==21
+          assert x['globally_no_signal']['n'] + x['globally_signalled']['n']==21
+          assert x['paper1_science_changed'] is False
+          assert x['el_v0_3_science_changed'] is False
+          print(json.dumps({
+            'no_signal':x['globally_no_signal'],
+            'signalled':x['globally_signalled'],
+            'primary':x['primary'],
+            'interpretation':x['interpretation']
+          },indent=2))
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: cryptic-hidden-memory-no-global-signal-v0-1
+          path: build/
