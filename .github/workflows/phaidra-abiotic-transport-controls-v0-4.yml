@@ -1,0 +1,48 @@
+name: PHAIDRA abiotic transport controls v0.4
+
+on:
+  pull_request:
+    paths:
+      - 'scripts/probe_phaidra_abiotic_transport_controls_v0_4.py'
+      - 'tests/test_probe_phaidra_abiotic_transport_controls_v0_4.py'
+      - 'data/flower_memory_abiotic_transport_controls_v0_4.json'
+      - 'docs/FLOWER_MEMORY_ABIOTIC_TRANSPORT_CONTROLS_V0_4.md'
+      - '.github/workflows/phaidra-abiotic-transport-controls-v0-4.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  diagnose:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: pip install pytest
+      - run: pytest -q tests/test_probe_phaidra_abiotic_transport_controls_v0_4.py
+      - name: Probe target download HEAD and public metadata controls
+        run: python scripts/probe_phaidra_abiotic_transport_controls_v0_4.py --out build/phaidra_abiotic_transport_controls_v0_4.json
+      - name: Assert no content opening
+        run: |
+          python - <<'PY'
+          import json
+          x=json.load(open('build/phaidra_abiotic_transport_controls_v0_4.json'))
+          assert x['outcome_firewall']['download_body_get_called'] is False
+          assert x['outcome_firewall']['target_file_content_opened'] is False
+          assert x['outcome_firewall']['environmental_rows_opened'] is False
+          assert x['outcome_firewall']['flower_memory_outcome_fit'] is False
+          print(json.dumps({
+            'status':x['status'],
+            'controls':x['controls'],
+            'targets':x['targets'],
+            'next_gate':x['next_gate']
+          },indent=2))
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: phaidra-abiotic-transport-controls-v0-4
+          path: build/
