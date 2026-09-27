@@ -117,5 +117,11 @@
     "no_significance_claim": true,
     "cannot_rescue_primary": true,
     "causal_claim_allowed": false
+  },
+  "candidate_replacement_rule": {
+    "biological_pass_or_fail": "STOP_CANDIDATE_SWITCHING",
+    "source_schema_crosswalk_opportunity_or_informativeness_hold": "MAY_REOPEN_METADATA_ONLY_CANDIDATE_SCREEN_WITHOUT_USING_EXPOSED_MERIANIEAE_COLOUR_OR_AUC_TO_RANK_CANDIDATES",
+    "rule_frozen_before_merianieae_row_level_colour": true,
+    "Hakea_current_screen_note": "Not admitted for this categorical hidden-memory estimand because its public flower-colour analysis is principally continuous RGB/colour-distance rather than an already source-defined categorical fine-to-coarse hierarchy; do not invent post-outcome bins."
   }
 }
