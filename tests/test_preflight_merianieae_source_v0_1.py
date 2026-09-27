@@ -1,8 +1,6 @@
 from __future__ import annotations
 
 import importlib.util
-import io
-import zipfile
 from pathlib import Path
 
 ROOT=Path(__file__).resolve().parents[1]
@@ -12,35 +10,31 @@ mod=importlib.util.module_from_spec(spec)
 spec.loader.exec_module(mod)
 
 
-def test_member_candidates_casefold_basename():
-    names=["a/floraltraits.csv","b/FLORALTRAITS.CSV","x/other.csv"]
-    assert mod.member_candidates(names,"floraltraits.csv")==["a/floraltraits.csv","b/FLORALTRAITS.CSV"]
+def test_member_by_suffix_is_folder_specific():
+    names=[
+      "1_morphospaces_disparity/floraltraits.csv",
+      "2_biogeo/Marcelo_Meris.tre",
+      "1_morphospaces_disparity/Marcelo_Meris.tre",
+    ]
+    assert mod.member_by_suffix(names,"1_morphospaces_disparity/floraltraits.csv")=="1_morphospaces_disparity/floraltraits.csv"
+    assert mod.member_by_suffix(names,"1_morphospaces_disparity/marcelo_meris.tre")=="1_morphospaces_disparity/Marcelo_Meris.tre"
 
 
-def test_identical_duplicate_members_are_allowed():
-    b=io.BytesIO()
-    with zipfile.ZipFile(b,"w") as z:
-        z.writestr("a/floraltraits.csv","species,x,corolla.colour\n")
-        z.writestr("b/floraltraits.csv","species,x,corolla.colour\n")
-    with zipfile.ZipFile(io.BytesIO(b.getvalue())) as z:
-        p,body,copies=mod.choose_identical_members(z,["a/floraltraits.csv","b/floraltraits.csv"],"trait")
-    assert p=="a/floraltraits.csv"
-    assert len(copies)==2
-    assert mod.header_only(body)==["species","x","corolla.colour"]
+def test_member_by_suffix_holds_on_ambiguity():
+    names=[
+      "x/1_morphospaces_disparity/floraltraits.csv",
+      "y/1_morphospaces_disparity/floraltraits.csv",
+    ]
+    try:
+        mod.member_by_suffix(names,"1_morphospaces_disparity/floraltraits.csv")
+    except RuntimeError as e:
+        assert "expected 1 match" in str(e)
+    else:
+        raise AssertionError("expected RuntimeError")
 
 
-def test_nonidentical_duplicate_members_hold():
-    b=io.BytesIO()
-    with zipfile.ZipFile(b,"w") as z:
-        z.writestr("a/floraltraits.csv","species,x,corolla.colour\n")
-        z.writestr("b/floraltraits.csv","species,x,colour\n")
-    with zipfile.ZipFile(io.BytesIO(b.getvalue())) as z:
-        try:
-            mod.choose_identical_members(z,["a/floraltraits.csv","b/floraltraits.csv"],"trait")
-        except RuntimeError as e:
-            assert "non-identical" in str(e)
-        else:
-            raise AssertionError("expected RuntimeError")
+def test_header_only():
+    assert mod.header_only(b"species,x,corolla.colour\nSECRET,SECRET,SECRET\n")==["species","x","corolla.colour"]
 
 
 def test_tree_metadata_counts_branch_lengths():
