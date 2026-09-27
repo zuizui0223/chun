@@ -1,0 +1,43 @@
+{
+  "version": "v0.2",
+  "status": "HOLD_PHAIDRA_SOURCE_METADATA_UNAVAILABLE_V0_2",
+  "article_doi": "10.1002/ajb2.70044",
+  "frozen_moderator": "data/flower_memory_abiotic_moderator_prereg_v0_1.json",
+  "source_identity_erratum": "data/phaidra_abiotic_source_identity_resolution_v0_1.json",
+  "recheck_change": "Current PHAIDRA membership discovery was retried with ispartof, legacy ismemberof, and root-PID related-object search; no environmental file contents were opened.",
+  "root_candidates": [
+    {
+      "pid": "o:2098641",
+      "provenance": "article_data_availability_statement",
+      "root_info_ready": false,
+      "direct_related_pid_count": 0,
+      "search_member_pid_count": 0,
+      "member_count": 0
+    },
+    {
+      "pid": "o:2322953",
+      "provenance": "current_university_publication_record",
+      "root_info_ready": false,
+      "direct_related_pid_count": 0,
+      "search_member_pid_count": 0,
+      "member_count": 0
+    }
+  ],
+  "chosen_source": null,
+  "primary_memory_moderator_fit": false,
+  "biological_decision": "NONE_SOURCE_METADATA_HOLD",
+  "hold_interpretation": "The current PHAIDRA public metadata/search routes still do not expose a uniquely identifiable article data/code object or member inventory. This is a source-access HOLD, not evidence for or against the frozen abiotic-heterogeneity hypothesis.",
+  "forbidden_rescue": [
+    "fresh GBIF reconstruction within this frozen test",
+    "post-hoc replacement environmental source selected using memory outcomes",
+    "treating either PID as the data object without metadata evidence"
+  ],
+  "outcome_firewall": {
+    "member_file_contents_downloaded": false,
+    "environmental_rows_opened": false,
+    "flower_memory_outcome_fit": false
+  },
+  "next_gate": "Reopen only when one of the frozen PHAIDRA root candidates exposes metadata or a member inventory that uniquely identifies the article-relevant data/code object.",
+  "paper1_science_changed": false,
+  "el_v0_3_science_changed": false
+}
