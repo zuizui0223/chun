@@ -9,12 +9,17 @@ from collections import Counter
 from pathlib import Path
 
 MISSING={"","na","n/a","nan"}
+NUMERIC_CODE_RE=re.compile(r"^[+-]?(?:\\d+(?:\\.\\d*)?|\\.\\d+)$")
 MIN_FINE=5
 MIN_TIPS=20
 
 
 def norm_state(x:str)->str:
     return re.sub(r"\s+"," ",str(x or "").strip()).lower()
+
+
+def is_numeric_code_token(x:str)->bool:
+    return bool(NUMERIC_CODE_RE.fullmatch(norm_state(x)))
 
 
 def read_rows(path:Path)->dict[int,dict]:
@@ -55,22 +60,27 @@ def build_state_frame(trait_path:Path,crosswalk_path:Path)->dict:
     raw_counts=Counter(r["fine_state"] for r in opened)
     retained_states=sorted(s for s,n in raw_counts.items() if n>=MIN_FINE)
     retained_set=set(retained_states)
-    retained=[]
-    for r in opened:
-        if r["fine_state"] not in retained_set:
-            continue
-        x=dict(r)
-        x["coarse_state"]="WHITE" if r["fine_state"]=="white" else "NONWHITE"
-        retained.append(x)
+    retained=[dict(r) for r in opened if r["fine_state"] in retained_set]
 
     fine_counts=Counter(r["fine_state"] for r in retained)
-    coarse_counts=Counter(r["coarse_state"] for r in retained)
-    opportunity=bool(
-        len(retained)>=MIN_TIPS
-        and len(fine_counts)>=2
-        and len(coarse_counts)>=2
-        and len(fine_counts)>len(coarse_counts)
-    )
+    numeric_code_schema=bool(retained and all(is_numeric_code_token(r["fine_state"]) for r in retained))
+
+    # The admission contract allows WHITE/NONWHITE only for literal source
+    # colour strings. A purely numeric coded field is a schema HOLD; do not
+    # decode codes or reinterpret every code as NONWHITE after exposure.
+    if numeric_code_schema:
+        coarse_counts=Counter()
+        opportunity=False
+    else:
+        for r in retained:
+            r["coarse_state"]="WHITE" if r["fine_state"]=="white" else "NONWHITE"
+        coarse_counts=Counter(r["coarse_state"] for r in retained)
+        opportunity=bool(
+            len(retained)>=MIN_TIPS
+            and len(fine_counts)>=2
+            and len(coarse_counts)>=2
+            and len(fine_counts)>len(coarse_counts)
+        )
     return {
       "matched_rows_before_colour_missingness":cw["matched_count"],
       "nonmissing_colour_rows":len(opened),
@@ -81,6 +91,7 @@ def build_state_frame(trait_path:Path,crosswalk_path:Path)->dict:
       "coarse_state_counts":dict(sorted(coarse_counts.items())),
       "fine_state_count":len(fine_counts),
       "coarse_state_count":len(coarse_counts),
+      "numeric_code_schema":numeric_code_schema,
       "compression_opportunity":opportunity,
       "rows":retained,
     }
@@ -97,7 +108,9 @@ def main()->int:
     a.frame_out.parent.mkdir(parents=True,exist_ok=True)
 
     x=build_state_frame(a.trait,a.crosswalk)
-    if x["retained_tips"]<MIN_TIPS:
+    if x["numeric_code_schema"]:
+        status="HOLD_MERIANIEAE_COROLLA_COLOUR_NUMERIC_CODE_SCHEMA"
+    elif x["retained_tips"]<MIN_TIPS:
         status="HOLD_MERIANIEAE_RETAINED_FRAME_LT_20"
     elif x["fine_state_count"]<2:
         status="HOLD_MERIANIEAE_FINE_STATES_LT_2"
@@ -117,6 +130,7 @@ def main()->int:
       "coarse_state_counts":x["coarse_state_counts"],
       "fine_state_count":x["fine_state_count"],
       "coarse_state_count":x["coarse_state_count"],
+      "numeric_code_schema":x["numeric_code_schema"],
     }
     a.frame_out.write_text(json.dumps(frame,indent=2,sort_keys=True)+"\n")
 
@@ -125,7 +139,8 @@ def main()->int:
       "status":status,
       **{k:v for k,v in x.items() if k!="rows"},
       "fine_state_rule":"exact corolla.colour after trim/lowercase/whitespace collapse; no semantic merging",
-      "coarse_state_rule":"WHITE iff fine_state == 'white'; otherwise NONWHITE",
+      "coarse_state_rule":"WHITE iff literal fine_state == 'white'; otherwise NONWHITE only for literal categorical colour strings",
+      "schema_rule":"If the retained corolla.colour field is purely numeric-coded, stop at HOLD_SCHEMA and do not decode or coarsen it post-outcome.",
       "missing_tokens":sorted(MISSING),
       "minimum_fine_state_support":MIN_FINE,
       "minimum_retained_tips":MIN_TIPS,
@@ -149,6 +164,7 @@ def main()->int:
       "fine_state_counts":x["fine_state_counts"],
       "coarse_state_counts":x["coarse_state_counts"],
       "compression_opportunity":x["compression_opportunity"],
+      "numeric_code_schema":x["numeric_code_schema"],
     },indent=2))
     return 0
 
