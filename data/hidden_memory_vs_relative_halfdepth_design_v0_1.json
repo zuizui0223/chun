@@ -22,7 +22,9 @@
   "robustness": {
     "leave_one_clade_out": true,
     "clade_bootstrap_replicates": 20000,
-    "bootstrap_seed": 20260927
+    "bootstrap_seed": 20260927,
+    "interior_fine_lambda_only_sensitivity": true,
+    "interior_sensitivity_rule": "Repeat Spearman descriptively after excluding clades whose existing fine lambda fit is at LOWER or UPPER optimization boundary; this cannot replace the primary all-clade test."
   },
   "secondary_descriptive": [
     "fine lambda versus hidden-memory effect",
