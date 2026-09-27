@@ -1,0 +1,30 @@
+name: Iochrominae hostile prior-art benchmark v0.1
+
+on:
+  pull_request:
+    paths:
+      - 'data/iochrominae_benchmark_contract_v0_1.csv'
+      - 'docs/IOCHROMINAE_CROSS_TIMESCALE_PRIOR_ART_V0_1.md'
+      - 'scripts/validate_iochrominae_benchmark_contract_v0_1.py'
+      - '.github/workflows/iochrominae-hostile-benchmark-v0-1.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Validate hostile prior-art boundary
+        run: |
+          mkdir -p build/iochrominae_benchmark_v0_1
+          python scripts/validate_iochrominae_benchmark_contract_v0_1.py \
+            --contract data/iochrominae_benchmark_contract_v0_1.csv \
+            --out build/iochrominae_benchmark_v0_1/summary.json
+      - name: Report
+        run: cat build/iochrominae_benchmark_v0_1/summary.json >> "$GITHUB_STEP_SUMMARY"
