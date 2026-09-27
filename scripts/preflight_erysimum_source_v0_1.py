@@ -330,8 +330,67 @@ def main()->int:
     obj=matches[0]
     url=file_download_url(obj)
     if not url:
-        raise RuntimeError("no Dryad package download URL")
-    body,final_url,headers=fetch(url)
+        out={
+          "version":"v0.1",
+          "status":"HOLD_ERYSIMUM_PACKAGE_DOWNLOAD_URL_UNAVAILABLE",
+          "dataset_doi":DOI,
+          "package_metadata":obj,
+          "package_metadata_name":file_name(obj),
+          "package_metadata_digest":metadata_digest(obj),
+          "diagnostics":diagnostics,
+          "outcome_firewall":{
+            "archive_downloaded":False,
+            "archive_member_names_opened":False,
+            "author_code_opened":False,
+            "trait_data_rows_opened":False,
+            "species_level_colour_values_opened":False,
+            "colour_state_frequencies_computed":False,
+            "tree_tip_labels_emitted":False,
+            "hidden_memory_auc_computed":False
+          },
+          "next_gate":"STOP_HOLD",
+          "paper1_science_changed":False,
+          "el_v0_3_science_changed":False
+        }
+        a.out.write_text(json.dumps(out,indent=2,sort_keys=True)+"\\n")
+        print(json.dumps({"status":out["status"],"package_metadata":obj},indent=2,default=str))
+        return 0
+    try:
+        body,final_url,headers=fetch(url)
+    except Exception as e:
+        out={
+          "version":"v0.1",
+          "status":"HOLD_ERYSIMUM_EXACT_PACKAGE_TRANSPORT_UNAVAILABLE",
+          "dataset_doi":DOI,
+          "package_metadata":obj,
+          "package_metadata_name":file_name(obj),
+          "package_metadata_digest":metadata_digest(obj),
+          "package_download_url":url,
+          "transport_error":f"{type(e).__name__}: {e}",
+          "diagnostics":diagnostics,
+          "outcome_firewall":{
+            "archive_downloaded":False,
+            "archive_member_names_opened":False,
+            "author_code_opened":False,
+            "trait_data_rows_opened":False,
+            "species_level_colour_values_opened":False,
+            "colour_state_frequencies_computed":False,
+            "tree_tip_labels_emitted":False,
+            "hidden_memory_auc_computed":False
+          },
+          "next_gate":"BOUNDED_EXACT_IDENTITY_MIRROR_RECOVERY",
+          "paper1_science_changed":False,
+          "el_v0_3_science_changed":False
+        }
+        a.out.write_text(json.dumps(out,indent=2,sort_keys=True,default=str)+"\\n")
+        print(json.dumps({
+          "status":out["status"],
+          "package_metadata":obj,
+          "package_metadata_digest":out["package_metadata_digest"],
+          "package_download_url":url,
+          "transport_error":out["transport_error"]
+        },indent=2,default=str))
+        return 0
     check=verify_against_metadata(body,obj)
     if check["size_match"] is False or not check["digest_match"] or not body.startswith(b"PK\x03\x04"):
         status="HOLD_ERYSIMUM_PACKAGE_IDENTITY_VERIFICATION_FAILED"
