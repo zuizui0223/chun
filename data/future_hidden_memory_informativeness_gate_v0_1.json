@@ -1,0 +1,67 @@
+{
+  "version": "v0.1",
+  "status": "FROZEN_FOR_FUTURE_NOT_YET_SELECTED_HIDDEN_MEMORY_SYSTEMS",
+  "purpose": "Prevent a new prospective hidden-memory test from being interpreted as a strong biological falsification when its frozen permutation design cannot cross alpha=0.05 for a point effect as large as the independently observed Schistanthe prospective effect.",
+  "scope": {
+    "applies_only_to": "future hidden-memory systems whose candidate-specific test and outcome have not already been frozen before this rule",
+    "does_not_apply_retroactively_to": [
+      "GESNERIOIDEAE",
+      "RUELLIA",
+      "SCHISTANTHE",
+      "NG2018_SOLANACEAE",
+      "PETUNIEAE"
+    ],
+    "does_not_change_existing_terminal_states": true,
+    "does_not_change_ruellia_specific_promotion_rule": true
+  },
+  "empirical_reference": {
+    "source": "results/schistanthe_hidden_memory_v0_1/result_v0_1.json",
+    "reference_role": "informativeness benchmark, not a minimum biologically meaningful effect",
+    "centered_auc_effect": 0.06415799106532227,
+    "prospective_status": "PROSPECTIVE_SCHISTANTHE_HIDDEN_MEMORY_PASS"
+  },
+  "sequence_before_observed_auc": [
+    "freeze candidate-specific hierarchy, tree rule, crosswalk rule, support thresholds, estimator, null and PASS rule",
+    "freeze identifier-only tree-trait crosswalk",
+    "open only the already-permitted state-support layer and determine compression opportunity",
+    "if there is no compression opportunity, stop at the candidate's structural no-opportunity terminal",
+    "construct the frozen same-coarse pair universe and negative-patristic-distance score ranks",
+    "generate the within-coarse fine-label permutation null without computing the observed fine-label AUC",
+    "compute null mean, one-sided alpha=0.05 AUC critical value and centered critical effect",
+    "apply the informativeness gate",
+    "only if the informativeness gate passes may the observed fine-label AUC be opened and the candidate-specific prospective PASS/FAIL rule evaluated"
+  ],
+  "null_informativeness_calculation": {
+    "permutations": 9999,
+    "seed": 20260927,
+    "null": "permute fine-state labels within each frozen coarse-state group, preserving fine-state counts and coarse membership",
+    "score": "negative patristic distance on the frozen same-coarse pair universe",
+    "metric": "ROC_AUC",
+    "critical_auc": "0.95 quantile of the permutation-null AUC distribution using the frozen implementation",
+    "centered_critical_effect": "critical_auc minus mean permutation-null AUC"
+  },
+  "informativeness_rule": {
+    "benchmark_centered_effect": 0.06415799106532227,
+    "pass_if": "centered_critical_effect <= benchmark_centered_effect",
+    "pass_terminal": "PRE_AUC_INFORMATION_GATE_PASS_OPEN_OBSERVED_AUC",
+    "hold_if": "centered_critical_effect > benchmark_centered_effect",
+    "hold_terminal": "STRUCTURAL_LOW_INFORMATION_HOLD_OBSERVED_AUC_UNOPENED",
+    "hold_is_biological_fail": false
+  },
+  "interpretation_boundary": [
+    "This is not a power analysis because it does not specify or simulate an alternative-effect distribution.",
+    "Passing means only that a point effect equal to the Schistanthe observed centered effect lies beyond the frozen null 5% critical threshold.",
+    "Passing does not guarantee detection probability, replication, or biological effect size.",
+    "Failing the informativeness gate is a structural information HOLD, not evidence against hidden memory.",
+    "No threshold may be relaxed after the candidate's observed AUC is opened."
+  ],
+  "motivation_receipt": {
+    "source": "results/gesnerioideae_fail_informativeness_v0_1/summary_v0_1.json",
+    "gesnerioideae_centered_critical_effect": 0.07198529682028032,
+    "schistanthe_reference_effect": 0.06415799106532227,
+    "schistanthe_sized_point_effect_crossed_gesnerioideae_critical": false,
+    "gesnerioideae_prospective_fail_changed": false
+  },
+  "paper1_science_changed": false,
+  "el_v0_3_science_changed": false
+}
