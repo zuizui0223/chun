@@ -1,0 +1,26 @@
+name: Future hidden memory informativeness gate v0.1
+
+on:
+  pull_request:
+    paths:
+      - 'data/future_hidden_memory_informativeness_gate_v0_1.json'
+      - 'scripts/validate_future_hidden_memory_informativeness_gate_v0_1.py'
+      - 'docs/FUTURE_HIDDEN_MEMORY_INFORMATIVENESS_GATE_V0_1.md'
+      - '.github/workflows/future-hidden-memory-informativeness-gate-v0-1.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Validate future-only informativeness rule
+        run: python scripts/validate_future_hidden_memory_informativeness_gate_v0_1.py
+      - name: Validate frozen EL v0.3 science
+        run: python scripts/validate_cross_radiation_el_v0_3_science_freeze_v0_1.py
