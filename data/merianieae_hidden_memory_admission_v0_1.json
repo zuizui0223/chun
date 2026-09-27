@@ -1,0 +1,78 @@
+{
+  "version": "v0.1",
+  "status": "FROZEN_BEFORE_MERIANIEAE_ROW_LEVEL_COROLLA_COLOUR_OPENING",
+  "programme_role": "NEW_INDEPENDENT_PROSPECTIVE_VISIBLE_HIDDEN_MEMORY_REPLICATION",
+  "candidate": "MERIANIEAE_MELASTOMATACEAE",
+  "selection_date": "2026-09-27",
+  "selection_basis": "Public source metadata only: a 139-species Merianieae floral-trait frame, explicit corolla.colour field, phylogeny tip-label field x, and author-provided branch-length phylogeny are documented before any row-level corolla colour is opened.",
+  "source_identity": {
+    "dryad_doi": "10.5061/dryad.bvq83bkdx",
+    "zenodo_record": "10.5281/zenodo.7659158",
+    "zenodo_record_id": 7659158,
+    "zenodo_bundle": "skripts.zip",
+    "zenodo_bundle_md5": "aab3192fa22e8562f93551dc18f040b7",
+    "required_trait_basename": "floraltraits.csv",
+    "required_tree_basename_casefold": "marcelo_meris.tre",
+    "expected_reported_species": 139,
+    "source_note": "The Dryad README states that floraltraits.csv contains floral traits for 139 Merianieae species, x contains phylogeny tip labels, corolla.colour is the colour field, and Marcelo_Meris.tre is the phylogenetic hypothesis. The linked Zenodo record is the author analysis package."
+  },
+  "source_recovery_rule": {
+    "preferred": "Recover the exact Zenodo skripts.zip whose MD5 matches the frozen Zenodo record, then require unique or byte-identical copies of floraltraits.csv and Marcelo_Meris.tre within the archive.",
+    "fallback": "If the tree is absent from the exact Zenodo archive, recover the exact Dryad Marcelo_Meris.tre through the official Dryad object metadata/download route; no third-party reconstructed tree is allowed.",
+    "duplicate_member_rule": "If multiple archive members share a required basename, accept only if all copies are byte-identical; otherwise HOLD_SOURCE_AMBIGUOUS.",
+    "no_source_substitution": true
+  },
+  "trait_semantics": {
+    "identifier_column": "x",
+    "species_column": "species",
+    "fine_state": "exact nonmissing corolla.colour string after trim/lowercase/collapse-whitespace only; no synonym, hue, or semantic merging",
+    "coarse_state": "WHITE iff normalized fine string is exactly 'white'; otherwise NONWHITE",
+    "composite_or_ambiguous_label_rule": "Retain as its exact fine state; do not reinterpret semantically. If the source encoding is not a categorical string field, HOLD_SCHEMA.",
+    "fine_state_minimum_tips": 5,
+    "minimum_retained_tips": 20,
+    "minimum_fine_states": 2,
+    "minimum_coarse_states": 2
+  },
+  "crosswalk_rule": {
+    "method": "exact normalized intersection of floraltraits.csv x and source-tree tip labels",
+    "normalization": "trim, replace underscores with spaces, collapse whitespace, lowercase",
+    "fuzzy_or_alias_repair": false,
+    "unmatched_trait_rows": "exclude before colour-state opening",
+    "duplicate_identifier": "HOLD_CROSSWALK"
+  },
+  "sequential_gates": [
+    "EXACT_SOURCE_RECOVERY_AND_HEADER_TREE_METADATA_ONLY",
+    "IDENTIFIER_ONLY_CROSSWALK_FREEZE_WITH_COROLLA_COLOUR_UNOPENED",
+    "COROLLA_COLOUR_STATE_SUPPORT_AND_COMPRESSION_OPPORTUNITY",
+    "FUTURE_HIDDEN_MEMORY_INFORMATIVENESS_GATE",
+    "OBSERVED_WITHIN_COARSE_HIDDEN_MEMORY_AUC"
+  ],
+  "hidden_memory_test": {
+    "opportunity_rule": "after rare fine-state filtering, retained fine-state count > retained coarse-state count and both coarse states are present",
+    "score": "negative patristic distance",
+    "metric": "ROC_AUC among pairs sharing the same coarse state",
+    "null": "permute retained fine labels within coarse groups, preserving fine-state counts",
+    "permutations": 9999,
+    "seed": 20260927,
+    "pass_rule": "centered conditional AUC > 0 and one-sided permutation P <= 0.05"
+  },
+  "informativeness_gate": "data/future_hidden_memory_informativeness_gate_v0_1.json",
+  "outcome_firewall_at_freeze": {
+    "zenodo_bundle_bytes_downloaded_by_chun": false,
+    "floraltraits_row_values_opened": false,
+    "x_identifier_values_opened": false,
+    "corolla_colour_values_opened": false,
+    "state_frequencies_computed": false,
+    "tree_body_opened": false,
+    "hidden_memory_auc_computed": false
+  },
+  "relation_to_existing_evidence": {
+    "independent_of_flowerclades51": true,
+    "independent_of_schistanthe": true,
+    "independent_of_gesnerioideae": true,
+    "changes_ruellia_promotion_rule": false,
+    "purpose": "additional future-facing replication under the v0.4 realization architecture; cannot retroactively rescue any prior FAIL"
+  },
+  "paper1_science_changed": false,
+  "el_v0_3_science_changed": false
+}
