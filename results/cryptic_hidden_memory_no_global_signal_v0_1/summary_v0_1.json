@@ -1,0 +1,38 @@
+{
+  "version": "v0.1",
+  "status": "CRYPTIC_HIDDEN_MEMORY_NO_GLOBAL_SIGNAL_EXPLORATORY_RESULT",
+  "analysis_design": "data/cryptic_hidden_memory_no_global_signal_design_v0_1.json",
+  "opportunity_clades_total": 21,
+  "globally_no_signal": {
+    "n": 10,
+    "positive": 8,
+    "negative": 2,
+    "positive_fraction_nonzero": 0.8,
+    "median_centered_auc_effect": 0.02753632600277217,
+    "mean_centered_auc_effect": 0.02477147093079033,
+    "sign_test_p_one_sided": 0.0546875,
+    "wilcoxon_p_one_sided": 0.009765625,
+    "primary_supported": false,
+    "focal_clades": [
+      "Chrysophyllum","Cissus","Clidemia","Diospyros","Elaeocarpus",
+      "Lonicera","Pouteria","Protium","Rhus","Ribes"
+    ],
+    "negative_clades": ["Pouteria","Rhus"]
+  },
+  "globally_signalled_descriptive": {
+    "n": 11,
+    "positive": 10,
+    "negative": 1,
+    "positive_fraction_nonzero": 0.9090909090909091,
+    "median_centered_auc_effect": 0.017272869363544552,
+    "mean_centered_auc_effect": 0.05422070896815887,
+    "sign_test_p_one_sided": 0.005859375,
+    "wilcoxon_p_one_sided": 0.0009765625
+  },
+  "decision": "PRIMARY_EXACT_SIGN_TEST_NOT_SUPPORTED",
+  "interpretation": "Eight of ten globally no-signal opportunity clades retain positive hidden-memory effects and the subgroup median is positive, but the pre-frozen exact sign test narrowly misses the 0.05 threshold. Cryptic hidden organization is therefore a strong descriptive pattern, not promoted as a subgroup-level inferential result.",
+  "important_boundary": "The significant one-sided Wilcoxon result cannot rescue the failed exact sign-test primary under the pre-frozen rule.",
+  "architectural_implication": "Absence of a significant unconditional global flower-colour profile is not equivalent to absence of positive within-coarse fine-state organization. The two measurements can disagree at the clade level even though the subgroup-level cryptic-memory hypothesis does not pass its frozen exact prevalence threshold.",
+  "paper1_science_changed": false,
+  "el_v0_3_science_changed": false
+}
