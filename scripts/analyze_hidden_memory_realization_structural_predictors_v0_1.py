@@ -151,12 +151,10 @@ def build()->dict:
                 "max_rho":float(max(loo_rhos)),
                 "positive_count":int(sum(r>0 for r in loo_rhos)),
                 "negative_count":int(sum(r<0 for r in loo_rhos)),
-                "details":loo,
             },
             "supported":supported,
         },
         "secondary_descriptive":secondary,
-        "rows":rows,
         "interpretation":(
             "The preregistered pair-collision measure of fine-to-coarse representation opportunity does not positively predict the magnitude of hidden fine-state memory. "
             "Thus the recurrent hidden-memory signal is not explained by the trivial amount of pairwise state collision created by coarse coding. "
