@@ -1,0 +1,40 @@
+name: PHAIDRA abiotic transport diagnosis v0.4
+
+on:
+  pull_request:
+    paths:
+      - 'data/phaidra_abiotic_transport_diagnosis_v0_4.json'
+      - 'docs/PHAIDRA_ABIOTIC_TRANSPORT_DIAGNOSIS_V0_4.md'
+      - '.github/workflows/phaidra-abiotic-transport-diagnosis-v0-4.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Validate transport receipt
+        run: |
+          python - <<'PY'
+          import json
+          x=json.load(open('data/phaidra_abiotic_transport_diagnosis_v0_4.json'))
+          assert x['status']=='HOLD_PHAIDRA_API_RESPONSE_LAYER_NONDIAGNOSTIC_TARGET_AND_CONTROL'
+          assert len(x['frozen_target_pids'])==2
+          assert all(p['handle_api_http_status']==200 for p in x['frozen_target_pids'])
+          assert x['diagnosis']['handle_identity_resolution']=='READY_FOR_BOTH_PIDS'
+          assert x['diagnosis']['frontend_response']=='ANUBIS_ANTI_BOT_INTERSTITIAL'
+          assert x['outcome_firewall']['environmental_rows_opened'] is False
+          assert x['outcome_firewall']['flower_memory_outcome_fit'] is False
+          assert x['abiotic_hypothesis_tested'] is False
+          assert x['biological_decision']=='NONE_SOURCE_TRANSPORT_HOLD'
+          assert x['paper1_science_changed'] is False
+          assert x['el_v0_3_science_changed'] is False
+          PY
+      - name: Validate frozen EL v0.3 science
+        run: python scripts/validate_cross_radiation_el_v0_3_science_freeze_v0_1.py

@@ -1,0 +1,45 @@
+{
+  "version": "v0.4",
+  "status": "HOLD_PHAIDRA_API_RESPONSE_LAYER_NONDIAGNOSTIC_TARGET_AND_CONTROL",
+  "programme_role": "SOURCE_TRANSPORT_DIAGNOSIS_FOR_ALREADY_FROZEN_ABIOTIC_MODERATOR",
+  "source_pr": 337,
+  "source_branch": "analysis/flower-memory-abiotic-source-recovery-v0-2",
+  "source_head_sha": "56964e5afb20fe5dd251a5b8d76c7bffe12aef21",
+  "frozen_target_pids": [
+    {
+      "pid": "o:2098641",
+      "role": "article_data_availability_statement",
+      "handle": "11353/10.2098641",
+      "handle_api_http_status": 200,
+      "handle_target": "https://phaidra.univie.ac.at/o:2098641"
+    },
+    {
+      "pid": "o:2322953",
+      "role": "current_university_publication_record",
+      "handle": "11353/10.2322953",
+      "handle_api_http_status": 200,
+      "handle_target": "https://phaidra.univie.ac.at/o:2322953"
+    }
+  ],
+  "diagnosis": {
+    "handle_identity_resolution": "READY_FOR_BOTH_PIDS",
+    "frontend_response": "ANUBIS_ANTI_BOT_INTERSTITIAL",
+    "frontend_marker": "Making sure you're not a bot!",
+    "services_object_info": "HTTP_200_EMPTY_BODY_FOR_TARGET_OBJECTS",
+    "alternate_metadata_routes": "NO_ARTICLE_RELEVANT_METADATA_OR_MEMBER_PIDS_DISCOVERED",
+    "target_and_control_response_layer": "NONDIAGNOSTIC",
+    "interpretation": "The PHAIDRA identifiers resolve through the Handle system, so the current CHUN HOLD is more specifically a transport/response-layer access problem rather than evidence that the cited PIDs are invalid or that the abiotic source does not exist."
+  },
+  "terminal_gate": "HOLD_PHAIDRA_SOURCE_TRANSPORT_ENVIRONMENTAL_ROWS_UNOPENED",
+  "next_gate": "Reopen only when public metadata/member inventory or identity-verifiable source bytes become accessible under the frozen source rule; do not substitute a fresh GBIF reconstruction.",
+  "outcome_firewall": {
+    "environmental_rows_opened": false,
+    "member_file_contents_opened": false,
+    "flower_memory_outcome_fit": false,
+    "fresh_gbif_substitution_used": false
+  },
+  "abiotic_hypothesis_tested": false,
+  "biological_decision": "NONE_SOURCE_TRANSPORT_HOLD",
+  "paper1_science_changed": false,
+  "el_v0_3_science_changed": false
+}
