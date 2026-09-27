@@ -1,0 +1,38 @@
+{
+  "version": "v0.1",
+  "status": "EL_V0_8_HIERARCHICAL_MEMORY_CANDIDATE_SUPERSEDED_FOR_SCIENTIFIC_USE_POST_GESNERIOIDEAE",
+  "original_candidate_gate": "data/cross_radiation_evolution_letters_v0_8_hierarchical_memory_gate.json",
+  "original_manuscript": "manuscript/CROSS_RADIATION_EVOLUTION_LETTERS_V0_8_HIERARCHICAL_MEMORY_SCHISTANTHE_CANDIDATE.md",
+  "original_candidate_files_modified": false,
+  "reason": "The v0.8 candidate predates the completed prospective Gesnerioideae biochemical hidden-memory FAIL and the v0.4 realization synthesis. Its visible-colour evidence remains valid, but its scientific state no longer represents the full current extension evidence.",
+  "current_authoritative_extension_synthesis": "data/hierarchical_evolutionary_memory_synthesis_v0_4.json",
+  "evidence_updates_since_v0_8": [
+    {
+      "source": "results/gesnerioideae_biochemical_hidden_memory_v0_1/summary_v0_1.json",
+      "status": "PROSPECTIVE_GESNERIOIDEAE_BIOCHEMICAL_HIDDEN_MEMORY_FAIL",
+      "consequence": "No prospective biochemical generalization claim."
+    },
+    {
+      "source": "results/hidden_memory_realization_structural_predictors_v0_1/summary_v0_1.json",
+      "consequence": "Trivial fine-to-coarse collision does not explain hidden-memory realization."
+    },
+    {
+      "source": "results/cryptic_hidden_memory_no_global_signal_v0_1/summary_v0_1.json",
+      "consequence": "Global no-signal and nested organization can disagree descriptively; subgroup primary remains unsupported."
+    },
+    {
+      "source": "results/hidden_memory_vs_relative_persistence_v0_1/summary_v0_1.json",
+      "consequence": "Fine-colour persistence relation is directionally positive but frozen primary remains unsupported at P=0.06147."
+    }
+  ],
+  "current_use_rule": {
+    "use_v0_8_as_submission_candidate": false,
+    "use_v0_8_as_historical_snapshot": true,
+    "current_submission": "Evolution Letters v0.3",
+    "build_new_hierarchical_candidate_from": "hierarchical-memory synthesis v0.4 only after the existing promotion governance permits it",
+    "ruellia_specific_promotion_rule_changed": false
+  },
+  "strongest_current_extension_claim": "Hierarchical hidden memory is recurrent and prospectively replicated in visible colour, is not a trivial state-compression artifact, but remains contingent across representations and mechanistically unresolved.",
+  "paper1_science_changed": false,
+  "el_v0_3_science_changed": false
+}
