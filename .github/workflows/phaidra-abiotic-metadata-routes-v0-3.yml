@@ -1,0 +1,43 @@
+name: PHAIDRA abiotic alternate metadata routes v0.3
+
+on:
+  pull_request:
+    paths:
+      - 'scripts/probe_phaidra_abiotic_metadata_routes_v0_3.py'
+      - 'tests/test_probe_phaidra_abiotic_metadata_routes_v0_3.py'
+      - 'data/flower_memory_abiotic_metadata_routes_v0_3.json'
+      - 'docs/FLOWER_MEMORY_ABIOTIC_METADATA_ROUTES_V0_3.md'
+      - '.github/workflows/phaidra-abiotic-metadata-routes-v0-3.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  diagnose:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: pip install pytest
+      - run: pytest -q tests/test_probe_phaidra_abiotic_metadata_routes_v0_3.py
+      - name: Probe metadata-only alternate routes
+        run: python scripts/probe_phaidra_abiotic_metadata_routes_v0_3.py --out build/phaidra_abiotic_metadata_routes_v0_3.json
+      - name: Assert outcome firewall
+        run: |
+          python - <<'PY'
+          import json
+          x=json.load(open('build/phaidra_abiotic_metadata_routes_v0_3.json'))
+          assert x['outcome_firewall']['content_download_routes_called'] is False
+          assert x['outcome_firewall']['member_file_contents_opened'] is False
+          assert x['outcome_firewall']['environmental_rows_opened'] is False
+          assert x['outcome_firewall']['flower_memory_outcome_fit'] is False
+          print(x['status'],x['discovered_pids'],x['next_gate'])
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: phaidra-abiotic-metadata-routes-v0-3
+          path: build/
