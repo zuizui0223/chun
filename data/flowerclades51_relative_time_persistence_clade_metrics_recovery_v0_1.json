@@ -1,0 +1,18 @@
+{
+  "version": "v0.1",
+  "status": "HISTORICAL_EXACT_SOURCE_DERIVED_ARTIFACT_RECOVERED",
+  "source_branch": "analysis/flowerclades51-distance-persistence-v0-1",
+  "source_branch_head": "973bd46b81a51b0fe8ddcfc58aad4dd70379fe5a",
+  "source_path": "results/flowerclades51_distance_persistence_v0_1/clade_metrics_v0_1.csv",
+  "source_git_blob_sha": "c34c24c82dcca10e2630686c828071fd6f278f40",
+  "recovered_path": "data/flowerclades51_relative_time_persistence_clade_metrics_historical_v0_1.csv",
+  "underlying_exact_source_sha256": {
+    "final_dataset.csv": "a253308785e4cbd0e361b3ca04cdfdae29c523eefa843375cebf8030ee0874af",
+    "trees.zip": "ae5c82945e5bf9c29bcabc52d6029acd8d4f5be1fe9141fad95918eacb4f674d"
+  },
+  "provenance_note": "The recovered CSV is copied byte-for-text from an existing historical analysis branch whose workflow and documentation identify the same exact frozen Flower-clades-51 source hashes. No persistence metric is recomputed during recovery.",
+  "source_rows": 28,
+  "outcome_fit_during_recovery": false,
+  "paper1_science_changed": false,
+  "el_v0_3_science_changed": false
+}
