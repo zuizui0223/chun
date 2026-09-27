@@ -1,0 +1,59 @@
+{
+  "analysis_role": "MECHANISM_DIAGNOSTIC_NOT_CONFIRMATORY_NOT_EL_V0_3_MODIFICATION",
+  "biological_implication": "Opportunity determines whether hidden fine structure can exist, but simple combinatorial opportunity does not determine how strongly lineage history is realized inside coarse phenotype classes. The remaining among-radiation variation therefore requires lineage history, transition dynamics, ecology, or other biological structure not captured by these state-space compression metrics.",
+  "claim_boundary": [
+    "post-outcome exploratory analysis",
+    "primary structural hypothesis failed unless rho > 0 and permutation P <= 0.05",
+    "secondary predictors are descriptive and cannot rescue the primary test",
+    "no ecological or molecular cause is inferred",
+    "no new environmental predictor was searched",
+    "frozen EL v0.3 remains unchanged"
+  ],
+  "el_v0_3_science_changed": false,
+  "interpretation": "The preregistered pair-collision measure of fine-to-coarse representation opportunity does not positively predict the magnitude of hidden fine-state memory. Thus the recurrent hidden-memory signal is not explained by the trivial amount of pairwise state collision created by coarse coding. Secondary structural correlations are descriptive only and cannot replace the failed primary hypothesis.",
+  "n_clades": 21,
+  "paper1_science_changed": false,
+  "primary": {
+    "bootstrap": {
+      "median": -0.25311477552761447,
+      "positive_fraction": 0.104,
+      "q025": -0.5931539519541624,
+      "q975": 0.1454789816028348,
+      "requested": 20000,
+      "usable": 20000
+    },
+    "leave_one_clade_out": {
+      "max_rho": -0.19999999999999998,
+      "min_rho": -0.362406015037594,
+      "negative_count": 21,
+      "positive_count": 0
+    },
+    "permutation_p_two_sided": 0.26023,
+    "permutations": 99999,
+    "predicted_direction": "positive",
+    "predictor": "collision_gain_fine_to_coarse",
+    "rho": -0.2571428571428571,
+    "seed": 20260927,
+    "supported": false
+  },
+  "secondary_descriptive": {
+    "entropy_loss_fine_to_coarse": {
+      "p_two_sided_asymptotic": 0.7286240142042282,
+      "rho": -0.08051948051948052
+    },
+    "fine_states": {
+      "p_two_sided_asymptotic": 0.07886216557125775,
+      "rho": 0.3919647479510927
+    },
+    "log10_eligible_tips": {
+      "p_two_sided_asymptotic": 0.10921076405040114,
+      "rho": 0.35974025974025975
+    },
+    "state_collapse_fine_to_coarse": {
+      "p_two_sided_asymptotic": 0.07886216557125775,
+      "rho": 0.3919647479510927
+    }
+  },
+  "status": "HIDDEN_MEMORY_STRUCTURAL_REALIZATION_EXPLORATORY_RESULT",
+  "version": "v0.1"
+}
