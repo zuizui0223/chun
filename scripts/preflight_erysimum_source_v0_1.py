@@ -352,7 +352,7 @@ def main()->int:
           "paper1_science_changed":False,
           "el_v0_3_science_changed":False
         }
-        a.out.write_text(json.dumps(out,indent=2,sort_keys=True)+"\\n")
+        a.out.write_text(json.dumps(out,indent=2,sort_keys=True)+"\n")
         print(json.dumps({"status":out["status"],"package_metadata":obj},indent=2,default=str))
         return 0
     try:
@@ -382,7 +382,7 @@ def main()->int:
           "paper1_science_changed":False,
           "el_v0_3_science_changed":False
         }
-        a.out.write_text(json.dumps(out,indent=2,sort_keys=True,default=str)+"\\n")
+        a.out.write_text(json.dumps(out,indent=2,sort_keys=True,default=str)+"\n")
         print(json.dumps({
           "status":out["status"],
           "package_metadata":obj,
