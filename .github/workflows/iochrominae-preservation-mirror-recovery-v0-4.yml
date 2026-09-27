@@ -1,0 +1,53 @@
+name: Iochrominae preservation mirror recovery v0.4
+
+on:
+  pull_request:
+    paths:
+      - 'scripts/recover_iochrominae_preservation_mirrors_v0_4.py'
+      - 'tests/test_recover_iochrominae_preservation_mirrors_v0_4.py'
+      - '.github/workflows/iochrominae-preservation-mirror-recovery-v0-4.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  recover:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install tests
+        run: pip install pytest
+      - name: Unit tests
+        run: pytest -q tests/test_recover_iochrominae_preservation_mirrors_v0_4.py
+      - name: Recover exact source bytes through preservation discovery
+        run: python scripts/recover_iochrominae_preservation_mirrors_v0_4.py --out build/iochrominae_preservation_recovery_v0_4.json
+      - name: Assert outcome firewall
+        run: |
+          python - <<'PY'
+          import json
+          x=json.load(open('build/iochrominae_preservation_recovery_v0_4.json'))
+          f=x['outcome_firewall']
+          assert x['analysis_role']=='RETROSPECTIVE_SECOND_BIOCHEMICAL_ANCHOR_NOT_PROSPECTIVE_REPLICATION'
+          assert f['readme_text_opened'] is False
+          assert f['archive_member_names_opened'] is False
+          assert f['archive_data_rows_opened'] is False
+          assert f['profile_state_mapping_computed'] is False
+          assert f['profile_states_computed'] is False
+          assert f['patristic_distances_computed'] is False
+          assert f['profile_auc_computed'] is False
+          assert f['hidden_memory_auc_computed'] is False
+          print(x['status'])
+          for name,o in x['objects'].items():
+              print(name,o['recovered'],o['recovered_size'],o['recovered_md5'])
+          print(x['next_gate'])
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: iochrominae-preservation-recovery-v0-4
+          path: build/
