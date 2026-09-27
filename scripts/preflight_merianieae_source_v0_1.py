@@ -64,21 +64,15 @@ def zenodo_bundle_url(meta:dict)->str:
     return matches[0]
 
 
-def member_candidates(names:list[str],basename_casefold:str)->list[str]:
-    return sorted(
-        [n for n in names if not n.endswith("/") and Path(n).name.casefold()==basename_casefold.casefold()]
+def member_by_suffix(names:list[str],required_suffix:str)->str:
+    suffix=required_suffix.replace("\\","/").casefold()
+    matches=sorted(
+        n for n in names
+        if not n.endswith("/") and n.replace("\\","/").casefold().endswith(suffix)
     )
-
-
-def choose_identical_members(z:zipfile.ZipFile,candidates:list[str],label:str)->tuple[str,bytes,list[dict]]:
-    if not candidates:
-        raise RuntimeError(f"{label}: required archive member not found")
-    payloads=[(n,z.read(n)) for n in candidates]
-    digests={sha256(b) for _,b in payloads}
-    if len(digests)!=1:
-        raise RuntimeError(f"{label}: multiple non-identical archive members")
-    chosen=payloads[0]
-    return chosen[0],chosen[1],[{"path":n,"bytes":len(b),"sha256":sha256(b)} for n,b in payloads]
+    if len(matches)!=1:
+        raise RuntimeError(f"required archive suffix {required_suffix!r}: expected 1 match, got {len(matches)}")
+    return matches[0]
 
 
 def header_only(csv_bytes:bytes)->list[str]:
@@ -122,10 +116,12 @@ def main()->int:
 
         with zipfile.ZipFile(io.BytesIO(bundle)) as z:
             names=z.namelist()
-            trait_cands=member_candidates(names,TRAIT_BASENAME)
-            tree_cands=member_candidates(names,TREE_BASENAME)
-            trait_path,trait_bytes,trait_copies=choose_identical_members(z,trait_cands,"trait")
-            tree_path,tree_bytes,tree_copies=choose_identical_members(z,tree_cands,"tree")
+            trait_path=member_by_suffix(names,TRAIT_SUFFIX)
+            tree_path=member_by_suffix(names,TREE_SUFFIX)
+            trait_bytes=z.read(trait_path)
+            tree_bytes=z.read(tree_path)
+            trait_copies=[{"path":trait_path,"bytes":len(trait_bytes),"sha256":sha256(trait_bytes)}]
+            tree_copies=[{"path":tree_path,"bytes":len(tree_bytes),"sha256":sha256(tree_bytes)}]
     except Exception as e:
         out={
           "version":"v0.1",
