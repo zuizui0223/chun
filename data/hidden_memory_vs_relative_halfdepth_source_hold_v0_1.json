@@ -1,0 +1,25 @@
+{
+  "version": "v0.1",
+  "status": "HOLD_EXACT_FLOWERCLADES51_SOURCE_BYTES_UNAVAILABLE_HALFDEPTH_RELATION_UNCOMPUTED",
+  "analysis_design": "data/hidden_memory_vs_relative_halfdepth_design_v0_1.json",
+  "hypothesis": "Longer relative fine-colour half-depth predicts stronger permutation-centered within-coarse hidden-memory effect.",
+  "hypothesis_tested": false,
+  "source_contract": {
+    "final_dataset_sha256": "a253308785e4cbd0e361b3ca04cdfdae29c523eefa843375cebf8030ee0874af",
+    "trees_zip_sha256": "ae5c82945e5bf9c29bcabc52d6029acd8d4f5be1fe9141fad95918eacb4f674d",
+    "dryad_doi": "10.5061/dryad.r4xgxd2sc"
+  },
+  "transport_attempts": [
+    "current Dryad API file download routes",
+    "Dryad file_stream routes",
+    "complete-dataset archive route",
+    "session-preserving landing-page cookie jar followed by file_stream/API routes"
+  ],
+  "exact_source_recovered": false,
+  "halfdepth_relation_computed": false,
+  "biological_decision": "NONE_SOURCE_TRANSPORT_HOLD",
+  "interpretation": "The temporal relation was not evaluated. This source HOLD is not evidence for or against a link between fine-state persistence duration and hidden-memory realization.",
+  "next_gate": "Reopen only if exact frozen final_dataset.csv and trees.zip bytes become recoverable or an exact preservation mirror is identified.",
+  "paper1_science_changed": false,
+  "el_v0_3_science_changed": false
+}

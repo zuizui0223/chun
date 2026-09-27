@@ -1,0 +1,72 @@
+name: Hidden memory vs relative half-depth v0.1
+
+on:
+  pull_request:
+    paths:
+      - 'data/hidden_memory_vs_relative_halfdepth_design_v0_1.json'
+      - 'scripts/analyze_hidden_memory_vs_relative_halfdepth_v0_1.py'
+      - 'results/hidden_memory_vs_relative_halfdepth_v0_1/**'
+      - 'data/hidden_memory_vs_relative_halfdepth_source_hold_v0_1.json'
+      - 'docs/HIDDEN_MEMORY_VS_RELATIVE_HALFDEPTH_SOURCE_HOLD_V0_1.md'
+      - 'docs/HIDDEN_MEMORY_VS_RELATIVE_HALFDEPTH_V0_1.md'
+      - '.github/workflows/hidden-memory-vs-relative-halfdepth-v0-1.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  analyze:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install runtime
+        run: pip install numpy scipy biopython
+      - name: Validate frozen exploratory design
+        run: |
+          python - <<'PY'
+          import json
+          x=json.load(open('data/hidden_memory_vs_relative_halfdepth_design_v0_1.json'))
+          assert x['status']=='POST_OUTCOME_EXPLORATORY_HALFDEPTH_RELATION_FIXED_BEFORE_NEW_CALCULATION'
+          assert x['primary_hypothesis']['predictor']=='fine_half_depth_ln2_over_lambda'
+          assert x['primary_hypothesis']['expected_direction']=='positive'
+          assert x['primary_hypothesis']['permutations']==99999
+          assert x['robustness']['interior_fine_lambda_only_sensitivity'] is True
+          assert x['el_v0_3_science_changed'] is False
+          PY
+      - name: Recompute half-depth and relation from exact frozen sources
+        run: |
+          python scripts/analyze_hidden_memory_vs_relative_halfdepth_v0_1.py             --work build/hidden_memory_vs_halfdepth_work             --out build/hidden_memory_vs_relative_halfdepth_v0_1.json
+      - name: Validate boundary
+        run: |
+          python - <<'PY'
+          import json
+          x=json.load(open('build/hidden_memory_vs_relative_halfdepth_v0_1.json'))
+          assert x['paper1_science_changed'] is False
+          assert x['el_v0_3_science_changed'] is False
+          if x['status']=='HIDDEN_MEMORY_VS_RELATIVE_HALFDEPTH_EXPLORATORY_RESULT':
+              assert x['n_clades']==21
+              assert x['primary']['predictor']=='fine_half_depth_ln2_over_lambda'
+              assert x['primary']['permutations']==99999
+              print(json.dumps({
+                'primary':x['primary'],
+                'interior':x['interior_fine_lambda_sensitivity'],
+                'secondary':x['secondary_descriptive'],
+                'interpretation':x['interpretation']
+              },indent=2))
+          else:
+              assert x['status']=='HOLD_EXACT_FLOWERCLADES51_SOURCE_BYTES_UNAVAILABLE_HALFDEPTH_RELATION_UNCOMPUTED'
+              h=json.load(open('data/hidden_memory_vs_relative_halfdepth_source_hold_v0_1.json'))
+              assert h['status']==x['status']
+              assert h['hypothesis_tested'] is False
+              assert h['halfdepth_relation_computed'] is False
+              print(x['status'])
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: hidden-memory-vs-relative-halfdepth-v0-1
+          path: build/
