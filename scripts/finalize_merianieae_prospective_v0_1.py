@@ -19,9 +19,11 @@ def main()->int:
 
     source=maybe(a.receipts/"source.json")
     crosswalk=maybe(a.receipts/"crosswalk.json")
+    pollinator=maybe(a.receipts/"pollinator.json")
     support=maybe(a.receipts/"state_support.json")
     info=maybe(a.receipts/"informativeness.json")
     result=maybe(a.receipts/"hidden_memory_result.json")
+    ecology=maybe(a.receipts/"pollinator_conditioned.json")
 
     if result is not None:
         terminal=result["status"]
@@ -56,9 +58,11 @@ def main()->int:
       "observed_hidden_memory_auc_opened":outcome_opened,
       "source_status":source["status"] if source else None,
       "crosswalk_status":crosswalk["status"] if crosswalk else None,
+      "pollinator_frame_status":pollinator["status"] if pollinator else None,
       "state_support_status":support["status"] if support else None,
       "informativeness_status":info["status"] if info else None,
       "hidden_memory_status":result["status"] if result else None,
+      "ecological_secondary_status":ecology["status"] if ecology else None,
       "sequential_gate_order_preserved":True,
       "ruellia_specific_promotion_rule_changed":False,
       "paper1_science_changed":False,
