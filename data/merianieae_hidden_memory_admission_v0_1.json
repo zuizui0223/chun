@@ -43,6 +43,7 @@
   "sequential_gates": [
     "EXACT_SOURCE_RECOVERY_AND_HEADER_TREE_METADATA_ONLY",
     "IDENTIFIER_ONLY_CROSSWALK_FREEZE_WITH_COROLLA_COLOUR_UNOPENED",
+    "OUTCOME_INDEPENDENT_ESTIMATED_POLLINATOR_FRAME_FREEZE",
     "COROLLA_COLOUR_STATE_SUPPORT_AND_COMPRESSION_OPPORTUNITY",
     "FUTURE_HIDDEN_MEMORY_INFORMATIVENESS_GATE",
     "OBSERVED_WITHIN_COARSE_HIDDEN_MEMORY_AUC"
@@ -78,5 +79,23 @@
   "source_identity_erratum": {
     "status": "FROZEN_PRE_ROW_METADATA_ONLY_SOURCE_PATH_REFINEMENT",
     "reason": "Zenodo archive preview exposes two non-identical Marcelo_Meris.tre copies in different analysis folders. The Dryad README states that folder 1_morphospaces_disparity contains floraltraits.csv and the Merianieae phylogeny used for floral-space analyses. The trait and tree are therefore frozen to that same folder before source bytes or row-level corolla colour are opened."
+  },
+  "ecological_secondary_frozen_before_colour": {
+    "predictor_column": "estimated_pollinator",
+    "opening_order": "identifier-only crosswalk first; then estimated_pollinator values may be opened and frozen before corolla.colour is accessed",
+    "normalization": "trim/lowercase/collapse whitespace only; missing tokens remain missing; no guild merging",
+    "frame": "intersection of primary retained colour frame and nonmissing estimated_pollinator",
+    "minimum_tips": 20,
+    "minimum_pollinator_states": 2,
+    "run_only_if_primary_hidden_memory_passes": true,
+    "diagnostic": "Compare the observed within-coarse phylogenetic AUC with (A) fine-label permutations within coarse state and (B) fine-label permutations within coarse x estimated_pollinator strata.",
+    "permutations": 9999,
+    "seed": 20260928,
+    "interpretation": {
+      "residual_pass": "If the pollinator-conditioned centered effect remains >0 with one-sided P<=0.05, nested lineage organization persists beyond the source-defined pollinator grouping.",
+      "attenuation_only": "If conditioning on pollinator grouping substantially raises the null expectation or removes residual significance, pollinator regime is compatible with accounting for part of the hidden organization.",
+      "causal_claim_allowed": false
+    },
+    "boundary": "secondary ecological diagnostic only; cannot rescue a failed primary hidden-memory test"
   }
 }
