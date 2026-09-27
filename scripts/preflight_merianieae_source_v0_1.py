@@ -112,19 +112,42 @@ def main()->int:
     a.out.parent.mkdir(parents=True,exist_ok=True)
     a.stage_dir.mkdir(parents=True,exist_ok=True)
 
-    meta=json.loads(fetch(ZENODO_API,"application/json").decode("utf-8"))
-    url=zenodo_bundle_url(meta)
-    bundle=fetch(url)
-    bundle_md5=md5(bundle)
-    if bundle_md5!=BUNDLE_MD5:
-        raise RuntimeError(f"Zenodo bundle MD5 drift: {bundle_md5}")
+    try:
+        meta=json.loads(fetch(ZENODO_API,"application/json").decode("utf-8"))
+        url=zenodo_bundle_url(meta)
+        bundle=fetch(url)
+        bundle_md5=md5(bundle)
+        if bundle_md5!=BUNDLE_MD5:
+            raise RuntimeError(f"Zenodo bundle MD5 drift: {bundle_md5}")
 
-    with zipfile.ZipFile(io.BytesIO(bundle)) as z:
-        names=z.namelist()
-        trait_cands=member_candidates(names,TRAIT_BASENAME)
-        tree_cands=member_candidates(names,TREE_BASENAME)
-        trait_path,trait_bytes,trait_copies=choose_identical_members(z,trait_cands,"trait")
-        tree_path,tree_bytes,tree_copies=choose_identical_members(z,tree_cands,"tree")
+        with zipfile.ZipFile(io.BytesIO(bundle)) as z:
+            names=z.namelist()
+            trait_cands=member_candidates(names,TRAIT_BASENAME)
+            tree_cands=member_candidates(names,TREE_BASENAME)
+            trait_path,trait_bytes,trait_copies=choose_identical_members(z,trait_cands,"trait")
+            tree_path,tree_bytes,tree_copies=choose_identical_members(z,tree_cands,"tree")
+    except Exception as e:
+        out={
+          "version":"v0.1",
+          "status":"HOLD_MERIANIEAE_SOURCE_TRANSPORT_OR_IDENTITY",
+          "candidate":"MERIANIEAE_MELASTOMATACEAE",
+          "error":f"{type(e).__name__}: {e}",
+          "outcome_firewall":{
+            "trait_header_opened":False,
+            "trait_data_rows_opened":False,
+            "identifier_values_opened":False,
+            "corolla_colour_values_opened":False,
+            "state_frequencies_computed":False,
+            "tree_tip_labels_emitted":False,
+            "hidden_memory_auc_computed":False,
+          },
+          "next_gate":"STOP_HOLD",
+          "paper1_science_changed":False,
+          "el_v0_3_science_changed":False
+        }
+        a.out.write_text(json.dumps(out,indent=2,sort_keys=True)+"\n")
+        print(json.dumps(out,indent=2,sort_keys=True))
+        return 0
 
     header=header_only(trait_bytes)
     required=["species","x","corolla.colour"]
