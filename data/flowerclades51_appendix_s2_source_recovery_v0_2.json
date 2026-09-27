@@ -1,0 +1,34 @@
+{
+  "version": "v0.2",
+  "status": "HOLD_WILEY_APPENDIX_S2_BYTES_UNAVAILABLE_V0_2",
+  "doi": "10.1002/ajb2.70146",
+  "expected_filename": "ajb270146-sup-0002-AJB_SinnottArmstrong_D_24_00358_AppendixS2_ce.docx",
+  "publisher_listing_verified": true,
+  "publisher_reported_size": "254.6 KB",
+  "recheck_routes": [
+    "publisher article href discovery",
+    "legacy Wiley action/downloadSupplement routes",
+    "current Wiley doi/suppl/.../supinfo routes on bsapubs, onlinelibrary and www.onlinelibrary hosts",
+    "browser-like request headers"
+  ],
+  "article_href_candidates_discovered_by_runner": 0,
+  "exact_docx_recovered": false,
+  "decision": "HOLD_SOURCE_LABILITY_VALUE_UNRESOLVED",
+  "biological_decision": "NONE_SOURCE_TRANSPORT_HOLD",
+  "outcome_firewall": {
+    "clade_transition_values_extracted": false,
+    "transition_counts_reestimated": false,
+    "manual_plot_digitization_used": false,
+    "chun_bridge_fitted": false
+  },
+  "hold_interpretation": "The exact publisher-listed Appendix S2 remains inaccessible to the reproducible runner. The frozen temporal-lability bridge therefore remains unfit; this is not evidence for or against lability as a biological moderator.",
+  "forbidden_rescue": [
+    "re-estimate stochastic maps under new trees/settings",
+    "switch to fruit transitions or another predictor",
+    "use fresh ecological predictors selected after viewing memory outcomes",
+    "manual figure digitization without a separately frozen protocol"
+  ],
+  "next_gate": "Reopen only if the exact Appendix S2 DOCX or an exact machine-readable companion object traceable to Appendix S2 becomes recoverable.",
+  "paper1_science_changed": false,
+  "el_v0_3_science_changed": false
+}

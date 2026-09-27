@@ -1,0 +1,56 @@
+name: Flowerclades51 Appendix S2 recovery v0.2
+
+on:
+  pull_request:
+    paths:
+      - 'scripts/recover_flowerclades51_appendix_s2_v0_2.py'
+      - 'tests/test_recover_flowerclades51_appendix_s2_v0_2.py'
+      - 'data/flowerclades51_appendix_s2_source_recovery_v0_2.json'
+      - 'docs/FLOWERCLADES51_APPENDIX_S2_SOURCE_RECOVERY_V0_2.md'
+      - '.github/workflows/flowerclades51-appendix-s2-recovery-v0-2.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  recover:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Unit tests
+        run: |
+          pip install pytest
+          pytest -q tests/test_recover_flowerclades51_appendix_s2_v0_2.py
+      - name: Recover exact Appendix S2 source only
+        run: python scripts/recover_flowerclades51_appendix_s2_v0_2.py --outdir build/appendix_s2_v0_2
+      - name: Assert frozen terminal HOLD and bridge firewall
+        run: |
+          python - <<'PY'
+          import json
+          x=json.load(open('build/appendix_s2_v0_2/source_receipt_v0_2.json'))
+          frozen=json.load(open('data/flowerclades51_appendix_s2_source_recovery_v0_2.json'))
+          assert x['status']==frozen['status']=='HOLD_WILEY_APPENDIX_S2_BYTES_UNAVAILABLE_V0_2'
+          assert x['decision']==frozen['decision']=='HOLD_SOURCE_LABILITY_VALUE_UNRESOLVED'
+          assert len(x['article_href_candidates_discovered'])==frozen['article_href_candidates_discovered_by_runner']==0
+          f=x['outcome_firewall']
+          assert f['transition_counts_reestimated'] is False
+          assert f['manual_plot_digitization_used'] is False
+          assert f['chun_bridge_fitted'] is False
+          assert x['paper1_science_changed'] is False
+          assert x['el_v0_3_science_changed'] is False
+          print(x['status'])
+          if 'sha256' in x:
+              print(x['sha256'],x['table_count'])
+              print(x['table_inventory'])
+          else:
+              print(x['article_href_candidates_discovered'])
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: flowerclades51-appendix-s2-recovery-v0-2
+          path: build/appendix_s2_v0_2/
