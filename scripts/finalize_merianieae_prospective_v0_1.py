@@ -37,7 +37,11 @@ def main()->int:
         outcome_opened=False
     elif support is not None and support["status"]!="MERIANIEAE_STATE_SUPPORT_COMPRESSION_READY_PRE_INFORMATION_GATE":
         terminal=support["status"]
-        biological_decision="NONE_STRUCTURAL_OR_SUPPORT_TERMINAL"
+        biological_decision=(
+            "NONE_SCHEMA_HOLD"
+            if support["status"]=="HOLD_MERIANIEAE_COROLLA_COLOUR_NUMERIC_CODE_SCHEMA"
+            else "NONE_STRUCTURAL_OR_SUPPORT_TERMINAL"
+        )
         outcome_opened=False
     elif crosswalk is not None and crosswalk["status"]!="MERIANIEAE_IDENTIFIER_CROSSWALK_FROZEN_COROLLA_COLOUR_UNOPENED":
         terminal=crosswalk["status"]
