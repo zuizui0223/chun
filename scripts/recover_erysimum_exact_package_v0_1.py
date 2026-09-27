@@ -25,7 +25,7 @@ DRYAD_ROUTES=[
 def fetch(url:str,accept:str="*/*")->dict:
     req=urllib.request.Request(url,headers={"User-Agent":UA,"Accept":accept})
     try:
-        with urllib.request.urlopen(req,timeout=120) as r:
+        with urllib.request.urlopen(req,timeout=30) as r:
             body=r.read()
             return {
                 "ok":True,"status":getattr(r,"status",200),"final_url":r.geturl(),
