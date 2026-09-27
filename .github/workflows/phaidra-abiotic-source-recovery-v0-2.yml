@@ -1,0 +1,62 @@
+name: PHAIDRA abiotic source recovery v0.2
+
+on:
+  pull_request:
+    paths:
+      - 'scripts/probe_phaidra_abiotic_source_v0_2.py'
+      - 'tests/test_probe_phaidra_abiotic_source_v0_2.py'
+      - 'data/flower_memory_abiotic_source_recovery_v0_2.json'
+      - 'docs/FLOWER_MEMORY_ABIOTIC_SOURCE_RECOVERY_V0_2.md'
+      - '.github/workflows/phaidra-abiotic-source-recovery-v0-2.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  recover:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install tests
+        run: pip install pytest
+      - name: Unit tests
+        run: pytest -q tests/test_probe_phaidra_abiotic_source_v0_2.py
+      - name: Validate original frozen moderator contract
+        run: |
+          python - <<'PY'
+          import json
+          x=json.load(open('data/flower_memory_abiotic_moderator_prereg_v0_1.json'))
+          assert x['status']=='FROZEN_BEFORE_PHAIDRA_ABIOTIC_DATA_INGESTION'
+          assert x['primary_test']['expected_direction']=='negative'
+          assert x['source_firewall']['no_new_gbif_redownload_if_phaidra_source_is_unavailable'] is True
+          PY
+      - name: Re-probe PHAIDRA metadata only
+        run: python scripts/probe_phaidra_abiotic_source_v0_2.py --out build/phaidra_abiotic_source_recovery_v0_2.json
+      - name: Assert outcome firewall
+        run: |
+          python - <<'PY'
+          import json
+          x=json.load(open('build/phaidra_abiotic_source_recovery_v0_2.json'))
+          assert x['outcome_firewall']['member_file_contents_downloaded'] is False
+          assert x['outcome_firewall']['environmental_rows_opened'] is False
+          assert x['outcome_firewall']['flower_memory_outcome_fit'] is False
+          assert x['paper1_science_changed'] is False
+          assert x['el_v0_3_science_changed'] is False
+          print(json.dumps({
+            'status':x['status'],
+            'roots':x['root_candidates'],
+            'global_discovered_pids':x['global_discovered_pids'],
+            'relevant_objects':x['relevant_objects'],
+            'relevant_filelike_objects':x['relevant_filelike_objects'],
+            'next_gate':x['next_gate']
+          },indent=2))
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: phaidra-abiotic-source-recovery-v0-2
+          path: build/
