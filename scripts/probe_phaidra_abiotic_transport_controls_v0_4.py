@@ -162,8 +162,19 @@ def main()->int:
             "handle_routes":hh,
         })
 
-    control_nonempty=any(x.get("ok") and x.get("bytes",0)>0 for x in control_meta)
-    control_members=any(isinstance(x.get("num_found"),int) and x["num_found"]>0 for x in control_search)
+    # A control is successful only if the actual services API returns a non-empty
+    # metadata payload. The frontend host can return a generic anti-bot HTML shell
+    # for arbitrary /api paths and must not count as metadata success.
+    control_nonempty=any(
+        x.get("ok") and x.get("bytes",0)>0
+        and str(x.get("final_url") or "").startswith(SERVICES+"/")
+        and "text/html" not in str(x.get("content_type") or "").lower()
+        for x in control_meta
+    )
+    control_members=any(
+        isinstance(x.get("num_found"),int) and x["num_found"]>0 and x.get("bytes",0)>0
+        for x in control_search
+    )
     target_head_identity=any(x["download_head_identity"]["informative"] for x in targets)
 
     if target_head_identity:
