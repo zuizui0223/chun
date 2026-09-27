@@ -60,6 +60,8 @@ def routes(pid:str)->list[tuple[str,str]]:
         ("services_jsonld",f"https://services.phaidra.univie.ac.at/api/object/{pid}/datastream/JSON-LD"),
         ("services_info_encoded",f"https://services.phaidra.univie.ac.at/api/object/{enc}/info"),
         ("services_metadata_encoded",f"https://services.phaidra.univie.ac.at/api/object/{enc}/metadata"),
+        ("services_uwmetadata_xml",f"https://services.phaidra.univie.ac.at/api/object/{pid}/uwmetadata?format=xml"),
+        ("services_uwmetadata_json",f"https://services.phaidra.univie.ac.at/api/object/{pid}/uwmetadata?format=json"),
         ("frontend_detail",f"https://phaidra.univie.ac.at/detail/{enc}"),
         ("frontend_object",f"https://phaidra.univie.ac.at/{pid}"),
         ("handle_api",f"https://hdl.handle.net/api/handles/11353/10.{num}"),
@@ -85,16 +87,17 @@ def main()->int:
             summ=body_summary(body)
             if parsed is not None:
                 summ["json_top_type"]=type(parsed).__name__
+            non_generic_files=[x for x in summ["filenames"] if x.lower() not in {"math.r"}]
             candidate=bool(
                 r.get("ok") and (
-                    parsed is not None or summ["contains_target_title"] or summ["contains_article_doi"]
-                    or summ["pids"] or summ["filenames"]
+                    summ["contains_target_title"] or summ["contains_article_doi"] or non_generic_files
                 )
             )
+            transport_alive=bool(r.get("ok") and r.get("status")==200 and r.get("bytes",0)>0)
             if candidate:
                 any_metadata=True
                 discovered.update(summ["pids"])
-            attempts.append({"label":label,**r,"candidate_metadata_response":candidate,"summary":summ})
+            attempts.append({"label":label,**r,"transport_alive":transport_alive,"candidate_metadata_response":candidate,"summary":summ})
         per_pid.append({"pid":pid,"attempts":attempts})
 
     status=("PHAIDRA_ALTERNATE_METADATA_ROUTE_RECOVERED"
