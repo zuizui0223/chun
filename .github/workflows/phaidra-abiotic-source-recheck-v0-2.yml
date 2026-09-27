@@ -6,6 +6,7 @@ on:
       - 'scripts/probe_phaidra_abiotic_source_v0_2.py'
       - 'tests/test_probe_phaidra_abiotic_source_v0_2.py'
       - 'data/phaidra_abiotic_source_recheck_v0_2.json'
+      - 'docs/PHAIDRA_ABIOTIC_SOURCE_RECHECK_V0_2.md'
       - '.github/workflows/phaidra-abiotic-source-recheck-v0-2.yml'
   workflow_dispatch:
 
@@ -26,11 +27,16 @@ jobs:
           pytest -q tests/test_probe_phaidra_abiotic_source_v0_2.py
       - name: Probe PHAIDRA metadata only
         run: python scripts/probe_phaidra_abiotic_source_v0_2.py --out build/phaidra_abiotic_source_recheck_v0_2.json
-      - name: Assert outcome firewall
+      - name: Assert frozen HOLD and outcome firewall
         run: |
           python - <<'PY'
           import json
           x=json.load(open('build/phaidra_abiotic_source_recheck_v0_2.json'))
+          f=json.load(open('data/phaidra_abiotic_source_recheck_v0_2.json'))
+          assert x['status']==f['status']=='HOLD_PHAIDRA_SOURCE_METADATA_UNAVAILABLE_V0_2'
+          assert x['chosen_source'] is None and f['chosen_source'] is None
+          summary=[{k:r[k] for k in ('pid','provenance','root_info_ready','direct_related_pid_count','search_member_pid_count','member_count')} for r in x['roots']]
+          assert summary==f['root_candidates'], (summary,f['root_candidates'])
           assert x['outcome_firewall']['member_file_contents_downloaded'] is False
           assert x['outcome_firewall']['environmental_rows_opened'] is False
           assert x['outcome_firewall']['flower_memory_outcome_fit'] is False
