@@ -1,0 +1,65 @@
+name: Hierarchical memory realization synthesis v0.4
+
+on:
+  pull_request:
+    paths:
+      - 'scripts/summarize_hierarchical_memory_synthesis_v0_4.py'
+      - 'data/hierarchical_evolutionary_memory_synthesis_v0_4.json'
+      - 'data/hierarchical_memory_novelty_audit_v0_4.json'
+      - 'docs/HIERARCHICAL_EVOLUTIONARY_MEMORY_SYNTHESIS_V0_4.md'
+      - '.github/workflows/hierarchical-memory-synthesis-v0-4.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Regenerate synthesis
+        run: python scripts/summarize_hierarchical_memory_synthesis_v0_4.py --out build/hierarchical_evolutionary_memory_synthesis_v0_4.json
+      - name: Validate frozen synthesis
+        run: |
+          python - <<'PY'
+          import json
+          g=json.load(open('build/hierarchical_evolutionary_memory_synthesis_v0_4.json'))
+          f=json.load(open('data/hierarchical_evolutionary_memory_synthesis_v0_4.json'))
+          assert g==f, (g,f)
+          assert f['foundation']['visible_standardized']['positive_clades']==18
+          assert f['foundation']['visible_standardized']['opportunity_clades']==21
+          assert f['foundation']['prospective_visible']['status']=='PROSPECTIVE_SCHISTANTHE_HIDDEN_MEMORY_PASS'
+          assert f['foundation']['biochemical']['gesnerioideae_status']=='PROSPECTIVE_GESNERIOIDEAE_BIOCHEMICAL_HIDDEN_MEMORY_FAIL'
+          s=f['realization_tests']['trivial_compression_explanation']
+          assert s['decision']=='NOT_SUPPORTED' and s['rho'] < 0
+          c=f['realization_tests']['cryptic_memory_inside_global_no_signal']
+          assert c['decision']=='PRIMARY_NOT_SUPPORTED'
+          assert c['positive_hidden_effects']==8 and c['no_signal_clades']==10
+          t=f['realization_tests']['relative_fine_persistence_relation']
+          assert t['decision']=='PRIMARY_NOT_SUPPORTED'
+          assert t['rho'] > 0 and t['permutation_p_two_sided'] > 0.05
+          assert f['submission_state']['current_submission']=='Evolution Letters v0.3'
+          assert f['submission_state']['current_submission_changed'] is False
+          PY
+      - name: Validate novelty ceiling
+        run: |
+          python - <<'PY'
+          import json
+          x=json.load(open('data/hierarchical_memory_novelty_audit_v0_4.json'))
+          assert x['status']=='HIERARCHICAL_MEMORY_NOVELTY_CEILING_AFTER_REALIZATION_DIAGNOSTICS'
+          assert x['current_explanatory_boundary']['trivial_compression']=='REJECTED_AS_SUPPORTED_EXPLANATION'
+          assert x['current_explanatory_boundary']['absolute_fine_persistence']=='PLAUSIBLE_DIRECTIONAL_HYPOTHESIS_NOT_CONFIRMED'
+          assert x['paper1_science_changed'] is False
+          assert x['el_v0_3_science_changed'] is False
+          PY
+      - name: Validate frozen EL v0.3 science
+        run: python scripts/validate_cross_radiation_el_v0_3_science_freeze_v0_1.py
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: hierarchical-memory-synthesis-v0-4
+          path: build/
