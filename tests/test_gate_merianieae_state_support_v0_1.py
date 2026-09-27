@@ -32,3 +32,27 @@ def test_state_frame_filters_rare_and_builds_white_nonwhite(tmp_path):
     assert x["fine_state_counts"]=={"pink":5,"red":5,"white":5}
     assert x["coarse_state_counts"]=={"NONWHITE":10,"WHITE":5}
     assert x["compression_opportunity"] is False  # 15 tips is below frozen 20-tip frame
+
+
+def test_numeric_colour_codes_trigger_schema_hold_without_coarse_recoding(tmp_path):
+    trait=tmp_path/"t_numeric.csv"
+    rows=["species,x,corolla.colour"]
+    matches=[]
+    rownum=2
+    for state,n in [("0",5),("1",5),("2",5),("3",5)]:
+        for i in range(n):
+            rows.append(f"S{state}_{i},T{state}_{i},{state}")
+            matches.append({"source_row":rownum,"source_x":f"T{state}_{i}","tree_tip":f"T{state}_{i}","species":f"S{state}_{i}"})
+            rownum+=1
+    trait.write_text("\n".join(rows)+"\n")
+    cw=tmp_path/"cw_numeric.json"
+    cw.write_text(json.dumps({
+        "status":"MERIANIEAE_IDENTIFIER_CROSSWALK_FROZEN_COROLLA_COLOUR_UNOPENED",
+        "matched_count":20,
+        "matches":matches
+    }))
+    x=mod.build_state_frame(trait,cw)
+    assert x["numeric_code_schema"] is True
+    assert x["fine_state_counts"]=={"0":5,"1":5,"2":5,"3":5}
+    assert x["coarse_state_counts"]=={}
+    assert x["compression_opportunity"] is False
