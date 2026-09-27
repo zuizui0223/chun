@@ -1,0 +1,60 @@
+name: Source-first Hedychium screen v0.1
+
+on:
+  pull_request:
+    paths:
+      - 'data/source_first_hidden_memory_candidate_screen_v0_1.json'
+      - 'data/source_first_hidden_memory_candidate_screen_v0_1.csv'
+      - 'scripts/screen_hedychium_source_first_v0_1.py'
+      - '.github/workflows/source-first-hedychium-screen-v0-1.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  screen:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install runtime
+        run: pip install biopython
+      - name: Validate frozen screen contract
+        run: |
+          python - <<'PY'
+          import json,csv
+          x=json.load(open('data/source_first_hidden_memory_candidate_screen_v0_1.json'))
+          rows=list(csv.DictReader(open('data/source_first_hidden_memory_candidate_screen_v0_1.csv')))
+          assert x['status']=='FROZEN_BEFORE_SOURCE_FIRST_REPLACEMENT_CANDIDATE_SEARCH'
+          assert x['search_budget']['maximum_new_candidates_screened']==5
+          assert rows[0]['candidate']=='Solanum'
+          assert rows[0]['source_first_status']=='HOLD_TREE_TRANSPORT'
+          assert rows[0]['outcome_rows_opened']=='false'
+          assert rows[1]['candidate']=='Hedychium'
+          assert rows[1]['outcome_rows_opened']=='false'
+          PY
+      - name: Run Hedychium source-first preflight
+        run: python scripts/screen_hedychium_source_first_v0_1.py --out build/hedychium_source_first_v0_1.json
+      - name: Assert phenotype firewall
+        run: |
+          python - <<'PY'
+          import json
+          x=json.load(open('build/hedychium_source_first_v0_1.json'))
+          assert x['outcome_firewall']['discrete_trait_rows_parsed'] is False
+          assert x['outcome_firewall']['species_level_colour_values_opened'] is False
+          assert x['outcome_firewall']['colour_state_frequencies_computed'] is False
+          assert x['outcome_firewall']['tree_tip_labels_emitted'] is False
+          assert x['outcome_firewall']['hidden_memory_auc_computed'] is False
+          print(x['status'])
+          print(x['hard_checks'])
+          print(x['tree_metadata'])
+          print(x['mapping_colour_tokens_found'])
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: source-first-hedychium-screen-v0-1
+          path: build/
