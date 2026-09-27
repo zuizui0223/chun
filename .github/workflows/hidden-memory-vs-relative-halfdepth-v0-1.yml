@@ -6,6 +6,8 @@ on:
       - 'data/hidden_memory_vs_relative_halfdepth_design_v0_1.json'
       - 'scripts/analyze_hidden_memory_vs_relative_halfdepth_v0_1.py'
       - 'results/hidden_memory_vs_relative_halfdepth_v0_1/**'
+      - 'data/hidden_memory_vs_relative_halfdepth_source_hold_v0_1.json'
+      - 'docs/HIDDEN_MEMORY_VS_RELATIVE_HALFDEPTH_SOURCE_HOLD_V0_1.md'
       - 'docs/HIDDEN_MEMORY_VS_RELATIVE_HALFDEPTH_V0_1.md'
       - '.github/workflows/hidden-memory-vs-relative-halfdepth-v0-1.yml'
   workflow_dispatch:
@@ -57,6 +59,10 @@ jobs:
               },indent=2))
           else:
               assert x['status']=='HOLD_EXACT_FLOWERCLADES51_SOURCE_BYTES_UNAVAILABLE_HALFDEPTH_RELATION_UNCOMPUTED'
+              h=json.load(open('data/hidden_memory_vs_relative_halfdepth_source_hold_v0_1.json'))
+              assert h['status']==x['status']
+              assert h['hypothesis_tested'] is False
+              assert h['halfdepth_relation_computed'] is False
               print(x['status'])
           PY
       - uses: actions/upload-artifact@v4
