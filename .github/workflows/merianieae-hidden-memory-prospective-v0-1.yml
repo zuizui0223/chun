@@ -6,14 +6,17 @@ on:
       - 'data/merianieae_hidden_memory_admission_v0_1.json'
       - 'scripts/preflight_merianieae_source_v0_1.py'
       - 'scripts/preflight_merianieae_crosswalk_v0_1.py'
+      - 'scripts/freeze_merianieae_pollinator_frame_v0_1.py'
       - 'scripts/gate_merianieae_state_support_v0_1.py'
       - 'scripts/gate_merianieae_informativeness_v0_1.py'
+      - 'scripts/analyze_merianieae_pollinator_conditioned_memory_v0_1.py'
       - 'scripts/analyze_merianieae_hidden_memory_v0_1.py'
       - 'scripts/finalize_merianieae_prospective_v0_1.py'
       - 'tests/test_preflight_merianieae_source_v0_1.py'
       - 'tests/test_preflight_merianieae_crosswalk_v0_1.py'
       - 'tests/test_gate_merianieae_state_support_v0_1.py'
       - 'tests/test_merianieae_informativeness_v0_1.py'
+      - 'tests/test_merianieae_pollinator_conditioned_memory_v0_1.py'
       - '.github/workflows/merianieae-hidden-memory-prospective-v0-1.yml'
   workflow_dispatch:
 
@@ -36,7 +39,8 @@ jobs:
             tests/test_preflight_merianieae_source_v0_1.py \
             tests/test_preflight_merianieae_crosswalk_v0_1.py \
             tests/test_gate_merianieae_state_support_v0_1.py \
-            tests/test_merianieae_informativeness_v0_1.py
+            tests/test_merianieae_informativeness_v0_1.py \
+            tests/test_merianieae_pollinator_conditioned_memory_v0_1.py
       - name: Validate admission was frozen before row-level colour
         run: |
           python - <<'PY'
@@ -47,6 +51,8 @@ jobs:
           assert x['crosswalk_rule']['fuzzy_or_alias_repair'] is False
           assert x['informativeness_gate']=='data/future_hidden_memory_informativeness_gate_v0_1.json'
           assert x['hidden_memory_test']['pass_rule']=='centered conditional AUC > 0 and one-sided permutation P <= 0.05'
+          assert x['ecological_secondary_frozen_before_colour']['predictor_column']=='estimated_pollinator'
+          assert x['ecological_secondary_frozen_before_colour']['run_only_if_primary_hidden_memory_passes'] is True
           PY
 
       - name: Exact source gate
@@ -86,6 +92,27 @@ jobs:
           with open(os.environ['GITHUB_OUTPUT'],'a') as f:
               f.write(f"ready={'true' if ready else 'false'}\n")
           print(x['status'],x['matched_count'])
+          PY
+
+      - name: Freeze source-defined pollinator frame before colour
+        if: steps.crosswalk_gate.outputs.ready == 'true'
+        run: |
+          python scripts/freeze_merianieae_pollinator_frame_v0_1.py \
+            --trait build/stage/floraltraits.csv \
+            --crosswalk build/receipts/crosswalk.json \
+            --out build/receipts/pollinator.json
+      - id: pollinator_gate
+        name: Read pollinator-frame terminal
+        if: steps.crosswalk_gate.outputs.ready == 'true'
+        run: |
+          python - <<'PY'
+          import json,os
+          x=json.load(open('build/receipts/pollinator.json'))
+          ready=x['status']=='MERIANIEAE_POLLINATOR_FRAME_FROZEN_COROLLA_COLOUR_UNOPENED'
+          with open(os.environ['GITHUB_OUTPUT'],'a') as f:
+              f.write(f"ready={'true' if ready else 'false'}\n")
+          assert x['corolla_colour_column_accessed'] is False
+          print(x['status'],x['pollinator_state_counts'])
           PY
 
       - name: State-support and compression gate
@@ -139,6 +166,29 @@ jobs:
             --tree build/stage/merianieae_crosswalk_tree.newick \
             --info build/receipts/informativeness.json \
             --out build/receipts/hidden_memory_result.json
+
+      - id: primary_decision
+        name: Read primary prospective decision
+        if: steps.information_gate.outputs.ready == 'true'
+        run: |
+          python - <<'PY'
+          import json,os
+          x=json.load(open('build/receipts/hidden_memory_result.json'))
+          passed=x['status']=='PROSPECTIVE_MERIANIEAE_VISIBLE_HIDDEN_MEMORY_PASS'
+          with open(os.environ['GITHUB_OUTPUT'],'a') as f:
+              f.write(f"passed={'true' if passed else 'false'}\n")
+          print(x['status'],x['centered_auc_effect'],x['p_one_sided'])
+          PY
+
+      - name: Pollinator-conditioned secondary diagnostic
+        if: steps.primary_decision.outputs.passed == 'true' && steps.pollinator_gate.outputs.ready == 'true'
+        run: |
+          python scripts/analyze_merianieae_pollinator_conditioned_memory_v0_1.py \
+            --frame build/stage/state_frame.json \
+            --pollinator build/receipts/pollinator.json \
+            --tree build/stage/merianieae_crosswalk_tree.newick \
+            --primary build/receipts/hidden_memory_result.json \
+            --out build/receipts/pollinator_conditioned.json
 
       - name: Finalize sequential terminal
         if: always()
