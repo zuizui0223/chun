@@ -1,0 +1,63 @@
+name: Merianieae prospective hidden-memory source gate v0.1
+
+on:
+  pull_request:
+    paths:
+      - 'data/merianieae_hidden_memory_admission_v0_1.json'
+      - 'docs/MERIANIEAE_HIDDEN_MEMORY_ADMISSION_V0_1.md'
+      - 'scripts/preflight_merianieae_source_v0_1.py'
+      - 'tests/test_preflight_merianieae_source_v0_1.py'
+      - '.github/workflows/merianieae-hidden-memory-source-v0-1.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  source:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install runtime
+        run: pip install biopython pytest
+      - name: Unit tests
+        run: pytest -q tests/test_preflight_merianieae_source_v0_1.py
+      - name: Validate frozen admission
+        run: |
+          python - <<'PY'
+          import json
+          x=json.load(open('data/merianieae_hidden_memory_admission_v0_1.json'))
+          assert x['status']=='FROZEN_BEFORE_MERIANIEAE_ROW_LEVEL_COROLLA_COLOUR_OPENING'
+          assert x['trait_semantics']['identifier_column']=='x'
+          assert x['trait_semantics']['fine_state_minimum_tips']==5
+          assert x['hidden_memory_test']['permutations']==9999
+          assert x['informativeness_gate']=='data/future_hidden_memory_informativeness_gate_v0_1.json'
+          assert x['outcome_firewall_at_freeze']['corolla_colour_values_opened'] is False
+          PY
+      - name: Recover exact author source and inspect metadata only
+        run: |
+          python scripts/preflight_merianieae_source_v0_1.py \
+            --out build/merianieae_source_gate_v0_1.json \
+            --stage-dir build/merianieae_stage
+      - name: Assert source firewall
+        run: |
+          python - <<'PY'
+          import json
+          x=json.load(open('build/merianieae_source_gate_v0_1.json'))
+          assert x['outcome_firewall']['trait_data_rows_opened'] is False
+          assert x['outcome_firewall']['identifier_values_opened'] is False
+          assert x['outcome_firewall']['corolla_colour_values_opened'] is False
+          assert x['outcome_firewall']['state_frequencies_computed'] is False
+          assert x['outcome_firewall']['hidden_memory_auc_computed'] is False
+          print(x['status'])
+          print(x['trait_member']['chosen_path'],x['trait_member']['header'])
+          print(x['tree_member']['chosen_path'],x['tree_member']['tip_count'])
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: merianieae-hidden-memory-source-v0-1
+          path: build/
