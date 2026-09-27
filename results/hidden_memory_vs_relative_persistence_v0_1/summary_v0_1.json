@@ -1,0 +1,68 @@
+{
+  "version": "v0.1",
+  "status": "HIDDEN_MEMORY_VS_RELATIVE_PERSISTENCE_EXPLORATORY_RESULT_PRIMARY_NOT_SUPPORTED",
+  "analysis_role": "TEMPORAL_REALIZATION_DIAGNOSTIC_NOT_CONFIRMATORY_NOT_EL_V0_3_MODIFICATION",
+  "historical_persistence_provenance": {
+    "source_branch": "analysis/flowerclades51-distance-persistence-v0-1",
+    "source_branch_head": "973bd46b81a51b0fe8ddcfc58aad4dd70379fe5a",
+    "source_git_blob_sha": "c34c24c82dcca10e2630686c828071fd6f278f40",
+    "underlying_exact_source_sha256": {
+      "final_dataset.csv": "a253308785e4cbd0e361b3ca04cdfdae29c523eefa843375cebf8030ee0874af",
+      "trees.zip": "ae5c82945e5bf9c29bcabc52d6029acd8d4f5be1fe9141fad95918eacb4f674d"
+    }
+  },
+  "n_clades": 21,
+  "primary": {
+    "predictor": "fine_area",
+    "outcome": "hidden_centered_auc_effect",
+    "expected_direction": "positive",
+    "rho": 0.41818181818181815,
+    "permutation_p_two_sided": 0.06147,
+    "permutations": 99999,
+    "seed": 20260927,
+    "supported": false,
+    "bootstrap": {
+      "requested": 20000,
+      "usable": 20000,
+      "q025": 0.01710470122415105,
+      "median": 0.41284403669724773,
+      "q975": 0.7081240567837651,
+      "positive_fraction": 0.9786
+    },
+    "leave_one_clade_out": {
+      "min_rho": 0.3669172932330827,
+      "max_rho": 0.4992481203007519,
+      "positive_count": 21,
+      "negative_count": 0
+    }
+  },
+  "secondary_descriptive": {
+    "fine_slope": {
+      "rho": -0.17792207792207793,
+      "p_two_sided_asymptotic": 0.4403496824576795
+    },
+    "fine_near_far": {
+      "rho": 0.17662337662337665,
+      "p_two_sided_asymptotic": 0.4437478469481735
+    },
+    "fine_area_minus_coarse_area": {
+      "rho": 0.1077922077922078,
+      "p_two_sided_asymptotic": 0.6418756070398507
+    }
+  },
+  "interpretation": "The frozen primary positive association is directionally consistent and leave-one-clade-out stable, but it does not meet the predeclared two-sided permutation threshold (P=0.06147). It is therefore not supported. The result is compatible with a link between overall fine-colour persistence and hidden-memory realization, but the current 21-clade analysis does not establish that link.",
+  "biological_implication": "Global exact-colour persistence and hierarchical within-coarse organization are not interchangeable measures. Their point association is moderately positive, while fine-minus-coarse persistence advantage is essentially unrelated to hidden memory. A future independent test can target the specific prediction that radiations with stronger absolute fine-colour persistence tend to preserve more hidden within-coarse lineage structure.",
+  "claim_boundary": [
+    "primary decision remains NOT SUPPORTED because frozen two-sided permutation P exceeds 0.05",
+    "do not reinterpret the directional expectation as permission for a post-outcome one-sided test",
+    "bootstrap and leave-one-out stability are robustness descriptors, not a rescue",
+    "secondary relations cannot replace the frozen primary",
+    "shared source states and phylogenies mean this is not independent replication",
+    "relative divergence depth only; no absolute-time claim",
+    "no ecological or molecular cause inferred",
+    "frozen EL v0.3 remains unchanged"
+  ],
+  "next_gate": "If this temporal-realization relation is tested again, freeze the positive fine-persistence prediction in an independent radiation set or future source before opening hidden-memory outcomes; do not tune the current 21-clade threshold or predictor.",
+  "paper1_science_changed": false,
+  "el_v0_3_science_changed": false
+}
