@@ -27,11 +27,15 @@ jobs:
           pytest -q tests/test_recover_flowerclades51_appendix_s2_v0_2.py
       - name: Recover exact Appendix S2 source only
         run: python scripts/recover_flowerclades51_appendix_s2_v0_2.py --outdir build/appendix_s2_v0_2
-      - name: Assert frozen bridge firewall
+      - name: Assert frozen terminal HOLD and bridge firewall
         run: |
           python - <<'PY'
           import json
           x=json.load(open('build/appendix_s2_v0_2/source_receipt_v0_2.json'))
+          frozen=json.load(open('data/flowerclades51_appendix_s2_source_recovery_v0_2.json'))
+          assert x['status']==frozen['status']=='HOLD_WILEY_APPENDIX_S2_BYTES_UNAVAILABLE_V0_2'
+          assert x['decision']==frozen['decision']=='HOLD_SOURCE_LABILITY_VALUE_UNRESOLVED'
+          assert len(x['article_href_candidates_discovered'])==frozen['article_href_candidates_discovered_by_runner']==0
           f=x['outcome_firewall']
           assert f['transition_counts_reestimated'] is False
           assert f['manual_plot_digitization_used'] is False
