@@ -1,0 +1,98 @@
+{
+  "version": "v0.1",
+  "status": "FROZEN_BEFORE_ERYSIMUM_SOURCE_ARCHIVE_OR_ROW_LEVEL_COLOUR_OPENING",
+  "programme_role": "REPLACEMENT_PROSPECTIVE_VISIBLE_HIDDEN_MEMORY_REPLICATION_AFTER_MERIANIEAE_SCHEMA_HOLD",
+  "candidate": "ERYSIMUM_WESTERN_EUROPE_NW_AFRICA_40",
+  "selection_date": "2026-09-27",
+  "replacement_provenance": {
+    "previous_candidate": "MERIANIEAE_MELASTOMATACEAE",
+    "previous_terminal": "HOLD_MERIANIEAE_COROLLA_COLOUR_NUMERIC_CODE_SCHEMA",
+    "previous_hidden_memory_auc_opened": false,
+    "replacement_allowed_by_frozen_rule": true,
+    "exposed_merianieae_colour_codes_used_to_rank_replacement": false
+  },
+  "metadata_basis": {
+    "article_doi": "10.1111/evo.12632",
+    "dryad_doi": "10.5061/dryad.rv08g",
+    "reported_species": 40,
+    "reported_colour_states": [
+      "yellow",
+      "lilac",
+      "white"
+    ],
+    "article_statement": "Corolla colour is a discrete trait with three states (yellow, lilac, white), and colour did not vary among individuals within species.",
+    "dryad_exact_package_filename": "R codes and data from Evolution #15-0052.zip",
+    "dryad_package_role": "R codes and raw data"
+  },
+  "source_admission_rules": {
+    "exact_dataset_doi_required": "10.5061/dryad.rv08g",
+    "exact_package_filename_required": "R codes and data from Evolution #15-0052.zip",
+    "require_repository_digest_verification_before_member_read": true,
+    "tree_identity": "Freeze only an author-code-referenced phylogeny/tree object from the exact Dryad package before trait rows are opened.",
+    "trait_identity": "Freeze only the author-code-referenced species-level floral-trait object/file from the exact Dryad package before row values are opened.",
+    "no_external_reconstructed_tree_substitution": true
+  },
+  "phenotype_schema_freeze": {
+    "allowed_fine_labels": [
+      "yellow",
+      "lilac",
+      "white"
+    ],
+    "fine_state": "exact source-defined corolla-colour category after trim/lowercase/whitespace normalization only",
+    "coarse_state": "WHITE iff source-defined fine label is exactly white; yellow and lilac are NONWHITE",
+    "source_code_mapping_rule": "If the raw trait object is coded numerically or symbolically, admit only if the exact author code/package provides an unambiguous pre-row mapping from raw codes to the three published labels yellow/lilac/white. Freeze that mapping before opening species-level colour values.",
+    "unmapped_code_rule": "HOLD_SCHEMA; do not infer or retrofit a mapping after row-level colour exposure.",
+    "unexpected_label_rule": "HOLD_SCHEMA; do not merge or reinterpret unexpected labels.",
+    "fine_state_minimum_tips": 5,
+    "minimum_retained_tips": 20,
+    "minimum_fine_states": 2,
+    "minimum_coarse_states": 2
+  },
+  "crosswalk_rule": {
+    "method": "Freeze exact normalized species/terminal intersection before species-level colour values are opened.",
+    "normalization": "trim, underscores-to-spaces, collapse whitespace, lowercase",
+    "fuzzy_or_alias_repair": false,
+    "duplicate_identifier": "HOLD_CROSSWALK"
+  },
+  "sequential_gates": [
+    "EXACT_DRYAD_PACKAGE_METADATA_AND_DIGEST",
+    "ARCHIVE_MEMBER_AND_AUTHOR_CODE_SCHEMA_INVENTORY_WITH_TRAIT_ROWS_UNOPENED",
+    "FREEZE_AUTHOR_REFERENCED_TREE_AND_TRAIT_OBJECTS",
+    "IDENTIFIER_ONLY_CROSSWALK_FREEZE",
+    "COROLLA_COLOUR_STATE_SUPPORT_AND_COMPRESSION_OPPORTUNITY",
+    "FUTURE_HIDDEN_MEMORY_INFORMATIVENESS_GATE",
+    "OBSERVED_WITHIN_COARSE_HIDDEN_MEMORY_AUC"
+  ],
+  "hidden_memory_test": {
+    "score": "negative patristic distance",
+    "metric": "conditional ROC_AUC among same-coarse pairs",
+    "null": "permute retained fine labels within coarse groups preserving fine-state counts",
+    "permutations": 9999,
+    "seed": 20260927,
+    "pass_rule": "centered conditional AUC > 0 and one-sided permutation P <= 0.05"
+  },
+  "future_informativeness_gate": "data/future_hidden_memory_informativeness_gate_v0_1.json",
+  "optional_temporal_prediction": {
+    "rule_source": "data/hierarchical_evolutionary_memory_synthesis_v0_4.json",
+    "run_only_if_source_tree_root_to_tip_cv_le_1e_8": true,
+    "predictor": "fine-state signed excess-retention area across relative divergence depth",
+    "training_predictor_median": 0.022164300864659012,
+    "predicted_outcome_threshold": 0.02700779596581926,
+    "role": "secondary out-of-sample realization prediction; cannot rescue primary hidden-memory decision"
+  },
+  "outcome_firewall_at_freeze": {
+    "dryad_package_bytes_downloaded_by_chun": false,
+    "archive_member_contents_opened": false,
+    "species_level_colour_values_opened": false,
+    "colour_state_frequencies_computed": false,
+    "tree_tip_labels_opened": false,
+    "hidden_memory_auc_computed": false
+  },
+  "relation_to_submission": {
+    "ruellia_specific_promotion_rule_changed": false,
+    "current_submission": "Evolution Letters v0.3",
+    "hierarchical_extension_promotion_changed": false
+  },
+  "paper1_science_changed": false,
+  "el_v0_3_science_changed": false
+}
