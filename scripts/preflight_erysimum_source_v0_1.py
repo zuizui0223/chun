@@ -397,7 +397,7 @@ def main()->int:
               "transport_error":out["transport_error"]
             },indent=2,default=str))
             return 0
-        check=verify_against_metadata(body,obj)
+    check=verify_against_metadata(body,obj)
     if check["size_match"] is False or not check["digest_match"] or not body.startswith(b"PK\x03\x04"):
         status="HOLD_ERYSIMUM_PACKAGE_IDENTITY_VERIFICATION_FAILED"
     else:
