@@ -1,0 +1,55 @@
+{
+  "version": "v0.1",
+  "status": "HOLD_ERYSIMUM_EXACT_PACKAGE_NO_IDENTITY_VERIFIED_MIRROR",
+  "candidate": "ERYSIMUM_WESTERN_EUROPE_NW_AFRICA_40",
+  "biological_decision": "NONE_SOURCE_TRANSPORT_HOLD",
+  "admission": "data/erysimum_hidden_memory_admission_v0_1.json",
+  "frozen_source_identity": {
+    "dryad_doi": "10.5061/dryad.rv08g",
+    "dryad_version_id": 25405,
+    "file_id": 89978,
+    "filename": "R codes and data from Evolution #15-0052.zip",
+    "bytes": 1689978,
+    "md5": "56003177c0bf87981e1afd0b24138461",
+    "mime_type": "application/zip",
+    "description": "R codes and raw data"
+  },
+  "bounded_recovery": {
+    "current_dryad": [
+      {
+        "route": "api/v2/files/89978/download",
+        "status": 401
+      },
+      {
+        "route": "stash/downloads/file_stream/89978",
+        "status": 403
+      },
+      {
+        "route": "downloads/file_stream/89978",
+        "status": 403
+      }
+    ],
+    "wayback_identity_candidates": 0,
+    "zenodo_identity_candidates": 0,
+    "github_exact_filename_or_doi_mirror_found": false,
+    "exact_bytes_recovered": false
+  },
+  "outcome_firewall": {
+    "archive_member_names_opened": false,
+    "author_code_opened": false,
+    "trait_data_rows_opened": false,
+    "species_level_colour_values_opened": false,
+    "colour_state_frequencies_computed": false,
+    "tree_tip_labels_opened": false,
+    "crosswalk_computed": false,
+    "compression_opportunity_computed": false,
+    "informativeness_gate_run": false,
+    "hidden_memory_auc_computed": false
+  },
+  "interpretation": "The Erysimum candidate remains scientifically untested. Publication metadata define a promising 40-species, three-colour-state system, but the exact archived code/data package cannot currently be transported through an identity-verifiable public route. No biological PASS/FAIL is assigned.",
+  "replacement_boundary": "This HOLD contains no row-level phenotype or CHUN outcome exposure. Any future replacement candidate must still be selected from metadata/source availability only, without using Erysimum target outcomes because none were opened.",
+  "next_gate": "Reopen Erysimum only if exact package bytes matching 1,689,978 bytes and MD5 56003177c0bf87981e1afd0b24138461 become publicly recoverable.",
+  "ruellia_specific_promotion_rule_changed": false,
+  "paper1_science_changed": false,
+  "el_v0_3_science_changed": false
+}

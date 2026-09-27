@@ -1,0 +1,110 @@
+name: Erysimum prospective hidden-memory source inventory v0.1
+
+on:
+  pull_request:
+    paths:
+      - 'data/erysimum_hidden_memory_admission_v0_1.json'
+      - 'data/erysimum_source_transport_hold_v0_1.json'
+      - 'docs/ERYSIMUM_SOURCE_TRANSPORT_HOLD_V0_1.md'
+      - 'docs/ERYSIMUM_HIDDEN_MEMORY_ADMISSION_V0_1.md'
+      - 'scripts/preflight_erysimum_source_v0_1.py'
+      - 'scripts/recover_erysimum_exact_package_v0_1.py'
+      - 'tests/test_preflight_erysimum_source_v0_1.py'
+      - '.github/workflows/erysimum-hidden-memory-source-v0-1.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  source:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install runtime
+        run: pip install biopython pytest
+      - name: Unit tests
+        run: pytest -q tests/test_preflight_erysimum_source_v0_1.py
+      - name: Validate admission freeze
+        run: |
+          python - <<'PY'
+          import json
+          x=json.load(open('data/erysimum_hidden_memory_admission_v0_1.json'))
+          assert x['status']=='FROZEN_BEFORE_ERYSIMUM_SOURCE_ARCHIVE_OR_ROW_LEVEL_COLOUR_OPENING'
+          assert x['metadata_basis']['reported_species']==40
+          assert x['metadata_basis']['reported_colour_states']==['yellow','lilac','white']
+          assert x['phenotype_schema_freeze']['unmapped_code_rule'].startswith('HOLD_SCHEMA')
+          assert x['replacement_provenance']['previous_hidden_memory_auc_opened'] is False
+          assert x['replacement_provenance']['exposed_merianieae_colour_codes_used_to_rank_replacement'] is False
+          PY
+      - name: Bounded exact-identity package recovery
+        run: |
+          mkdir -p build
+          python scripts/recover_erysimum_exact_package_v0_1.py \
+            --out build/erysimum_exact_package_recovery_v0_1.json \
+            --exact-out build/erysimum_recovered_exact_package.zip
+      - name: Assert recovery firewall
+        run: |
+          python - <<'PY'
+          import json
+          x=json.load(open('build/erysimum_exact_package_recovery_v0_1.json'))
+          assert x['frozen_identity']['file_id']==89978
+          assert x['frozen_identity']['bytes']==1689978
+          assert x['frozen_identity']['md5']=='56003177c0bf87981e1afd0b24138461'
+          assert x['outcome_firewall']['trait_rows_opened'] is False
+          assert x['outcome_firewall']['species_level_colour_values_opened'] is False
+          assert x['outcome_firewall']['hidden_memory_auc_computed'] is False
+          print(x['status'],x.get('recovered_url'))
+          PY
+      - name: Resolve exact package and inspect source code only
+        run: |
+          python scripts/preflight_erysimum_source_v0_1.py \
+            --out build/erysimum_source_inventory_v0_1.json \
+            --stage build/erysimum_exact_package.zip \
+            --package-path build/erysimum_recovered_exact_package.zip
+      - name: Assert outcome firewall
+        run: |
+          python - <<'PY'
+          import json
+          x=json.load(open('build/erysimum_source_inventory_v0_1.json'))
+          assert x['outcome_firewall']['trait_data_rows_opened'] is False
+          assert x['outcome_firewall']['species_level_colour_values_opened'] is False
+          assert x['outcome_firewall']['colour_state_frequencies_computed'] is False
+          assert x['outcome_firewall']['tree_tip_labels_emitted'] is False
+          assert x['outcome_firewall']['hidden_memory_auc_computed'] is False
+          print(x['status'])
+          print('members',len(x.get('archive_members',[])))
+          print('trees',x.get('tree_candidates',[]))
+          print('code files',[z['path'] for z in x.get('author_code_evidence',[])])
+          PY
+      - name: Validate frozen source-HOLD receipt
+        run: |
+          python - <<'PY'
+          import json
+          r=json.load(open('data/erysimum_source_transport_hold_v0_1.json'))
+          rec=json.load(open('build/erysimum_exact_package_recovery_v0_1.json'))
+          src=json.load(open('build/erysimum_source_inventory_v0_1.json'))
+          assert r['status']=='HOLD_ERYSIMUM_EXACT_PACKAGE_NO_IDENTITY_VERIFIED_MIRROR'
+          assert rec['status']==r['status']
+          assert src['status']=='HOLD_ERYSIMUM_EXACT_PACKAGE_TRANSPORT_UNAVAILABLE'
+          assert r['frozen_source_identity']['file_id']==89978
+          assert r['frozen_source_identity']['bytes']==1689978
+          assert r['frozen_source_identity']['md5']=='56003177c0bf87981e1afd0b24138461'
+          assert r['bounded_recovery']['wayback_identity_candidates']==0
+          assert r['bounded_recovery']['zenodo_identity_candidates']==0
+          assert r['biological_decision']=='NONE_SOURCE_TRANSPORT_HOLD'
+          assert all(v is False for v in r['outcome_firewall'].values())
+          assert r['ruellia_specific_promotion_rule_changed'] is False
+          assert r['paper1_science_changed'] is False
+          assert r['el_v0_3_science_changed'] is False
+          PY
+      - name: Validate frozen EL v0.3 science
+        run: python scripts/validate_cross_radiation_el_v0_3_science_freeze_v0_1.py
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: erysimum-hidden-memory-source-v0-1
+          path: build/
