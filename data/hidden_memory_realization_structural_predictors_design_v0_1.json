@@ -1,0 +1,48 @@
+{
+  "version": "v0.1",
+  "status": "POST_OUTCOME_EXPLORATORY_STRUCTURAL_REALIZATION_TEST_FIXED_BEFORE_NEW_CALCULATION",
+  "analysis_role": "MECHANISM_DIAGNOSTIC_NOT_CONFIRMATORY_NOT_EL_V0_3_MODIFICATION",
+  "question": "Does trivial state-space compression explain why hidden fine-state phylogenetic memory is stronger in some visible-colour radiations than others?",
+  "analysis_frame": {
+    "hidden_memory_source": "data/flowerclades51_hidden_fine_memory_clades_v0_1.csv",
+    "structural_metrics_source": "data/flowerclades51_resolution_opportunity_metrics_v0_1.csv",
+    "unit": "one biological radiation/clade",
+    "included_clades": "the 21 clades already fixed as having genuine fine-to-coarse compression opportunity",
+    "outcome": "permutation-centered within-coarse hidden-memory AUC effect"
+  },
+  "primary_hypothesis": {
+    "predictor": "collision_gain_fine_to_coarse",
+    "direction": "positive",
+    "rationale": "If hidden memory mainly arises because coarse coding creates more fine-state collisions, clades with larger pairwise collision gain should show stronger centered hidden-memory effects.",
+    "test": "Spearman rho with 99999 two-sided label permutations",
+    "seed": 20260927
+  },
+  "secondary_descriptive_predictors": [
+    "entropy_loss_fine_to_coarse",
+    "state_collapse_fine_to_coarse",
+    "fine_states",
+    "log10_eligible_tips"
+  ],
+  "secondary_rule": "Report two-sided Spearman rho and asymptotic P values descriptively; no secondary predictor can rescue a failed primary hypothesis and no multiplicity-based winner is selected.",
+  "robustness": {
+    "primary_leave_one_clade_out": true,
+    "primary_bootstrap_clades": 20000,
+    "bootstrap_seed": 20260927
+  },
+  "interpretation_rules": {
+    "primary_supported": "rho > 0 and permutation P <= 0.05",
+    "primary_failed": "otherwise",
+    "if_primary_failed": "Conclude that the magnitude of hidden memory is not explained by the preregistered pair-collision measure of representation opportunity.",
+    "causal_claim_allowed": false,
+    "ecological_cause_allowed": false
+  },
+  "no_posthoc_rescue": [
+    "do not add environmental predictors after seeing these results",
+    "do not choose a secondary structural metric as a new primary predictor after seeing its P value",
+    "do not drop clades based on effect direction or significance",
+    "do not transform the hidden-memory outcome to significance or absolute effect",
+    "do not modify frozen EL v0.3"
+  ],
+  "paper1_science_changed": false,
+  "el_v0_3_science_changed": false
+}
