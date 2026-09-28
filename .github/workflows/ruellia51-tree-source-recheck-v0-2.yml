@@ -1,0 +1,74 @@
+name: Ruellia authoritative tree source recheck v0.2
+
+on:
+  pull_request:
+    paths:
+      - 'scripts/recheck_ruellia51_tree_source_v0_2.py'
+      - 'data/ruellia51_tree_source_recheck_v0_2.json'
+      - 'docs/RUELLIA51_TREE_SOURCE_RECHECK_V0_2.md'
+      - '.github/workflows/ruellia51-tree-source-recheck-v0-2.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  recheck:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Recheck current Figshare versions and author GitHub
+        run: python scripts/recheck_ruellia51_tree_source_v0_2.py --out build/ruellia51_tree_source_recheck_v0_2.json
+      - name: Assert source-only firewall
+        run: |
+          python - <<'PY'
+          import json
+          x=json.load(open('build/ruellia51_tree_source_recheck_v0_2.json'))
+          f=x['outcome_firewall']
+          assert all(v is False for v in f.values())
+          assert x['ruellia_specific_promotion_rule_changed'] is False
+          assert x['paper1_science_changed'] is False
+          assert x['el_v0_3_science_changed'] is False
+          print(x['status'])
+          print('located=',x['authoritative_target_tree_located'])
+          if x.get('figshare'):
+              print('figshare',x['figshare']['current_version'],x['figshare']['current_modified_date'])
+              print('figshare target',x['figshare']['exact_target_hits'])
+              print('figshare tree-like',x['figshare']['tree_like_hits'])
+          if x.get('github'):
+              print('github head',x['github']['head_sha'])
+              print('github target',x['github']['exact_target_hits'])
+              print('github tree-like',x['github']['tree_like_hits'])
+              print('analysis target path',x['github']['analysis_expected_target_path_present'])
+          PY
+      - name: Validate frozen current-source receipt
+        run: |
+          python - <<'PY'
+          import json
+          live=json.load(open('build/ruellia51_tree_source_recheck_v0_2.json'))
+          frozen=json.load(open('data/ruellia51_tree_source_recheck_v0_2.json'))
+          assert live['status']==frozen['status']=='HOLD_RUELLIA_AUTHORITATIVE_TARGET_TREE_STILL_UNAVAILABLE_OUTCOMES_UNOPENED'
+          assert live['authoritative_target_tree_located'] is False
+          assert live['figshare']['current_version']==frozen['figshare']['current_version']==2
+          assert live['figshare']['current_modified_date']==frozen['figshare']['current_modified_date']
+          assert live['figshare']['exact_target_hits']==[]
+          assert live['figshare']['tree_like_hits']==[]
+          assert live['github']['head_sha']==frozen['github']['current_head_sha']
+          assert live['github']['exact_target_hits']==[]
+          assert live['github']['tree_like_hits']==[]
+          assert live['github']['analysis_expected_target_path_present'] is True
+          assert all(v is False for v in frozen['outcome_firewall'].values())
+          assert frozen['current_programme_consequence']['candidate_search_stop']=='STOP_NO_SOURCE_COMPLETE_REPLACEMENT_AFTER_FIVE_SOURCE_FIRST_CANDIDATES'
+          assert frozen['current_programme_consequence']['current_submission']=='Evolution Letters v0.3'
+          assert frozen['current_programme_consequence']['ruellia_specific_promotion_rule_changed'] is False
+          PY
+      - name: Validate frozen EL v0.3 science
+        run: python scripts/validate_cross_radiation_el_v0_3_science_freeze_v0_1.py
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: ruellia51-tree-source-recheck-v0-2
+          path: build/
