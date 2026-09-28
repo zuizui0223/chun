@@ -44,6 +44,27 @@ jobs:
               print('github tree-like',x['github']['tree_like_hits'])
               print('analysis target path',x['github']['analysis_expected_target_path_present'])
           PY
+      - name: Validate frozen current-source receipt
+        run: |
+          python - <<'PY'
+          import json
+          live=json.load(open('build/ruellia51_tree_source_recheck_v0_2.json'))
+          frozen=json.load(open('data/ruellia51_tree_source_recheck_v0_2.json'))
+          assert live['status']==frozen['status']=='HOLD_RUELLIA_AUTHORITATIVE_TARGET_TREE_STILL_UNAVAILABLE_OUTCOMES_UNOPENED'
+          assert live['authoritative_target_tree_located'] is False
+          assert live['figshare']['current_version']==frozen['figshare']['current_version']==2
+          assert live['figshare']['current_modified_date']==frozen['figshare']['current_modified_date']
+          assert live['figshare']['exact_target_hits']==[]
+          assert live['figshare']['tree_like_hits']==[]
+          assert live['github']['head_sha']==frozen['github']['current_head_sha']
+          assert live['github']['exact_target_hits']==[]
+          assert live['github']['tree_like_hits']==[]
+          assert live['github']['analysis_expected_target_path_present'] is True
+          assert all(v is False for v in frozen['outcome_firewall'].values())
+          assert frozen['current_programme_consequence']['candidate_search_stop']=='STOP_NO_SOURCE_COMPLETE_REPLACEMENT_AFTER_FIVE_SOURCE_FIRST_CANDIDATES'
+          assert frozen['current_programme_consequence']['current_submission']=='Evolution Letters v0.3'
+          assert frozen['current_programme_consequence']['ruellia_specific_promotion_rule_changed'] is False
+          PY
       - name: Validate frozen EL v0.3 science
         run: python scripts/validate_cross_radiation_el_v0_3_science_freeze_v0_1.py
       - uses: actions/upload-artifact@v4
