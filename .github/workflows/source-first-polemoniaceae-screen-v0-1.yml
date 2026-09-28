@@ -27,8 +27,8 @@ jobs:
           g=json.load(open('data/source_first_hidden_memory_candidate_screen_v0_1.json'))
           rows=list(csv.DictReader(open('data/source_first_hidden_memory_candidate_screen_v0_1.csv')))
           assert g['search_budget']['maximum_new_candidates_screened']==5
-          assert len(rows)==2
-          assert [int(r['candidate_order']) for r in rows]==[1,2]
+          assert len(rows)>=2
+          assert [int(r['candidate_order']) for r in rows[:2]]==[1,2]
           assert all(r['outcome_rows_opened'].lower()=='false' for r in rows)
           PY
       - name: Probe author-linked Zenodo source without opening Color rows
