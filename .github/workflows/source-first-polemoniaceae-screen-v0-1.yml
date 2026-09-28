@@ -1,0 +1,56 @@
+name: Source-first Polemoniaceae screen v0.1
+
+on:
+  pull_request:
+    paths:
+      - 'data/source_first_hidden_memory_candidate_screen_v0_1.json'
+      - 'data/source_first_hidden_memory_candidate_screen_v0_1.csv'
+      - 'scripts/screen_polemoniaceae_source_first_v0_1.py'
+      - '.github/workflows/source-first-polemoniaceae-screen-v0-1.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  screen:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Validate source-first budget before candidate 3
+        run: |
+          python - <<'PY'
+          import csv,json
+          g=json.load(open('data/source_first_hidden_memory_candidate_screen_v0_1.json'))
+          rows=list(csv.DictReader(open('data/source_first_hidden_memory_candidate_screen_v0_1.csv')))
+          assert g['search_budget']['maximum_new_candidates_screened']==5
+          assert len(rows)==2
+          assert [int(r['candidate_order']) for r in rows]==[1,2]
+          assert all(r['outcome_rows_opened'].lower()=='false' for r in rows)
+          PY
+      - name: Probe author-linked Zenodo source without opening Color rows
+        run: |
+          python scripts/screen_polemoniaceae_source_first_v0_1.py \
+            --out build/polemoniaceae_source_first_v0_1.json
+      - name: Assert firewall
+        run: |
+          python - <<'PY'
+          import json
+          x=json.load(open('build/polemoniaceae_source_first_v0_1.json'))
+          assert x['candidate_order']==3
+          assert x['outcome_firewall']['species_level_Color_csv_rows_opened'] is False
+          assert x['outcome_firewall']['colour_state_frequencies_computed'] is False
+          assert x['outcome_firewall']['tree_tip_labels_emitted'] is False
+          assert x['outcome_firewall']['hidden_memory_auc_computed'] is False
+          print(x['status'])
+          print('records',x['zenodo_records_considered'])
+          print('admitted',x['admitted_source_record'])
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: source-first-polemoniaceae-screen-v0-1
+          path: build/
