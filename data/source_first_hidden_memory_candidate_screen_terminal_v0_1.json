@@ -1,0 +1,77 @@
+{
+  "version": "v0.1",
+  "status": "STOP_NO_SOURCE_COMPLETE_REPLACEMENT_AFTER_FIVE_SOURCE_FIRST_CANDIDATES",
+  "programme_role": "TERMINAL_SOURCE_FIRST_PROSPECTIVE_HIDDEN_MEMORY_REPLACEMENT_SEARCH",
+  "source_first_design": "data/source_first_hidden_memory_candidate_screen_v0_1.json",
+  "ledger": "data/source_first_hidden_memory_candidate_screen_v0_1.csv",
+  "search_budget": {
+    "maximum_new_candidates_screened": 5,
+    "candidates_screened": 5,
+    "admitted_candidate": null,
+    "budget_exhausted": true
+  },
+  "candidate_terminals": [
+    {
+      "order": 1,
+      "candidate": "Solanum",
+      "status": "HOLD_TREE_TRANSPORT",
+      "reason": "Exact author tree bytes are not currently publicly transportable."
+    },
+    {
+      "order": 2,
+      "candidate": "Hedychium",
+      "status": "HOLD_PRE_ROW_COLOUR_SCHEMA_MAPPING",
+      "reason": "Exact trait/tree bytes are available, but an author-defined raw labellum code-to-biological-colour mapping cannot be established before species rows."
+    },
+    {
+      "order": 3,
+      "candidate": "Polemoniaceae",
+      "status": "HOLD_REQUIRED_OBJECT_TRANSPORT",
+      "reason": "The publication-defined colour hierarchy is suitable and required object metadata exist, but exact Rose2021 README/trait/code/phylogeny bytes are not currently transportable."
+    },
+    {
+      "order": 4,
+      "candidate": "Lactuca",
+      "status": "HOLD_TREE_BRANCH_LENGTHS_MISSING",
+      "reason": "Exact official workbook and author-defined colour mapping are available, but the 21-tip supplementary tree has no non-root branch lengths."
+    },
+    {
+      "order": 5,
+      "candidate": "Petrocoptis",
+      "status": "HOLD_LT20_AND_RESTRICTED_SOURCE",
+      "reason": "The genus has only 9 species / 11 operational taxa under the source treatment, below the frozen >=20-species rule, and the Zenodo files are restricted."
+    }
+  ],
+  "outcome_firewall": {
+    "any_candidate_species_level_colour_rows_used_for_CHUN_outcome": false,
+    "any_candidate_colour_state_frequencies_used_to_rank_candidates": false,
+    "any_candidate_hidden_memory_auc_computed": false,
+    "any_candidate_biological_pass_or_fail": false
+  },
+  "stop_rule": {
+    "action": "STOP_REPLACEMENT_CANDIDATE_SEARCH",
+    "reason": "All five pre-budgeted source-first candidates failed hard admission before a CHUN hidden-memory outcome was opened.",
+    "reopen_only_if": [
+      "a newly released dataset plausibly satisfies the already-frozen hard admission criteria before decisive rows are inspected",
+      "a currently blocked exact source becomes publicly recoverable without changing its frozen identity contract"
+    ],
+    "forbidden": [
+      "screen additional existing candidates merely to obtain a favorable source/outcome",
+      "relax the >=20-species rule",
+      "accept trees without branch lengths",
+      "invent post-row colour mappings",
+      "substitute reconstructed or non-authoritative source objects after a HOLD"
+    ]
+  },
+  "scientific_consequence": {
+    "new_prospective_visible_replication_added": false,
+    "existing_schistanthe_pass_changed": false,
+    "gesnerioideae_fail_changed": false,
+    "hierarchical_v0_4_claim_changed": false,
+    "current_submission": "Evolution Letters v0.3",
+    "ruellia_specific_promotion_rule_changed": false
+  },
+  "next_mainline": "Do not continue candidate fishing. Treat the hierarchical-memory extension as source-limited at the next-replication frontier; resume only on a new qualifying public release or a frozen blocked-source recovery.",
+  "paper1_science_changed": false,
+  "el_v0_3_science_changed": false
+}
