@@ -21,11 +21,11 @@ REQUIRED_TREE="MCC.fixed.nex"
 UA="CHUN-Polemoniaceae-source-first/0.1"
 
 QUERIES=[
-    f'"{TITLE}"',
-    ARTICLE_DOI,
-    '"Polemoniaceae" "flower color"',
-    '"Polemoniaceae" "floral traits" diversification',
-    '"Color.csv" "MCC.fixed.nex"',
+    "Polemoniaceae",
+    "Landis Polemoniaceae",
+    "floral traits reproductive mode diversification phlox family",
+    "Color.csv",
+    "MCC.fixed.nex",
 ]
 
 def fetch(url:str,accept:str="*/*")->bytes:
@@ -229,8 +229,11 @@ def main()->int:
             admitted={"record_id":row["record_id"],"title":row["title"],"found_required":sorted(found)}
         candidates.append(row)
 
+    successful_queries=sum(1 for q in qdiag if q.get("ok"))
     if admitted is not None:
         status="PASS_POLEMONIACEAE_SOURCE_FIRST_EXACT_TRAIT_TREE_FOUND"
+    elif successful_queries==0:
+        status="HOLD_POLEMONIACEAE_ZENODO_SEARCH_TRANSPORT_NONDIAGNOSTIC"
     else:
         status="HOLD_POLEMONIACEAE_REQUIRED_TRAIT_TREE_BYTES_NOT_RECOVERED"
 
@@ -254,6 +257,7 @@ def main()->int:
       },
       "zenodo_queries":qdiag,
       "zenodo_records_considered":len(seen),
+      "successful_zenodo_queries":successful_queries,
       "candidate_records":candidates,
       "admitted_source_record":admitted,
       "outcome_firewall":{
