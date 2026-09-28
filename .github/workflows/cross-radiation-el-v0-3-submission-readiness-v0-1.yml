@@ -1,0 +1,66 @@
+name: Cross-radiation EL v0.3 submission readiness v0.1
+
+on:
+  pull_request:
+    paths:
+      - 'scripts/export_cross_radiation_el_v0_3_submission_figures_v0_1.py'
+      - 'scripts/audit_cross_radiation_el_v0_3_submission_readiness_v0_1.py'
+      - 'data/cross_radiation_el_v0_3_submission_readiness_v0_1.json'
+      - 'docs/CROSS_RADIATION_EL_V0_3_SUBMISSION_READINESS_V0_1.md'
+      - '.github/workflows/cross-radiation-el-v0-3-submission-readiness-v0-1.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  readiness:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install render runtime
+        run: pip install matplotlib numpy pandas
+      - name: Export vector submission figures without modifying frozen builder
+        env:
+          MPLBACKEND: Agg
+        run: |
+          python scripts/export_cross_radiation_el_v0_3_submission_figures_v0_1.py \
+            --out-dir build/el_v0_3_submission/figures \
+            --manifest build/el_v0_3_submission/figure_manifest.json
+      - name: Audit current manuscript against submission requirements
+        run: |
+          python scripts/audit_cross_radiation_el_v0_3_submission_readiness_v0_1.py \
+            --figure-manifest build/el_v0_3_submission/figure_manifest.json \
+            --out build/el_v0_3_submission/readiness.json
+      - name: Validate frozen readiness receipt
+        run: |
+          python - <<'PY'
+          import json
+          live=json.load(open('build/el_v0_3_submission/readiness.json'))
+          frozen=json.load(open('data/cross_radiation_el_v0_3_submission_readiness_v0_1.json'))
+          assert live['status']==frozen['status']=='EL_V0_3_AUTOMATED_SUBMISSION_CHECKS_PASS_HUMAN_METADATA_HOLD'
+          assert live['automated_checks_pass'] is True
+          assert live['ready_for_final_bundle'] is False
+          assert live['journal_checks']['title_words']['value']==11
+          assert live['journal_checks']['abstract_words']['value']==246
+          assert live['journal_checks']['teaser_words']['value']==66
+          assert live['journal_checks']['keywords']['value']==8
+          assert live['journal_checks']['approximate_main_text_words']['value']==3770
+          assert live['journal_checks']['figures']['count']==5
+          assert live['journal_checks']['figures']['alt_text_count']==5
+          assert live['journal_checks']['submission_figure_files']['all_pdf'] is True
+          assert live['metadata_validator_state']['current_state']=='AWAITING_PHASE1_AUTHOR_IDENTITY'
+          assert live['scientific_results_changed'] is False
+          assert frozen['frozen_v0_3_science_changed'] is False
+          PY
+      - name: Validate frozen v0.3 science
+        run: python scripts/validate_cross_radiation_el_v0_3_science_freeze_v0_1.py
+      - uses: actions/upload-artifact@v4
+        with:
+          name: cross-radiation-el-v0-3-submission-readiness-v0-1
+          path: build/el_v0_3_submission/

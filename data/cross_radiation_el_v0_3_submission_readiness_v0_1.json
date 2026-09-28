@@ -1,0 +1,108 @@
+{
+  "version": "v0.1",
+  "status": "EL_V0_3_AUTOMATED_SUBMISSION_CHECKS_PASS_HUMAN_METADATA_HOLD",
+  "guidelines": {
+    "url": "https://academic.oup.com/evlett/pages/author-guidelines",
+    "checked_on": "2026-09-29",
+    "article_type": "Letter"
+  },
+  "manuscript": "manuscript/CROSS_RADIATION_EVOLUTION_LETTERS_V0_3_TEMPORAL_MEMORY_CANDIDATE.md",
+  "journal_checks": {
+    "title_words": {
+      "value": 11,
+      "limit": 30,
+      "pass": true
+    },
+    "abstract_words": {
+      "value": 246,
+      "limit": 300,
+      "pass": true
+    },
+    "teaser_words": {
+      "value": 66,
+      "limit": 150,
+      "pass": true
+    },
+    "keywords": {
+      "value": 8,
+      "limit": 10,
+      "pass": true
+    },
+    "approximate_main_text_words": {
+      "value": 3770,
+      "guide": 5000,
+      "pass": true
+    },
+    "required_end_matter": {
+      "data_and_code": true,
+      "author_contributions": true,
+      "funding": true,
+      "conflict_of_interest": true,
+      "acknowledgements": true
+    },
+    "figures": {
+      "count": 5,
+      "alt_text_count": 5,
+      "all_have_alt_text": true
+    },
+    "submission_figure_files": {
+      "count": 5,
+      "all_pdf": true
+    }
+  },
+  "metadata_validator_state": {
+    "schema_version": "v0.1",
+    "phase1_complete": false,
+    "phase2_complete": false,
+    "phase3_complete": false,
+    "current_state": "AWAITING_PHASE1_AUTHOR_IDENTITY",
+    "phase1_missing": [
+      "corresponding_author.author_name",
+      "corresponding_author.email",
+      "corresponding_author.orcid",
+      "corresponding_author.postal_address",
+      "final author list/order",
+      "full affiliations/addresses"
+    ],
+    "phase2_missing": [
+      "CRediT roles for every ordered author",
+      "acknowledgments or explicit None",
+      "funding_status=funded|none"
+    ],
+    "phase3_missing": [
+      "archive_doi",
+      "archive_url",
+      "archive_version"
+    ],
+    "authors_count": 0,
+    "affiliations_count": 0,
+    "ready_for_final_bundle": false,
+    "scientific_results_changed": false
+  },
+  "human_only_holds": {
+    "phase1_author_identity": [
+      "corresponding_author.author_name",
+      "corresponding_author.email",
+      "corresponding_author.orcid",
+      "corresponding_author.postal_address",
+      "final author list/order",
+      "full affiliations/addresses"
+    ],
+    "phase2_declarations": [
+      "CRediT roles for every ordered author",
+      "acknowledgments or explicit None",
+      "funding_status=funded|none"
+    ],
+    "phase3_archive": [
+      "archive_doi",
+      "archive_url",
+      "archive_version"
+    ]
+  },
+  "remaining_render_note": "Initial free-format submission permits a single readable manuscript file; line numbering should be applied in the final human-metadata render. Frozen science markdown is not modified by this audit.",
+  "archive_preparation_note": "A persistent identifier is still required by the repository metadata contract before final bundle; this audit does not invent a DOI.",
+  "automated_checks_pass": true,
+  "ready_for_final_bundle": false,
+  "scientific_results_changed": false,
+  "frozen_v0_3_science_changed": false
+}
