@@ -1,0 +1,49 @@
+{
+  "version": "v0.2",
+  "status": "HOLD_RUELLIA_AUTHORITATIVE_TARGET_TREE_STILL_UNAVAILABLE_OUTCOMES_UNOPENED",
+  "checked_on": "2026-09-29",
+  "target_programme": "RUELLIA_HPLC_RESOLUTION_PROFILE",
+  "target_basename": "03-Ruellia_phylo.timed.tre",
+  "author_code_path": "color data/color data/phylogeny/03-Ruellia_phylo.timed.tre",
+  "figshare": {
+    "article_id": 30282448,
+    "current_version": 2,
+    "current_modified_date": "2025-10-06T16:28:17Z",
+    "exact_target_hits": [],
+    "tree_like_hits": [],
+    "conclusion": "No authoritative target tree or other tree-like object is present in the current Figshare article or any enumerated Figshare version."
+  },
+  "github": {
+    "repo": "jlwatts98/Ruellia_theoretical_colorspace",
+    "current_head_sha": "38bb511da1390bdd525a15ea8738bcc3f016fb59",
+    "exact_target_hits": [],
+    "tree_like_hits": [],
+    "analysis_expected_target_path_present": true,
+    "conclusion": "The author repository still contains code that consumes the exact target path, but the tree object itself is absent from the repository tree."
+  },
+  "source_identity_interpretation": "The missing object remains a provenance/availability blocker rather than a biological result. The source article continues to state that raw/processed data are deposited in Figshare and code is deposited in the author GitHub repository, but the author-used timed tree is not publicly exposed on either checked surface.",
+  "release_condition": "Locate the exact author-used 03-Ruellia_phylo.timed.tre object, an author-supplied exact hash/object, or an authoritative final 2023 ML tree plus a pre-outcome deterministic recipe demonstrably reproducing the author-used timed/pruned tree.",
+  "prohibited_substitutions": [
+    "do not substitute the older Ruellia chronogram solely by filename/taxon similarity",
+    "do not reconstruct a new ddRAD tree from raw reads and treat it as source recovery",
+    "do not open HPLC states while tree provenance is unresolved"
+  ],
+  "outcome_firewall": {
+    "six_HPLC_numeric_values_opened": false,
+    "compound_presence_patterns_computed": false,
+    "branch_presence_patterns_computed": false,
+    "state_frequencies_computed": false,
+    "AUC_computed": false,
+    "permutations_computed": false,
+    "winner_computed": false
+  },
+  "current_programme_consequence": {
+    "candidate_search_stop": "STOP_NO_SOURCE_COMPLETE_REPLACEMENT_AFTER_FIVE_SOURCE_FIRST_CANDIDATES",
+    "current_submission": "Evolution Letters v0.3",
+    "authoritative_extension_synthesis": "hierarchical-memory synthesis v0.4",
+    "ruellia_specific_promotion_rule_changed": false,
+    "no_new_biological_decision": true
+  },
+  "paper1_science_changed": false,
+  "el_v0_3_science_changed": false
+}
