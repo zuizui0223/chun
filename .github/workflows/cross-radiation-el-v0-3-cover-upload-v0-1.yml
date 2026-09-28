@@ -1,0 +1,59 @@
+name: Cross-radiation EL v0.3 cover and upload manifest v0.1
+
+on:
+  pull_request:
+    paths:
+      - 'submission/CROSS_RADIATION_EL_V0_3_COVER_LETTER_V0_1.md'
+      - 'submission/CROSS_RADIATION_EL_V0_3_UPLOAD_MANIFEST_V0_1.json'
+      - '.github/workflows/cross-radiation-el-v0-3-cover-upload-v0-1.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Validate cover letter boundaries
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          s=Path('submission/CROSS_RADIATION_EL_V0_3_COVER_LETTER_V0_1.md').read_text()
+          assert 'Flower-color evolutionary memory is transient but lacks a universal phenotypic scale' in s
+          assert 'preregistered prediction' in s
+          assert 'That prediction failed' in s
+          assert 'avoids claiming a universal biochemical advantage' in s
+          assert '[CORRESPONDING AUTHOR NAME]' in s
+          assert '[RELATED WORKS / PREPRINTS / MANUSCRIPTS' in s
+          assert '[EDITORIAL DISCLOSURES' in s
+          assert 'accepted' not in s.lower()
+          PY
+      - name: Validate upload manifest
+        run: |
+          python - <<'PY'
+          import json
+          x=json.load(open('submission/CROSS_RADIATION_EL_V0_3_UPLOAD_MANIFEST_V0_1.json'))
+          assert x['status']=='EL_V0_3_PREHUMAN_UPLOAD_MANIFEST_READY'
+          assert x['current_submission']=='Evolution Letters v0.3'
+          assert len(x['generated_submission_figures']['files'])==5
+          assert x['generated_submission_figures']['format']=='PDF'
+          assert x['supplementary_material']['separate_si_required_by_current_manuscript'] is False
+          assert x['scientific_results_changed'] is False
+          assert x['frozen_v0_3_science_changed'] is False
+          PY
+      - name: Validate current submission readiness receipt
+        run: |
+          python - <<'PY'
+          import json
+          x=json.load(open('data/cross_radiation_el_v0_3_submission_readiness_v0_1.json'))
+          assert x['status']=='EL_V0_3_AUTOMATED_SUBMISSION_CHECKS_PASS_HUMAN_METADATA_HOLD'
+          assert x['automated_checks_pass'] is True
+          assert x['ready_for_final_bundle'] is False
+          PY
+      - name: Validate frozen v0.3 science
+        run: python scripts/validate_cross_radiation_el_v0_3_science_freeze_v0_1.py
