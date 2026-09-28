@@ -1,0 +1,54 @@
+{
+  "version": "v0.1",
+  "status": "EL_V0_3_PREHUMAN_UPLOAD_MANIFEST_READY",
+  "target_journal": "Evolution Letters",
+  "article_type": "Letter",
+  "current_submission": "Evolution Letters v0.3",
+  "source_manuscript": "manuscript/CROSS_RADIATION_EVOLUTION_LETTERS_V0_3_TEMPORAL_MEMORY_CANDIDATE.md",
+  "cover_letter": "submission/CROSS_RADIATION_EL_V0_3_COVER_LETTER_V0_1.md",
+  "submission_metadata": "submission/CROSS_RADIATION_EL_SUBMISSION_METADATA_V0_2.json",
+  "submission_readiness_receipt": "data/cross_radiation_el_v0_3_submission_readiness_v0_1.json",
+  "generated_submission_figures": {
+    "script": "scripts/export_cross_radiation_el_v0_3_submission_figures_v0_1.py",
+    "format": "PDF",
+    "files": [
+      "fig1_iris_profile.pdf",
+      "fig2_visible_clades_profiles.pdf",
+      "fig3_tree_moderators.pdf",
+      "fig4_petunieae_profile.pdf",
+      "fig5_relative_time_persistence.pdf"
+    ]
+  },
+  "supplementary_material": {
+    "separate_si_required_by_current_manuscript": false,
+    "manuscript_cites_separate_si": false,
+    "rationale": "The current manuscript does not cite a CHUN supplementary appendix or supplementary figures/tables. Reproducibility materials are handled through cited public datasets and the submission-specific CHUN archive snapshot."
+  },
+  "submission_sequence": [
+    "confirm and populate phase1 author identity metadata",
+    "confirm and populate CRediT, funding, acknowledgements and related-work disclosure",
+    "create persistent submission-specific CHUN archive and populate DOI/version/URL",
+    "render the final line-numbered manuscript from the frozen science source plus confirmed human metadata",
+    "export five vector PDF figures with the submission exporter",
+    "finalize cover letter human placeholders and related-work disclosure",
+    "run final metadata validator with --require-complete",
+    "upload manuscript, five figures and cover letter to the Evolution Letters submission system"
+  ],
+  "human_only_inputs_required": [
+    "final author list and order",
+    "affiliations and addresses",
+    "corresponding author contact and ORCID",
+    "CRediT roles",
+    "funding status, funders and grant numbers",
+    "acknowledgements or explicit none",
+    "related/overlapping works disclosure or explicit none",
+    "editorial conflict disclosure or explicit none"
+  ],
+  "external_archive_input_required": [
+    "persistent archive DOI",
+    "archive version",
+    "archive URL"
+  ],
+  "scientific_results_changed": false,
+  "frozen_v0_3_science_changed": false
+}
