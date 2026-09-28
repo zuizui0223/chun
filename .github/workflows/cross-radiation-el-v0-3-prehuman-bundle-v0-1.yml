@@ -1,0 +1,76 @@
+name: Cross-radiation EL v0.3 prehuman bundle v0.1
+
+on:
+  pull_request:
+    paths:
+      - 'scripts/build_cross_radiation_el_v0_3_submission_docx_v0_1.py'
+      - 'scripts/build_cross_radiation_el_v0_3_snapshot_v0_1.py'
+      - 'docs/CROSS_RADIATION_EL_V0_3_PREHUMAN_BUNDLE_V0_1.md'
+      - '.github/workflows/cross-radiation-el-v0-3-prehuman-bundle-v0-1.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  bundle:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install runtime
+        run: pip install python-docx matplotlib numpy pandas
+      - name: Build line-numbered manuscript DOCX
+        run: |
+          mkdir -p build/el_v0_3_prehuman
+          python scripts/build_cross_radiation_el_v0_3_submission_docx_v0_1.py \
+            --out build/el_v0_3_prehuman/CROSS_RADIATION_EL_V0_3_PREHUMAN.docx \
+            --status build/el_v0_3_prehuman/docx_status.json
+      - name: Export vector figures
+        env:
+          MPLBACKEND: Agg
+        run: |
+          python scripts/export_cross_radiation_el_v0_3_submission_figures_v0_1.py \
+            --out-dir build/el_v0_3_prehuman/figures \
+            --manifest build/el_v0_3_prehuman/figure_manifest.json
+      - name: Build reproducibility snapshot candidate
+        run: |
+          python scripts/build_cross_radiation_el_v0_3_snapshot_v0_1.py \
+            --out-dir build/el_v0_3_prehuman/snapshot \
+            --zip build/el_v0_3_prehuman/CHUN_EL_V0_3_REPRODUCIBILITY_SNAPSHOT.zip
+      - name: Assemble prehuman upload package
+        run: |
+          cp submission/CROSS_RADIATION_EL_V0_3_COVER_LETTER_V0_1.md build/el_v0_3_prehuman/
+          cp submission/CROSS_RADIATION_EL_SUBMISSION_METADATA_V0_2.json build/el_v0_3_prehuman/
+          cp submission/CROSS_RADIATION_EL_V0_3_UPLOAD_MANIFEST_V0_1.json build/el_v0_3_prehuman/
+          cp data/cross_radiation_el_v0_3_submission_readiness_v0_1.json build/el_v0_3_prehuman/
+      - name: Validate bundle state
+        run: |
+          python - <<'PY'
+          import json,zipfile
+          from pathlib import Path
+          root=Path('build/el_v0_3_prehuman')
+          d=json.load(open(root/'docx_status.json'))
+          assert d['status']=='EL_V0_3_PREHUMAN_DOCX_READY'
+          assert 'author identity pending' in d['human_metadata_pending']
+          assert 'archive DOI pending' in d['human_metadata_pending']
+          f=json.load(open(root/'figure_manifest.json'))
+          assert len(f['figures'])==5 and all(x['format']=='pdf' for x in f['figures'])
+          z=root/'CHUN_EL_V0_3_REPRODUCIBILITY_SNAPSHOT.zip'
+          assert z.exists() and z.stat().st_size>0
+          with zipfile.ZipFile(z) as zz:
+              names=set(zz.namelist())
+              assert 'SNAPSHOT_MANIFEST.json' in names
+              assert 'manuscript/CROSS_RADIATION_EVOLUTION_LETTERS_V0_3_TEMPORAL_MEMORY_CANDIDATE.md' in names
+          assert Path(root/'CROSS_RADIATION_EL_V0_3_PREHUMAN.docx').exists()
+          PY
+      - name: Validate frozen v0.3 science
+        run: python scripts/validate_cross_radiation_el_v0_3_science_freeze_v0_1.py
+      - uses: actions/upload-artifact@v4
+        with:
+          name: cross-radiation-el-v0-3-prehuman-bundle-v0-1
+          path: build/el_v0_3_prehuman/
