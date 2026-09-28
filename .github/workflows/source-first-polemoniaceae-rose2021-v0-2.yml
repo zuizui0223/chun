@@ -1,0 +1,54 @@
+name: Source-first Polemoniaceae Rose2021 screen v0.2
+
+on:
+  pull_request:
+    paths:
+      - 'scripts/screen_polemoniaceae_rose2021_source_first_v0_2.py'
+      - '.github/workflows/source-first-polemoniaceae-rose2021-v0-2.yml'
+      - 'data/source_first_hidden_memory_candidate_screen_v0_1.json'
+      - 'data/source_first_hidden_memory_candidate_screen_v0_1.csv'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  screen:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Confirm candidate order and firewall
+        run: |
+          python - <<'PY'
+          import csv
+          rows=list(csv.DictReader(open('data/source_first_hidden_memory_candidate_screen_v0_1.csv')))
+          assert len(rows)>=2
+          assert [int(r['candidate_order']) for r in rows[:2]]==[1,2]
+          assert all(r['outcome_rows_opened'].lower()=='false' for r in rows)
+          PY
+      - name: Probe Rose 2021 exact source objects
+        run: python scripts/screen_polemoniaceae_rose2021_source_first_v0_2.py --out build/polemoniaceae_rose2021_v0_2.json
+      - name: Assert no trait rows or tip labels opened
+        run: |
+          python - <<'PY'
+          import json
+          x=json.load(open('build/polemoniaceae_rose2021_v0_2.json'))
+          assert x['candidate_order']==3
+          assert x['outcome_firewall']['SuppData_2_species_rows_opened'] is False
+          assert x['outcome_firewall']['corolla_lobe_colour_values_opened'] is False
+          assert x['outcome_firewall']['colour_state_frequencies_computed'] is False
+          assert x['outcome_firewall']['tree_tip_labels_emitted'] is False
+          assert x['outcome_firewall']['hidden_memory_auc_computed'] is False
+          print(x['status'])
+          print(x.get('missing_required_objects'))
+          print({k:v.get('ready') for k,v in x.get('recovered',{}).items()})
+          print(x.get('phylogeny_archive_members',[])[:30])
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: source-first-polemoniaceae-rose2021-v0-2
+          path: build/

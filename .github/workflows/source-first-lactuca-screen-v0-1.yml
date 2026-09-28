@@ -1,0 +1,57 @@
+name: Source-first Lactuca screen v0.1
+
+on:
+  pull_request:
+    paths:
+      - 'data/source_first_hidden_memory_candidate_screen_v0_1.json'
+      - 'data/source_first_hidden_memory_candidate_screen_v0_1.csv'
+      - 'scripts/screen_lactuca_source_first_v0_1.py'
+      - 'tests/test_screen_lactuca_source_first_v0_1.py'
+      - '.github/workflows/source-first-lactuca-screen-v0-1.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  screen:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install runtime
+        run: pip install openpyxl biopython pytest
+      - name: Unit tests
+        run: pytest -q tests/test_screen_lactuca_source_first_v0_1.py
+      - name: Validate candidate order
+        run: |
+          python - <<'PY'
+          import csv
+          rows=list(csv.DictReader(open('data/source_first_hidden_memory_candidate_screen_v0_1.csv')))
+          assert len(rows)>=3
+          assert [int(r['candidate_order']) for r in rows[:3]]==[1,2,3]
+          assert all(r['outcome_rows_opened'].lower()=='false' for r in rows)
+          PY
+      - name: Probe official publisher workbook and author schema
+        run: python scripts/screen_lactuca_source_first_v0_1.py --out build/lactuca_source_first_v0_1.json
+      - name: Assert species colour firewall
+        run: |
+          python - <<'PY'
+          import json
+          x=json.load(open('build/lactuca_source_first_v0_1.json'))
+          assert x['candidate_order']==4
+          assert x['outcome_firewall']['species_level_PetColor_values_opened'] is False
+          assert x['outcome_firewall']['colour_state_frequencies_computed'] is False
+          assert x['outcome_firewall']['tree_tip_labels_emitted'] is False
+          assert x['outcome_firewall']['hidden_memory_auc_computed'] is False
+          print(x['status'])
+          print(x.get('official_supplement'))
+          print(x.get('workbook_metadata'))
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: source-first-lactuca-screen-v0-1
+          path: build/

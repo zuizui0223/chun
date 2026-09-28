@@ -1,0 +1,72 @@
+{
+  "version": "v0.1",
+  "status": "FROZEN_BEFORE_SOURCE_FIRST_REPLACEMENT_CANDIDATE_SEARCH",
+  "programme_role": "POST_MERIANIEAE_AND_ERYSIMUM_HOLD_SOURCE_FIRST_PROSPECTIVE_REPLICATION_SEARCH",
+  "motivation": [
+    "Merianieae reached an outcome-unopened schema HOLD because the target colour field was numeric-coded under a literal-colour hierarchy contract.",
+    "Erysimum reached an outcome-unopened source-transport HOLD despite a publication-defined three-state colour trait because its exact Dryad package is currently not publicly transportable through an identity-verifiable route.",
+    "Future candidate selection should therefore gate on currently recoverable exact bytes before committing to phenotype semantics or analysis."
+  ],
+  "search_budget": {
+    "maximum_new_candidates_screened": 5,
+    "selection_rule": "Evaluate candidates in the order they are discovered under the frozen metadata/source criteria; stop at the first candidate that passes every hard admission criterion.",
+    "if_none_pass": "STOP_NO_SOURCE_COMPLETE_REPLACEMENT; do not continue open-ended candidate fishing until a new dataset is released or a blocked exact source becomes recoverable.",
+    "candidate_switch_after_admission": "Only source/schema/crosswalk/opportunity/informativeness HOLD may reopen this source-first screen. A biological PASS or FAIL ends replacement searching."
+  },
+  "hard_admission_criteria": {
+    "independent_radiation_not_previously_used_for_CHUN_hidden_memory": true,
+    "minimum_reported_species": 20,
+    "publication_or_repository_metadata_reports_discrete_flower_colour_categories": true,
+    "publication_level_colour_set_must_include": "white plus at least two distinct non-white categories, or an equivalently explicit source-defined nested colour hierarchy frozen before rows",
+    "exact_trait_bytes_publicly_recoverable_now": true,
+    "exact_tree_bytes_publicly_recoverable_now": true,
+    "exact_bytes_identity_verifiable": "repository checksum/digest or repository-version exact object identity plus deterministic byte hash frozen at recovery",
+    "tree_branch_lengths_required": true,
+    "trait_tree_joint_frame_plausibly_at_least_20_from_metadata": true,
+    "author_defined_raw_code_to_colour_mapping_required_pre_row_if_raw_trait_is_not_literal": true,
+    "target_species_level_colour_rows_unopened_before_admission": true,
+    "CHUN_hidden_memory_outcome_unopened_before_admission": true
+  },
+  "preferred_source_priority": [
+    "Zenodo exact files with checksums",
+    "GitHub release or tagged repository files plus immutable commit/blob identity",
+    "OSF public files with stable identifiers/checksums",
+    "Dryad only when exact file bytes are currently downloadable without authentication or anti-bot transport failure"
+  ],
+  "metadata_only_operations_allowed": [
+    "article abstract/methods and reported species count",
+    "repository landing page and file list",
+    "repository file sizes/checksums",
+    "README and author code needed to identify trait/tree objects or decode schema, provided species-level colour rows are not opened",
+    "tree object metadata such as tip count and presence of branch lengths without emitting tip labels",
+    "trait header/schema without row values"
+  ],
+  "forbidden_during_screen": [
+    "species-level colour values",
+    "colour state frequencies",
+    "conditional hidden-memory AUC",
+    "global colour phylogenetic signal computed by CHUN",
+    "ranking candidates by published or newly computed CHUN-like outcome",
+    "changing the source criteria after a candidate fails them"
+  ],
+  "prospective_sequence_after_admission": [
+    "freeze exact trait/tree identities and schema",
+    "freeze identifier-only crosswalk",
+    "open state support/compression opportunity",
+    "run future informativeness gate",
+    "open observed within-coarse hidden-memory AUC"
+  ],
+  "hidden_memory_test_reference": "data/future_hidden_memory_informativeness_gate_v0_1.json",
+  "historical_holds_not_counted_as_biological_results": [
+    "MERIANIEAE schema HOLD",
+    "ERYSIMUM source-transport HOLD",
+    "Ruellia source/tree HOLD",
+    "Rhododendron30 trait-source HOLD",
+    "Iochrominae source-transport HOLD",
+    "Ng2018 source/schema HOLD"
+  ],
+  "current_submission": "Evolution Letters v0.3",
+  "ruellia_specific_promotion_rule_changed": false,
+  "paper1_science_changed": false,
+  "el_v0_3_science_changed": false
+}

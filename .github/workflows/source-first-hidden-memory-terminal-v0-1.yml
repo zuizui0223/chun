@@ -1,0 +1,50 @@
+name: Source-first hidden-memory candidate-search terminal v0.1
+
+on:
+  pull_request:
+    paths:
+      - 'data/source_first_hidden_memory_candidate_screen_v0_1.csv'
+      - 'data/source_first_hidden_memory_candidate_screen_terminal_v0_1.json'
+      - 'docs/SOURCE_FIRST_HIDDEN_MEMORY_CANDIDATE_SCREEN_TERMINAL_V0_1.md'
+      - '.github/workflows/source-first-hidden-memory-terminal-v0-1.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Validate bounded screen terminal
+        run: |
+          python - <<'PY'
+          import csv,json
+          rows=list(csv.DictReader(open('data/source_first_hidden_memory_candidate_screen_v0_1.csv')))
+          x=json.load(open('data/source_first_hidden_memory_candidate_screen_terminal_v0_1.json'))
+          assert x['status']=='STOP_NO_SOURCE_COMPLETE_REPLACEMENT_AFTER_FIVE_SOURCE_FIRST_CANDIDATES'
+          assert len(rows)==5
+          assert [int(r['candidate_order']) for r in rows]==[1,2,3,4,5]
+          assert x['search_budget']['maximum_new_candidates_screened']==5
+          assert x['search_budget']['candidates_screened']==5
+          assert x['search_budget']['admitted_candidate'] is None
+          assert x['search_budget']['budget_exhausted'] is True
+          assert all(r['outcome_rows_opened'].lower()=='false' for r in rows)
+          assert not any(r['source_first_status'].startswith('PASS_') for r in rows)
+          assert x['outcome_firewall']['any_candidate_hidden_memory_auc_computed'] is False
+          assert x['outcome_firewall']['any_candidate_biological_pass_or_fail'] is False
+          assert x['scientific_consequence']['existing_schistanthe_pass_changed'] is False
+          assert x['scientific_consequence']['gesnerioideae_fail_changed'] is False
+          assert x['scientific_consequence']['hierarchical_v0_4_claim_changed'] is False
+          assert x['scientific_consequence']['current_submission']=='Evolution Letters v0.3'
+          assert x['scientific_consequence']['ruellia_specific_promotion_rule_changed'] is False
+          assert x['paper1_science_changed'] is False
+          assert x['el_v0_3_science_changed'] is False
+          print([(r['candidate_order'],r['candidate'],r['source_first_status']) for r in rows])
+          PY
+      - name: Validate frozen EL v0.3 science
+        run: python scripts/validate_cross_radiation_el_v0_3_science_freeze_v0_1.py
