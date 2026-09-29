@@ -4,149 +4,226 @@
 
 `chun` is the **evolutionary-time arm** of a broader research programme on the spatiotemporal organization of flower-colour variation.
 
-The umbrella question is not "why are camellias colourful?" It is:
+The umbrella question is:
 
-> **How is flower-colour variation generated, retained, and organized across time and space?**
+> **How is flower-colour variation organized, retained and transformed across evolutionary time and geographic space?**
 
-Within that programme, the two current comparative papers are deliberately orthogonal:
+The programme now has two deliberately parallel axes:
 
-- **`chun` — evolutionary time:** how similar visible flower-colour states are repeatedly generated across evolutionary history, and whether those repeated phenotypes replay the same molecular transition;
-- **`fcp` — geographic space:** once intraspecific flower-colour variation exists, whether it is maintained as local within-population coexistence or sorted into geographic differentiation among populations.
+- **`chun` — evolutionary time:** how long flower-colour identity retains lineage history as lineages diverge, at what phenotypic resolution that history is expressed, and whether broad phenotype classes can contain finer hidden history;
+- **`fcp` — geographic space:** how within-species flower-colour variation is organized geographically, from local coexistence and neighbourhood structure to differentiation among populations.
 
-The shared conceptual decomposition is:
+The shared empirical architecture is:
 
-`generation through time -> establishment/persistence -> organization in space`
+> **Local or lineage-conditioned structure is recurrent, while one universal global template is not supported.**
 
-This is a research-programme connection, not a claim that the two repositories share a dataset, model, or inferential unit.
+This is a programme-level synthesis, not a claim that the two repositories share a dataset, statistical model or inferential unit.
 
-## Why Camellia is a useful temporal model system
+## Two temporal layers inside CHUN
 
-The biological question should come first; *Camellia* is the comparative system used to answer it.
+The repository contains two distinct but complementary temporal questions.
 
-### 1. A plausible low-visible-colour ancestral baseline, followed by diversification
+### Layer 1 — mechanistic generation in Camellia
 
-Independent genus-scale phylogenomics suggests that the most recent common ancestor of *Camellia* likely had white flowers (Fan et al. 2026, DOI `10.1111/pbi.70442`). That makes the genus attractive for asking how visible flower-colour states are repeatedly generated from a relatively low-visible-pigment baseline.
+The current Camellia Paper 1 asks whether repeated visible flower-colour change replays the same molecular transition.
 
-However, `chun` does **not** use "white = zero" as a molecular assumption. White petals can retain flavonols, pathway enzymes, regulatory capacity, UV structure, fluorescence, and other signals that are invisible to a coarse human colour label. The appropriate concept is therefore:
+Its central result remains bounded:
 
-> **a white-like visible baseline with retained pigment-network capacity**
+> **Repeated visible flower-colour change does not require replay of one invariant complete pigment-state programme; molecular repeatability is modular and transition-class dependent.**
 
-rather than an empty or pigment-free state.
+This layer separates mechanistic accessibility, observation regime, realized lineage pattern and historical-event identity.
 
-The current accepted-species `chun` ancestral-state analysis also retains W/Y uncertainty. Consequently, a definitive white ancestor is neither required by the analysis nor available as a `chun` headline claim. The independent white-MRCA result makes the temporal framing biologically plausible; it does not replace the project's own uncertainty gate.
+### Layer 2 — cross-radiation temporal memory
 
-### 2. Repeated visible states provide natural evolutionary replicates
+The Evolution Letters programme asks a different question:
 
-Red/pink, white, and yellow states recur across the genus. This allows repeated visible transitions to be treated as natural comparative replicates for a narrower question:
+> **As lineages diverge, how long does flower-colour identity retain evolutionary history, and is there one phenotypic resolution at which that history is universally strongest?**
 
-> **When evolution repeatedly reaches a similar visible state, how much of the underlying pigment-network transition is actually replayed?**
+The current frozen v0.3 answer is:
 
-The unit of interest is therefore not "a red flower" by itself. The relevant objects are repeated transition classes and their A/F/C/P pigment-state trajectories.
+> **Exact visible flower-colour memory generally decays with relative evolutionary divergence, but the phenotypic scale carrying that memory is radiation-specific rather than universal.**
 
-### 3. Pollination environments are diverse enough that visible colour is not a fixed ecological state
+The post-v0.3 hierarchical-memory extension adds:
 
-*Camellia* also spans contrasting reproductive environments. For example, *C. japonica* and *C. rusticana* are both visibly red but recruit different pollinators and differ in UV/fluorescence and pollinator-visible signal structure (Mori et al. 2023, DOI `10.1016/j.phytochem.2022.113559`). The golden-flowered *C. petelotii* receives substantial service from both sunbirds and honeybees, with insect activity varying with weather (Sun et al. 2017, DOI `10.3732/ajb.1600428`). Other *Camellia* systems add specialist bees, flies, hoverflies, bird pollination, and mixed pollinator service.
+> **Fine flower-colour states can retain lineage history inside broader phenotype classes; this hidden history is recurrent in visible colour, not a trivial state-compression artifact, but not universal across all phenotype representations.**
 
-This diversity is valuable precisely because it prevents a simple mapping such as `red = bird-pollinated` or `yellow = insect-pollinated`. It lets the project distinguish:
+The two temporal layers must not be pooled statistically. Paper 1 concerns mechanistic recurrence in Camellia; the cross-radiation programme concerns temporal retention, phenotype resolution and nested lineage history across radiations.
 
-- recurrence of a **visible phenotype**;
-- recurrence of a **molecular implementation**;
-- recurrence of an **ecological context**.
+## Current cross-radiation evidence
 
-Those three quantities need not coincide.
+The temporal-memory programme is broadly triangulated but not biologically exhaustive.
 
-### 4. Public molecular systems make the temporal question empirically testable
+### Standardized visible-colour frame
 
-The genus contains multiple public flower-colour transcriptomic and multi-omic systems. `chun` therefore does more than summarize reported candidate genes: it asks what recurrence remains when the same auditable public systems are re-expressed in one frozen pathway-wide A/F/C/P coordinate system.
+From the predefined Flower-clades-51 source:
 
-This makes *Camellia* useful not because it is taxonomically unique, but because it combines repeated colour evolution, mechanistic diversity, ecological diversity, and enough public molecular evidence to test repeatability rather than merely discuss it.
+- 32 clades are eligible for direct fine-colour temporal-persistence analysis;
+- 28 complete the standardized three-resolution profile;
+- 21 have genuine fine-to-coarse opportunity for hidden-memory analysis;
+- ineligible or insufficient-state clades remain HOLD rather than being rescued after outcomes are known.
 
-## The temporal question in `chun`
+### Prospective falsification of a universal scale
 
-The central biological question is:
+The preregistered Iris intermediate-resolution prediction failed.
 
-> **How is flower-colour diversity repeatedly generated through evolutionary time? Does repeated phenotypic change replay the same molecular transition, or can evolution repeatedly assemble similar visible states from different pigment-network modules?**
+Across the 28 completed standardized clades, coarse, fine, tied and no-signal profiles all occur, with zero unique intermediate winners.
 
-The inferential hierarchy remains:
+Four simple pre-outcome tree-geometry predictors fail qualification.
 
-`mechanistic feasibility -> observation regime -> identified recurrence -> macroevolutionary realization -> persistence/filtering`
+The supported conclusion is therefore not that another phenotype scale replaces the intermediate scale universally; it is that **no single privileged resolution is supported across radiations**.
 
-The observation-regime analysis is therefore **not the biological endpoint**. It is the identification step required before making a claim about temporal evolutionary repeatability.
+### Temporal decay
 
-## Current empirical answer
+Among 32 eligible visible-colour clades:
 
-The current matched candidate-free common set supports the following qualitative answer:
+- 23/32 have negative excess-retention slopes;
+- median slope = -0.1897;
+- 23/32 have positive integrated excess-retention area.
 
-1. repeated visible flower-colour change does not imply repeated use of one invariant whole A/F/C/P package;
-2. mechanistic reuse is modular and transition-class dependent;
-3. yellow-development systems retain stronger shared A/C/P structure than the anthocyanin-gain systems retain as a complete multivariate package;
-4. accepted wild colour is nevertheless locally phylogenetically structured, so molecular accessibility alone does not explain long-term realization and persistence;
-5. individual accepted-species transition branches are not robust to colour coding, so ecological causes cannot yet be assigned to particular historical events.
+Thus exact visible flower colour generally retains more excess similarity among shallower relatives and loses that excess with increasing relative divergence depth.
 
-This turns the cross-scale result into a temporal statement:
+The time axis is relative phylogenetic depth, not calibrated absolute time.
 
-> **Evolution can repeatedly generate similar visible colour states without replaying one complete molecular programme, while long-term lineage-level persistence remains more structured than molecular accessibility alone would predict.**
+### Hidden within-coarse history
 
-## Generation is not persistence
+Among 21 radiations with genuine fine-to-coarse opportunity:
 
-A key distinction for the temporal programme is between **generation** and **persistence**.
+- 18/21 hidden-memory effects are positive;
+- median centered effect = +0.0270 AUC;
+- one-sided Wilcoxon P = 3.34e-5;
+- sign-test P = 7.45e-4.
 
-A pigment state may be mechanistically accessible but fail to establish, spread, or persist. Conversely, a visible state may persist across related lineages even though the detailed molecular route by which it arose is not invariant.
+A frozen structural prediction that more state collision should mechanically create stronger hidden memory is not supported:
 
-The ecological role of `chun` is therefore not currently to prove that a particular bird, bee, climate variable, or habitat caused a particular branch transition. It is to expose the unresolved biological step between:
+- rho = -0.2571;
+- permutation P = 0.26023;
+- all 21 leave-one-clade-out correlations are negative.
 
-`what can be generated molecularly`
+Hidden history is therefore not explained by the trivial amount of phenotype compression.
 
-and
+### Independent prospective and cross-representation tests
 
-`what becomes realized and persists through evolutionary time`.
+The independent prospective Schistanthe visible-colour test passes:
 
-That unresolved step is where ecological filtering, reproductive interactions, demographic history, and lineage context can enter future work once event identity is adequate.
+- 129 retained tips;
+- centered effect = +0.06416 AUC;
+- P = 0.0033.
 
-## Relation to FCP: the spatial arm
+Biochemical evidence is mixed:
 
-The companion `fcp` project asks a different question at a different biological scale:
+- Petunieae retrospective: +0.18794 AUC, P = 0.0001;
+- Gesnerioideae prospective: -0.00779 AUC, P = 0.5005, frozen FAIL;
+- Ruellia remains outcome-unopened because the authoritative author-used tree is unavailable.
 
-> **Once intraspecific flower-colour variation exists, is it maintained as local coexistence or expressed as geographic differentiation?**
+Linoideae, Angraecinae and Antirrhineae provide three additional independent source-specific qualitative concordances for finer organization conditional on coarser states, but their statistics and phenotype dimensions are not pooled with the standardized AUC frame.
 
-Its current 34-species comparison treats within-population coexistence and among-population geographic structure as alternative **spatial organizations** of intraspecific variation and relates those states to occupied climatic niche breadth.
+## What is and is not comprehensive
 
-The two projects therefore form a clean pair:
+The temporal programme is comparatively broad with respect to inferential failure modes. It has directly tested:
 
-| Research axis | `chun` | `fcp` |
+1. a proposed universal resolution optimum;
+2. temporal decay of exact colour memory;
+3. heterogeneity in the phenotype scale carrying memory;
+4. hidden history inside coarse phenotype classes;
+5. the trivial compression-artifact explanation;
+6. equivalence between global signal and hidden organization;
+7. equivalence between hidden memory and a global fine-resolution advantage;
+8. prospective transport to an independent visible-colour radiation;
+9. cross-representation generalization;
+10. explicit negative, FAIL and HOLD outcomes.
+
+It is **not** exhaustive in the biological sampling sense. It does not provide:
+
+- a random or complete census of angiosperm radiations;
+- full coverage of spectra, pigments, regulatory states and developmental modules;
+- a calibrated absolute-time decay law shared across clades;
+- an identified ecological cause of memory decay;
+- an identified developmental or molecular cause of hidden-memory realization;
+- a direct harmonized link from macroevolutionary temporal memory to contemporary population-level spatial sorting.
+
+The source-first replacement search was intentionally stopped under a frozen candidate budget rather than becoming an open-ended search. That reduces selection bias; it does not make the taxonomic sample exhaustive.
+
+See `docs/TEMPORAL_PROGRAM_COVERAGE_AND_FCP_SISTER_V0_1.md` for the explicit coverage audit.
+
+## Relation to FCP: the spatial sister arm
+
+The companion `fcp` project is the geographic-space arm.
+
+The strongest sister-paper symmetry is now:
+
+| Research axis | `chun` — evolutionary time | `fcp` — geographic space |
 |---|---|---|
-| Primary dimension | evolutionary time | geographic space |
-| Primary process | generation / mechanistic recurrence | maintenance / spatial sorting |
-| Main comparison | repeated phenotype vs repeated mechanism | local coexistence vs geographic differentiation |
-| Main unit | evolutionary transition / lineage | species with intraspecific variation |
-| Ecology enters as | filtering and persistence after generation | correlate of spatial organization |
-| Current causal ceiling | no robust branch-specific cause | no morph-specific climatic cause |
+| Coordinate | relative evolutionary divergence | geographic separation / neighbourhood |
+| Local structure | recent relatives retain excess colour similarity | nearby observations can retain excess colour similarity |
+| Heterogeneity | memory strength and carrying resolution differ among radiations | spatial organization and transition geography differ among species |
+| Universal-template test | no universal privileged phenotype resolution | no confirmed universal global transition boundary |
+| Nested/local structure | fine lineage history can remain inside coarse phenotype classes | within-species variation can be locally structured without one shared global map |
+| Current causal gap | why memory decays and why hidden history is realized | why variation is locally maintained or geographically sorted |
 
-A concise programme label is:
+The programme-level principle is therefore:
 
-> **Spatiotemporal structure of flower-colour variation: repeated generation through evolutionary history and local coexistence versus geographic differentiation in space.**
+> **Flower-colour variation is structured in both evolutionary time and geographic space, but the form of that structure is context dependent rather than governed by one universal scale or map.**
+
+In the time arm, “local” means phylogenetic proximity or lineage-conditioned state space. In the space arm, “local” means geographic neighbourhood or within-species spatial configuration.
+
+The parallel is biological and conceptual, not statistical.
+
+## Why the time-space pairing matters
+
+The pairing changes the overarching question from “what causes flower colour?” to:
+
+> **How does phenotypic variation retain structure while being reorganized across two fundamental coordinates: evolutionary divergence and geographic separation?**
+
+That exposes a general distinction between **structure** and **template**.
+
+A trait can be non-randomly organized without all lineages sharing the same evolutionary resolution, and within-species variation can be non-randomly organized without all species sharing the same geographic boundary.
+
+This suggests a broader candidate principle:
+
+> **Phenotypic organization can be recurrent without being universally templated.**
+
+The current evidence supports that statement separately in time and space. It does not yet establish one common mechanism linking the two.
+
+## The next genuinely integrative test
+
+The clean next synthesis is not another retrospective moderator search.
+
+A future harmonized study should freeze a lineage property before outcomes are opened and ask whether it predicts both:
+
+1. **faster or slower loss of flower-colour memory through evolutionary divergence**, and
+2. **stronger or weaker contemporary geographic turnover or spatial sorting within species**.
+
+Possible biological predictors include pollinator turnover, environmental heterogeneity, mating system, dispersal/gene flow and developmental accessibility, but none is currently established.
+
+That prospective test would convert the present sister-paper symmetry into a direct spatiotemporal ecological hypothesis.
 
 ## Terminology
 
 Use **flower-colour variation** as the umbrella term across the programme.
 
-Reserve **flower-colour polymorphism** for the stricter population-level meaning used by `fcp`: coexistence of discrete colour variants within the same population.
+Reserve **flower-colour polymorphism** for documented within-population coexistence of discrete colour variants.
 
-This avoids calling species-level or lineage-level repeated colour evolution a "polymorphism" when there is no demonstrated within-population coexistence.
+Use **temporal memory** for lineage-conditioned excess similarity through relative evolutionary divergence.
+
+Use **hidden memory** only for additional fine-state lineage organization after coarse phenotype membership is held fixed.
 
 ## Claim boundaries
 
-This framing does not license the following claims:
+Do not claim:
 
-- `white = molecular zero`;
-- a definitive white *Camellia* ancestor in the current `chun` accepted-species analysis;
-- repeated visible state = repeated complete molecular mechanism;
-- pollinator identity inferred directly from visible hue;
-- a particular pollinator or climate driver assigned to an unstable reconstructed branch;
-- `chun` and `fcp` as one pooled analysis.
+- that the 51-clade source is an exhaustive sample of flowering plants;
+- that one phenotype resolution is universally optimal;
+- that hidden memory is universal across all phenotype representations;
+- that one ecological mechanism causes temporal memory decay;
+- that the same mechanism causes both CHUN temporal structure and FCP spatial structure;
+- that temporal memory predicts FCP spatial sorting in the current separate datasets;
+- that `chun` and `fcp` estimate the same parameter or constitute one pooled analysis;
+- that post-v0.3 hierarchical-memory results are already part of frozen Evolution Letters v0.3.
 
-## Current open science gate
+## Governance
 
-The temporal programme framing is independent of the exact final literature-conditioned recurrence bounds. Citation chasing on 2026-08-27 identified Luo et al. 2016 (DOI `10.3389/fpls.2015.01257`) as a potentially result-relevant *C. japonica* literature source because it reports canonical white-to-red DFR increase together with higher FLS in white flowers. The literature-conditioned recurrence and direct-overlap statistics must therefore be rechecked under the existing frozen collapse/enumeration rules before the next submission freeze.
-
-That numerical audit may change the width of the literature identified set, but it does not change the programme-level question: **how repeatable is the generation of flower-colour states through evolutionary time?**
+- Frozen Evolution Letters v0.3 science remains unchanged.
+- Post-v0.3 hierarchical-memory work remains an extension.
+- Camellia Paper 1 science remains unchanged.
+- FCP science remains unchanged.
+- This document updates programme-level framing only.
