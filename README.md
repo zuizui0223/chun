@@ -1,24 +1,64 @@
 # chun
 
-**Evolutionary-time analysis of flower-colour variation using *Camellia* as a comparative model system.**
+**Evolutionary-time analyses of flower-colour variation, spanning mechanistic recurrence in *Camellia* and cross-radiation temporal memory.**
 
 ## Programme position
 
-`chun` is the **evolutionary-time arm** of a broader programme on the spatiotemporal organization of flower-colour variation. Its central question is:
+`chun` is the **evolutionary-time arm** of a broader programme on the spatiotemporal organization of flower-colour variation.
 
-> **When similar flower-colour states are repeatedly generated through evolutionary time, how much of the underlying pigment-network transition is replayed?**
+Its current programme-level question is:
 
-The complementary [`fcp`](https://github.com/zuizui0223/fcp) project is the **geographic-space arm**, asking whether intraspecific flower-colour variation is maintained as local coexistence or sorted into geographic differentiation.
+> **How is flower-colour variation structured and retained as lineages diverge, and at what phenotypic resolution does that evolutionary history remain visible?**
 
-The shared conceptual decomposition is:
+The complementary [`fcp`](https://github.com/zuizui0223/fcp) project is the **geographic-space arm**, asking how within-species flower-colour variation is organized across geographic neighbourhoods and populations.
 
-`generation through time -> establishment/persistence -> organization in space`
+The sister-paper synthesis is:
 
-Across the programme, **flower-colour variation** is the umbrella term. **Polymorphism** is reserved for documented within-population coexistence. See [`docs/FLOWER_COLOUR_VARIATION_TEMPORAL_PROGRAM.md`](docs/FLOWER_COLOUR_VARIATION_TEMPORAL_PROGRAM.md).
+> **Flower-colour variation is structured in both evolutionary time and geographic space, but the form of that structure is context dependent rather than governed by one universal scale or map.**
+
+In `chun`, recent relatives generally retain excess colour similarity, but the resolution carrying historical information differs among radiations and finer lineage history can remain hidden inside broader phenotype classes. In `fcp`, nearby observations can be more colour-similar, while independent species do not support one confirmed universal geography of their strongest transitions.
+
+This is a conceptual parallel, not a pooled analysis. Across the programme, **flower-colour variation** is the umbrella term and **polymorphism** is reserved for documented within-population coexistence.
+
+See:
+
+- [`docs/FLOWER_COLOUR_VARIATION_TEMPORAL_PROGRAM.md`](docs/FLOWER_COLOUR_VARIATION_TEMPORAL_PROGRAM.md) — current temporal-arm framing;
+- [`docs/TEMPORAL_PROGRAM_COVERAGE_AND_FCP_SISTER_V0_1.md`](docs/TEMPORAL_PROGRAM_COVERAGE_AND_FCP_SISTER_V0_1.md) — explicit coverage and non-exhaustiveness audit.
 
 ## Scope
 
-`chun` is *Camellia*-only. East Asian *Cirsium* work is maintained separately in [EAzami](https://github.com/zuizui0223/EAzami). Historical cross-family scaffolds remain in Git history but are not current analysis inputs.
+The repository contains two analytically separate temporal layers.
+
+- **Camellia Paper 1** is *Camellia*-only and asks about mechanistic recurrence of repeated flower-colour change.
+- **Cross-radiation Evolution Letters programme** asks about temporal persistence, phenotype resolution and hidden lineage history across flower-colour radiations.
+
+These layers are not pooled statistically. East Asian *Cirsium* work is maintained separately in [EAzami](https://github.com/zuizui0223/EAzami).
+
+## Current temporal sister paper — Evolution Letters v0.3
+
+The frozen first-submission candidate is **Evolution Letters v0.3, “Flower-color evolutionary memory is transient but lacks a universal phenotypic scale.”**
+
+Its central result is:
+
+> **Exact visible flower-colour memory generally decays with relative evolutionary divergence, but no single phenotypic resolution is universally privileged across radiations.**
+
+Current frozen v0.3 evidence includes:
+
+- 32 clades eligible for direct fine-colour temporal persistence;
+- 23/32 negative excess-retention slopes, median -0.1897;
+- 28 standardized clades with coarse, fine, tied and no-signal resolution profiles;
+- zero unique intermediate-resolution winners;
+- a preregistered Iris intermediate-resolution prediction that failed prospectively;
+- no qualified simple tree-geometry moderator.
+
+The post-v0.3 extension strengthens the temporal interpretation without changing frozen v0.3 science:
+
+- 18/21 opportunity clades have positive hidden-memory effects;
+- the state-compression explanation is not supported;
+- independent prospective Schistanthe visible-colour validation passes;
+- prospective Gesnerioideae biochemical validation fails.
+
+Thus the extension supports **recurrent but non-universal hierarchical evolutionary memory**. It remains separate from the frozen submission candidate.
 
 ## Current Paper 1
 
