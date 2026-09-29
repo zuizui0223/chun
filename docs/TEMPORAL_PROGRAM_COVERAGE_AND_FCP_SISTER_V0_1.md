@@ -174,6 +174,35 @@ Do not claim:
 - that hidden memory is universal across phenotype representations;
 - that FCP and CHUN estimate the same parameter.
 
+## Direct bridge feasibility audit
+
+A direct CHUN–FCP coupling test was evaluated under an outcome-blind gate after the sister-paper framing was established.
+
+The existing FCP discovery/validation cohorts were first checked only for taxonomic overlap with the 28 CHUN common temporal clades. Coverage was too sparse for a defensible radiation-level association:
+
+- discovery: 7 overlapping clades / 17 D-eligible species;
+- validation: 7 overlapping clades / 12 D-eligible species;
+- only 1 validation clade contained at least 3 species.
+
+No existing-outcome correlation was run.
+
+A genuinely prospective bridge was then qualified using the untouched FCP U100 pool. The frozen gate required at least 5 unused high-depth species in at least 12 independent CHUN clades, with no threshold relaxation after seeing coverage.
+
+After excluding every previously allocated high-depth cohort:
+
+- unused U100 species = 2,730;
+- exact-genus matches to the 28 CHUN common temporal clades = 127 species;
+- clades with at least 5 unused species = 10;
+- required qualifying clades = 12.
+
+Terminal state:
+
+> **HOLD_INSUFFICIENT_FRESH_CLADE_COVERAGE**
+
+The threshold was not relaxed from 12 to 10, no synonym/family fallback was added, no fresh bridge cohort was selected, and no temporal-turnover/spatial-organization association was computed.
+
+This means the temporal–spatial symmetry is presently a **programme-level empirical parallel**, not direct evidence that the same lineage property governs both axes.
+
 ## 5. Next genuinely new test
 
 The clean next synthesis is not another retrospective moderator search.
