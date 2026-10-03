@@ -20,7 +20,7 @@ jobs:
         with:
           python-version: '3.12'
       - name: Install Fan seed dependency
-        run: python -m pip install --disable-pip-version-check openpyxl
+        run: python -m pip install --disable-pip-version-check -r requirements-camellia-analysis.txt
       - name: Rebuild frozen runtime91 panel
         run: |
           mkdir -p build/ultimate
