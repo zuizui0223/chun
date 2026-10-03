@@ -3,6 +3,7 @@ name: Rhododendron30 source access recheck v0.3
 on:
   pull_request:
     paths:
+      - 'requirements-rhododendron.txt'
       - 'scripts/recheck_rhododendron30_source_access_v0_3.py'
       - 'tests/test_rhododendron30_source_access_recheck_v0_3.py'
       - 'data/rhododendron30_source_access_recheck_v0_3.json'
