@@ -11,7 +11,7 @@ on:
       - 'tests/test_gesnerioideae_biochemical_hidden_memory_v0_1.py'
       - 'results/gesnerioideae_biochemical_hidden_memory_v0_1/**'
       - 'docs/GESNERIOIDEAE_BIOCHEMICAL_HIDDEN_MEMORY_RESULT_V0_1.md'
-      - 'tmp/gesnerioideae_verified_source_tree_v0_1.nex'
+      - 'data/source_snapshots/gesnerioideae_verified_source_tree_v0_1.nex'
       - '.github/workflows/gesnerioideae-biochemical-hidden-memory-v0-1.yml'
   workflow_dispatch:
 
@@ -36,7 +36,7 @@ jobs:
       - name: Rebuild frozen identifier frame
         run: |
           python scripts/preflight_gesnerioideae_biochemical_crosswalk_v0_1.py \
-            --tree tmp/gesnerioideae_verified_source_tree_v0_1.nex \
+            --tree data/source_snapshots/gesnerioideae_verified_source_tree_v0_1.nex \
             --out-json build/gesnerioideae_biochemical_crosswalk_v0_1.json \
             --out-tree build/gesnerioideae_biochemical_pruned_tree_v0_1.newick
       - name: Open frozen state-support gate
