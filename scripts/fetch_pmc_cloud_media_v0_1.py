@@ -143,7 +143,7 @@ def main() -> int:
     ap.add_argument("--require-glob")
     args = ap.parse_args()
     summary = fetch_pmc_media(args.pmcid, args.out_dir)
-    if args.require_glob and not list(args.out_dir.glob(args.require_glob)):
+    if args.require_glob and not list(args.out_dir.rglob(args.require_glob)):
         raise SystemExit(f"required PMC media pattern not found: {args.require_glob}")
     print(json.dumps(summary, indent=2, sort_keys=True))
     return 0
