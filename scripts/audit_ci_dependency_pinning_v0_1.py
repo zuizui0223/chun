@@ -26,9 +26,9 @@ def family(path: Path) -> str:
     return "other:" + stem.split("-", 1)[0]
 
 
-def pip_lines(path: Path) -> list[dict[str, object]]:
+def pip_lines_from_text(text: str) -> list[dict[str, object]]:
     rows = []
-    for lineno, raw in enumerate(path.read_text(encoding="utf-8").splitlines(), start=1):
+    for lineno, raw in enumerate(text.splitlines(), start=1):
         m = PIP_RE.search(raw)
         if not m:
             continue
@@ -49,6 +49,49 @@ def pip_lines(path: Path) -> list[dict[str, object]]:
             "via_requirement_file": requirement_file,
         })
     return rows
+
+
+def pip_lines(path: Path) -> list[dict[str, object]]:
+    return pip_lines_from_text(path.read_text(encoding="utf-8"))
+
+
+def new_unpinned_rows(
+    current_rows: list[dict[str, object]],
+    base_rows: list[dict[str, object]],
+) -> list[dict[str, object]]:
+    """Return only unpinned install commands newly introduced vs the base.
+
+    Existing dependency debt is inventoried but does not block unrelated workflow
+    maintenance. Increasing the count of an existing unpinned command still fails.
+    """
+    base_counts = Counter(
+        str(row["command"])
+        for row in base_rows
+        if not bool(row["pinned"])
+    )
+    seen = Counter()
+    added = []
+    for row in current_rows:
+        if bool(row["pinned"]):
+            continue
+        command = str(row["command"])
+        seen[command] += 1
+        if seen[command] > base_counts[command]:
+            added.append(row)
+    return added
+
+
+def base_workflow_rows(base_ref: str, relative_path: str) -> list[dict[str, object]]:
+    proc = subprocess.run(
+        ["git", "show", f"{base_ref}:{relative_path}"],
+        cwd=ROOT,
+        check=False,
+        capture_output=True,
+        text=True,
+    )
+    if proc.returncode != 0:
+        return []
+    return pip_lines_from_text(proc.stdout)
 
 
 def inventory() -> dict:
@@ -126,16 +169,18 @@ def main() -> int:
     if args.base_ref:
         violations = []
         for path in changed_workflows(args.base_ref):
-            for row in pip_lines(path):
-                if not row["pinned"]:
-                    violations.append({
-                        "workflow": str(path.relative_to(ROOT)),
-                        **row,
-                    })
+            relative = str(path.relative_to(ROOT))
+            current_rows = pip_lines(path)
+            base_rows = base_workflow_rows(args.base_ref, relative)
+            for row in new_unpinned_rows(current_rows, base_rows):
+                violations.append({
+                    "workflow": relative,
+                    **row,
+                })
         if violations:
             raise SystemExit(
-                "changed workflows contain unpinned direct pip installs; "
-                "move them to a version-pinned requirements file or pin every direct package:\n"
+                "changed workflows introduce new unpinned direct pip installs; "
+                "move new installs to a version-pinned requirements file or pin every direct package:\n"
                 + json.dumps(violations, indent=2)
             )
         print("CHANGED_WORKFLOW_DEPENDENCY_PINNING_PASS")
