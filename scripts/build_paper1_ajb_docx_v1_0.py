@@ -74,8 +74,8 @@ def main() -> int:
     summary = {
         **inherited,
         "submission_version": "v1.0",
-        "source_markdown": str(a.source),
-        "output_docx": str(a.out),
+        "source_markdown": "manuscript/PAPER1_AJB_UPLOAD_V1_0.md",
+        "output_docx": "manuscript/PAPER1_AJB_UPLOAD_V1_0.docx",
         "bytes": a.out.stat().st_size,
         "source_science_version": "Paper 1 v0.2.2",
         "source_framing_version": "Paper 1 v0.3.4 event-boundary-safe novelty framing",
