@@ -3,6 +3,7 @@ name: Fan 2026 supporting data audit
 on:
   pull_request:
     paths:
+      - 'scripts/fetch_pmc_cloud_media_v0_1.py'
       - 'scripts/audit_fan2026_datas1.py'
       - '.github/workflows/fan2026-supporting-data-audit.yml'
   workflow_dispatch:
@@ -23,37 +24,10 @@ jobs:
       - name: Acquire open-access Data S1 through PMC OA package
         run: |
           mkdir -p build/fan2026_datas1/package
-          curl --fail --location --retry 3 \
-            'https://www.ncbi.nlm.nih.gov/pmc/utils/oa/oa.fcgi?id=PMC12946509' \
-            -o build/fan2026_datas1/oa_record.xml
-          python - <<'PY'
-          from pathlib import Path
-          import xml.etree.ElementTree as ET
-          p=Path('build/fan2026_datas1/oa_record.xml')
-          root=ET.fromstring(p.read_bytes())
-          links=root.findall('.//link')
-          tgz=[x.attrib.get('href','') for x in links if x.attrib.get('format')=='tgz']
-          if len(tgz)!=1:
-              raise SystemExit(f'expected one PMC OA tgz link, observed {tgz}; response={p.read_text(errors="replace")[:2000]}')
-          href=tgz[0]
-          if href.startswith('ftp://ftp.ncbi.nlm.nih.gov/'):
-              href='https://ftp.ncbi.nlm.nih.gov/'+href.split('ftp://ftp.ncbi.nlm.nih.gov/',1)[1]
-          Path('build/fan2026_datas1/package_url.txt').write_text(href+'\n')
-          print('OA package',href)
-          PY
-          url=$(cat build/fan2026_datas1/package_url.txt)
-          if ! curl --fail --location --retry 3 --retry-all-errors "$url" -o build/fan2026_datas1/PMC12946509.tar.gz; then
-            # April 2026 PMC transition moved legacy FTP paths under deprecated/.
-            deprecated=$(python - <<'PY'
-          from pathlib import Path
-          u=Path('build/fan2026_datas1/package_url.txt').read_text().strip()
-          marker='https://ftp.ncbi.nlm.nih.gov/pub/pmc/'
-          print(u.replace(marker,marker+'deprecated/',1) if u.startswith(marker) and '/deprecated/' not in u else u)
-          PY
-          )
-            curl --fail --location --retry 3 --retry-all-errors "$deprecated" -o build/fan2026_datas1/PMC12946509.tar.gz
-          fi
-          tar -xzf build/fan2026_datas1/PMC12946509.tar.gz -C build/fan2026_datas1/package
+          python scripts/fetch_pmc_cloud_media_v0_1.py \
+            --pmcid PMC12946509 \
+            --out-dir build/fan2026_datas1/package \
+            --require-glob '*s002*.xlsx'
           find build/fan2026_datas1/package -type f -maxdepth 3 -printf '%P\n' | sort | tee build/fan2026_datas1/package_file_list.txt
           candidate=$(find build/fan2026_datas1/package -type f \( -iname '*s002*.xlsx' -o -iname '*DataS1*.xlsx' \) | head -n 1)
           if [ -z "$candidate" ]; then
