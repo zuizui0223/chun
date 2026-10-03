@@ -3,6 +3,7 @@ name: Flower-clades-51 distance persistence v0.1
 on:
   pull_request:
     paths:
+      - 'requirements-flowerclades51.txt'
       - 'scripts/run_flowerclades51_distance_persistence_v0_1.py'
       - 'tests/test_flowerclades51_distance_persistence_v0_1.py'
       - 'data/flowerclades51_relative_time_persistence_result_v0_1.json'
@@ -24,7 +25,7 @@ jobs:
         with:
           python-version: '3.12'
       - name: Install runtime
-        run: pip install numpy scipy biopython pytest
+        run: python -m pip install --disable-pip-version-check -r requirements-flowerclades51.txt
       - name: Unit tests
         run: pytest -q tests/test_flowerclades51_distance_persistence_v0_1.py
       - name: Validate frozen derived result

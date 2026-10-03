@@ -6,6 +6,7 @@ on:
       - analysis/flowerclades51-temporal-lability-v0-1
   pull_request:
     paths:
+      - 'requirements-flowerclades51.txt'
       - 'data/flowerclades51_temporal_lability_bridge_prereg_v0_1.json'
       - 'docs/FLOWERCLADES51_TEMPORAL_LABILITY_BRIDGE_PREREG_V0_1.md'
       - 'tests/test_flowerclades51_temporal_lability_bridge_prereg_v0_1.py'
@@ -20,6 +21,6 @@ jobs:
         with:
           python-version: '3.12'
       - name: Install test runtime
-        run: python -m pip install pytest
+        run: python -m pip install --disable-pip-version-check -r requirements-flowerclades51.txt
       - name: Validate frozen temporal-lability bridge contract
         run: python -m pytest -q tests/test_flowerclades51_temporal_lability_bridge_prereg_v0_1.py

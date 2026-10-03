@@ -3,6 +3,7 @@ name: Flower-clades-51 hierarchical hidden memory v0.1
 on:
   pull_request:
     paths:
+      - 'requirements-flowerclades51.txt'
       - 'data/flowerclades51_hidden_fine_memory_design_v0_1.json'
       - 'data/flowerclades51_hidden_fine_memory_clades_v0_1.csv'
       - 'scripts/analyze_flowerclades51_hidden_fine_memory_v0_1.py'
@@ -24,7 +25,7 @@ jobs:
         with:
           python-version: '3.12'
       - name: Install runtime
-        run: pip install numpy scipy biopython pandas pytest
+        run: python -m pip install --disable-pip-version-check -r requirements-flowerclades51.txt
       - name: Unit tests
         run: pytest -q tests/test_flowerclades51_hidden_fine_memory_v0_1.py
       - name: Validate frozen result if present
