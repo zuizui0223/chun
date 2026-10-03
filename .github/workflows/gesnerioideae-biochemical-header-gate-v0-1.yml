@@ -3,6 +3,7 @@ name: Gesnerioideae biochemical header gate v0.1
 on:
   pull_request:
     paths:
+      - 'requirements-gesnerioideae.txt'
       - 'scripts/probe_gesnerioideae_biochemical_headers_v0_1.py'
       - 'tests/test_probe_gesnerioideae_biochemical_headers_v0_1.py'
       - 'data/gesnerioideae_biochemical_header_gate_v0_1.json'
@@ -22,7 +23,7 @@ jobs:
         with:
           python-version: '3.12'
       - name: Install runtime
-        run: pip install pytest openpyxl requests
+        run: python -m pip install --disable-pip-version-check -r requirements-gesnerioideae.txt
       - name: Unit tests
         run: pytest -q tests/test_probe_gesnerioideae_biochemical_headers_v0_1.py
       - name: Probe exact supplementary workbook headers only

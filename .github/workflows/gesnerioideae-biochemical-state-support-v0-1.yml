@@ -3,6 +3,7 @@ name: Gesnerioideae biochemical state support v0.1
 on:
   pull_request:
     paths:
+      - 'requirements-gesnerioideae.txt'
       - 'scripts/preflight_gesnerioideae_biochemical_crosswalk_v0_1.py'
       - 'scripts/gate_gesnerioideae_biochemical_state_support_v0_1.py'
       - 'tests/test_gesnerioideae_biochemical_crosswalk_v0_1.py'
@@ -23,7 +24,7 @@ jobs:
         with:
           python-version: '3.12'
       - name: Install runtime
-        run: pip install pytest openpyxl biopython
+        run: python -m pip install --disable-pip-version-check -r requirements-gesnerioideae.txt
       - name: Unit tests
         run: |
           pytest -q tests/test_gesnerioideae_biochemical_crosswalk_v0_1.py
