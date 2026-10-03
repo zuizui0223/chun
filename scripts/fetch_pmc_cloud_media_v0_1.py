@@ -78,7 +78,7 @@ def choose_version(metadata: list[dict]) -> dict:
     return max(pool, key=lambda x: int(x.get("version", 0)))
 
 
-def fetch_pmc_media(pmcid: str, out_dir: Path) -> dict:
+def fetch_pmc_media(pmcid: str, out_dir: Path, *, include_core: bool = False) -> dict:
     prefixes = list_versions(pmcid)
     if not prefixes:
         raise RuntimeError(f"no PMC Cloud article version found for {pmcid}")
@@ -88,7 +88,14 @@ def fetch_pmc_media(pmcid: str, out_dir: Path) -> dict:
     out_dir.mkdir(parents=True, exist_ok=True)
 
     rows = []
-    for source in meta.get("media_urls") or []:
+    sources = list(meta.get("media_urls") or [])
+    if include_core:
+        sources.extend(
+            source
+            for source in (meta.get("xml_url"), meta.get("pdf_url"), meta.get("text_url"))
+            if source
+        )
+    for source in sources:
         https_url, expected_md5 = s3_to_https(source)
         name = Path(urllib.parse.urlparse(https_url).path).name
         if not name:
@@ -127,7 +134,9 @@ def fetch_pmc_media(pmcid: str, out_dir: Path) -> dict:
         "license_code": meta.get("license_code"),
         "doi": meta.get("doi"),
         "citation": meta.get("citation"),
-        "media_files": len(rows),
+        "media_files": len(meta.get("media_urls") or []),
+        "downloaded_files": len(rows),
+        "include_core": include_core,
         "tabular_media_files": sum(Path(r["filename"]).suffix.lower() in {".xlsx", ".xls", ".csv", ".tsv"} for r in rows),
     }
     (out_dir / "pmc_cloud_summary.json").write_text(
@@ -141,8 +150,9 @@ def main() -> int:
     ap.add_argument("--pmcid", required=True)
     ap.add_argument("--out-dir", type=Path, required=True)
     ap.add_argument("--require-glob")
+    ap.add_argument("--include-core", action="store_true")
     args = ap.parse_args()
-    summary = fetch_pmc_media(args.pmcid, args.out_dir)
+    summary = fetch_pmc_media(args.pmcid, args.out_dir, include_core=args.include_core)
     if args.require_glob and not list(args.out_dir.rglob(args.require_glob)):
         raise SystemExit(f"required PMC media pattern not found: {args.require_glob}")
     print(json.dumps(summary, indent=2, sort_keys=True))
