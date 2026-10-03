@@ -21,7 +21,7 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
-      - run: python -m pip install --disable-pip-version-check numpy requests rasterio
+      - run: python -m pip install --disable-pip-version-check -r requirements-camellia-spatial.txt
       - name: Download CHELSA BIO1 and BIO6
         run: |
           mkdir -p build/chelsa build/camellia_thermal
