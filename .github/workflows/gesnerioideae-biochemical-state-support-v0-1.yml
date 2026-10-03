@@ -7,7 +7,7 @@ on:
       - 'scripts/gate_gesnerioideae_biochemical_state_support_v0_1.py'
       - 'tests/test_gesnerioideae_biochemical_crosswalk_v0_1.py'
       - 'tests/test_gesnerioideae_biochemical_state_support_v0_1.py'
-      - 'tmp/gesnerioideae_verified_source_tree_v0_1.nex'
+      - 'data/source_snapshots/gesnerioideae_verified_source_tree_v0_1.nex'
       - '.github/workflows/gesnerioideae-biochemical-state-support-v0-1.yml'
   workflow_dispatch:
 
@@ -31,7 +31,7 @@ jobs:
       - name: Rebuild frozen pre-outcome crosswalk
         run: |
           python scripts/preflight_gesnerioideae_biochemical_crosswalk_v0_1.py \
-            --tree tmp/gesnerioideae_verified_source_tree_v0_1.nex \
+            --tree data/source_snapshots/gesnerioideae_verified_source_tree_v0_1.nex \
             --out-json build/gesnerioideae_biochemical_crosswalk_v0_1.json \
             --out-tree build/gesnerioideae_biochemical_pruned_tree_v0_1.newick
       - name: Open frozen chemistry columns for support only
