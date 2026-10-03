@@ -112,7 +112,7 @@ def main() -> int:
     a.out.write_text(out.rstrip() + "\n", encoding="utf-8")
 
     summary.update({
-        "source_manuscript": str(a.source),
+        "source_manuscript": "provenance/PAPER1_NOVELTY_FRAMING_V0_3_4.md",
         "source_framing_version": "Paper 1 v0.3.4 event-boundary-safe novelty framing",
         "compatibility_marker_removed": True,
         "v0_3_4_title_restored": True,
