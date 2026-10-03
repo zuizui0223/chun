@@ -3,6 +3,7 @@ name: Rhododendron30 Wiley supplement recovery v0.5
 on:
   pull_request:
     paths:
+      - 'requirements-rhododendron-test.txt'
       - 'scripts/recover_rhododendron30_wiley_supplements_v0_5.py'
       - 'tests/test_recover_rhododendron30_wiley_supplements_v0_5.py'
       - '.github/workflows/rhododendron30-wiley-supplement-recovery-v0-5.yml'
@@ -20,7 +21,7 @@ jobs:
         with:
           python-version: '3.12'
       - name: Install tests
-        run: pip install pytest
+        run: python -m pip install --disable-pip-version-check -r requirements-rhododendron-test.txt
       - name: Unit tests
         run: pytest -q tests/test_recover_rhododendron30_wiley_supplements_v0_5.py
       - name: Recover exact-named publisher supplements without opening contents
