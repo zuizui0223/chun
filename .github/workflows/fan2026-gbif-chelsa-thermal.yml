@@ -3,6 +3,7 @@ name: Fan 2026 species-scale GBIF CHELSA thermal
 on:
   pull_request:
     paths:
+      - 'scripts/fetch_pmc_cloud_media_v0_1.py'
       - 'scripts/build_fan2026_species_colour_seed.py'
       - 'scripts/analyze_fan2026_colour_geography.py'
       - 'data/fan2026_colour_geography_tests_v0_1.csv'
@@ -32,29 +33,10 @@ jobs:
       - name: Acquire Fan 2026 Data S1 from PMC OA package
         run: |
           mkdir -p build/fan_macro/package build/chelsa build/fan_macro/result
-          curl --fail --location --retry 3 'https://www.ncbi.nlm.nih.gov/pmc/utils/oa/oa.fcgi?id=PMC12946509' -o build/fan_macro/oa.xml
-          python - <<'PY'
-          import xml.etree.ElementTree as ET
-          from pathlib import Path
-          root=ET.fromstring(Path('build/fan_macro/oa.xml').read_bytes())
-          links=[x.attrib.get('href','') for x in root.findall('.//link') if x.attrib.get('format')=='tgz']
-          if len(links)!=1: raise SystemExit(f'unexpected OA links {links}')
-          u=links[0]
-          if u.startswith('ftp://ftp.ncbi.nlm.nih.gov/'):
-              u='https://ftp.ncbi.nlm.nih.gov/'+u.split('ftp://ftp.ncbi.nlm.nih.gov/',1)[1]
-          Path('build/fan_macro/url').write_text(u+'\n')
-          PY
-          u=$(cat build/fan_macro/url)
-          if ! curl --fail --location --retry 3 --retry-all-errors "$u" -o build/fan_macro/a.tgz; then
-            u2=$(python - <<'PY'
-          from pathlib import Path
-          u=Path('build/fan_macro/url').read_text().strip(); m='https://ftp.ncbi.nlm.nih.gov/pub/pmc/'
-          print(u.replace(m,m+'deprecated/',1) if u.startswith(m) and '/deprecated/' not in u else u)
-          PY
-          )
-            curl --fail --location --retry 3 --retry-all-errors "$u2" -o build/fan_macro/a.tgz
-          fi
-          tar -xzf build/fan_macro/a.tgz -C build/fan_macro/package
+          python scripts/fetch_pmc_cloud_media_v0_1.py \
+            --pmcid PMC12946509 \
+            --out-dir build/fan_macro/package \
+            --require-glob '*s002*.xlsx'
           xlsx=$(find build/fan_macro/package -type f -iname '*s002*.xlsx' | head -n 1)
           test -n "$xlsx"
           cp "$xlsx" build/fan_macro/DataS1.xlsx

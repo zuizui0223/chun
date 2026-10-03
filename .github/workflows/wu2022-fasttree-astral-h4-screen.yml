@@ -3,6 +3,7 @@ name: Wu FastTree ASTRAL H4 screen
 on:
   pull_request:
     paths:
+      - 'scripts/fetch_pmc_cloud_media_v0_1.py'
       - 'scripts/test_nuclear_topology_colour_clustering.py'
       - '.github/workflows/wu2022-fasttree-astral-h4-screen.yml'
   workflow_dispatch:
@@ -82,24 +83,10 @@ jobs:
       - name: Rebuild Fan colour seed after topology freeze
         run: |
           mkdir -p build/fan/package build/result
-          curl --fail --location --retry 3 'https://www.ncbi.nlm.nih.gov/pmc/utils/oa/oa.fcgi?id=PMC12946509' -o build/fan/oa.xml
-          python - <<'PY'
-          import xml.etree.ElementTree as ET
-          from pathlib import Path
-          r=ET.fromstring(Path('build/fan/oa.xml').read_bytes());ls=[x.attrib.get('href','') for x in r.findall('.//link') if x.attrib.get('format')=='tgz'];assert len(ls)==1,ls;u=ls[0]
-          if u.startswith('ftp://ftp.ncbi.nlm.nih.gov/'):u='https://ftp.ncbi.nlm.nih.gov/'+u.split('ftp://ftp.ncbi.nlm.nih.gov/',1)[1]
-          Path('build/fan/url').write_text(u+'\n')
-          PY
-          u=$(cat build/fan/url)
-          if ! curl --fail --location --retry 3 --retry-all-errors "$u" -o build/fan/a.tgz; then
-            u2=$(python - <<'PY'
-          from pathlib import Path
-          u=Path('build/fan/url').read_text().strip();m='https://ftp.ncbi.nlm.nih.gov/pub/pmc/';print(u.replace(m,m+'deprecated/',1) if u.startswith(m) and '/deprecated/' not in u else u)
-          PY
-          )
-            curl --fail --location --retry 3 --retry-all-errors "$u2" -o build/fan/a.tgz
-          fi
-          tar -xzf build/fan/a.tgz -C build/fan/package
+          python scripts/fetch_pmc_cloud_media_v0_1.py \
+            --pmcid PMC12946509 \
+            --out-dir build/fan/package \
+            --require-glob '*s002*.xlsx'
           x=$(find build/fan/package -type f -iname '*s002*.xlsx' | head -n 1); test -n "$x"
           python scripts/build_fan2026_species_colour_seed.py "$x" --output build/fan/colour.csv --audit build/fan/audit.json
       - name: Run 100k topology clustering permutations
