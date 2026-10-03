@@ -55,6 +55,8 @@ def inventory() -> dict:
     files = sorted([*WORKFLOWS.glob("*.yml"), *WORKFLOWS.glob("*.yaml")])
     entries = []
     families = Counter()
+    unpinned_by_family = Counter()
+    unpinned_workflows_by_family: dict[str, set[str]] = {}
     unpinned = 0
     with_pip = 0
     for path in files:
@@ -64,7 +66,11 @@ def inventory() -> dict:
         with_pip += 1
         fam = family(path)
         families[fam] += 1
-        unpinned += sum(not bool(row["pinned"]) for row in rows)
+        unpinned_rows = [row for row in rows if not bool(row["pinned"])]
+        unpinned += len(unpinned_rows)
+        if unpinned_rows:
+            unpinned_by_family[fam] += len(unpinned_rows)
+            unpinned_workflows_by_family.setdefault(fam, set()).add(str(path.relative_to(ROOT)))
         entries.append({
             "workflow": str(path.relative_to(ROOT)),
             "family": fam,
@@ -75,6 +81,14 @@ def inventory() -> dict:
         "workflows_with_pip_install": with_pip,
         "unpinned_pip_install_lines": unpinned,
         "families": dict(sorted(families.items())),
+        "unpinned_by_family": dict(sorted(unpinned_by_family.items(), key=lambda kv: (-kv[1], kv[0]))),
+        "unpinned_workflows_by_family": {
+            fam: sorted(paths)
+            for fam, paths in sorted(
+                unpinned_workflows_by_family.items(),
+                key=lambda kv: (-len(kv[1]), kv[0]),
+            )
+        },
         "entries": entries,
     }
 
