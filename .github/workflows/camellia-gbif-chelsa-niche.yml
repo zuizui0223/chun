@@ -22,7 +22,7 @@ jobs:
         with:
           python-version: '3.12'
       - name: Install dependencies
-        run: python -m pip install --disable-pip-version-check numpy requests rasterio
+        run: python -m pip install --disable-pip-version-check -r requirements-camellia-spatial.txt
       - name: Run GBIF + CHELSA COG analysis
         run: |
           mkdir -p build/camellia_macro_niche_chelsa
