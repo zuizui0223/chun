@@ -34,11 +34,14 @@ def main() -> None:
 
     out = args.out_dir
     pkg_dir = out / "package"
+    article_dir = pkg_dir / args.pmcid
     nested_dir = out / "nested"
-    pkg_dir.mkdir(parents=True, exist_ok=True)
+    article_dir.mkdir(parents=True, exist_ok=True)
     nested_dir.mkdir(parents=True, exist_ok=True)
 
-    cloud = fetch_pmc_media(args.pmcid, pkg_dir)
+    # Preserve the historical extracted-package layout expected by frozen
+    # downstream extractors: package/<PMCID>/<media filename>.
+    cloud = fetch_pmc_media(args.pmcid, article_dir)
 
     # Keep transport receipts outside the biological package inventory.
     for name in (
@@ -46,7 +49,7 @@ def main() -> None:
         "pmc_cloud_media_manifest.csv",
         "pmc_cloud_summary.json",
     ):
-        src = pkg_dir / name
+        src = article_dir / name
         if src.exists():
             shutil.move(str(src), str(out / name))
 
