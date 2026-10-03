@@ -3,6 +3,7 @@ name: Iris source taxon crosswalk v0.1
 on:
   pull_request:
     paths:
+      - 'requirements-iris.txt'
       - 'scripts/inspect_iris_source_taxon_labels_v0_1.py'
       - '.github/workflows/iris-source-taxon-label-inspection-v0-1.yml'
       - 'data/iris_source_taxon_crosswalk_v0_1.csv'
@@ -21,7 +22,7 @@ jobs:
         with: {fetch-depth: 0}
       - uses: actions/setup-python@v5
         with: {python-version: '3.12'}
-      - run: python -m pip install --disable-pip-version-check pandas openpyxl
+      - run: python -m pip install --disable-pip-version-check -r requirements-iris.txt
       - name: Inspect source taxon labels only
         run: python scripts/inspect_iris_source_taxon_labels_v0_1.py
       - name: Validate frozen one-to-one source crosswalk
