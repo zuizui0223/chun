@@ -9,11 +9,13 @@ import subprocess
 import sys
 from pathlib import Path
 
+REPRODUCIBLE_EPOCH = "946684800"  # 2000-01-01T00:00:00Z
+
 
 def run(*args: str) -> None:
     cmd = [sys.executable, *args]
     print("+", " ".join(cmd), flush=True)
-    subprocess.run(cmd, check=True, env={**os.environ, "MPLBACKEND": "Agg"})
+    subprocess.run(cmd, check=True, env={**os.environ, "MPLBACKEND": "Agg", "SOURCE_DATE_EPOCH": REPRODUCIBLE_EPOCH})
 
 
 def main() -> int:
