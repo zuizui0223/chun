@@ -3,6 +3,7 @@ name: Iris source join and sequence preflight v0.1
 on:
   pull_request:
     paths:
+      - 'requirements-iris.txt'
       - 'scripts/preflight_iris_source_join_sequences_v0_1.py'
       - '.github/workflows/iris-source-join-sequence-preflight-v0-1.yml'
   workflow_dispatch:
@@ -21,7 +22,7 @@ jobs:
         with:
           python-version: '3.12'
       - name: Install table readers
-        run: python -m pip install --disable-pip-version-check pandas openpyxl
+        run: python -m pip install --disable-pip-version-check -r requirements-iris.txt
       - name: Confirm preregistration and source-schema erratum are frozen
         run: |
           python - <<'PY'
