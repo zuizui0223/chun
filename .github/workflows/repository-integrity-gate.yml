@@ -38,6 +38,7 @@ jobs:
       - name: Run frozen-contract regression tests
         run: |
           pytest -q \
+            tests/test_audit_ci_dependency_pinning_v0_1.py \
             tests/test_gate_merianieae_state_support_v0_1.py \
             tests/test_flowerclades51_relative_time_persistence_prereg_v0_1.py \
             tests/test_flowerclades51_relative_time_halfdepth_v0_1.py \
