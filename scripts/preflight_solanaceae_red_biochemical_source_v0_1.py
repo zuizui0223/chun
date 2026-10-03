@@ -7,6 +7,7 @@ import io
 import json
 import re
 import ssl
+import sys
 import tarfile
 import urllib.request
 import xml.etree.ElementTree as ET
@@ -15,6 +16,10 @@ from pathlib import Path
 from urllib.parse import urljoin, urlparse
 
 ROOT = Path(__file__).resolve().parents[1]
+SCRIPTS = Path(__file__).resolve().parent
+if str(SCRIPTS) not in sys.path:
+    sys.path.insert(0, str(SCRIPTS))
+from fetch_pmc_cloud_media_v0_1 import choose_version, fetch_metadata, list_versions, s3_to_https
 PREREG = ROOT / "data/solanaceae_red_biochemical_resolution_profile_prereg_v0_1.json"
 UA = "Mozilla/5.0 CHUN-source-preflight/0.2"
 
@@ -96,49 +101,74 @@ def inspect_docx_identifiers(docx_bytes: bytes, expected_name: str) -> dict:
 
 
 def supplement_from_oa_package(pmcid: str, filename: str, out_dir: Path) -> tuple[bytes | None, dict]:
-    api = f"https://www.ncbi.nlm.nih.gov/pmc/utils/oa/oa.fcgi?id={pmcid}"
+    """Recover the exact supplement from the current PMC Cloud media inventory."""
     attempts = []
     try:
-        xml_bytes, final, ctype = fetch(api)
-        root = ET.fromstring(xml_bytes)
-        links = [el.attrib.get("href") for el in root.iter() if local_name(el.tag) == "link" and el.attrib.get("href")]
-        attempts.append({"method": "oa_api", "url": api, "final_url": final,
-                         "content_type": ctype, "links": links})
-        tgz_links = [u for u in links if u.endswith(".tar.gz") or "tar.gz" in u]
-        for raw_url in tgz_links:
-            candidates = [raw_url]
-            if raw_url.startswith("ftp://ftp.ncbi.nlm.nih.gov/"):
-                candidates.insert(0, "https://ftp.ncbi.nlm.nih.gov/" + raw_url.split("ftp.ncbi.nlm.nih.gov/", 1)[1])
-            for u in candidates:
-                try:
-                    b, fu, ct = fetch(u, timeout=120)
-                    rec = {"method": "oa_package", "url": u, "final_url": fu,
-                           "content_type": ct, "bytes": len(b), "sha256": sha256_bytes(b)}
-                    with tarfile.open(fileobj=io.BytesIO(b), mode="r:gz") as tf:
-                        matches = [m for m in tf.getmembers() if Path(m.name).name == filename]
-                        rec["matching_members"] = [m.name for m in matches]
-                        if len(matches) == 1:
-                            fh = tf.extractfile(matches[0])
-                            if fh is None:
-                                raise RuntimeError("matched OA-package member is not a file")
-                            docx = fh.read()
-                            rec["supplement_bytes"] = len(docx)
-                            rec["supplement_sha256"] = sha256_bytes(docx)
-                            rec["supplement_is_zip"] = docx.startswith(b"PK")
-                            attempts.append(rec)
-                            if docx.startswith(b"PK"):
-                                (out_dir / filename).write_bytes(docx)
-                                return docx, {"oa_api": api, "attempts": attempts,
-                                              "selected_method": "oa_package",
-                                              "selected_package_url": u,
-                                              "selected_member": matches[0].name}
-                    attempts.append(rec)
-                except Exception as e:
-                    attempts.append({"method": "oa_package", "url": u,
-                                     "error": f"{type(e).__name__}: {e}"})
+        prefixes = list_versions(pmcid)
+        metadata = [fetch_metadata(prefix) for prefix in prefixes]
+        selected = choose_version(metadata)
+        selected_prefix = f"{selected['pmcid']}.{selected['version']}"
+        matches = []
+        for raw in selected.get("media_urls") or []:
+            https_url, expected_md5 = s3_to_https(raw)
+            if Path(urlparse(https_url).path).name == filename:
+                matches.append((https_url, expected_md5))
+        attempts.append({
+            "method": "pmc_cloud_metadata",
+            "selected_prefix": selected_prefix,
+            "available_prefixes": prefixes,
+            "matching_media_count": len(matches),
+            "matching_media_urls": [u for u, _ in matches],
+        })
+        if len(matches) != 1:
+            return None, {
+                "oa_api": None,
+                "attempts": attempts,
+                "selected_method": None,
+            }
+
+        url, expected_md5 = matches[0]
+        payload, final_url, content_type = fetch(url, timeout=120)
+        actual_md5 = hashlib.md5(payload).hexdigest()
+        ok_md5 = expected_md5 is None or actual_md5.lower() == expected_md5.lower()
+        rec = {
+            "method": "pmc_cloud_media",
+            "url": url,
+            "final_url": final_url,
+            "content_type": content_type,
+            "bytes": len(payload),
+            "sha256": sha256_bytes(payload),
+            "expected_md5": expected_md5,
+            "actual_md5": actual_md5,
+            "md5_match": ok_md5,
+            "supplement_is_zip": payload.startswith(b"PK"),
+        }
+        attempts.append(rec)
+        if not ok_md5:
+            raise RuntimeError(
+                f"PMC Cloud MD5 mismatch for {filename}: {actual_md5} != {expected_md5}"
+            )
+        if payload.startswith(b"PK"):
+            (out_dir / filename).write_bytes(payload)
+            return payload, {
+                "oa_api": None,
+                "attempts": attempts,
+                "selected_method": "pmc_cloud_media",
+                "selected_package_url": None,
+                "selected_member": filename,
+                "selected_url": url,
+                "selected_prefix": selected_prefix,
+            }
     except Exception as e:
-        attempts.append({"method": "oa_api", "url": api, "error": f"{type(e).__name__}: {e}"})
-    return None, {"oa_api": api, "attempts": attempts, "selected_method": None}
+        attempts.append({
+            "method": "pmc_cloud_media",
+            "error": f"{type(e).__name__}: {e}",
+        })
+    return None, {
+        "oa_api": None,
+        "attempts": attempts,
+        "selected_method": None,
+    }
 
 
 def supplement_from_article_links(pmcid: str, filename: str, out_dir: Path) -> tuple[bytes | None, dict]:
