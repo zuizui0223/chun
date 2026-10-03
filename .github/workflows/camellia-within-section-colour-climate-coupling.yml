@@ -20,7 +20,7 @@ jobs:
         with:
           python-version: '3.12'
       - name: Install dependency
-        run: python -m pip install --disable-pip-version-check numpy
+        run: python -m pip install --disable-pip-version-check -r requirements-camellia-analysis.txt
       - name: Run history-proxy coupling screen
         run: |
           mkdir -p build/within_section_colour_climate
