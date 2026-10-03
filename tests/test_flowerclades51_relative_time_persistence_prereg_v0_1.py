@@ -4,9 +4,14 @@ import json
 ROOT = Path(__file__).resolve().parents[1]
 P = ROOT / "data/flowerclades51_relative_time_persistence_prereg_v0_1.json"
 
-def test_relative_time_persistence_contract_is_frozen_before_curve_outcomes():
+def test_relative_time_persistence_contract_preserves_true_chronology():
     x = json.loads(P.read_text())
-    assert x["status"] == "FROZEN_BEFORE_RELATIVE_TIME_PERSISTENCE_OUTCOMES"
+    assert x["status"] == "PRE_OUTCOME_CONTRACT_MATERIALIZED_AFTER_OUTCOME_EXPOSURE"
+    provenance = x["contract_provenance"]
+    assert provenance["pre_outcome_test_commit"] == "82aacf4281d64587eec58d21eee595a483fbe252"
+    assert provenance["pre_outcome_pr"] == 300
+    assert provenance["contract_frozen_before_flowerclades51_relative_time_result"] is True
+    assert "not described as a prospective preregistration" in provenance["note"]
     assert x["source_hashes"]["final_dataset.csv"] == "a253308785e4cbd0e361b3ca04cdfdae29c523eefa843375cebf8030ee0874af"
     assert x["source_hashes"]["trees.zip"] == "ae5c82945e5bf9c29bcabc52d6029acd8d4f5be1fe9141fad95918eacb4f674d"
     assert x["analysis_role"] == "RETROSPECTIVE_RELATIVE_PHYLOGENETIC_TIME_PERSISTENCE"
