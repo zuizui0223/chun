@@ -3,6 +3,7 @@ name: Rhododendron30 source preflight v0.1
 on:
   pull_request:
     paths:
+      - 'requirements-rhododendron-source.txt'
       - 'scripts/run_rhododendron30_source_preflight_v0_1.py'
       - 'data/rhododendron30_source_preflight_receipt_v0_1.json'
       - '.github/workflows/rhododendron30-source-preflight-v0-1.yml'
