@@ -3,6 +3,7 @@ name: Rhododendron30 tree mirror recovery v0.4
 on:
   pull_request:
     paths:
+      - 'requirements-rhododendron.txt'
       - 'scripts/recover_rhododendron30_tree_from_zenodo_v0_4.py'
       - 'tests/test_recover_rhododendron30_tree_from_zenodo_v0_4.py'
       - 'data/rhododendron30_tree_mirror_recovery_v0_4.json'
