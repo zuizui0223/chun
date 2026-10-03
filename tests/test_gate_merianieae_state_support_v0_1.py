@@ -56,3 +56,7 @@ def test_numeric_colour_codes_trigger_schema_hold_without_coarse_recoding(tmp_pa
     assert x["fine_state_counts"]=={"0":5,"1":5,"2":5,"3":5}
     assert x["coarse_state_counts"]=={}
     assert x["compression_opportunity"] is False
+
+
+def test_repository_integrity_gate_negative_canary():
+    assert False, "intentional canary: repository integrity gate must fail"
