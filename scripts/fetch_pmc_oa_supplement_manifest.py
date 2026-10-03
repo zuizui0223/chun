@@ -1,10 +1,9 @@
 #!/usr/bin/env python3
-"""Fetch a PMC Open Access article package and inventory supplementary files.
+"""Fetch PMC supplementary/media files through the current PMC Cloud Service.
 
-The script uses the documented PMC OA Web Service to resolve the package URL,
-then inventories the extracted package and nested ZIP files with checksums. PMC
-moved legacy individual-article packages under /deprecated/ in 2026, so a 404
-from the API-returned legacy path is retried at that documented location.
+The legacy PMC OA Web Service / tar-package route was retired in August 2026.
+This compatibility wrapper preserves CHUN's existing supplement-manifest outputs
+while using the supported pmc-oa-opendata object store underneath.
 """
 from __future__ import annotations
 
@@ -12,12 +11,11 @@ import argparse
 import csv
 import hashlib
 import json
-import tarfile
+import shutil
 import zipfile
 from pathlib import Path
-import xml.etree.ElementTree as ET
 
-import requests
+from fetch_pmc_cloud_media_v0_1 import fetch_pmc_media
 
 
 def sha256(path: Path) -> str:
@@ -28,84 +26,36 @@ def sha256(path: Path) -> str:
     return h.hexdigest()
 
 
-def safe_extract_tar(tar: tarfile.TarFile, out: Path) -> None:
-    root = out.resolve()
-    for member in tar.getmembers():
-        target = (out / member.name).resolve()
-        if root not in target.parents and target != root:
-            raise RuntimeError(f"unsafe tar member: {member.name}")
-    tar.extractall(out)
-
-
-def normalize_download_url(href: str) -> str:
-    if href.startswith("ftp://ftp.ncbi.nlm.nih.gov/"):
-        return "https://ftp.ncbi.nlm.nih.gov/" + href.split("ftp.ncbi.nlm.nih.gov/", 1)[1]
-    return href
-
-
-def download_candidates(url: str) -> list[str]:
-    candidates = [url]
-    marker = "/pub/pmc/oa_package/"
-    if marker in url:
-        candidates.append(url.replace(marker, "/pub/pmc/deprecated/oa_package/", 1))
-    # Deduplicate while preserving order.
-    return list(dict.fromkeys(candidates))
-
-
 def main() -> None:
     ap = argparse.ArgumentParser()
     ap.add_argument("--pmcid", required=True)
     ap.add_argument("--out-dir", type=Path, required=True)
     args = ap.parse_args()
+
     out = args.out_dir
     pkg_dir = out / "package"
+    article_dir = pkg_dir / args.pmcid
     nested_dir = out / "nested"
-    pkg_dir.mkdir(parents=True, exist_ok=True)
+    article_dir.mkdir(parents=True, exist_ok=True)
     nested_dir.mkdir(parents=True, exist_ok=True)
 
-    api = "https://www.ncbi.nlm.nih.gov/pmc/utils/oa/oa.fcgi"
-    s = requests.Session()
-    s.headers["User-Agent"] = "chun-camellia-meta/0.2 (public-data audit)"
-    r = s.get(api, params={"id": args.pmcid}, timeout=60)
-    r.raise_for_status()
-    root = ET.fromstring(r.text)
-    rec = root.find(".//record")
-    if rec is None:
-        raise SystemExit(f"PMC OA record not found for {args.pmcid}: {r.text[:1000]}")
-    links = rec.findall("link")
-    tgz = next((x.attrib.get("href", "") for x in links if x.attrib.get("format") == "tgz"), "")
-    if not tgz:
-        raise SystemExit(f"No OA tgz package for {args.pmcid}")
-    api_url = normalize_download_url(tgz)
+    # Preserve the historical extracted-package layout expected by frozen
+    # downstream extractors: package/<PMCID>/<media filename>.
+    cloud = fetch_pmc_media(args.pmcid, article_dir)
 
-    package = out / f"{args.pmcid}.tar.gz"
-    attempts = []
-    used_url = None
-    for url in download_candidates(api_url):
-        try:
-            with s.get(url, stream=True, timeout=(20, 180)) as rr:
-                attempts.append({"url": url, "status": rr.status_code})
-                if rr.status_code != 200:
-                    continue
-                with package.open("wb") as fh:
-                    for chunk in rr.iter_content(1024 * 1024):
-                        if chunk:
-                            fh.write(chunk)
-                used_url = url
-                break
-        except Exception as exc:
-            attempts.append({"url": url, "error": f"{type(exc).__name__}: {exc}"})
-    if used_url is None:
-        (out / "download_attempts.json").write_text(json.dumps(attempts, indent=2) + "\n")
-        raise SystemExit(f"Could not download PMC OA package; attempts={attempts}")
-
-    with tarfile.open(package, "r:gz") as tar:
-        safe_extract_tar(tar, pkg_dir)
+    # Keep transport receipts outside the biological package inventory.
+    for name in (
+        "pmc_cloud_metadata.json",
+        "pmc_cloud_media_manifest.csv",
+        "pmc_cloud_summary.json",
+    ):
+        src = article_dir / name
+        if src.exists():
+            shutil.move(str(src), str(out / name))
 
     # Unpack nested ZIP supplements without deleting originals.
     for zpath in sorted(pkg_dir.rglob("*.zip")):
-        zslug = zpath.stem
-        dest = nested_dir / zslug
+        dest = nested_dir / zpath.stem
         dest.mkdir(parents=True, exist_ok=True)
         with zipfile.ZipFile(zpath) as zf:
             for info in zf.infolist():
@@ -129,26 +79,33 @@ def main() -> None:
                 "sha256": sha256(path),
             })
 
+    fields = ["scope", "relative_path", "suffix", "bytes", "sha256"]
     with (out / "supplement_manifest.csv").open("w", newline="", encoding="utf-8") as fh:
-        w = csv.DictWriter(fh, fieldnames=list(rows[0]) if rows else ["scope", "relative_path"])
+        w = csv.DictWriter(fh, fieldnames=fields)
         w.writeheader()
         w.writerows(rows)
 
     summary = {
         "pmcid": args.pmcid,
-        "citation": rec.attrib.get("citation"),
-        "license": rec.attrib.get("license"),
-        "oa_package_original_href": tgz,
-        "oa_package_api_url": api_url,
-        "oa_package_download_url": used_url,
-        "download_attempts": attempts,
-        "package_sha256": sha256(package),
-        "package_bytes": package.stat().st_size,
+        "citation": cloud.get("citation"),
+        "license": cloud.get("license_code"),
+        "transport": "PMC_CLOUD_PMC_OA_OPENDATA",
+        "selected_prefix": cloud.get("selected_prefix"),
+        "oa_package_original_href": None,
+        "oa_package_api_url": None,
+        "oa_package_download_url": None,
+        "download_attempts": [],
+        "package_sha256": None,
+        "package_bytes": None,
         "inventory_files": len(rows),
-        "tabular_candidates": sum(r["suffix"] in {".xlsx", ".xls", ".csv", ".tsv"} for r in rows),
+        "tabular_candidates": sum(
+            r["suffix"] in {".xlsx", ".xls", ".csv", ".tsv"} for r in rows
+        ),
         "claim_ceiling": "public supplementary-file provenance only; no biological effect extracted yet",
     }
-    (out / "summary.json").write_text(json.dumps(summary, indent=2) + "\n", encoding="utf-8")
+    (out / "summary.json").write_text(
+        json.dumps(summary, indent=2) + "\n", encoding="utf-8"
+    )
     print(json.dumps(summary, indent=2))
 
 
