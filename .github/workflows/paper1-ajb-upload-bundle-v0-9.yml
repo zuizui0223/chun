@@ -37,7 +37,7 @@ jobs:
         with:
           python-version: '3.12'
       - name: Install submission dependencies
-        run: python -m pip install --disable-pip-version-check matplotlib python-docx
+        run: python -m pip install --disable-pip-version-check -r requirements-paper1-submission.txt
       - name: Build audited AJB v0.9 upload bundle
         run: |
           python scripts/build_paper1_ajb_bundle_v0_9.py \
