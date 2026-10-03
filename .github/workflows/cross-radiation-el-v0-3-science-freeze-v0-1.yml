@@ -3,6 +3,7 @@ name: Cross-radiation EL v0.3 science freeze
 on:
   pull_request:
     paths:
+      - 'requirements-cross-radiation.txt'
       - 'manuscript/CROSS_RADIATION_EVOLUTION_LETTERS_V0_3_TEMPORAL_MEMORY_CANDIDATE.md'
       - 'scripts/validate_cross_radiation_evolution_letters_v0_3_temporal_memory.py'
       - 'scripts/build_cross_radiation_evolution_letters_figures_v0_3_temporal_memory.py'
@@ -43,7 +44,7 @@ jobs:
         with:
           python-version: '3.12'
       - name: Install tests
-        run: pip install pytest
+        run: python -m pip install --disable-pip-version-check -r requirements-cross-radiation.txt
       - name: Freeze validator tests
         run: pytest -q tests/test_cross_radiation_el_v0_3_science_freeze_v0_1.py
       - name: Validate frozen science assets
