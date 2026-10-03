@@ -17,6 +17,7 @@ on:
       - 'scripts/audit_paper1_ajb_bundle_v0_9.py'
       - 'scripts/build_paper1_fig1_framework_v0_2_2.py'
       - 'scripts/build_paper1_fig2_molecular_v0_2_2.py'
+      - 'scripts/build_paper1_fig2_molecular_v0_2.py'
       - 'scripts/build_paper1_fig3_fig4_audits_v0_2.py'
       - 'scripts/build_paper1_fig5_macro_v0_2.py'
       - 'scripts/build_paper1_fig6_identifiability_v0_2.py'
