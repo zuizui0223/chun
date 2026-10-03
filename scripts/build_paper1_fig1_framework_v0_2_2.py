@@ -8,6 +8,7 @@ import textwrap
 from pathlib import Path
 
 import matplotlib.pyplot as plt
+plt.rcParams["svg.hashsalt"] = "paper1-ajb-v1.0"
 
 
 def read(path: Path) -> list[dict[str, str]]:

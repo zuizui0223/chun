@@ -222,6 +222,8 @@ def main() -> int:
     docx_summary = json.loads((root / "provenance/docx_v1_0_summary.json").read_text(encoding="utf-8"))
     if not all(docx_summary.get("structural_checks", {}).values()):
         raise SystemExit("DOCX v1.0 structural checks are not all true")
+    if docx_summary.get("reproducible_package_normalized") is not True:
+        raise SystemExit("DOCX v1.0 was not reproducibly byte-normalized")
     expected_docx_format = {
         "font": "Times New Roman 12 pt body",
         "line_spacing": "double",
@@ -255,6 +257,9 @@ def main() -> int:
 
     files = sorted(p for p in root.rglob("*") if p.is_file() and p != a.out)
     entries = [{"path": str(p.relative_to(root)), "bytes": p.stat().st_size, "sha256": sha256(p)} for p in files]
+    expected_file_count = 61
+    if len(entries) != expected_file_count:
+        raise SystemExit(f"v1.0 bundle file-count drift: expected {expected_file_count}, found {len(entries)}")
     manifest = {
         "bundle_version": "v1.0-ajb-upload-paper1-v0.2.2-framing-v0.3.4",
         "source_science_version": "Paper 1 v0.2.2",
@@ -274,6 +279,8 @@ def main() -> int:
         "yellow_changed": False,
         "macro_results_changed": False,
         "n_files": len(entries),
+        "expected_n_files": expected_file_count,
+        "byte_reproducibility_contract": True,
         "main_figures": 6,
         "appendices": 8,
         "reference_registry_rows": 25,

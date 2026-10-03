@@ -178,7 +178,7 @@ AJB **v1.0** is the current and only active submission bundle route. The final e
 
 The route promoted to `main` passed hosted run **33072640192**. Rebuilding the route confirms:
 
-- final manifest = **59 packaged files**, each recorded by size and SHA256;
+- final manifest = **61 packaged files**, each recorded by size and SHA256;
 - **25/25 reference DOIs** matched the journal-facing registry;
 - AJB structured Abstract = **242 words**;
 - Fig. 1 uses **10/5/1/3**, **5/4/1/2**, and **P=0.078125** without annotation collision;
