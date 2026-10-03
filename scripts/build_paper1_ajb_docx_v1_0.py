@@ -7,13 +7,13 @@ import os
 import subprocess
 import sys
 import tempfile
-from datetime import datetime
+from datetime import datetime, timezone
 from pathlib import Path
 from zipfile import ZIP_DEFLATED, ZIP_STORED, ZipFile, ZipInfo
 
 from docx import Document
 
-FIXED_CORE_TIME = datetime(2000, 1, 1, 0, 0, 0)
+FIXED_CORE_TIME = datetime(2000, 1, 1, 0, 0, 0, tzinfo=timezone.utc)
 FIXED_ZIP_TIME = (2000, 1, 1, 0, 0, 0)
 
 
