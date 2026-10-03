@@ -9,7 +9,7 @@ from collections import Counter
 from pathlib import Path
 
 MISSING={"","na","n/a","nan"}
-NUMERIC_CODE_RE=re.compile(r"^[+-]?(?:\\d+(?:\\.\\d*)?|\\.\\d+)$")
+NUMERIC_CODE_RE=re.compile(r"^[+-]?(?:\d+(?:\.\d*)?|\.\d+)$")
 MIN_FINE=5
 MIN_TIPS=20
 
