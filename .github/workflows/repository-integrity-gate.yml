@@ -17,6 +17,8 @@ jobs:
     timeout-minutes: 45
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
       - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
@@ -26,6 +28,12 @@ jobs:
 
       - name: Validate all workflow YAML
         run: python scripts/check_workflow_yaml_integrity_v0_1.py
+
+      - name: Audit dependency pinning and reject new debt
+        run: |
+          python scripts/audit_ci_dependency_pinning_v0_1.py \
+            --base-ref "origin/${{ github.base_ref }}" \
+            --report-out build/ci_dependency_inventory.json
 
       - name: Run frozen-contract regression tests
         run: |
