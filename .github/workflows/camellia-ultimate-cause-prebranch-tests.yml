@@ -3,6 +3,7 @@ name: Camellia ultimate-cause pre-branch tests
 on:
   pull_request:
     paths:
+      - 'requirements-camellia-analysis.txt'
       - 'scripts/fetch_pmc_cloud_media_v0_1.py'
       - 'scripts/test_ultimate_cause_prebranch.py'
       - '.github/workflows/camellia-ultimate-cause-prebranch-tests.yml'
@@ -21,7 +22,7 @@ jobs:
         with:
           python-version: '3.12'
       - name: Install dependencies
-        run: python -m pip install --disable-pip-version-check numpy openpyxl
+        run: python -m pip install --disable-pip-version-check -r requirements-camellia-analysis.txt
       - name: Rebuild frozen runtime91 panel
         run: |
           mkdir -p build/ultimate_pre/fan_package
