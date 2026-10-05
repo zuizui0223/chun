@@ -3,6 +3,7 @@ name: Camellia huana reported effect pilot
 on:
   pull_request:
     paths:
+      - 'requirements-camellia-literature.txt'
       - 'scripts/fetch_pmc_oa_supplement_manifest.py'
       - 'scripts/inspect_tabular_supplements.py'
       - '.github/workflows/camellia-huana-reported-effect-pilot.yml'
