@@ -63,3 +63,15 @@ def test_structure_does_not_decode_cell_text_anywhere():
         "SECRET_HEADER_A","SECRET_HEADER_B","SECRET_DATA_A","SECRET_DATA_B"
     ]:
         assert secret not in text
+
+
+def test_source_unavailable_receipt_preserves_outcome_firewall():
+    out=mod.source_unavailable_receipt("exact Table S1 source no longer recoverable")
+    assert out["status"]=="HOLD_NG2018_TRAIT_SUPPLEMENT_SOURCE_UNAVAILABLE"
+    assert out["predeclared_header_candidate_row"] is None
+    assert out["shared_string_values_opened"] is False
+    assert out["inline_string_values_opened"] is False
+    assert out["trait_data_values_opened"] is False
+    assert out["trait_state_frequencies_computed"] is False
+    assert out["hidden_memory_auc_computed"] is False
+    assert out["next_gate"]=="STOP_HOLD"

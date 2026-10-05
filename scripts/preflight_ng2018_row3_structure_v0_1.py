@@ -90,13 +90,44 @@ def sheet_structure(body:bytes)->dict:
     }
 
 
+def source_unavailable_receipt(error: str) -> dict:
+    return {
+        "version": "v0.2",
+        "status": "HOLD_NG2018_TRAIT_SUPPLEMENT_SOURCE_UNAVAILABLE",
+        "source_error": error,
+        "trait_source_url": None,
+        "trait_source_sha256": None,
+        "trait_source_bytes": None,
+        "worksheet_xml_path": None,
+        "row_structure": [],
+        "merged_ranges": [],
+        "first_multi_value_cell_row": None,
+        "all_preceding_rows_single_or_empty": None,
+        "predeclared_header_candidate_row": None,
+        "candidate_rule": "not evaluated because the exact frozen Table S1 source was unavailable",
+        "shared_string_values_opened": False,
+        "inline_string_values_opened": False,
+        "trait_data_values_opened": False,
+        "trait_state_frequencies_computed": False,
+        "hidden_memory_auc_computed": False,
+        "next_gate": "STOP_HOLD",
+    }
+
+
 def main()->int:
     ap=argparse.ArgumentParser()
     ap.add_argument("--out",type=Path,required=True)
     a=ap.parse_args()
     a.out.parent.mkdir(parents=True,exist_ok=True)
 
-    body,url=preflight.recover_trait_source()
+    try:
+        body,url=preflight.recover_trait_source()
+    except RuntimeError as exc:
+        out=source_unavailable_receipt(str(exc))
+        a.out.write_text(json.dumps(out,indent=2,sort_keys=True)+"\n")
+        print(json.dumps(out,indent=2,sort_keys=True))
+        return 0
+
     structure=sheet_structure(body)
     candidate=structure["predeclared_header_candidate_row"]
     status=(
