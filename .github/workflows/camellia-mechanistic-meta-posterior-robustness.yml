@@ -21,7 +21,7 @@ jobs:
         with:
           python-version: '3.12'
       - name: Install dependency
-        run: python -m pip install --disable-pip-version-check scipy
+        run: python -m pip install --disable-pip-version-check -r requirements-camellia-analysis.txt
       - name: Recompute posterior robustness
         run: |
           python scripts/analyze_mechanistic_meta_posterior_robustness.py \
