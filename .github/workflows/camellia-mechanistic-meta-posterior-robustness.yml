@@ -3,6 +3,7 @@ name: Camellia mechanism meta posterior robustness
 on:
   pull_request:
     paths:
+      - 'requirements-camellia-analysis.txt'
       - 'data/camellia_flower_color_mechanism_meta_v0_3.csv'
       - 'data/mechanistic_meta_posterior_robustness_v0_1.csv'
       - 'scripts/analyze_mechanistic_meta_posterior_robustness.py'
