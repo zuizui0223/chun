@@ -3,6 +3,7 @@ name: Camellia ultimate-cause trait coverage gate
 on:
   pull_request:
     paths:
+      - 'requirements-camellia-analysis.txt'
       - 'scripts/fetch_pmc_cloud_media_v0_1.py'
       - 'scripts/audit_wu91_ultimate_trait_overlap.py'
       - '.github/workflows/camellia-ultimate-trait-coverage.yml'
@@ -21,7 +22,7 @@ jobs:
         with:
           python-version: '3.12'
       - name: Install Fan seed dependency
-        run: python -m pip install --disable-pip-version-check openpyxl
+        run: python -m pip install --disable-pip-version-check -r requirements-camellia-analysis.txt
       - name: Rebuild frozen runtime91 panel
         run: |
           mkdir -p build/ultimate
