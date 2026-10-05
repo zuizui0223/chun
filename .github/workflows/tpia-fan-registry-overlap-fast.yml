@@ -3,6 +3,7 @@ name: TPIA Fan registry overlap fast
 on:
   pull_request:
     paths:
+      - 'requirements-tpia-fan.txt'
       - 'scripts/fetch_pmc_cloud_media_v0_1.py'
       - 'scripts/build_fan2026_species_colour_seed.py'
       - 'scripts/audit_tpia_fan_registry_overlap_fast.py'
@@ -21,7 +22,7 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
-      - run: python -m pip install --disable-pip-version-check openpyxl requests
+      - run: python -m pip install --disable-pip-version-check -r requirements-tpia-fan.txt
       - name: Acquire Fan Data S1 and species seed
         run: |
           mkdir -p build/tpia_fast/package build/tpia_fast/result
