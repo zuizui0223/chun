@@ -3,6 +3,7 @@ name: Hidden memory structural realization v0.1
 on:
   pull_request:
     paths:
+      - 'requirements-hidden-memory.txt'
       - 'data/hidden_memory_realization_structural_predictors_design_v0_1.json'
       - 'scripts/analyze_hidden_memory_realization_structural_predictors_v0_1.py'
       - 'results/hidden_memory_realization_structural_predictors_v0_1/**'
@@ -22,7 +23,7 @@ jobs:
         with:
           python-version: '3.12'
       - name: Install runtime
-        run: pip install numpy scipy
+        run: python -m pip install --disable-pip-version-check -r requirements-hidden-memory.txt
       - name: Validate frozen exploratory design
         run: |
           python - <<'PY'
