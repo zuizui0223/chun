@@ -3,6 +3,7 @@ name: Macro-paper topology robustness gate
 on:
   pull_request:
     paths:
+      - 'requirements-small-numpy-biopython.txt'
       - 'scripts/compare_rooted94_wastral_runtime91_topologies.py'
       - '.github/workflows/macro-paper-topology-robustness.yml'
   workflow_dispatch:
@@ -27,7 +28,7 @@ jobs:
         with:
           python-version: '3.12'
       - name: Install dependencies
-        run: python -m pip install --disable-pip-version-check numpy biopython
+        run: python -m pip install --disable-pip-version-check -r requirements-small-numpy-biopython.txt
       - name: Download frozen topology, colour, and branch artifacts
         env:
           GH_TOKEN: ${{ github.token }}
