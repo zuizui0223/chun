@@ -3,6 +3,7 @@ name: Camellia quantitative pigment state-vector meta
 on:
   pull_request:
     paths:
+      - 'requirements-camellia-analysis.txt'
       - 'data/csinensis_reported_effect_summary_v0_1.json'
       - 'data/creticulata_reported_effect_summary_v0_1.json'
       - 'data/cjaponica_reported_effect_summary_v0_1.json'
