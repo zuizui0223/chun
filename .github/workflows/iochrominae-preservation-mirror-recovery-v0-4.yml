@@ -3,6 +3,7 @@ name: Iochrominae preservation mirror recovery v0.4
 on:
   pull_request:
     paths:
+      - 'requirements-iochrominae.txt'
       - 'scripts/recover_iochrominae_preservation_mirrors_v0_4.py'
       - 'tests/test_recover_iochrominae_preservation_mirrors_v0_4.py'
       - '.github/workflows/iochrominae-preservation-mirror-recovery-v0-4.yml'
@@ -21,7 +22,7 @@ jobs:
         with:
           python-version: '3.12'
       - name: Install tests
-        run: pip install pytest
+        run: python -m pip install --disable-pip-version-check -r requirements-iochrominae.txt
       - name: Unit tests
         run: pytest -q tests/test_recover_iochrominae_preservation_mirrors_v0_4.py
       - name: Recover exact source bytes through preservation discovery
