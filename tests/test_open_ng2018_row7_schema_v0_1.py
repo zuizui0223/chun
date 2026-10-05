@@ -39,3 +39,16 @@ def test_frozen_trait_terms_do_not_treat_source_as_trait():
         if any(term in n for term in mod.TRAIT_TERMS)
     ]
     assert trait==[]
+
+
+def test_source_unavailable_receipt_preserves_row7_firewall():
+    out=mod.source_unavailable_receipt("exact Table S1 source no longer recoverable")
+    assert out["status"]=="HOLD_NG2018_TRAIT_SUPPLEMENT_SOURCE_UNAVAILABLE"
+    assert out["header_row_frozen_before_value_opening"]==7
+    assert out["header"]==[]
+    assert out["rows_8_plus_opened"] is False
+    assert out["trait_data_rows_opened"]==0
+    assert out["trait_state_frequencies_computed"] is False
+    assert out["tree_trait_crosswalk_computed"] is False
+    assert out["hidden_memory_auc_computed"] is False
+    assert out["next_gate"]=="STOP_HOLD"
