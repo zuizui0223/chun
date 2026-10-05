@@ -3,6 +3,7 @@ name: Camellia GBIF WorldClim macro niche
 on:
   pull_request:
     paths:
+      - 'requirements-camellia-spatial.txt'
       - 'data/camellia_macro_niche_taxa_v0_1.csv'
       - 'scripts/run_camellia_gbif_worldclim_niche.py'
       - '.github/workflows/camellia-gbif-worldclim-niche.yml'
