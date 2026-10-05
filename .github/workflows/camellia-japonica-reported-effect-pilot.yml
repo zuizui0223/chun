@@ -3,6 +3,7 @@ name: Camellia japonica reported effect pilot
 on:
   pull_request:
     paths:
+      - 'requirements-camellia-literature.txt'
       - 'data/cjaponica_reported_effect_summary_v0_1.json'
       - 'scripts/fetch_pmc_oa_supplement_manifest.py'
       - 'scripts/inspect_tabular_supplements.py'
@@ -23,7 +24,7 @@ jobs:
         with:
           python-version: '3.12'
       - name: Install dependencies
-        run: python -m pip install --disable-pip-version-check requests openpyxl python-docx scipy
+        run: python -m pip install --disable-pip-version-check -r requirements-camellia-literature.txt
       - name: Fetch PMC8226227 OA package
         run: |
           python scripts/fetch_pmc_oa_supplement_manifest.py \
