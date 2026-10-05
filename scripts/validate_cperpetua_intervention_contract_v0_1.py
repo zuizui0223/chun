@@ -26,7 +26,7 @@ def main()->int:
 
     # Intervention causal estimands must preserve the actual randomized flower/bud unit.
     assert all('randomized within plant-season block' in r['primary_unit'] for r in c)
-    assert '6/6' in gates['G4X_MANIP_CHECK']['decision_rule']
+    assert '6 active/6 sham' in gates['G4X_MANIP_CHECK']['decision_rule']
     assert '6/6' in gates['G4X_BEE_RESPONSE']['decision_rule']
     assert '8/8' in gates['G5X_BIRD_WINTER']['decision_rule']
     assert '8/8' in gates['G5X_BIRD_SEASON']['decision_rule']
