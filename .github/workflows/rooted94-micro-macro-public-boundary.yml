@@ -3,6 +3,7 @@ name: Rooted94 micro-to-macro mechanism public-data boundary
 on:
   pull_request:
     paths:
+      - 'requirements-rooted94-bio.txt'
       - 'scripts/audit_rooted_transition_molecular_mechanism_coverage.py'
       - '.github/workflows/rooted94-micro-macro-public-boundary.yml'
   workflow_dispatch:
@@ -25,7 +26,7 @@ jobs:
         with:
           python-version: '3.12'
       - name: Install dependencies
-        run: python -m pip install --disable-pip-version-check scipy biopython
+        run: python -m pip install --disable-pip-version-check -r requirements-rooted94-bio.txt
       - name: Download frozen rooted tree and transition posterior artifacts
         env:
           GH_TOKEN: ${{ github.token }}
