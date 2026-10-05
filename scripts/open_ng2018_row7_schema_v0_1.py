@@ -27,13 +27,46 @@ def row_values(body:bytes,row:int)->list[str]:
     return ["" if c.value is None else str(c.value).strip() for c in ws[row]]
 
 
+def source_unavailable_receipt(error: str) -> dict:
+    return {
+        "version": "v0.1",
+        "status": "HOLD_NG2018_TRAIT_SUPPLEMENT_SOURCE_UNAVAILABLE",
+        "source_error": error,
+        "trait_source_url": None,
+        "trait_source_sha256": None,
+        "trait_source_bytes": None,
+        "header_row_frozen_before_value_opening": HEADER_ROW,
+        "header": [],
+        "header_has_species": False,
+        "trait_columns_matching_frozen_terms": [],
+        "header_has_trait_column": False,
+        "rows_8_plus_opened": False,
+        "trait_data_rows_opened": 0,
+        "trait_state_frequencies_computed": False,
+        "tree_trait_crosswalk_computed": False,
+        "hidden_memory_auc_computed": False,
+        "next_gate": "STOP_HOLD",
+        "interpretation_if_source_only": "Not evaluated because the exact frozen Table S1 source was unavailable.",
+        "paper1_science_changed": False,
+        "el_v0_3_science_changed": False,
+        "v0_8_promotion_state_changed": False,
+    }
+
+
 def main()->int:
     ap=argparse.ArgumentParser()
     ap.add_argument("--out",type=Path,required=True)
     a=ap.parse_args()
     a.out.parent.mkdir(parents=True,exist_ok=True)
 
-    body,url=structure.preflight.recover_trait_source()
+    try:
+        body,url=structure.preflight.recover_trait_source()
+    except RuntimeError as exc:
+        out=source_unavailable_receipt(str(exc))
+        a.out.write_text(json.dumps(out,indent=2,sort_keys=True)+"\n")
+        print(json.dumps(out,indent=2,sort_keys=True))
+        return 0
+
     structural=structure.sheet_structure(body)
     if structural["predeclared_header_candidate_row"] != HEADER_ROW:
         raise RuntimeError(
