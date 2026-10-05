@@ -3,6 +3,7 @@ name: Rooted94 Camellia branch colour-transition posteriors
 on:
   pull_request:
     paths:
+      - 'requirements-rooted94-transition.txt'
       - 'scripts/analyze_rooted_camellia_branch_transitions.py'
       - '.github/workflows/rooted94-branch-transition-posteriors.yml'
   workflow_dispatch:
@@ -24,7 +25,7 @@ jobs:
         with:
           python-version: '3.12'
       - name: Install dependencies
-        run: python -m pip install --disable-pip-version-check numpy scipy biopython
+        run: python -m pip install --disable-pip-version-check -r requirements-rooted94-transition.txt
       - name: Download frozen rooted colour-history artifact
         env:
           GH_TOKEN: ${{ github.token }}
