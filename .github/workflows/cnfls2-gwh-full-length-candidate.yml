@@ -3,6 +3,7 @@ name: CnFLS2 GWH full-length candidate
 on:
   pull_request:
     paths:
+      - 'requirements-cnfls2-http.txt'
       - 'data/tpia_yunkang10_priority_crosswalk_v0_1.csv'
       - 'data/cnfls2_gwh_full_length_candidate_v0_1.json'
       - 'data/cnfls2_gwh_reference_similarity_v0_1.csv'
@@ -29,7 +30,7 @@ jobs:
 
       - name: Install dependencies
         run: |
-          python -m pip install --disable-pip-version-check requests
+          python -m pip install --disable-pip-version-check -r requirements-cnfls2-http.txt
           sudo apt-get update -qq
           sudo apt-get install -y --no-install-recommends ncbi-blast+ mafft fasttree
 
