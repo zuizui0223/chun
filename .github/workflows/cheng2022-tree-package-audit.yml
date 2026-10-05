@@ -3,6 +3,7 @@ name: Cheng 2022 nuclear tree package audit
 on:
   pull_request:
     paths:
+      - 'scripts/fetch_pmc_cloud_media_v0_1.py'
       - '.github/workflows/cheng2022-tree-package-audit.yml'
   workflow_dispatch:
 
@@ -18,32 +19,10 @@ jobs:
       - name: Download PMC OA package
         run: |
           mkdir -p build/cheng2022/package
-          curl --fail --location --retry 3 \
-            'https://www.ncbi.nlm.nih.gov/pmc/utils/oa/oa.fcgi?id=PMC9311850' \
-            -o build/cheng2022/oa.xml
-          python - <<'PY'
-          from pathlib import Path
-          import xml.etree.ElementTree as ET
-          root=ET.fromstring(Path('build/cheng2022/oa.xml').read_bytes())
-          links=[x.attrib.get('href','') for x in root.findall('.//link') if x.attrib.get('format')=='tgz']
-          if len(links)!=1: raise SystemExit(f'unexpected tgz links {links}')
-          u=links[0]
-          if u.startswith('ftp://ftp.ncbi.nlm.nih.gov/'):
-              u='https://ftp.ncbi.nlm.nih.gov/'+u.split('ftp://ftp.ncbi.nlm.nih.gov/',1)[1]
-          Path('build/cheng2022/url').write_text(u+'\n')
-          print(u)
-          PY
-          u=$(cat build/cheng2022/url)
-          if ! curl --fail --location --retry 3 --retry-all-errors "$u" -o build/cheng2022/a.tgz; then
-            u2=$(python - <<'PY'
-          from pathlib import Path
-          u=Path('build/cheng2022/url').read_text().strip(); m='https://ftp.ncbi.nlm.nih.gov/pub/pmc/'
-          print(u.replace(m,m+'deprecated/',1) if u.startswith(m) and '/deprecated/' not in u else u)
-          PY
-          )
-            curl --fail --location --retry 3 --retry-all-errors "$u2" -o build/cheng2022/a.tgz
-          fi
-          tar -xzf build/cheng2022/a.tgz -C build/cheng2022/package
+          python scripts/fetch_pmc_cloud_media_v0_1.py \
+            --pmcid PMC9311850 \
+            --out-dir build/cheng2022/package \
+            --include-core
       - name: Inventory tree-like resources
         run: |
           find build/cheng2022/package -type f -printf '%P\t%s\n' | sort > build/cheng2022/all_files.tsv
