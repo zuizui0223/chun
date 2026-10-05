@@ -3,6 +3,7 @@ name: Fan 2026 specimen-only CHELSA sensitivity
 on:
   pull_request:
     paths:
+      - 'scripts/fetch_pmc_cloud_media_v0_1.py'
       - 'scripts/build_fan2026_species_colour_seed.py'
       - 'scripts/run_fan2026_gbif_chelsa_thermal.py'
       - 'scripts/run_camellia_gbif_worldclim_niche.py'
@@ -26,28 +27,10 @@ jobs:
       - name: Acquire Fan Data S1 and species seed
         run: |
           mkdir -p build/specimen/package build/chelsa build/specimen/result
-          curl --fail --location --retry 3 'https://www.ncbi.nlm.nih.gov/pmc/utils/oa/oa.fcgi?id=PMC12946509' -o build/specimen/oa.xml
-          python - <<'PY'
-          import xml.etree.ElementTree as ET
-          from pathlib import Path
-          root=ET.fromstring(Path('build/specimen/oa.xml').read_bytes())
-          links=[x.attrib.get('href','') for x in root.findall('.//link') if x.attrib.get('format')=='tgz']
-          if len(links)!=1: raise SystemExit(links)
-          u=links[0]
-          if u.startswith('ftp://ftp.ncbi.nlm.nih.gov/'): u='https://ftp.ncbi.nlm.nih.gov/'+u.split('ftp://ftp.ncbi.nlm.nih.gov/',1)[1]
-          Path('build/specimen/url').write_text(u+'\n')
-          PY
-          u=$(cat build/specimen/url)
-          if ! curl --fail --location --retry 3 --retry-all-errors "$u" -o build/specimen/a.tgz; then
-            u2=$(python - <<'PY'
-          from pathlib import Path
-          u=Path('build/specimen/url').read_text().strip(); m='https://ftp.ncbi.nlm.nih.gov/pub/pmc/'
-          print(u.replace(m,m+'deprecated/',1) if u.startswith(m) and '/deprecated/' not in u else u)
-          PY
-          )
-            curl --fail --location --retry 3 --retry-all-errors "$u2" -o build/specimen/a.tgz
-          fi
-          tar -xzf build/specimen/a.tgz -C build/specimen/package
+          python scripts/fetch_pmc_cloud_media_v0_1.py \
+            --pmcid PMC12946509 \
+            --out-dir build/specimen/package \
+            --require-glob '*s002*.xlsx'
           xlsx=$(find build/specimen/package -type f -iname '*s002*.xlsx' | head -n 1); test -n "$xlsx"; cp "$xlsx" build/specimen/DataS1.xlsx
           python scripts/build_fan2026_species_colour_seed.py build/specimen/DataS1.xlsx --output build/specimen/seed.csv --audit build/specimen/seed_audit.json
       - name: Download CHELSA BIO1 BIO6
