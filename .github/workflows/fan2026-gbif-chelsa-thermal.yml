@@ -3,6 +3,7 @@ name: Fan 2026 species-scale GBIF CHELSA thermal
 on:
   pull_request:
     paths:
+      - 'requirements-fan2026-gbif-thermal.txt'
       - 'scripts/fetch_pmc_cloud_media_v0_1.py'
       - 'scripts/build_fan2026_species_colour_seed.py'
       - 'scripts/analyze_fan2026_colour_geography.py'
@@ -29,7 +30,7 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
-      - run: python -m pip install --disable-pip-version-check openpyxl numpy pandas requests rasterio
+      - run: python -m pip install --disable-pip-version-check -r requirements-fan2026-gbif-thermal.txt
       - name: Acquire Fan 2026 Data S1 from PMC OA package
         run: |
           mkdir -p build/fan_macro/package build/chelsa build/fan_macro/result
