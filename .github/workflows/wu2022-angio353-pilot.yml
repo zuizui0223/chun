@@ -3,6 +3,7 @@ name: Wu 2022 Angiosperms353 nuclear pilot
 on:
   pull_request:
     paths:
+      - 'requirements-wu2022-pilot.txt'
       - 'data/wu2022_angio353_pilot_panel_v0_1.csv'
       - 'scripts/download_tpia_panel_assemblies.py'
       - 'scripts/extract_angio353_pilot_hits.py'
@@ -17,7 +18,7 @@ permissions:
 jobs:
   pilot:
     runs-on: ubuntu-latest
-    timeout-minutes: 45
+    timeout-minutes: 300
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
@@ -28,7 +29,7 @@ jobs:
           sudo apt-get update -qq
           sudo apt-get install -y diamond-aligner mafft fasttree
           if apt-cache show iqtree >/dev/null 2>&1; then sudo apt-get install -y iqtree; fi
-          python -m pip install --disable-pip-version-check requests biopython
+          python -m pip install --disable-pip-version-check -r requirements-wu2022-pilot.txt
           diamond version
           mafft --version 2>&1 | head -n 1 || true
           command -v iqtree2 || command -v iqtree || command -v FastTree || command -v fasttree
@@ -47,7 +48,7 @@ jobs:
           python scripts/download_tpia_panel_assemblies.py \
             --panel data/wu2022_angio353_pilot_panel_v0_1.csv \
             --out-dir build/wu_angio353/assemblies \
-            --workers 8
+            --workers 1 --read-timeout 90 --wall-timeout 1800 --retries 1
       - name: Recover Angiosperms353 translated marker HSPs
         run: |
           mkdir -p build/wu_angio353/hits
