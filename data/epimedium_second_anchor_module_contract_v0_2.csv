@@ -1,0 +1,7 @@
+module_id,module_label,primary_gene_families,mandatory,visible_state_rule,decision_use,notes
+PG,PHENYLPROPANOID_GATEWAY,PAL,yes,"never inferred from visible colour",primary,"Gateway flux module. All annotation-matched PAL paralogs retained."
+A,ANTHOCYANIN_CORE,"CHS;CHI;F3H;F3'H;F3'5'H;DFR;ANS",yes,"magenta/red does not determine module direction; white/yellow/green does not imply zero",primary,"Outcome-independent annotation-driven family aggregate. UFGT may be added only if the reference annotation supports a frozen family definition before expression inspection."
+F,FLAVONOL_COMPETITION,FLS,yes,"never inferred from visible colour",primary,"Tracks competition/copigment branch separately from anthocyanin core."
+R,REGULATORY_STATE,"MYB;bHLH;WD40",no,"never inferred from visible colour",secondary,"Secondary because cross-species annotation and family expansion may be less stable. No single candidate regulator is selected from observed outcomes."
+D,SHARED_FLUX_DIVERSION,"LAR;ANR",no,"never inferred from visible colour",secondary,"Optional diversion branch if annotation completeness passes the frozen threshold."
+Y,YELLOW_PIGMENT_TYPED,NA,no,"yellow/green remains CHEMISTRY_UNRESOLVED unless direct pigment evidence identifies the chemistry",context,"Do not equate yellow with carotenoid or green with absence of anthocyanin. Visible colour is retained separately from functional chemistry."
