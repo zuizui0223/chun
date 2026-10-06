@@ -126,7 +126,7 @@ def main():
 
     args.output.parent.mkdir(parents=True, exist_ok=True)
     with args.output.open("w", newline="", encoding="utf-8") as fh:
-        w = csv.DictWriter(fh, fieldnames=list(out[0]))
+        w = csv.DictWriter(fh, fieldnames=list(out[0]), lineterminator="\n")
         w.writeheader()
         w.writerows(out)
 
