@@ -9,12 +9,14 @@ The repository-level merge gate is the job named **integrity** in
 The workflow runs on every pull request without a path filter. It validates:
 
 - workflow YAML syntax;
-- incremental dependency pinning (changed workflows may not add unpinned installs);
+- repository-wide dependency pinning: `unpinned_pip_install_lines == 0` is required, and changed workflows may not introduce new unpinned installs;
 - frozen Merianieae numeric-state support;
 - Flowerclades51 relative-time contract chronology and half-depth result;
 - frozen cross-radiation Evolution Letters v0.3 science;
 - Paper 1 DOCX reproducibility;
 - two independent Paper 1 bundle builds with byte-identical SHA256 inventories.
+
+Dependency migration issue #363 is complete; the zero-debt condition is enforced by `--require-zero` in the audit.
 
 ## Negative-canary evidence
 
