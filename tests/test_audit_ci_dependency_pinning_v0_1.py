@@ -48,3 +48,16 @@ def test_requirement_file_is_not_dependency_debt():
     )
     assert current[0]["pinned"] is True
     assert mod.new_unpinned_rows(current, []) == []
+
+
+def test_require_zero_debt_passes_at_zero():
+    mod.require_zero_debt({"unpinned_pip_install_lines": 0})
+
+
+def test_require_zero_debt_fails_above_zero():
+    try:
+        mod.require_zero_debt({"unpinned_pip_install_lines": 2})
+    except SystemExit as exc:
+        assert "2 unpinned pip install line" in str(exc)
+    else:
+        raise AssertionError("nonzero dependency debt did not fail closed")

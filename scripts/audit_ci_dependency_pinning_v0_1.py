@@ -94,6 +94,14 @@ def base_workflow_rows(base_ref: str, relative_path: str) -> list[dict[str, obje
     return pip_lines_from_text(proc.stdout)
 
 
+def require_zero_debt(report: dict) -> None:
+    n = int(report["unpinned_pip_install_lines"])
+    if n != 0:
+        raise SystemExit(
+            f"repository dependency debt remains: {n} unpinned pip install line(s)"
+        )
+
+
 def inventory() -> dict:
     files = sorted([*WORKFLOWS.glob("*.yml"), *WORKFLOWS.glob("*.yaml")])
     entries = []
@@ -156,6 +164,7 @@ def main() -> int:
     ap = argparse.ArgumentParser()
     ap.add_argument("--base-ref")
     ap.add_argument("--report-out", type=Path)
+    ap.add_argument("--require-zero", action="store_true")
     args = ap.parse_args()
 
     report = inventory()
@@ -165,6 +174,9 @@ def main() -> int:
     if args.report_out:
         args.report_out.parent.mkdir(parents=True, exist_ok=True)
         args.report_out.write_text(json.dumps(report, indent=2, sort_keys=True) + "\n", encoding="utf-8")
+
+    if args.require_zero:
+        require_zero_debt(report)
 
     if args.base_ref:
         violations = []
