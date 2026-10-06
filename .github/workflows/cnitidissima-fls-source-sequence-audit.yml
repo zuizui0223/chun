@@ -3,6 +3,7 @@ name: C nitidissima FLS source sequence audit
 on:
   pull_request:
     paths:
+      - 'requirements-source-cnitidissima-audit.txt'
       - 'scripts/fetch_pmc_oa_supplement_manifest.py'
       - 'scripts/scan_public_supplements_for_terms.py'
       - '.github/workflows/cnitidissima-fls-source-sequence-audit.yml'
@@ -21,7 +22,7 @@ jobs:
         with:
           python-version: '3.12'
       - name: Install dependencies
-        run: python -m pip install --disable-pip-version-check requests openpyxl pypdf
+        run: python -m pip install --disable-pip-version-check -r requirements-source-cnitidissima-audit.txt
       - name: Fetch Feng 2024 PMC OA package
         run: |
           python scripts/fetch_pmc_oa_supplement_manifest.py \
