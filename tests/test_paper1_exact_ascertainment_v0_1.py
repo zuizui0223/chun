@@ -32,8 +32,8 @@ def test_exact_axis_null_matches_hand_enumerated_two_row_case() -> None:
     }
     assert result["n_exact_axis_assignments"] == 16
     assert result["n_distinct_coverage_vectors"] == 10
-    assert result["exact_p_A_enrichment"] == pytest.approx(1 / 16, abs=1e-15)
-    assert result["exact_p_any_axis_imbalance"] == pytest.approx(1 / 4, abs=1e-15)
+    assert result["exact_p_A_enrichment"] == pytest.approx(1 / 16, rel=0, abs=1e-15)
+    assert result["exact_p_any_axis_imbalance"] == pytest.approx(1 / 4, rel=0, abs=1e-15)
 
 
 def test_paper1_luo_exact_ascertainment_contract() -> None:
@@ -64,7 +64,7 @@ def test_paper1_luo_exact_ascertainment_contract() -> None:
         "P_change": 2,
     }
     assert collapsed["n_exact_axis_assignments"] == 3456
-    assert collapsed["exact_p_A_enrichment"] == pytest.approx(0.078125, abs=1e-15)
+    assert collapsed["exact_p_A_enrichment"] == pytest.approx(0.078125, rel=0, abs=1e-15)
     assert collapsed["exact_p_any_axis_imbalance"] == pytest.approx(
         0.1736111111111111, abs=1e-15
     )
