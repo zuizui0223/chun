@@ -51,10 +51,10 @@ def test_paper1_luo_exact_ascertainment_contract() -> None:
     }
     assert system["n_exact_axis_assignments"] == 127401984
     assert system["exact_p_A_enrichment"] == pytest.approx(
-        0.0015277862548828125, abs=1e-15
+        0.0015277862548828125, rel=0, abs=1e-15
     )
     assert system["exact_p_any_axis_imbalance"] == pytest.approx(
-        0.003514796127507716, abs=1e-15
+        0.003514796127507716, rel=0, abs=1e-15
     )
 
     assert collapsed["observed_axis_coverage"] == {
@@ -66,5 +66,5 @@ def test_paper1_luo_exact_ascertainment_contract() -> None:
     assert collapsed["n_exact_axis_assignments"] == 3456
     assert collapsed["exact_p_A_enrichment"] == pytest.approx(0.078125, rel=0, abs=1e-15)
     assert collapsed["exact_p_any_axis_imbalance"] == pytest.approx(
-        0.1736111111111111, abs=1e-15
+        0.1736111111111111, rel=0, abs=1e-15
     )
