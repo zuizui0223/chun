@@ -1,3 +1,6 @@
+# Intentionally frozen legacy replay environment for the prospective Petunieae gate.
+# Do not normalize these versions to repository-wide pins without rerunning and
+# revalidating the frozen prospective result contract.
 biopython==1.85
 numpy==2.2.6
 pandas==2.2.3
