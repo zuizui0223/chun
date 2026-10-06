@@ -1,0 +1,30 @@
+name: Epimedium molecular dependence screen v0.1
+
+on:
+  pull_request:
+    paths:
+      - 'data/epimedium_molecular_dependence_screen_v0_1.csv'
+      - 'docs/EPIMEDIUM_MOLECULAR_DEPENDENCE_SCREEN_V0_1.md'
+      - 'scripts/validate_epimedium_molecular_dependence_screen_v0_1.py'
+      - '.github/workflows/epimedium-molecular-dependence-screen-v0-1.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Validate conservative dependence collapse
+        run: |
+          mkdir -p build/epimedium_dependence_v0_1
+          python scripts/validate_epimedium_molecular_dependence_screen_v0_1.py \
+            --screen data/epimedium_molecular_dependence_screen_v0_1.csv \
+            --out build/epimedium_dependence_v0_1/summary.json
+      - name: Report
+        run: cat build/epimedium_dependence_v0_1/summary.json >> "$GITHUB_STEP_SUMMARY"
