@@ -3,6 +3,7 @@ name: OpenTree Grafen niche sensitivity
 on:
   pull_request:
     paths:
+      - 'requirements-small-numpy-scipy-biopython-requests.txt'
       - 'data/fan2026_chelsa_species_compact_v0_1.csv'
       - 'scripts/run_opentree_grafen_niche_sensitivity.py'
       - '.github/workflows/opentree-grafen-niche-sensitivity.yml'
@@ -20,7 +21,7 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
-      - run: python -m pip install --disable-pip-version-check numpy scipy requests biopython
+      - run: python -m pip install --disable-pip-version-check -r requirements-small-numpy-scipy-biopython-requests.txt
       - name: Run OpenTree topology sensitivity
         run: |
           mkdir -p build/opentree_sensitivity
