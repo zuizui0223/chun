@@ -3,6 +3,7 @@ name: Ruellia51 hidden-memory prospective test v0.1
 on:
   pull_request:
     paths:
+      - 'requirements-ruellia.txt'
       - 'data/ruellia51_hidden_memory_prediction_v0_1.json'
       - 'docs/RUELLIA51_HIDDEN_MEMORY_PREDICTION_V0_1.md'
       - 'tests/test_ruellia51_hidden_memory_prediction_v0_1.py'
@@ -21,7 +22,7 @@ jobs:
         with:
           python-version: '3.12'
       - name: Install tests
-        run: pip install pytest
+        run: python -m pip install --disable-pip-version-check -r requirements-ruellia.txt
       - name: Validate hidden-memory prediction
         run: pytest -q tests/test_ruellia51_hidden_memory_prediction_v0_1.py
       - name: Assert Ruellia outcomes remain unopened

@@ -3,6 +3,7 @@ name: PHAIDRA abiotic source recheck v0.2
 on:
   pull_request:
     paths:
+      - 'requirements-phaidra.txt'
       - 'scripts/probe_phaidra_abiotic_source_v0_2.py'
       - 'tests/test_probe_phaidra_abiotic_source_v0_2.py'
       - 'data/phaidra_abiotic_source_recheck_v0_2.json'
@@ -23,7 +24,7 @@ jobs:
           python-version: '3.12'
       - name: Unit tests
         run: |
-          pip install pytest
+          python -m pip install --disable-pip-version-check -r requirements-phaidra.txt
           pytest -q tests/test_probe_phaidra_abiotic_source_v0_2.py
       - name: Probe PHAIDRA metadata only
         run: python scripts/probe_phaidra_abiotic_source_v0_2.py --out build/phaidra_abiotic_source_recheck_v0_2.json
