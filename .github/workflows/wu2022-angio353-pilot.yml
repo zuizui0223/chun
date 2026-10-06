@@ -17,7 +17,7 @@ permissions:
 jobs:
   pilot:
     runs-on: ubuntu-latest
-    timeout-minutes: 45
+    timeout-minutes: 300
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
@@ -47,7 +47,7 @@ jobs:
           python scripts/download_tpia_panel_assemblies.py \
             --panel data/wu2022_angio353_pilot_panel_v0_1.csv \
             --out-dir build/wu_angio353/assemblies \
-            --workers 8
+            --workers 1 --read-timeout 90 --wall-timeout 1800 --retries 1
       - name: Recover Angiosperms353 translated marker HSPs
         run: |
           mkdir -p build/wu_angio353/hits
