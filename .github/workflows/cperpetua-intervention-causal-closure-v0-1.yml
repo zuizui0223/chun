@@ -3,6 +3,7 @@ name: C. perpetua intervention causal closure v0.1
 on:
   pull_request:
     paths:
+      - 'requirements-cperpetua.txt'
       - 'data/cperpetua_intervention_causal_contract_v0_1.csv'
       - 'data/cperpetua_intervention_allocation_v0_1.csv'
       - 'scripts/validate_cperpetua_intervention_contract_v0_1.py'
@@ -25,7 +26,7 @@ jobs:
         with:
           python-version: '3.12'
       - name: Install runtime dependency
-        run: python -m pip install --quiet numpy
+        run: python -m pip install --disable-pip-version-check -r requirements-cperpetua.txt
       - name: Validate intervention allocation and causal gates
         run: |
           mkdir -p build/cperpetua_intervention_v0_1
