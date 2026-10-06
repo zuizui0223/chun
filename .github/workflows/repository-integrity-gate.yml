@@ -33,6 +33,7 @@ jobs:
         run: |
           python scripts/audit_ci_dependency_pinning_v0_1.py \
             --base-ref "origin/${{ github.base_ref }}" \
+            --require-zero \
             --report-out build/ci_dependency_inventory.json
 
       - name: Run frozen-contract regression tests
