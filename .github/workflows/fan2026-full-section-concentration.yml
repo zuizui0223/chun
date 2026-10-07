@@ -3,7 +3,7 @@ name: Fan 2026 full colour-section concentration
 on:
   pull_request:
     paths:
-      - 'requirements-fan2026-seed.txt'
+      - 'requirements/requirements-fan2026-seed.txt'
       - 'scripts/fetch_pmc_cloud_media_v0_1.py'
       - 'scripts/build_fan2026_species_colour_seed.py'
       - 'scripts/analyze_fan2026_full_section_concentration.py'
@@ -23,7 +23,7 @@ jobs:
         with:
           python-version: '3.12'
       - name: Install dependencies
-        run: python -m pip install --disable-pip-version-check -r requirements-fan2026-seed.txt
+        run: python -m pip install --disable-pip-version-check -r requirements/requirements-fan2026-seed.txt
       - name: Acquire Fan 2026 Data S1
         run: |
           mkdir -p build/fan_full/package build/fan_full/result

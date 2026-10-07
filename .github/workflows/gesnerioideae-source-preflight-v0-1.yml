@@ -3,7 +3,7 @@ name: Gesnerioideae source preflight v0.1
 on:
   pull_request:
     paths:
-      - 'requirements-gesnerioideae.txt'
+      - 'requirements/requirements-gesnerioideae.txt'
       - 'data/gesnerioideae_source_semantics_contract_v0_1.json'
       - 'scripts/preflight_gesnerioideae_sources_v0_1.py'
       - '.github/workflows/gesnerioideae-source-preflight-v0-1.yml'
@@ -23,7 +23,7 @@ jobs:
         run: |
           test ! -e results/gesnerioideae_resolution_profile_v0_1/gesnerioideae_resolution_profile_result_v0_1.json
       - name: Install preflight dependencies
-        run: python -m pip install --disable-pip-version-check -r requirements-gesnerioideae.txt
+        run: python -m pip install --disable-pip-version-check -r requirements/requirements-gesnerioideae.txt
       - name: Run outcome-blind source and crosswalk preflight
         run: python scripts/preflight_gesnerioideae_sources_v0_1.py
       - name: Assert receipt contains no outcome exposure

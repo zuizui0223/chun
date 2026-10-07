@@ -8,7 +8,7 @@ on:
       - 'data/paper1_*'
       - 'manuscript/PAPER1_*'
       - 'docs/PAPER1_*'
-      - 'requirements-paper1-submission.txt'
+      - 'requirements/requirements-paper1-submission.txt'
       - 'README.md'
       - '.github/workflows/paper1-ajb-upload-bundle-v1-0.yml'
   workflow_dispatch:
@@ -29,7 +29,7 @@ jobs:
         with:
           python-version: '3.12'
       - name: Install submission dependencies
-        run: python -m pip install --disable-pip-version-check -r requirements-paper1-submission.txt
+        run: python -m pip install --disable-pip-version-check -r requirements/requirements-paper1-submission.txt
       - name: Test Paper 1 reproducibility primitives
         run: pytest -q tests/test_paper1_ajb_docx_determinism_v1_0.py
       - name: Build audited AJB v1.0 upload bundle twice

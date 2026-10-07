@@ -1,0 +1,1875 @@
+{
+  "entries": [
+    {
+      "family": "other:angraecinae",
+      "pip_installs": [
+        {
+          "command": "python -m pip install 'numpy==2.2.6' 'biopython==1.85' 'scipy==1.15.3'",
+          "line": 20,
+          "pinned": true,
+          "via_requirement_file": false
+        }
+      ],
+      "workflow": ".github/workflows/angraecinae-fast-mk-v0-1.yml"
+    },
+    {
+      "family": "other:angraecinae",
+      "pip_installs": [
+        {
+          "command": "run: python -m pip install 'numpy==2.2.6' 'biopython==1.85' 'scipy==1.15.3'",
+          "line": 25,
+          "pinned": true,
+          "via_requirement_file": false
+        }
+      ],
+      "workflow": ".github/workflows/angraecinae-frozen-replay-v0-1.yml"
+    },
+    {
+      "family": "other:angraecinae",
+      "pip_installs": [
+        {
+          "command": "python -m pip install 'numpy==2.2.6' 'biopython==1.85' 'scipy==1.15.3'",
+          "line": 21,
+          "pinned": true,
+          "via_requirement_file": false
+        }
+      ],
+      "workflow": ".github/workflows/angraecinae-resume-all4-mk-v0-1.yml"
+    },
+    {
+      "family": "other:angraecinae",
+      "pip_installs": [
+        {
+          "command": "python -m pip install 'numpy==2.2.6' 'biopython==1.85' 'scipy==1.15.3'",
+          "line": 24,
+          "pinned": true,
+          "via_requirement_file": false
+        }
+      ],
+      "workflow": ".github/workflows/angraecinae-source-reanalysis-v0-1.yml"
+    },
+    {
+      "family": "other:anr",
+      "pip_installs": [
+        {
+          "command": "python -m pip install --disable-pip-version-check -r requirements/requirements-source-http-sequence.txt",
+          "line": 37,
+          "pinned": true,
+          "via_requirement_file": true
+        }
+      ],
+      "workflow": ".github/workflows/anr-live-diagnostic.yml"
+    },
+    {
+      "family": "other:ans",
+      "pip_installs": [
+        {
+          "command": "python -m pip install --disable-pip-version-check -r requirements/requirements-source-biopython.txt",
+          "line": 35,
+          "pinned": true,
+          "via_requirement_file": true
+        }
+      ],
+      "workflow": ".github/workflows/ans-ldox-sequence-resolution.yml"
+    },
+    {
+      "family": "other:antirrhineae",
+      "pip_installs": [
+        {
+          "command": "run: python -m pip install 'numpy==2.2.6' 'biopython==1.85'",
+          "line": 26,
+          "pinned": true,
+          "via_requirement_file": false
+        }
+      ],
+      "workflow": ".github/workflows/antirrhineae-fine-state-v0-1.yml"
+    },
+    {
+      "family": "other:camellia",
+      "pip_installs": [
+        {
+          "command": "run: python -m pip install --disable-pip-version-check -r requirements/requirements-camellia-spatial.txt",
+          "line": 26,
+          "pinned": true,
+          "via_requirement_file": true
+        }
+      ],
+      "workflow": ".github/workflows/camellia-gbif-chelsa-niche.yml"
+    },
+    {
+      "family": "other:camellia",
+      "pip_installs": [
+        {
+          "command": "- run: python -m pip install --disable-pip-version-check -r requirements/requirements-camellia-spatial.txt",
+          "line": 25,
+          "pinned": true,
+          "via_requirement_file": true
+        }
+      ],
+      "workflow": ".github/workflows/camellia-gbif-chelsa-thermal.yml"
+    },
+    {
+      "family": "other:camellia",
+      "pip_installs": [
+        {
+          "command": "run: python -m pip install --disable-pip-version-check -r requirements/requirements-camellia-spatial.txt",
+          "line": 25,
+          "pinned": true,
+          "via_requirement_file": true
+        }
+      ],
+      "workflow": ".github/workflows/camellia-gbif-worldclim-niche.yml"
+    },
+    {
+      "family": "other:camellia",
+      "pip_installs": [
+        {
+          "command": "run: python -m pip install --disable-pip-version-check -r requirements/requirements-camellia-literature.txt",
+          "line": 25,
+          "pinned": true,
+          "via_requirement_file": true
+        }
+      ],
+      "workflow": ".github/workflows/camellia-huana-reported-effect-pilot.yml"
+    },
+    {
+      "family": "other:camellia",
+      "pip_installs": [
+        {
+          "command": "run: python -m pip install --disable-pip-version-check -r requirements/requirements-camellia-literature.txt",
+          "line": 27,
+          "pinned": true,
+          "via_requirement_file": true
+        }
+      ],
+      "workflow": ".github/workflows/camellia-japonica-reported-effect-pilot.yml"
+    },
+    {
+      "family": "other:camellia",
+      "pip_installs": [
+        {
+          "command": "run: python -m pip install --disable-pip-version-check -r requirements/requirements-camellia-analysis.txt",
+          "line": 25,
+          "pinned": true,
+          "via_requirement_file": true
+        }
+      ],
+      "workflow": ".github/workflows/camellia-mechanistic-meta-posterior-robustness.yml"
+    },
+    {
+      "family": "other:camellia",
+      "pip_installs": [
+        {
+          "command": "run: python -m pip install --disable-pip-version-check -r requirements/requirements-camellia-literature.txt",
+          "line": 27,
+          "pinned": true,
+          "via_requirement_file": true
+        }
+      ],
+      "workflow": ".github/workflows/camellia-oil-colour-reported-effect-pilot.yml"
+    },
+    {
+      "family": "other:camellia",
+      "pip_installs": [
+        {
+          "command": "run: python -m pip install --disable-pip-version-check -r requirements/requirements-camellia-analysis.txt",
+          "line": 30,
+          "pinned": true,
+          "via_requirement_file": true
+        }
+      ],
+      "workflow": ".github/workflows/camellia-quantitative-state-vector-meta.yml"
+    },
+    {
+      "family": "other:camellia",
+      "pip_installs": [
+        {
+          "command": "run: python -m pip install --disable-pip-version-check -r requirements/requirements-camellia-literature.txt",
+          "line": 27,
+          "pinned": true,
+          "via_requirement_file": true
+        }
+      ],
+      "workflow": ".github/workflows/camellia-reticulata-reported-effect-pilot.yml"
+    },
+    {
+      "family": "other:camellia",
+      "pip_installs": [
+        {
+          "command": "run: python -m pip install --disable-pip-version-check -r requirements/requirements-camellia-literature.txt",
+          "line": 27,
+          "pinned": true,
+          "via_requirement_file": true
+        }
+      ],
+      "workflow": ".github/workflows/camellia-sinensis-reported-effect-pilot.yml"
+    },
+    {
+      "family": "other:camellia",
+      "pip_installs": [
+        {
+          "command": "run: python -m pip install --disable-pip-version-check -r requirements/requirements-camellia-analysis.txt",
+          "line": 25,
+          "pinned": true,
+          "via_requirement_file": true
+        }
+      ],
+      "workflow": ".github/workflows/camellia-ultimate-cause-prebranch-tests.yml"
+    },
+    {
+      "family": "other:camellia",
+      "pip_installs": [
+        {
+          "command": "run: python -m pip install --disable-pip-version-check -r requirements/requirements-camellia-analysis.txt",
+          "line": 25,
+          "pinned": true,
+          "via_requirement_file": true
+        }
+      ],
+      "workflow": ".github/workflows/camellia-ultimate-trait-coverage.yml"
+    },
+    {
+      "family": "other:camellia",
+      "pip_installs": [
+        {
+          "command": "run: python -m pip install --disable-pip-version-check -r requirements/requirements-camellia-analysis.txt",
+          "line": 24,
+          "pinned": true,
+          "via_requirement_file": true
+        }
+      ],
+      "workflow": ".github/workflows/camellia-within-section-colour-climate-coupling.yml"
+    },
+    {
+      "family": "other:camellia",
+      "pip_installs": [
+        {
+          "command": "run: python -m pip install 'numpy==2.2.6' 'biopython==1.85'",
+          "line": 23,
+          "pinned": true,
+          "via_requirement_file": false
+        }
+      ],
+      "workflow": ".github/workflows/camellia-yellow-axis-validation-v0-1.yml"
+    },
+    {
+      "family": "other:cjdfr",
+      "pip_installs": [
+        {
+          "command": "python -m pip install --disable-pip-version-check -r requirements/requirements-source-biopython.txt",
+          "line": 34,
+          "pinned": true,
+          "via_requirement_file": true
+        }
+      ],
+      "workflow": ".github/workflows/cjdfr-sequence-anchor.yml"
+    },
+    {
+      "family": "other:cnfls2",
+      "pip_installs": [
+        {
+          "command": "python -m pip install --disable-pip-version-check -r requirements/requirements-cnfls2-http.txt",
+          "line": 33,
+          "pinned": true,
+          "via_requirement_file": true
+        }
+      ],
+      "workflow": ".github/workflows/cnfls2-gwh-full-length-candidate.yml"
+    },
+    {
+      "family": "other:cnfls2",
+      "pip_installs": [
+        {
+          "command": "run: python -m pip install --disable-pip-version-check -r requirements/requirements-cnfls2-http.txt",
+          "line": 24,
+          "pinned": true,
+          "via_requirement_file": true
+        }
+      ],
+      "workflow": ".github/workflows/cnfls2-prjna909942-longread-audit.yml"
+    },
+    {
+      "family": "other:cnfls2",
+      "pip_installs": [
+        {
+          "command": "python -m pip install --disable-pip-version-check -r requirements/requirements-cnfls2-sequence.txt",
+          "line": 35,
+          "pinned": true,
+          "via_requirement_file": true
+        }
+      ],
+      "workflow": ".github/workflows/cnfls2-synteny-gene-tree.yml"
+    },
+    {
+      "family": "other:cnfls2",
+      "pip_installs": [
+        {
+          "command": "run: python -m pip install --disable-pip-version-check -r requirements/requirements-cnfls2-http.txt",
+          "line": 26,
+          "pinned": true,
+          "via_requirement_file": true
+        }
+      ],
+      "workflow": ".github/workflows/cnfls2-synteny-source-audit.yml"
+    },
+    {
+      "family": "other:cnitidissima",
+      "pip_installs": [
+        {
+          "command": "run: python -m pip install --disable-pip-version-check -r requirements/requirements-source-cnitidissima-audit.txt",
+          "line": 25,
+          "pinned": true,
+          "via_requirement_file": true
+        }
+      ],
+      "workflow": ".github/workflows/cnitidissima-fls-source-sequence-audit.yml"
+    },
+    {
+      "family": "other:cnitidissima",
+      "pip_installs": [
+        {
+          "command": "run: python -m pip install --disable-pip-version-check -r requirements/requirements-source-http-sequence.txt",
+          "line": 25,
+          "pinned": true,
+          "via_requirement_file": true
+        }
+      ],
+      "workflow": ".github/workflows/cnitidissima-fls2-primer-to-tea-paralog.yml"
+    },
+    {
+      "family": "other:cperpetua",
+      "pip_installs": [
+        {
+          "command": "run: python -m pip install --disable-pip-version-check -r requirements/requirements-cperpetua.txt",
+          "line": 30,
+          "pinned": true,
+          "via_requirement_file": true
+        }
+      ],
+      "workflow": ".github/workflows/cperpetua-competing-seasonal-models-v0-1.yml"
+    },
+    {
+      "family": "other:cperpetua",
+      "pip_installs": [
+        {
+          "command": "run: python -m pip install --disable-pip-version-check -r requirements/requirements-cperpetua.txt",
+          "line": 32,
+          "pinned": true,
+          "via_requirement_file": true
+        }
+      ],
+      "workflow": ".github/workflows/cperpetua-future-data-runner-v0-1.yml"
+    },
+    {
+      "family": "other:cperpetua",
+      "pip_installs": [
+        {
+          "command": "run: python -m pip install --disable-pip-version-check -r requirements/requirements-cperpetua.txt",
+          "line": 29,
+          "pinned": true,
+          "via_requirement_file": true
+        }
+      ],
+      "workflow": ".github/workflows/cperpetua-intervention-causal-closure-v0-1.yml"
+    },
+    {
+      "family": "cross-radiation",
+      "pip_installs": [
+        {
+          "command": "run: python -m pip install --disable-pip-version-check -r requirements/requirements-cross-radiation.txt",
+          "line": 29,
+          "pinned": true,
+          "via_requirement_file": true
+        }
+      ],
+      "workflow": ".github/workflows/cross-radiation-el-current-candidate-v0-3.yml"
+    },
+    {
+      "family": "cross-radiation",
+      "pip_installs": [
+        {
+          "command": "run: python -m pip install --disable-pip-version-check -r requirements/requirements-cross-radiation.txt",
+          "line": 27,
+          "pinned": true,
+          "via_requirement_file": true
+        }
+      ],
+      "workflow": ".github/workflows/cross-radiation-el-v0-3-prehuman-bundle-v0-1.yml"
+    },
+    {
+      "family": "cross-radiation",
+      "pip_installs": [
+        {
+          "command": "run: python -m pip install --disable-pip-version-check -r requirements/requirements-cross-radiation.txt",
+          "line": 47,
+          "pinned": true,
+          "via_requirement_file": true
+        }
+      ],
+      "workflow": ".github/workflows/cross-radiation-el-v0-3-science-freeze-v0-1.yml"
+    },
+    {
+      "family": "cross-radiation",
+      "pip_installs": [
+        {
+          "command": "run: python -m pip install --disable-pip-version-check -r requirements/requirements-cross-radiation.txt",
+          "line": 28,
+          "pinned": true,
+          "via_requirement_file": true
+        }
+      ],
+      "workflow": ".github/workflows/cross-radiation-el-v0-3-submission-readiness-v0-1.yml"
+    },
+    {
+      "family": "cross-radiation",
+      "pip_installs": [
+        {
+          "command": "run: python -m pip install --disable-pip-version-check -r requirements/requirements-cross-radiation.txt",
+          "line": 25,
+          "pinned": true,
+          "via_requirement_file": true
+        }
+      ],
+      "workflow": ".github/workflows/cross-radiation-el-v0-7-hierarchical-memory-figures.yml"
+    },
+    {
+      "family": "cross-radiation",
+      "pip_installs": [
+        {
+          "command": "run: python -m pip install --disable-pip-version-check -r requirements/requirements-cross-radiation.txt",
+          "line": 26,
+          "pinned": true,
+          "via_requirement_file": true
+        }
+      ],
+      "workflow": ".github/workflows/cross-radiation-el-v0-7-hierarchical-memory.yml"
+    },
+    {
+      "family": "cross-radiation",
+      "pip_installs": [
+        {
+          "command": "run: python -m pip install --disable-pip-version-check -r requirements/requirements-cross-radiation.txt",
+          "line": 25,
+          "pinned": true,
+          "via_requirement_file": true
+        }
+      ],
+      "workflow": ".github/workflows/cross-radiation-el-v0-8-hierarchical-memory-figures.yml"
+    },
+    {
+      "family": "cross-radiation",
+      "pip_installs": [
+        {
+          "command": "run: python -m pip install --disable-pip-version-check -r requirements/requirements-cross-radiation.txt",
+          "line": 29,
+          "pinned": true,
+          "via_requirement_file": true
+        }
+      ],
+      "workflow": ".github/workflows/cross-radiation-evolution-letters-v0-1.yml"
+    },
+    {
+      "family": "cross-radiation",
+      "pip_installs": [
+        {
+          "command": "run: python -m pip install --disable-pip-version-check -r requirements/requirements-cross-radiation.txt",
+          "line": 28,
+          "pinned": true,
+          "via_requirement_file": true
+        }
+      ],
+      "workflow": ".github/workflows/cross-radiation-evolution-letters-v0-2.yml"
+    },
+    {
+      "family": "cross-radiation",
+      "pip_installs": [
+        {
+          "command": "run: python -m pip install --disable-pip-version-check -r requirements/requirements-cross-radiation.txt",
+          "line": 31,
+          "pinned": true,
+          "via_requirement_file": true
+        }
+      ],
+      "workflow": ".github/workflows/cross-radiation-evolution-letters-v0-3-temporal-memory.yml"
+    },
+    {
+      "family": "other:cryptic",
+      "pip_installs": [
+        {
+          "command": "run: python -m pip install --disable-pip-version-check -r requirements/requirements-small-numpy-scipy.txt",
+          "line": 26,
+          "pinned": true,
+          "via_requirement_file": true
+        }
+      ],
+      "workflow": ".github/workflows/cryptic-hidden-memory-no-global-signal-v0-1.yml"
+    },
+    {
+      "family": "other:csng",
+      "pip_installs": [
+        {
+          "command": "run: python -m pip install --disable-pip-version-check -r requirements/requirements-source-http.txt",
+          "line": 26,
+          "pinned": true,
+          "via_requirement_file": true
+        }
+      ],
+      "workflow": ".github/workflows/csng-primer-to-tpia-candidate-map.yml"
+    },
+    {
+      "family": "other:csng",
+      "pip_installs": [
+        {
+          "command": "run: python -m pip install --disable-pip-version-check -r requirements/requirements-source-csng-audit.txt",
+          "line": 25,
+          "pinned": true,
+          "via_requirement_file": true
+        }
+      ],
+      "workflow": ".github/workflows/csng-unigene-provenance-audit.yml"
+    },
+    {
+      "family": "other:el",
+      "pip_installs": [
+        {
+          "command": "run: python -m pip install --disable-pip-version-check -r requirements/requirements-el-promotion.txt",
+          "line": 25,
+          "pinned": true,
+          "via_requirement_file": true
+        }
+      ],
+      "workflow": ".github/workflows/el-v0-7-ruellia-promotion-rule-v0-1.yml"
+    },
+    {
+      "family": "other:erysimum",
+      "pip_installs": [
+        {
+          "command": "run: python -m pip install --disable-pip-version-check -r requirements/requirements-small-biopython-pytest.txt",
+          "line": 29,
+          "pinned": true,
+          "via_requirement_file": true
+        }
+      ],
+      "workflow": ".github/workflows/erysimum-hidden-memory-source-v0-1.yml"
+    },
+    {
+      "family": "other:fan2026",
+      "pip_installs": [
+        {
+          "command": "- run: python -m pip install --disable-pip-version-check -r requirements/requirements-fan2026-gbif.txt",
+          "line": 25,
+          "pinned": true,
+          "via_requirement_file": true
+        }
+      ],
+      "workflow": ".github/workflows/fan2026-exact-gbif-postfilter.yml"
+    },
+    {
+      "family": "other:fan2026",
+      "pip_installs": [
+        {
+          "command": "run: python -m pip install --disable-pip-version-check -r requirements/requirements-fan2026-seed.txt",
+          "line": 26,
+          "pinned": true,
+          "via_requirement_file": true
+        }
+      ],
+      "workflow": ".github/workflows/fan2026-full-section-concentration.yml"
+    },
+    {
+      "family": "other:fan2026",
+      "pip_installs": [
+        {
+          "command": "- run: python -m pip install --disable-pip-version-check -r requirements/requirements-fan2026-gbif-seed.txt",
+          "line": 27,
+          "pinned": true,
+          "via_requirement_file": true
+        }
+      ],
+      "workflow": ".github/workflows/fan2026-gbif-chelsa-specimen-sensitivity.yml"
+    },
+    {
+      "family": "other:fan2026",
+      "pip_installs": [
+        {
+          "command": "- run: python -m pip install --disable-pip-version-check -r requirements/requirements-fan2026-gbif-thermal.txt",
+          "line": 33,
+          "pinned": true,
+          "via_requirement_file": true
+        }
+      ],
+      "workflow": ".github/workflows/fan2026-gbif-chelsa-thermal.yml"
+    },
+    {
+      "family": "other:fan2026",
+      "pip_installs": [
+        {
+          "command": "run: python -m pip install --disable-pip-version-check -r requirements/requirements-fan2026-supplement.txt",
+          "line": 28,
+          "pinned": true,
+          "via_requirement_file": true
+        }
+      ],
+      "workflow": ".github/workflows/fan2026-quantitative-pigment-supplement-audit.yml"
+    },
+    {
+      "family": "other:fan2026",
+      "pip_installs": [
+        {
+          "command": "- run: python -m pip install --disable-pip-version-check -r requirements/requirements-fan2026-numpy.txt",
+          "line": 23,
+          "pinned": true,
+          "via_requirement_file": true
+        }
+      ],
+      "workflow": ".github/workflows/fan2026-state-section-dominance.yml"
+    },
+    {
+      "family": "other:fan2026",
+      "pip_installs": [
+        {
+          "command": "- run: python -m pip install --disable-pip-version-check -r requirements/requirements-fan2026-openpyxl.txt",
+          "line": 24,
+          "pinned": true,
+          "via_requirement_file": true
+        }
+      ],
+      "workflow": ".github/workflows/fan2026-supporting-data-audit.yml"
+    },
+    {
+      "family": "flower-fruit",
+      "pip_installs": [
+        {
+          "command": "run: python -m pip install --disable-pip-version-check -r requirements/requirements-flower-fruit.txt",
+          "line": 27,
+          "pinned": true,
+          "via_requirement_file": true
+        }
+      ],
+      "workflow": ".github/workflows/flower-fruit-memory-tradeoff-v0-1.yml"
+    },
+    {
+      "family": "flowerclades51",
+      "pip_installs": [
+        {
+          "command": "python -m pip install --disable-pip-version-check -r requirements/requirements-flowerclades51.txt",
+          "line": 27,
+          "pinned": true,
+          "via_requirement_file": true
+        }
+      ],
+      "workflow": ".github/workflows/flowerclades51-appendix-s2-recovery-v0-2.yml"
+    },
+    {
+      "family": "flowerclades51",
+      "pip_installs": [
+        {
+          "command": "run: python -m pip install --disable-pip-version-check -r requirements/requirements-flowerclades51.txt",
+          "line": 24,
+          "pinned": true,
+          "via_requirement_file": true
+        }
+      ],
+      "workflow": ".github/workflows/flowerclades51-appendix-s2-source-recovery-v0-1.yml"
+    },
+    {
+      "family": "flowerclades51",
+      "pip_installs": [
+        {
+          "command": "run: python -m pip install --disable-pip-version-check -r requirements/requirements-flowerclades51.txt",
+          "line": 28,
+          "pinned": true,
+          "via_requirement_file": true
+        }
+      ],
+      "workflow": ".github/workflows/flowerclades51-distance-persistence-v0-1.yml"
+    },
+    {
+      "family": "flowerclades51",
+      "pip_installs": [
+        {
+          "command": "run: python -m pip install --disable-pip-version-check -r requirements/requirements-flowerclades51.txt",
+          "line": 28,
+          "pinned": true,
+          "via_requirement_file": true
+        }
+      ],
+      "workflow": ".github/workflows/flowerclades51-hidden-fine-memory-v0-1.yml"
+    },
+    {
+      "family": "flowerclades51",
+      "pip_installs": [
+        {
+          "command": "run: python -m pip install --disable-pip-version-check -r requirements/requirements-flowerclades51.txt",
+          "line": 27,
+          "pinned": true,
+          "via_requirement_file": true
+        }
+      ],
+      "workflow": ".github/workflows/flowerclades51-memory-architecture-v0-1.yml"
+    },
+    {
+      "family": "flowerclades51",
+      "pip_installs": [
+        {
+          "command": "- run: python -m pip install --disable-pip-version-check -r requirements/requirements-flowerclades51.txt",
+          "line": 26,
+          "pinned": true,
+          "via_requirement_file": true
+        }
+      ],
+      "workflow": ".github/workflows/flowerclades51-relative-time-persistence-prereg-v0-1.yml"
+    },
+    {
+      "family": "flowerclades51",
+      "pip_installs": [
+        {
+          "command": "run: python -m pip install --disable-pip-version-check -r requirements/requirements-flowerclades51.txt",
+          "line": 28,
+          "pinned": true,
+          "via_requirement_file": true
+        }
+      ],
+      "workflow": ".github/workflows/flowerclades51-resolution-opportunity-v0-1.yml"
+    },
+    {
+      "family": "flowerclades51",
+      "pip_installs": [
+        {
+          "command": "run: python -m pip install --disable-pip-version-check -r requirements/requirements-flowerclades51.txt",
+          "line": 24,
+          "pinned": true,
+          "via_requirement_file": true
+        }
+      ],
+      "workflow": ".github/workflows/flowerclades51-temporal-lability-v0-1.yml"
+    },
+    {
+      "family": "gesnerioideae",
+      "pip_installs": [
+        {
+          "command": "run: python -m pip install --disable-pip-version-check -r requirements/requirements-gesnerioideae.txt",
+          "line": 27,
+          "pinned": true,
+          "via_requirement_file": true
+        }
+      ],
+      "workflow": ".github/workflows/gesnerioideae-biochemical-crosswalk-v0-1.yml"
+    },
+    {
+      "family": "gesnerioideae",
+      "pip_installs": [
+        {
+          "command": "run: python -m pip install --disable-pip-version-check -r requirements/requirements-gesnerioideae.txt",
+          "line": 26,
+          "pinned": true,
+          "via_requirement_file": true
+        }
+      ],
+      "workflow": ".github/workflows/gesnerioideae-biochemical-header-gate-v0-1.yml"
+    },
+    {
+      "family": "gesnerioideae",
+      "pip_installs": [
+        {
+          "command": "run: python -m pip install --disable-pip-version-check -r requirements/requirements-gesnerioideae.txt",
+          "line": 31,
+          "pinned": true,
+          "via_requirement_file": true
+        }
+      ],
+      "workflow": ".github/workflows/gesnerioideae-biochemical-hidden-memory-v0-1.yml"
+    },
+    {
+      "family": "gesnerioideae",
+      "pip_installs": [
+        {
+          "command": "run: python -m pip install --disable-pip-version-check -r requirements/requirements-gesnerioideae.txt",
+          "line": 27,
+          "pinned": true,
+          "via_requirement_file": true
+        }
+      ],
+      "workflow": ".github/workflows/gesnerioideae-biochemical-state-support-v0-1.yml"
+    },
+    {
+      "family": "gesnerioideae",
+      "pip_installs": [
+        {
+          "command": "run: python -m pip install --disable-pip-version-check -r requirements/requirements-gesnerioideae.txt",
+          "line": 25,
+          "pinned": true,
+          "via_requirement_file": true
+        }
+      ],
+      "workflow": ".github/workflows/gesnerioideae-fail-informativeness-v0-1.yml"
+    },
+    {
+      "family": "gesnerioideae",
+      "pip_installs": [
+        {
+          "command": "run: python -m pip install --disable-pip-version-check -r requirements/requirements-gesnerioideae.txt",
+          "line": 26,
+          "pinned": true,
+          "via_requirement_file": true
+        }
+      ],
+      "workflow": ".github/workflows/gesnerioideae-source-preflight-v0-1.yml"
+    },
+    {
+      "family": "gesnerioideae",
+      "pip_installs": [
+        {
+          "command": "run: python -m pip install --disable-pip-version-check -r requirements/requirements-gesnerioideae.txt",
+          "line": 26,
+          "pinned": true,
+          "via_requirement_file": true
+        }
+      ],
+      "workflow": ".github/workflows/gesnerioideae-source-schema-v0-1.yml"
+    },
+    {
+      "family": "hidden-memory",
+      "pip_installs": [
+        {
+          "command": "run: python -m pip install --disable-pip-version-check -r requirements/requirements-hidden-memory.txt",
+          "line": 26,
+          "pinned": true,
+          "via_requirement_file": true
+        }
+      ],
+      "workflow": ".github/workflows/hidden-memory-realization-structural-v0-1.yml"
+    },
+    {
+      "family": "hidden-memory",
+      "pip_installs": [
+        {
+          "command": "run: python -m pip install --disable-pip-version-check -r requirements/requirements-hidden-memory-tree.txt",
+          "line": 28,
+          "pinned": true,
+          "via_requirement_file": true
+        }
+      ],
+      "workflow": ".github/workflows/hidden-memory-vs-relative-halfdepth-v0-1.yml"
+    },
+    {
+      "family": "hidden-memory",
+      "pip_installs": [
+        {
+          "command": "run: python -m pip install --disable-pip-version-check -r requirements/requirements-hidden-memory.txt",
+          "line": 28,
+          "pinned": true,
+          "via_requirement_file": true
+        }
+      ],
+      "workflow": ".github/workflows/hidden-memory-vs-relative-persistence-v0-1.yml"
+    },
+    {
+      "family": "other:hierarchy",
+      "pip_installs": [
+        {
+          "command": "run: python -m pip install 'numpy==2.2.6' 'biopython==1.85' 'scipy==1.15.3'",
+          "line": 27,
+          "pinned": true,
+          "via_requirement_file": false
+        }
+      ],
+      "workflow": ".github/workflows/hierarchy-specificity-controls-v0-1.yml"
+    },
+    {
+      "family": "other:hydrangea",
+      "pip_installs": [
+        {
+          "command": "run: python -m pip install 'numpy==2.5.3' 'biopython==1.85' 'scipy==1.16.1'",
+          "line": 31,
+          "pinned": true,
+          "via_requirement_file": false
+        },
+        {
+          "command": "python -m pip install 'PyMuPDF==1.26.4' 'numpy==2.5.3' 'biopython==1.85' 'scipy==1.16.1'",
+          "line": 59,
+          "pinned": true,
+          "via_requirement_file": false
+        }
+      ],
+      "workflow": ".github/workflows/hydrangea-source-reanalysis-v0-2.yml"
+    },
+    {
+      "family": "iochrominae",
+      "pip_installs": [
+        {
+          "command": "run: python -m pip install --disable-pip-version-check -r requirements/requirements-iochrominae.txt",
+          "line": 26,
+          "pinned": true,
+          "via_requirement_file": true
+        }
+      ],
+      "workflow": ".github/workflows/iochrominae-dryad-access-recheck-v0-3.yml"
+    },
+    {
+      "family": "iochrominae",
+      "pip_installs": [
+        {
+          "command": "run: python -m pip install --disable-pip-version-check -r requirements/requirements-iochrominae.txt",
+          "line": 25,
+          "pinned": true,
+          "via_requirement_file": true
+        }
+      ],
+      "workflow": ".github/workflows/iochrominae-preservation-mirror-recovery-v0-4.yml"
+    },
+    {
+      "family": "iris",
+      "pip_installs": [
+        {
+          "command": "run: python -m pip install --disable-pip-version-check -r requirements/requirements-iris.txt",
+          "line": 25,
+          "pinned": true,
+          "via_requirement_file": true
+        }
+      ],
+      "workflow": ".github/workflows/iris-intermediate-resolution-preflight-v0-1.yml"
+    },
+    {
+      "family": "iris",
+      "pip_installs": [
+        {
+          "command": "run: python -m pip install --disable-pip-version-check -r requirements/requirements-iris.txt",
+          "line": 25,
+          "pinned": true,
+          "via_requirement_file": true
+        }
+      ],
+      "workflow": ".github/workflows/iris-postfreeze-row-ingest-v0-1.yml"
+    },
+    {
+      "family": "iris",
+      "pip_installs": [
+        {
+          "command": "python -m pip install --disable-pip-version-check -r requirements/requirements-iris.txt",
+          "line": 31,
+          "pinned": true,
+          "via_requirement_file": true
+        }
+      ],
+      "workflow": ".github/workflows/iris-primary-tree-v0-1.yml"
+    },
+    {
+      "family": "iris",
+      "pip_installs": [
+        {
+          "command": "run: python -m pip install --disable-pip-version-check -r requirements/requirements-iris.txt",
+          "line": 37,
+          "pinned": true,
+          "via_requirement_file": true
+        }
+      ],
+      "workflow": ".github/workflows/iris-prospective-outcome-v0-1.yml"
+    },
+    {
+      "family": "iris",
+      "pip_installs": [
+        {
+          "command": "run: python -m pip install --disable-pip-version-check -r requirements/requirements-iris.txt",
+          "line": 25,
+          "pinned": true,
+          "via_requirement_file": true
+        }
+      ],
+      "workflow": ".github/workflows/iris-source-join-sequence-preflight-v0-1.yml"
+    },
+    {
+      "family": "iris",
+      "pip_installs": [
+        {
+          "command": "run: python -m pip install --disable-pip-version-check -r requirements/requirements-iris.txt",
+          "line": 27,
+          "pinned": true,
+          "via_requirement_file": true
+        }
+      ],
+      "workflow": ".github/workflows/iris-source-schema-erratum-v0-1.yml"
+    },
+    {
+      "family": "iris",
+      "pip_installs": [
+        {
+          "command": "- run: python -m pip install --disable-pip-version-check -r requirements/requirements-iris.txt",
+          "line": 25,
+          "pinned": true,
+          "via_requirement_file": true
+        }
+      ],
+      "workflow": ".github/workflows/iris-source-taxon-label-inspection-v0-1.yml"
+    },
+    {
+      "family": "other:linoideae",
+      "pip_installs": [
+        {
+          "command": "run: python -m pip install 'numpy==2.2.6' 'biopython==1.85' 'scipy==1.15.3'",
+          "line": 31,
+          "pinned": true,
+          "via_requirement_file": false
+        }
+      ],
+      "workflow": ".github/workflows/linoideae-inference-replay-v0-2.yml"
+    },
+    {
+      "family": "other:linoideae",
+      "pip_installs": [
+        {
+          "command": "python -m pip install biopython==1.85",
+          "line": 24,
+          "pinned": true,
+          "via_requirement_file": false
+        }
+      ],
+      "workflow": ".github/workflows/linoideae-nuclear-sensitivity-v0-2.yml"
+    },
+    {
+      "family": "other:linoideae",
+      "pip_installs": [
+        {
+          "command": "python -m pip install pymupdf==1.26.4 biopython==1.85 numpy==2.2.6 scipy==1.15.3",
+          "line": 16,
+          "pinned": true,
+          "via_requirement_file": false
+        }
+      ],
+      "workflow": ".github/workflows/linoideae-source-reanalysis-v0-2.yml"
+    },
+    {
+      "family": "other:macro",
+      "pip_installs": [
+        {
+          "command": "run: python -m pip install --disable-pip-version-check -r requirements/requirements-small-numpy-biopython.txt",
+          "line": 31,
+          "pinned": true,
+          "via_requirement_file": true
+        }
+      ],
+      "workflow": ".github/workflows/macro-paper-topology-robustness.yml"
+    },
+    {
+      "family": "merianieae",
+      "pip_installs": [
+        {
+          "command": "run: python -m pip install --disable-pip-version-check -r requirements/requirements-merianieae.txt",
+          "line": 41,
+          "pinned": true,
+          "via_requirement_file": true
+        }
+      ],
+      "workflow": ".github/workflows/merianieae-hidden-memory-prospective-v0-1.yml"
+    },
+    {
+      "family": "merianieae",
+      "pip_installs": [
+        {
+          "command": "run: python -m pip install --disable-pip-version-check -r requirements/requirements-merianieae.txt",
+          "line": 26,
+          "pinned": true,
+          "via_requirement_file": true
+        }
+      ],
+      "workflow": ".github/workflows/merianieae-hidden-memory-source-v0-1.yml"
+    },
+    {
+      "family": "other:ng2018",
+      "pip_installs": [
+        {
+          "command": "run: python -m pip install --disable-pip-version-check -r requirements/requirements-ng2018-table.txt",
+          "line": 26,
+          "pinned": true,
+          "via_requirement_file": true
+        }
+      ],
+      "workflow": ".github/workflows/ng2018-row3-structure-gate-v0-1.yml"
+    },
+    {
+      "family": "other:ng2018",
+      "pip_installs": [
+        {
+          "command": "run: python -m pip install --disable-pip-version-check -r requirements/requirements-ng2018-table.txt",
+          "line": 27,
+          "pinned": true,
+          "via_requirement_file": true
+        }
+      ],
+      "workflow": ".github/workflows/ng2018-row7-schema-gate-v0-1.yml"
+    },
+    {
+      "family": "other:ng2018",
+      "pip_installs": [
+        {
+          "command": "run: python -m pip install --disable-pip-version-check -r requirements/requirements-ng2018-table.txt",
+          "line": 27,
+          "pinned": true,
+          "via_requirement_file": true
+        }
+      ],
+      "workflow": ".github/workflows/ng2018-solanaceae-schema-tree-preflight-v0-1.yml"
+    },
+    {
+      "family": "other:ng2018",
+      "pip_installs": [
+        {
+          "command": "run: python -m pip install --disable-pip-version-check -r requirements/requirements-ng2018-test.txt",
+          "line": 27,
+          "pinned": true,
+          "via_requirement_file": true
+        }
+      ],
+      "workflow": ".github/workflows/ng2018-solanaceae-source-gate-v0-1.yml"
+    },
+    {
+      "family": "other:opentree",
+      "pip_installs": [
+        {
+          "command": "- run: python -m pip install --disable-pip-version-check -r requirements/requirements-small-numpy-scipy-biopython-requests.txt",
+          "line": 24,
+          "pinned": true,
+          "via_requirement_file": true
+        }
+      ],
+      "workflow": ".github/workflows/opentree-grafen-niche-sensitivity.yml"
+    },
+    {
+      "family": "paper1",
+      "pip_installs": [
+        {
+          "command": "run: python -m pip install --disable-pip-version-check -r requirements/requirements-paper1-figures.txt",
+          "line": 26,
+          "pinned": true,
+          "via_requirement_file": true
+        }
+      ],
+      "workflow": ".github/workflows/paper1-ajb-upload-bundle-v0-4.yml"
+    },
+    {
+      "family": "paper1",
+      "pip_installs": [
+        {
+          "command": "run: python -m pip install --disable-pip-version-check -r requirements/requirements-paper1-submission.txt",
+          "line": 40,
+          "pinned": true,
+          "via_requirement_file": true
+        }
+      ],
+      "workflow": ".github/workflows/paper1-ajb-upload-bundle-v0-9.yml"
+    },
+    {
+      "family": "paper1",
+      "pip_installs": [
+        {
+          "command": "run: python -m pip install --disable-pip-version-check -r requirements/requirements-paper1-submission.txt",
+          "line": 32,
+          "pinned": true,
+          "via_requirement_file": true
+        }
+      ],
+      "workflow": ".github/workflows/paper1-ajb-upload-bundle-v1-0.yml"
+    },
+    {
+      "family": "paper1",
+      "pip_installs": [
+        {
+          "command": "run: python -m pip install --disable-pip-version-check -r requirements/requirements-paper1-figures.txt",
+          "line": 31,
+          "pinned": true,
+          "via_requirement_file": true
+        }
+      ],
+      "workflow": ".github/workflows/paper1-fig1-framework-v0-2.yml"
+    },
+    {
+      "family": "paper1",
+      "pip_installs": [
+        {
+          "command": "run: python -m pip install --disable-pip-version-check -r requirements/requirements-paper1-figures.txt",
+          "line": 28,
+          "pinned": true,
+          "via_requirement_file": true
+        }
+      ],
+      "workflow": ".github/workflows/paper1-fig2-molecular-v0-2.yml"
+    },
+    {
+      "family": "paper1",
+      "pip_installs": [
+        {
+          "command": "run: python -m pip install --disable-pip-version-check -r requirements/requirements-paper1-figures.txt",
+          "line": 26,
+          "pinned": true,
+          "via_requirement_file": true
+        }
+      ],
+      "workflow": ".github/workflows/paper1-fig3-fig4-audits-v0-2.yml"
+    },
+    {
+      "family": "paper1",
+      "pip_installs": [
+        {
+          "command": "run: python -m pip install --disable-pip-version-check -r requirements/requirements-paper1-figures.txt",
+          "line": 27,
+          "pinned": true,
+          "via_requirement_file": true
+        }
+      ],
+      "workflow": ".github/workflows/paper1-fig5-macro-v0-2.yml"
+    },
+    {
+      "family": "paper1",
+      "pip_installs": [
+        {
+          "command": "run: python -m pip install --disable-pip-version-check -r requirements/requirements-paper1-figures.txt",
+          "line": 27,
+          "pinned": true,
+          "via_requirement_file": true
+        }
+      ],
+      "workflow": ".github/workflows/paper1-fig6-identifiability-v0-2.yml"
+    },
+    {
+      "family": "paper1",
+      "pip_installs": [
+        {
+          "command": "run: python -m pip install --disable-pip-version-check -r requirements/requirements-paper1-figures.txt",
+          "line": 25,
+          "pinned": true,
+          "via_requirement_file": true
+        }
+      ],
+      "workflow": ".github/workflows/paper1-main-figures.yml"
+    },
+    {
+      "family": "paper1",
+      "pip_installs": [
+        {
+          "command": "run: python -m pip install --disable-pip-version-check -r requirements/requirements-paper1-figures.txt",
+          "line": 33,
+          "pinned": true,
+          "via_requirement_file": true
+        }
+      ],
+      "workflow": ".github/workflows/paper1-science-v0-2-1.yml"
+    },
+    {
+      "family": "paper1",
+      "pip_installs": [
+        {
+          "command": "run: python -m pip install --disable-pip-version-check -r requirements/requirements-paper1-figures.txt",
+          "line": 39,
+          "pinned": true,
+          "via_requirement_file": true
+        }
+      ],
+      "workflow": ".github/workflows/paper1-science-v0-2-2.yml"
+    },
+    {
+      "family": "paper1",
+      "pip_installs": [
+        {
+          "command": "run: python -m pip install --disable-pip-version-check -r requirements/requirements-paper1-figures.txt",
+          "line": 47,
+          "pinned": true,
+          "via_requirement_file": true
+        }
+      ],
+      "workflow": ".github/workflows/paper1-submission-bundle.yml"
+    },
+    {
+      "family": "paper1",
+      "pip_installs": [
+        {
+          "command": "run: python -m pip install --disable-pip-version-check -r requirements/requirements-paper1-figures.txt",
+          "line": 25,
+          "pinned": true,
+          "via_requirement_file": true
+        }
+      ],
+      "workflow": ".github/workflows/paper1-supp-figures.yml"
+    },
+    {
+      "family": "petunieae",
+      "pip_installs": [
+        {
+          "command": "run: python -m pip install --disable-pip-version-check -r requirements/requirements-petunieae.txt",
+          "line": 29,
+          "pinned": true,
+          "via_requirement_file": true
+        }
+      ],
+      "workflow": ".github/workflows/petunieae-biochemical-resolution-profile-outcome-v0-2.yml"
+    },
+    {
+      "family": "petunieae",
+      "pip_installs": [
+        {
+          "command": "run: python -m pip install --disable-pip-version-check -r requirements/requirements-petunieae.txt",
+          "line": 30,
+          "pinned": true,
+          "via_requirement_file": true
+        }
+      ],
+      "workflow": ".github/workflows/petunieae-hidden-memory-v0-1.yml"
+    },
+    {
+      "family": "petunieae",
+      "pip_installs": [
+        {
+          "command": "run: python -m pip install --disable-pip-version-check -r requirements/requirements-petunieae-cross-level.txt",
+          "line": 32,
+          "pinned": true,
+          "via_requirement_file": true
+        }
+      ],
+      "workflow": ".github/workflows/petunieae-prospective-cross-level-v0-1.yml"
+    },
+    {
+      "family": "other:phaidra",
+      "pip_installs": [
+        {
+          "command": "run: python -m pip install --disable-pip-version-check -r requirements/requirements-phaidra.txt",
+          "line": 29,
+          "pinned": true,
+          "via_requirement_file": true
+        }
+      ],
+      "workflow": ".github/workflows/phaidra-abiotic-source-gate-v0-1.yml"
+    },
+    {
+      "family": "other:phaidra",
+      "pip_installs": [
+        {
+          "command": "python -m pip install --disable-pip-version-check -r requirements/requirements-phaidra.txt",
+          "line": 27,
+          "pinned": true,
+          "via_requirement_file": true
+        }
+      ],
+      "workflow": ".github/workflows/phaidra-abiotic-source-recheck-v0-2.yml"
+    },
+    {
+      "family": "other:repository",
+      "pip_installs": [
+        {
+          "command": "run: python -m pip install --disable-pip-version-check -r requirements/requirements-repository-integrity.txt",
+          "line": 27,
+          "pinned": true,
+          "via_requirement_file": true
+        }
+      ],
+      "workflow": ".github/workflows/repository-integrity-gate.yml"
+    },
+    {
+      "family": "rhododendron",
+      "pip_installs": [
+        {
+          "command": "run: python -m pip install --disable-pip-version-check -r requirements/requirements-rhododendron.txt",
+          "line": 28,
+          "pinned": true,
+          "via_requirement_file": true
+        }
+      ],
+      "workflow": ".github/workflows/rhododendron30-source-access-recheck-v0-3.yml"
+    },
+    {
+      "family": "rhododendron",
+      "pip_installs": [
+        {
+          "command": "run: python -m pip install --disable-pip-version-check -r requirements/requirements-rhododendron-source.txt",
+          "line": 26,
+          "pinned": true,
+          "via_requirement_file": true
+        }
+      ],
+      "workflow": ".github/workflows/rhododendron30-source-preflight-v0-1.yml"
+    },
+    {
+      "family": "rhododendron",
+      "pip_installs": [
+        {
+          "command": "run: python -m pip install --disable-pip-version-check -r requirements/requirements-rhododendron.txt",
+          "line": 26,
+          "pinned": true,
+          "via_requirement_file": true
+        }
+      ],
+      "workflow": ".github/workflows/rhododendron30-tree-mirror-recovery-v0-4.yml"
+    },
+    {
+      "family": "rhododendron",
+      "pip_installs": [
+        {
+          "command": "run: python -m pip install --disable-pip-version-check -r requirements/requirements-rhododendron-test.txt",
+          "line": 24,
+          "pinned": true,
+          "via_requirement_file": true
+        }
+      ],
+      "workflow": ".github/workflows/rhododendron30-wiley-supplement-recovery-v0-5.yml"
+    },
+    {
+      "family": "other:robust",
+      "pip_installs": [
+        {
+          "command": "run: python -m pip install --disable-pip-version-check -r requirements/requirements-small-numpy-scipy-biopython.txt",
+          "line": 30,
+          "pinned": true,
+          "via_requirement_file": true
+        }
+      ],
+      "workflow": ".github/workflows/robust-transition-trait-taxonomy-audit.yml"
+    },
+    {
+      "family": "other:rooted94",
+      "pip_installs": [
+        {
+          "command": "run: python -m pip install --disable-pip-version-check -r requirements/requirements-rooted94-climate.txt",
+          "line": 30,
+          "pinned": true,
+          "via_requirement_file": true
+        }
+      ],
+      "workflow": ".github/workflows/rooted94-branch-climate-public-boundary.yml"
+    },
+    {
+      "family": "other:rooted94",
+      "pip_installs": [
+        {
+          "command": "run: python -m pip install --disable-pip-version-check -r requirements/requirements-rooted94-bio.txt",
+          "line": 30,
+          "pinned": true,
+          "via_requirement_file": true
+        }
+      ],
+      "workflow": ".github/workflows/rooted94-branch-pollination-public-boundary.yml"
+    },
+    {
+      "family": "other:rooted94",
+      "pip_installs": [
+        {
+          "command": "run: python -m pip install --disable-pip-version-check -r requirements/requirements-rooted94-transition.txt",
+          "line": 28,
+          "pinned": true,
+          "via_requirement_file": true
+        }
+      ],
+      "workflow": ".github/workflows/rooted94-branch-transition-posteriors.yml"
+    },
+    {
+      "family": "other:rooted94",
+      "pip_installs": [
+        {
+          "command": "run: python -m pip install --disable-pip-version-check -r requirements/requirements-rooted94-colour.txt",
+          "line": 29,
+          "pinned": true,
+          "via_requirement_file": true
+        }
+      ],
+      "workflow": ".github/workflows/rooted94-colour-history-sensitivity.yml"
+    },
+    {
+      "family": "other:rooted94",
+      "pip_installs": [
+        {
+          "command": "run: python -m pip install --disable-pip-version-check -r requirements/requirements-rooted94-bio.txt",
+          "line": 29,
+          "pinned": true,
+          "via_requirement_file": true
+        }
+      ],
+      "workflow": ".github/workflows/rooted94-micro-macro-public-boundary.yml"
+    },
+    {
+      "family": "other:rooted94",
+      "pip_installs": [
+        {
+          "command": "run: python -m pip install --disable-pip-version-check -r requirements/requirements-rooted94-tree.txt",
+          "line": 31,
+          "pinned": true,
+          "via_requirement_file": true
+        }
+      ],
+      "workflow": ".github/workflows/rooted94-wfo2026-taxonomy-normalization.yml"
+    },
+    {
+      "family": "ruellia",
+      "pip_installs": [
+        {
+          "command": "run: python -m pip install --disable-pip-version-check -r requirements/requirements-ruellia.txt",
+          "line": 25,
+          "pinned": true,
+          "via_requirement_file": true
+        }
+      ],
+      "workflow": ".github/workflows/ruellia51-hidden-memory-prediction-v0-1.yml"
+    },
+    {
+      "family": "ruellia",
+      "pip_installs": [
+        {
+          "command": "run: python -m pip install --disable-pip-version-check -r requirements/requirements-ruellia.txt",
+          "line": 25,
+          "pinned": true,
+          "via_requirement_file": true
+        }
+      ],
+      "workflow": ".github/workflows/ruellia51-opportunity-conditional-prediction-v0-1.yml"
+    },
+    {
+      "family": "schistanthe",
+      "pip_installs": [
+        {
+          "command": "run: python -m pip install --disable-pip-version-check -r requirements/requirements-schistanthe.txt",
+          "line": 26,
+          "pinned": true,
+          "via_requirement_file": true
+        }
+      ],
+      "workflow": ".github/workflows/schistanthe-hidden-memory-candidate-v0-1.yml"
+    },
+    {
+      "family": "schistanthe",
+      "pip_installs": [
+        {
+          "command": "run: python -m pip install --disable-pip-version-check -r requirements/requirements-schistanthe.txt",
+          "line": 27,
+          "pinned": true,
+          "via_requirement_file": true
+        }
+      ],
+      "workflow": ".github/workflows/schistanthe-hidden-memory-prospective-v0-1.yml"
+    },
+    {
+      "family": "schistanthe",
+      "pip_installs": [
+        {
+          "command": "run: python -m pip install --disable-pip-version-check -r requirements/requirements-schistanthe.txt",
+          "line": 26,
+          "pinned": true,
+          "via_requirement_file": true
+        }
+      ],
+      "workflow": ".github/workflows/schistanthe-identifier-crosswalk-v0-1.yml"
+    },
+    {
+      "family": "schistanthe",
+      "pip_installs": [
+        {
+          "command": "run: python -m pip install --disable-pip-version-check -r requirements/requirements-schistanthe.txt",
+          "line": 26,
+          "pinned": true,
+          "via_requirement_file": true
+        }
+      ],
+      "workflow": ".github/workflows/schistanthe-source-recovery-v0-1.yml"
+    },
+    {
+      "family": "other:section",
+      "pip_installs": [
+        {
+          "command": "run: python -m pip install --disable-pip-version-check -r requirements/requirements-small-numpy.txt",
+          "line": 29,
+          "pinned": true,
+          "via_requirement_file": true
+        }
+      ],
+      "workflow": ".github/workflows/section-relative-niche-displacement.yml"
+    },
+    {
+      "family": "solanaceae",
+      "pip_installs": [
+        {
+          "command": "run: python -m pip install --disable-pip-version-check biopython==1.85",
+          "line": 28,
+          "pinned": true,
+          "via_requirement_file": false
+        }
+      ],
+      "workflow": ".github/workflows/solanaceae-red-archived-treebase-crosswalk-v0-2.yml"
+    },
+    {
+      "family": "solanaceae",
+      "pip_installs": [
+        {
+          "command": "run: python -m pip install --disable-pip-version-check biopython==1.85 numpy==2.5.3 scipy==1.16.1",
+          "line": 30,
+          "pinned": true,
+          "via_requirement_file": false
+        }
+      ],
+      "workflow": ".github/workflows/solanaceae-red-biochemical-resolution-profile-outcome-v0-1.yml"
+    },
+    {
+      "family": "source-first",
+      "pip_installs": [
+        {
+          "command": "run: python -m pip install --disable-pip-version-check -r requirements/requirements-source-biopython.txt",
+          "line": 26,
+          "pinned": true,
+          "via_requirement_file": true
+        }
+      ],
+      "workflow": ".github/workflows/source-first-hedychium-screen-v0-1.yml"
+    },
+    {
+      "family": "source-first",
+      "pip_installs": [
+        {
+          "command": "run: python -m pip install --disable-pip-version-check -r requirements/requirements-source-lactuca.txt",
+          "line": 26,
+          "pinned": true,
+          "via_requirement_file": true
+        }
+      ],
+      "workflow": ".github/workflows/source-first-lactuca-screen-v0-1.yml"
+    },
+    {
+      "family": "other:stress",
+      "pip_installs": [
+        {
+          "command": "run: python -m pip install --disable-pip-version-check -r requirements/requirements-small-numpy-scipy-biopython-pytest.txt",
+          "line": 27,
+          "pinned": true,
+          "via_requirement_file": true
+        }
+      ],
+      "workflow": ".github/workflows/stress-color-memory-v0-1.yml"
+    },
+    {
+      "family": "other:tpia",
+      "pip_installs": [
+        {
+          "command": "- run: python -m pip install --disable-pip-version-check -r requirements/requirements-tpia-http.txt",
+          "line": 23,
+          "pinned": true,
+          "via_requirement_file": true
+        }
+      ],
+      "workflow": ".github/workflows/tpia-bulk-download-registry-audit.yml"
+    },
+    {
+      "family": "other:tpia",
+      "pip_installs": [
+        {
+          "command": "run: python -m pip install --disable-pip-version-check -r requirements/requirements-tpia-sequence.txt",
+          "line": 28,
+          "pinned": true,
+          "via_requirement_file": true
+        }
+      ],
+      "workflow": ".github/workflows/tpia-crosswalk-sequence-fetch.yml"
+    },
+    {
+      "family": "other:tpia",
+      "pip_installs": [
+        {
+          "command": "- run: python -m pip install --disable-pip-version-check -r requirements/requirements-tpia-fan.txt",
+          "line": 25,
+          "pinned": true,
+          "via_requirement_file": true
+        }
+      ],
+      "workflow": ".github/workflows/tpia-fan-assembly-overlap.yml"
+    },
+    {
+      "family": "other:tpia",
+      "pip_installs": [
+        {
+          "command": "- run: python -m pip install --disable-pip-version-check -r requirements/requirements-tpia-fan.txt",
+          "line": 25,
+          "pinned": true,
+          "via_requirement_file": true
+        }
+      ],
+      "workflow": ".github/workflows/tpia-fan-registry-overlap-fast.yml"
+    },
+    {
+      "family": "other:tpia",
+      "pip_installs": [
+        {
+          "command": "run: python -m pip install --disable-pip-version-check -r requirements/requirements-tpia-http.txt",
+          "line": 25,
+          "pinned": true,
+          "via_requirement_file": true
+        }
+      ],
+      "workflow": ".github/workflows/tpia-priority-gene-id-convert.yml"
+    },
+    {
+      "family": "other:tpia",
+      "pip_installs": [
+        {
+          "command": "run: python -m pip install --disable-pip-version-check -r requirements/requirements-tpia-http.txt",
+          "line": 24,
+          "pinned": true,
+          "via_requirement_file": true
+        }
+      ],
+      "workflow": ".github/workflows/tpia-sequence-crosswalk-endpoint-audit.yml"
+    },
+    {
+      "family": "other:visible",
+      "pip_installs": [
+        {
+          "command": "run: python -m pip install --disable-pip-version-check -r requirements/requirements-small-numpy.txt",
+          "line": 27,
+          "pinned": true,
+          "via_requirement_file": true
+        }
+      ],
+      "workflow": ".github/workflows/visible-state-section-concentration.yml"
+    },
+    {
+      "family": "other:wfo53",
+      "pip_installs": [
+        {
+          "command": "run: python -m pip install --disable-pip-version-check -r requirements/requirements-small-numpy-biopython.txt",
+          "line": 30,
+          "pinned": true,
+          "via_requirement_file": true
+        }
+      ],
+      "workflow": ".github/workflows/wfo53-ufboot-colour-conservatism.yml"
+    },
+    {
+      "family": "other:wfo53",
+      "pip_installs": [
+        {
+          "command": "run: python -m pip install --disable-pip-version-check -r requirements/requirements-small-biopython.txt",
+          "line": 29,
+          "pinned": true,
+          "via_requirement_file": true
+        }
+      ],
+      "workflow": ".github/workflows/wfo53-ufboot-topology-sensitivity.yml"
+    },
+    {
+      "family": "other:wfo55",
+      "pip_installs": [
+        {
+          "command": "run: python -m pip install --disable-pip-version-check -r requirements/requirements-small-numpy-biopython.txt",
+          "line": 29,
+          "pinned": true,
+          "via_requirement_file": true
+        }
+      ],
+      "workflow": ".github/workflows/wfo55-colour-conservatism.yml"
+    },
+    {
+      "family": "other:wfo55",
+      "pip_installs": [
+        {
+          "command": "run: python -m pip install --disable-pip-version-check -r requirements/requirements-small-numpy-scipy-biopython.txt",
+          "line": 31,
+          "pinned": true,
+          "via_requirement_file": true
+        }
+      ],
+      "workflow": ".github/workflows/wfo55-wild-colour-history.yml"
+    },
+    {
+      "family": "other:wu2022",
+      "pip_installs": [
+        {
+          "command": "python -m pip install --disable-pip-version-check -r requirements/requirements-wu2022-pilot.txt",
+          "line": 32,
+          "pinned": true,
+          "via_requirement_file": true
+        }
+      ],
+      "workflow": ".github/workflows/wu2022-angio353-pilot.yml"
+    },
+    {
+      "family": "other:wu2022",
+      "pip_installs": [
+        {
+          "command": "python -m pip install --disable-pip-version-check -r requirements/requirements-wu2022-production.txt",
+          "line": 55,
+          "pinned": true,
+          "via_requirement_file": true
+        }
+      ],
+      "workflow": ".github/workflows/wu2022-angio353-production93-shards.yml"
+    },
+    {
+      "family": "other:wu2022",
+      "pip_installs": [
+        {
+          "command": "- run: python -m pip install --disable-pip-version-check -r requirements/requirements-wu2022-fasttree.txt",
+          "line": 79,
+          "pinned": true,
+          "via_requirement_file": true
+        }
+      ],
+      "workflow": ".github/workflows/wu2022-fasttree-astral-h4-screen.yml"
+    },
+    {
+      "family": "other:wu2022",
+      "pip_installs": [
+        {
+          "command": "- run: python -m pip install --disable-pip-version-check -r requirements/requirements-wu2022-tpia.txt",
+          "line": 32,
+          "pinned": true,
+          "via_requirement_file": true
+        }
+      ],
+      "workflow": ".github/workflows/wu2022-tpia-backbone-assets.yml"
+    }
+  ],
+  "families": {
+    "cross-radiation": 10,
+    "flower-fruit": 1,
+    "flowerclades51": 8,
+    "gesnerioideae": 7,
+    "hidden-memory": 3,
+    "iochrominae": 2,
+    "iris": 7,
+    "merianieae": 2,
+    "other:angraecinae": 4,
+    "other:anr": 1,
+    "other:ans": 1,
+    "other:antirrhineae": 1,
+    "other:camellia": 14,
+    "other:cjdfr": 1,
+    "other:cnfls2": 4,
+    "other:cnitidissima": 2,
+    "other:cperpetua": 3,
+    "other:cryptic": 1,
+    "other:csng": 2,
+    "other:el": 1,
+    "other:erysimum": 1,
+    "other:fan2026": 7,
+    "other:hierarchy": 1,
+    "other:hydrangea": 1,
+    "other:linoideae": 3,
+    "other:macro": 1,
+    "other:ng2018": 4,
+    "other:opentree": 1,
+    "other:phaidra": 2,
+    "other:repository": 1,
+    "other:robust": 1,
+    "other:rooted94": 6,
+    "other:section": 1,
+    "other:stress": 1,
+    "other:tpia": 6,
+    "other:visible": 1,
+    "other:wfo53": 2,
+    "other:wfo55": 2,
+    "other:wu2022": 4,
+    "paper1": 13,
+    "petunieae": 3,
+    "rhododendron": 4,
+    "ruellia": 2,
+    "schistanthe": 4,
+    "solanaceae": 2,
+    "source-first": 2
+  },
+  "unpinned_by_family": {},
+  "unpinned_pip_install_lines": 0,
+  "unpinned_workflows_by_family": {},
+  "workflow_files": 328,
+  "workflows_with_pip_install": 151
+}

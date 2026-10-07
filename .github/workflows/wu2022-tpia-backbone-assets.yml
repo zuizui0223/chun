@@ -4,7 +4,7 @@ name: Wu 2022 TPIA backbone assets
 on:
   pull_request:
     paths:
-      - 'requirements-wu2022-tpia.txt'
+      - 'requirements/requirements-wu2022-tpia.txt'
       - 'scripts/audit_wu2022_tpia_backbone_assets.py'
       - 'scripts/build_wu2022_tpia_preferred_manifest_v2.py'
       - 'scripts/fetch_sra_runinfo.py'
@@ -29,7 +29,7 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
-      - run: python -m pip install --disable-pip-version-check -r requirements-wu2022-tpia.txt
+      - run: python -m pip install --disable-pip-version-check -r requirements/requirements-wu2022-tpia.txt
 
       - name: Resolve PRJNA665925 public RunInfo
         run: |

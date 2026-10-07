@@ -3,7 +3,7 @@ name: Fan 2026 exact GBIF taxon postfilter
 on:
   pull_request:
     paths:
-      - 'requirements-fan2026-gbif.txt'
+      - 'requirements/requirements-fan2026-gbif.txt'
       - 'data/fan2026_chelsa_species_compact_v0_1.csv'
       - 'scripts/postfilter_exact_gbif_thermal_results.py'
       - 'scripts/run_exact_postfilter_live.py'
@@ -22,7 +22,7 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
-      - run: python -m pip install --disable-pip-version-check -r requirements-fan2026-gbif.txt
+      - run: python -m pip install --disable-pip-version-check -r requirements/requirements-fan2026-gbif.txt
       - name: Apply live GBIF exact-match and unique-key gate
         run: |
           python scripts/run_exact_postfilter_live.py \

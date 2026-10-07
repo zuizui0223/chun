@@ -3,7 +3,7 @@ name: TPIA Fan assembly overlap
 on:
   pull_request:
     paths:
-      - 'requirements-tpia-fan.txt'
+      - 'requirements/requirements-tpia-fan.txt'
       - 'scripts/fetch_pmc_cloud_media_v0_1.py'
       - 'scripts/build_fan2026_species_colour_seed.py'
       - 'scripts/audit_tpia_fan_assembly_overlap.py'
@@ -22,7 +22,7 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
-      - run: python -m pip install --disable-pip-version-check -r requirements-tpia-fan.txt
+      - run: python -m pip install --disable-pip-version-check -r requirements/requirements-tpia-fan.txt
       - name: Acquire Fan Data S1 and deterministic species seed
         run: |
           mkdir -p build/tpia_overlap/package build/tpia_overlap/result

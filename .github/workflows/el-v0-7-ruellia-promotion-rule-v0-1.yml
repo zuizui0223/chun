@@ -3,7 +3,7 @@ name: EL v0.7 Ruellia promotion rule v0.1
 on:
   pull_request:
     paths:
-      - 'requirements-el-promotion.txt'
+      - 'requirements/requirements-el-promotion.txt'
       - 'data/el_v0_7_ruellia_promotion_rule_v0_1.json'
       - 'docs/EL_V0_7_RUELLIA_PROMOTION_RULE_V0_1.md'
       - 'tests/test_el_v0_7_ruellia_promotion_rule_v0_1.py'
@@ -22,7 +22,7 @@ jobs:
         with:
           python-version: '3.12'
       - name: Install tests
-        run: python -m pip install --disable-pip-version-check -r requirements-el-promotion.txt
+        run: python -m pip install --disable-pip-version-check -r requirements/requirements-el-promotion.txt
       - name: Promotion-rule tests
         run: pytest -q tests/test_el_v0_7_ruellia_promotion_rule_v0_1.py
       - name: Confirm v0.7 candidate still pending

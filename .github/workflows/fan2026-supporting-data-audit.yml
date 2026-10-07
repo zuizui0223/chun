@@ -3,7 +3,7 @@ name: Fan 2026 supporting data audit
 on:
   pull_request:
     paths:
-      - 'requirements-fan2026-openpyxl.txt'
+      - 'requirements/requirements-fan2026-openpyxl.txt'
       - 'scripts/fetch_pmc_cloud_media_v0_1.py'
       - 'scripts/audit_fan2026_datas1.py'
       - '.github/workflows/fan2026-supporting-data-audit.yml'
@@ -21,7 +21,7 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
-      - run: python -m pip install --disable-pip-version-check -r requirements-fan2026-openpyxl.txt
+      - run: python -m pip install --disable-pip-version-check -r requirements/requirements-fan2026-openpyxl.txt
       - name: Acquire open-access Data S1 through PMC OA package
         run: |
           mkdir -p build/fan2026_datas1/package

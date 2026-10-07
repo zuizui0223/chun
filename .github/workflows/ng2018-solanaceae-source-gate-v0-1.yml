@@ -3,7 +3,7 @@ name: Ng2018 Solanaceae biochemical source gate v0.1
 on:
   pull_request:
     paths:
-      - 'requirements-ng2018-test.txt'
+      - 'requirements/requirements-ng2018-test.txt'
       - 'data/ng2018_solanaceae_hidden_memory_design_v0_1.json'
       - 'scripts/probe_ng2018_solanaceae_sources_v0_1.py'
       - 'tests/test_probe_ng2018_solanaceae_sources_v0_1.py'
@@ -24,7 +24,7 @@ jobs:
         with:
           python-version: '3.12'
       - name: Install tests
-        run: python -m pip install --disable-pip-version-check -r requirements-ng2018-test.txt
+        run: python -m pip install --disable-pip-version-check -r requirements/requirements-ng2018-test.txt
       - name: Unit tests
         run: pytest -q tests/test_probe_ng2018_solanaceae_sources_v0_1.py
       - name: Validate pre-row design

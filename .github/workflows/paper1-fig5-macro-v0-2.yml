@@ -24,7 +24,7 @@ jobs:
         with:
           python-version: '3.12'
       - name: Install plotting dependency
-        run: python -m pip install --disable-pip-version-check -r requirements-paper1-figures.txt
+        run: python -m pip install --disable-pip-version-check -r requirements/requirements-paper1-figures.txt
       - name: Build Fig. 5 from frozen macro source tables
         run: |
           python scripts/build_paper1_fig5_macro_v0_2.py \

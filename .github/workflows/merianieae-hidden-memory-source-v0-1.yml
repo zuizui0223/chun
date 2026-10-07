@@ -3,7 +3,7 @@ name: Merianieae prospective hidden-memory source gate v0.1
 on:
   pull_request:
     paths:
-      - 'requirements-merianieae.txt'
+      - 'requirements/requirements-merianieae.txt'
       - 'data/merianieae_hidden_memory_admission_v0_1.json'
       - 'docs/MERIANIEAE_HIDDEN_MEMORY_ADMISSION_V0_1.md'
       - 'scripts/preflight_merianieae_source_v0_1.py'
@@ -23,7 +23,7 @@ jobs:
         with:
           python-version: '3.12'
       - name: Install runtime
-        run: python -m pip install --disable-pip-version-check -r requirements-merianieae.txt
+        run: python -m pip install --disable-pip-version-check -r requirements/requirements-merianieae.txt
       - name: Unit tests
         run: pytest -q tests/test_preflight_merianieae_source_v0_1.py
       - name: Validate frozen admission

@@ -3,7 +3,7 @@ name: Gesnerioideae FAIL informativeness audit v0.1
 on:
   pull_request:
     paths:
-      - 'requirements-gesnerioideae.txt'
+      - 'requirements/requirements-gesnerioideae.txt'
       - 'scripts/audit_gesnerioideae_fail_informativeness_v0_1.py'
       - 'results/gesnerioideae_fail_informativeness_v0_1/**'
       - 'docs/GESNERIOIDEAE_FAIL_INFORMATIVENESS_V0_1.md'
@@ -22,7 +22,7 @@ jobs:
         with:
           python-version: '3.12'
       - name: Install runtime
-        run: python -m pip install --disable-pip-version-check -r requirements-gesnerioideae.txt
+        run: python -m pip install --disable-pip-version-check -r requirements/requirements-gesnerioideae.txt
       - name: Rebuild frozen identifier frame
         run: |
           python scripts/preflight_gesnerioideae_biochemical_crosswalk_v0_1.py \

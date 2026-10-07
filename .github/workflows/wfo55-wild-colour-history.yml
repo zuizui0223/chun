@@ -3,7 +3,7 @@ name: WFO55 wild colour history and transition gate
 on:
   pull_request:
     paths:
-      - 'requirements-small-numpy-scipy-biopython.txt'
+      - 'requirements/requirements-small-numpy-scipy-biopython.txt'
       - 'scripts/analyze_wfo55_colour_history.py'
       - 'scripts/analyze_wfo55_branch_transitions.py'
       - 'scripts/compare_wfo55_transition_scenarios.py'
@@ -28,7 +28,7 @@ jobs:
         with:
           python-version: '3.12'
       - name: Install dependencies
-        run: python -m pip install --disable-pip-version-check -r requirements-small-numpy-scipy-biopython.txt
+        run: python -m pip install --disable-pip-version-check -r requirements/requirements-small-numpy-scipy-biopython.txt
       - name: Download frozen accepted-species tree and wild-colour seeds
         env:
           GH_TOKEN: ${{ github.token }}

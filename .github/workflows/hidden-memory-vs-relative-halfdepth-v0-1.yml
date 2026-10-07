@@ -3,7 +3,7 @@ name: Hidden memory vs relative half-depth v0.1
 on:
   pull_request:
     paths:
-      - 'requirements-hidden-memory-tree.txt'
+      - 'requirements/requirements-hidden-memory-tree.txt'
       - 'data/hidden_memory_vs_relative_halfdepth_design_v0_1.json'
       - 'scripts/analyze_hidden_memory_vs_relative_halfdepth_v0_1.py'
       - 'results/hidden_memory_vs_relative_halfdepth_v0_1/**'
@@ -25,7 +25,7 @@ jobs:
         with:
           python-version: '3.12'
       - name: Install runtime
-        run: python -m pip install --disable-pip-version-check -r requirements-hidden-memory-tree.txt
+        run: python -m pip install --disable-pip-version-check -r requirements/requirements-hidden-memory-tree.txt
       - name: Validate frozen exploratory design
         run: |
           python - <<'PY'

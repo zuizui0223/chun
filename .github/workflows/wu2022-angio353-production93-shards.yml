@@ -3,7 +3,7 @@ name: Wu 2022 Angiosperms353 runtime-assembled shard recovery
 on:
   pull_request:
     paths:
-      - 'requirements-wu2022-production.txt'
+      - 'requirements/requirements-wu2022-production.txt'
       - 'data/wu2022_public_backbone_manifest_v0_3.csv'
       - 'data/wu2022_tpia_runtime_exclusions_v0_1.csv'
       - 'scripts/build_wu2022_angio353_backbone_panel.py'
@@ -52,7 +52,7 @@ jobs:
       - name: Install marker-recovery tools
         run: |
           sudo apt-get install -y -qq diamond-aligner
-          python -m pip install --disable-pip-version-check -r requirements-wu2022-production.txt
+          python -m pip install --disable-pip-version-check -r requirements/requirements-wu2022-production.txt
       - name: Fetch Angiosperms353 targets
         run: |
           mkdir -p build/targets

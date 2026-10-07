@@ -24,7 +24,7 @@ jobs:
           python-version: "3.12"
 
       - name: Install pinned integrity dependencies
-        run: python -m pip install --disable-pip-version-check -r requirements-repository-integrity.txt
+        run: python -m pip install --disable-pip-version-check -r requirements/requirements-repository-integrity.txt
 
       - name: Validate all workflow YAML
         run: python scripts/check_workflow_yaml_integrity_v0_1.py

@@ -3,7 +3,7 @@ name: Merianieae prospective hidden-memory pipeline v0.1
 on:
   pull_request:
     paths:
-      - 'requirements-merianieae.txt'
+      - 'requirements/requirements-merianieae.txt'
       - 'data/merianieae_hidden_memory_admission_v0_1.json'
       - 'data/merianieae_prospective_terminal_v0_1.json'
       - 'docs/MERIANIEAE_PROSPECTIVE_SCHEMA_HOLD_V0_1.md'
@@ -38,7 +38,7 @@ jobs:
         with:
           python-version: '3.12'
       - name: Install runtime
-        run: python -m pip install --disable-pip-version-check -r requirements-merianieae.txt
+        run: python -m pip install --disable-pip-version-check -r requirements/requirements-merianieae.txt
       - name: Unit tests
         run: |
           pytest -q \
