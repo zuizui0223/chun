@@ -1,0 +1,132 @@
+name: Bootstrap requirements directory migration
+
+on:
+  push:
+    branches:
+      - chore/requirements-directory-migration
+
+permissions:
+  contents: write
+
+jobs:
+  migrate:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          ref: chore/requirements-directory-migration
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Move root requirement files and rewrite tracked references
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          from pathlib import Path
+          import subprocess
+
+          root = Path(".")
+          old_files = sorted(p for p in root.glob("requirements-*.txt") if p.is_file())
+          if len(old_files) != 62:
+              raise SystemExit(f"expected exactly 62 root requirement files before migration, found {len(old_files)}")
+
+          names = [p.name for p in old_files]
+          reqdir = root / "requirements"
+          reqdir.mkdir(exist_ok=True)
+
+          for path in old_files:
+              subprocess.run(["git", "mv", str(path), str(reqdir / path.name)], check=True)
+
+          bootstrap = ".github/workflows/requirements-directory-migration-bootstrap.yml"
+          tracked = subprocess.check_output(["git", "ls-files", "-z"]).decode().split("\0")
+          changed = []
+          for rel in tracked:
+              if not rel or rel == bootstrap or rel.startswith("requirements/"):
+                  continue
+              path = root / rel
+              if not path.is_file():
+                  continue
+              try:
+                  text = path.read_text(encoding="utf-8")
+              except UnicodeDecodeError:
+                  continue
+              updated = text
+              for name in names:
+                  updated = updated.replace(name, f"requirements/{name}")
+              if updated != text:
+                  path.write_text(updated, encoding="utf-8")
+                  changed.append(rel)
+
+          test_path = root / "tests" / "test_requirements_layout_v0_1.py"
+          test_path.write_text(
+              '''from pathlib import Path\n\n\nROOT = Path(__file__).resolve().parents[1]\n\n\ndef test_no_root_requirement_files_remain() -> None:\n    assert sorted(p.name for p in ROOT.glob("requirements-*.txt")) == []\n\n\ndef test_requirement_files_live_under_requirements_directory() -> None:\n    reqdir = ROOT / "requirements"\n    assert reqdir.is_dir()\n    files = sorted(reqdir.glob("requirements-*.txt"))\n    assert files\n    assert all(p.is_file() for p in files)\n''',
+              encoding="utf-8",
+          )
+
+          readme = reqdir / "README.md"
+          readme.write_text(
+              """# Dependency environments\n\nPinned Python requirement files live in this directory. This migration changes paths only; it does not normalize package versions.\n\nSome files intentionally preserve historical replay environments. In particular, `requirements-petunieae-cross-level.txt` retains the dependency versions used for its frozen prospective result and must not be upgraded merely to match newer repository-wide pins.\n""",
+              encoding="utf-8",
+          )
+
+          # Verify every old root filename reference was rewritten outside this bootstrap file
+          # and the moved requirement files themselves.
+          unresolved = []
+          tracked_after = subprocess.check_output(["git", "ls-files", "-z"]).decode().split("\0")
+          for rel in tracked_after:
+              if not rel or rel == bootstrap or rel.startswith("requirements/"):
+                  continue
+              path = root / rel
+              if not path.is_file():
+                  continue
+              try:
+                  text = path.read_text(encoding="utf-8")
+              except UnicodeDecodeError:
+                  continue
+              for name in names:
+                  needle = name
+                  start = 0
+                  while True:
+                      idx = text.find(needle, start)
+                      if idx < 0:
+                          break
+                      prefix = text[max(0, idx - len("requirements/")):idx]
+                      if prefix != "requirements/":
+                          unresolved.append((rel, name))
+                          break
+                      start = idx + len(needle)
+          if unresolved:
+              raise SystemExit(f"unresolved root requirement references: {unresolved[:20]}")
+
+          print({"moved_requirement_files": len(names), "rewritten_tracked_files": len(changed)})
+          PY
+
+      - name: Remove bootstrap workflow from migrated tree
+        run: git rm .github/workflows/requirements-directory-migration-bootstrap.yml
+
+      - name: Install migrated integrity environment
+        run: python -m pip install --disable-pip-version-check -r requirements/requirements-repository-integrity.txt
+
+      - name: Validate migrated repository
+        run: |
+          python scripts/check_workflow_yaml_integrity_v0_1.py
+          pytest -q tests
+          python scripts/audit_ci_dependency_pinning_v0_1.py \
+            --base-ref origin/main \
+            --require-zero \
+            --report-out build/ci_dependency_inventory.json
+
+      - name: Commit migration
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          git diff --cached --check
+          git status --short
+          git commit -m "Consolidate requirement files under requirements directory"
+          git push origin HEAD:chore/requirements-directory-migration
