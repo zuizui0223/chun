@@ -70,3 +70,13 @@ The existing *Camellia* Paper 1 full literature ascertainment, macro coding/topo
 The combined article outline and evidence gate are implemented as isolated proposal files. Neither original first-submission route is deprecated or modified. They remain valid fallback deliverables while the stronger one-paper cross-level link is evaluated. Replacing those routes also requires author approval, intellectual-property/data-rights checks, journal choice, and integration of overlapping acknowledgements.
 
 The next actual research test is **an independent same-taxa/phylogeny replication of the Petunieae within-fine-pigment-class expression-history test**, preferably Iochrominae after verifying exact source access. Do not retrofit another favourable gene subset onto the outcome-open Petunieae sample or re-fit the existing 21-clade moderators.
+
+## Independent Iochrominae source-audit result — 2026-10-08
+
+The 2018 comparative expression study (Larter et al., DOI 10.1093/molbev/msy117; 28 species, seven pigment-pathway genes) cites Smith & Goldberg (2015, DOI 10.3732/ajb.1500163) for its tree. Its original archived tree is Dryad DOI 10.5061/dryad.0732g, version 3567, file ModeandTempoFlColor.zip (686,186 bytes; MD5 78957f5320749f5c022de78e8ad1ab32). This is distinct from the later Smith–Kriebel 2018 floral-shape tree (10.5061/dryad.5jn7b) and Larter 2019 developmental Dvdy source (10.5061/dryad.p5dq84v).
+
+The exact original-tree archive name, size and MD5 were verified from live Dryad metadata. Both ordinary unauthenticated file-download and whole-dataset-download requests returned **HTTP 401 Unauthorized** on hosted run 37763678309. The tree archive has not been recovered or opened. A complete, species-level seven-gene qPCR numeric matrix for the 2018 paper has also not been source-verified. No new independent Iochrominae conditional-memory statistic was computed.
+
+Thus the combined-manuscript promotion ceiling remains **one retrospective Petunieae nested biochemical-to-expression analysis**, not two independent radiations. Source-specific next steps are recorded in [Issue #415](https://github.com/zuizui0223/chun/issues/415). The legitimate authenticated exact-tree archive and species-level qPCR matrix are the missing inputs, not more tuning of Petunieae.
+
+This is a source-access HOLD, not a negative biological result, and does not change any existing Evolution Letters or AJB scientific freeze.
