@@ -4,6 +4,7 @@ on:
   pull_request:
     paths:
       - 'data/petunieae_nested_regulatory_leaveoneout_prediction_design_v0_1.json'
+      - 'results/petunieae_nested_regulatory_leaveoneout_prediction_v0_1/result_v0_1.json'
       - 'scripts/run_petunieae_nested_regulatory_leaveoneout_prediction_v0_1.py'
       - 'tests/test_petunieae_nested_regulatory_leaveoneout_prediction_v0_1.py'
       - '.github/workflows/petunieae-regulatory-heldout-prediction-v0-1.yml'
@@ -54,7 +55,21 @@ jobs:
           assert r['not_prospective_independent_validation'] is True
           assert r['original_paper1_and_el_science_unchanged'] is True
           assert r['source_verified'] is True
-          print('PETUNIEAE_RETROSPECTIVE_PREDICTION_RESULT',r['decision'],r['observed_relative_prediction_gain'],r['p_one_sided'])
+          # A P value against shuffled assignments cannot override a failed
+          # positive-gain requirement against the pigment-class mean baseline.
+          assert r['decision']=='NOT_SUPPORTED'
+          assert r['observed_relative_prediction_gain']<0
+          assert r['p_one_sided']<=0.05
+          recorded=json.loads(Path('results/petunieae_nested_regulatory_leaveoneout_prediction_v0_1/result_v0_1.json').read_text())
+          assert recorded['decision']=='NOT_SUPPORTED'
+          for key in ['baseline_loss','neighbor_loss','observed_relative_prediction_gain',
+                      'permutation_null_mean','permutation_null_q025','permutation_null_q975']:
+              assert abs(r[key]-recorded[key])<=1e-7, (key,r[key],recorded[key])
+          assert abs(r['p_one_sided']-recorded['p_one_sided'])<=0.0001
+          assert r['fine_state_counts']==recorded['fine_state_counts']
+          assert r['leave_one_fine_class_out_descriptive']['positive']==recorded['leave_one_fine_class_out_descriptive']['positive']==0
+          print('PETUNIEAE_RETROSPECTIVE_PREDICTION_REPLAY_PASS',
+                r['decision'],r['observed_relative_prediction_gain'],r['p_one_sided'])
           PY
       - uses: actions/upload-artifact@v4
         if: always()
