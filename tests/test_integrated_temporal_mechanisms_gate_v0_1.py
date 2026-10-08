@@ -85,3 +85,23 @@ def test_proposal_cannot_relabel_distinct_evidence_tiers_as_joint_causal_result(
     assert "0 exact matches" in decision
     for row in d["governance"]["prior_art"]:
         assert row["doi"] in manuscript or row["doi"] in decision
+
+
+def test_integrated_single_radiation_bridge_is_matched_but_not_cross_radiation_causal() -> None:
+    d = _gate()
+    b = d["cross_tier_linkage"]["new_single_radiation_matched_petunieae_bridge"]
+    r = json.loads((ROOT / b["source"]).read_text(encoding="utf-8"))
+    assert b["status"] == "POSITIVE_EXPLORATORY"
+    assert b["same_tree_tips"] == r["retained_tips"] == 47
+    assert b["exact_six_anthocyanidin_presence_class_pair_count"] == 183
+    assert b["gene_expression_dimensions"] == 21
+    assert b["expression_distance_tree_distance_spearman_rho"] == pytest.approx(
+        r["primary_conditional_expression_memory"]["rho"], rel=0, abs=1e-14
+    )
+    assert b["within_fine_permutation_one_sided_p"] == r["primary_conditional_expression_memory"]["p_one_sided"] == 0.0001
+    assert b["leave_one_tip_out_positive_count"] == 47
+    assert b["earlier_pigment_memory_test_is_same_47_tip_source"] is True
+    assert b["not_joint_32_by_7_mechanism_memory_slope"] is True
+    assert d["cross_tier_linkage"]["current_same_radiation_quantitative_mechanism_memory_association_estimated"] is False
+    assert "RETROSPECTIVE" in b["prospective_status"]
+    assert "independent" in d["governance"]["submission_decision"].lower()
