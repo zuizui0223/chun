@@ -123,7 +123,8 @@ def fig5a(data: dict, out: Path) -> None:
     plt.close(fig)
 
 def fig5b(data: dict, out: Path) -> None:
-    fig, ax = plt.subplots(figsize=(8.8, 5.2), layout="constrained")
+    fig, ax = plt.subplots(figsize=(9.5, 5.6))
+    fig.subplots_adjust(left=0.32, right=0.97, top=0.82, bottom=0.29)
     y = np.arange(3)
     colors = ["#688393","#B3BDC5","#2B647A"]
     bars = ax.barh(y, data["mse"], height=0.58, color=colors, edgecolor="none")
@@ -131,17 +132,17 @@ def fig5b(data: dict, out: Path) -> None:
     ax.invert_yaxis()
     ax.set_xlim(0, 1.70)
     ax.set_xlabel("Held-out 21-gene standardized mean squared error (lower is better)")
-    ax.set_title("Fig. 5B  Phylogenetic locality helps, but two donors cannot beat the class mean",
-                 fontsize=12,loc="left")
+    ax.set_title("Fig. 5B  Phylogenetic locality versus donor number",
+                 fontsize=12,loc="left",pad=11)
     for rect,v in zip(bars,data["mse"]):
         ax.text(v+0.025,rect.get_y()+rect.get_height()/2,f"{v:.3f}",
                 va="center",ha="left",fontsize=11,weight="semibold")
-    ax.text(0.04,.01,
-            "Exact same-class donor-count decomposition:\n"
-            "two-donor penalty  +23.5%  |  nearest-relative recovery  −13.6%  |  net  +9.9%\n"
-            "Frozen nearest-two prediction criterion: NOT SUPPORTED",
-            transform=ax.transAxes,fontsize=9.1,ha="left",va="bottom",
-            bbox={"facecolor":"white","edgecolor":"none","alpha":0.94,"boxstyle":"round,pad=0.3"})
+    # Report annotation BELOW the axes, rather than covering the third bar.
+    fig.text(0.32,0.105,
+             "Relative to the class mean: two-donor penalty +23.5%; "
+             "phylogenetic recovery −13.6%; net +9.9%\n"
+             "Frozen nearest-two prediction: NOT SUPPORTED",
+             fontsize=9.2,ha="left",va="bottom")
     ax.spines[["top","right"]].set_visible(False)
     fig.savefig(out.with_suffix(".png"),dpi=250)
     fig.savefig(out.with_suffix(".svg"))
