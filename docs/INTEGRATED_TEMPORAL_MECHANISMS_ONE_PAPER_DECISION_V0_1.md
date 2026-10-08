@@ -2,7 +2,7 @@
 
 ## Verdict
 
-**Scientifically coherent as one synthesis manuscript; not yet established as one direct quantitative causal/inferential study.** The proper principal evidence is the multi-radiation hierarchical-memory analysis; *Camellia* moves into the mechanistic diversity tier, alongside six other examples.
+**Scientifically coherent as one synthesis manuscript. A retrospective, same-phylogeny Petunieae biochemical-to-expression result is now measured, but cross-radiation causal and generalization claims remain unestablished.** The proper principal evidence is the multi-radiation hierarchical-memory analysis; *Camellia* moves into the mechanistic diversity tier, alongside six other examples.
 
 A naïve merger of the complete six-figure *Camellia* AJB paper and the Evolution Letters v0.3 figures would create a long, two-centre manuscript. It is not recommended. The new draft instead concentrates on one question:
 
@@ -19,11 +19,18 @@ Do not equate (i) phenotype similarity vs relative distance; (ii) additional wit
 | Independent visible validation | *Schistanthe* prospective PASS | Not wholly an exploratory post-outcome story |
 | Biochemical transport | Petunieae retrospective PASS; Gesnerioideae prospective FAIL | Not universal across representations |
 | Mechanism benchmark | Seven distinct comparative systems | Supports diversity of recurrence level, **not seven pooled estimates** |
-| Direct same-unit overlap | 0 exact matches between 32-clade table and 7-case mechanism table | **No current mechanism–memory correlation can be claimed** |
+| Direct overlap of the ORIGINAL 32×7 cohorts | 0 exact named analysis-unit matches | **No cross-radiation mechanism–memory slope is identifiable** |
+| NEW same-phylogeny Petunieae bridge | 47 taxa, 183 exact-six-bit-pigment-matched pairs; expression–distance rho +0.6074, P=0.0001 | Retrospective, fixed before this new statistic but not independently outcome-unexposed; **supports hidden pathway-expression history within finer pigment identity in one radiation** |
 | *Camellia* placement | Excluded from main 32-clade source frame | Mechanistic case, **not** the flagship replicate in temporal decay |
 | Raw-event linkage | *Camellia* has no robust shared historical branch set across strict/dominant coding | Molecular RNA-seq contrasts must not be labelled macro historical origins |
 
 The exact-name overlap calculation compares those table-defined analysis units. Broader nesting (e.g. Solanaceae) is not a valid exact matched cohort.
+
+## New completed source-matched biological bridge
+
+The already existing Petunieae analysis showed that exact six-anthocyanidin pigment-presence identity retains phylogenetic information inside coarse anthocyanidin-present/absent classes on a 47-tip dated tree (centered conditional AUC +0.1879, P=0.0001). A newly commit-fixed, retrospective same-tree test now shows that the full 21-gene expression vector also retains phylogenetic organization among the **183 taxon pairs already sharing an identical six-bit pigment-presence code** (Spearman rho +0.60744; one-sided within-fine-vector permutation P=0.0001). The secondary nine-pigment concentration comparison (rho +0.21986; P=0.0554) did not pass its nominal threshold and was not tested as a significant difference from the expression statistic. All 47 leave-one-tip-out gene-expression rho values were positive; six leave-one-fine-class-out checks were performed after observing the result and are descriptive only.
+
+This is the first **directly matched** bridge in the present integrated work, but it is one retrospective radiation, not a new cross-radiation estimate of the causes of relative-depth visible-colour memory. Exact fine code is compound *presence*, not equal pigment quantities, and gene expression is not a genetically proven causal route. See `docs/PETUNIEAE_NESTED_REGULATORY_MEMORY_RESULT_V0_1.md`.
 
 ## Contribution vs existing prior art
 
@@ -31,7 +38,7 @@ The exact-name overlap calculation compares those table-defined analysis units. 
 - **Not new:** repeated late-pathway expression convergence and branching/hue dependence (Larter et al. 2018, DOI 10.1093/molbev/msy117).
 - **Not new:** hierarchical/multi-level convergence as a concept (Lau et al. 2021, DOI 10.1111/brv.12672).
 - **Potentially new empirical addition:** one frozen conditional within-coarse approach supports fine-state historical organization across 18/21 standardized clades, with prospective visible validation, alongside explicit prospective failure of biochemical generalization. Different molecular repetition levels provide biological *examples and hypotheses*, not direct explanatory covariates.
-- **Unresolved stronger novelty:** demonstrate in at least one matched biological radiation a distance-conditioned *phenotype–pigment–module* contrast and validate its inference beyond that initial radiation.
+- **Stronger new empirical layer now present:** one retrospective same-phylogeny Petunieae *fine pigment class–21-gene expression* conditional association. Its novelty over Ng & Smith (2016) is the more restrictive multicomponent pigment-presence conditioning, but this still needs direct critical prior-art and independent-radiation validation. It is **not yet** a three-way visible phenotype–pigment–causal molecular implementation test.
 
 A general-evolution journal decision should be re-opened only against an actual completed new bridge and current prior art, not based on the combined length of two papers.
 
@@ -62,4 +69,4 @@ The existing *Camellia* Paper 1 full literature ascertainment, macro coding/topo
 
 The combined article outline and evidence gate are implemented as isolated proposal files. Neither original first-submission route is deprecated or modified. They remain valid fallback deliverables while the stronger one-paper cross-level link is evaluated. Replacing those routes also requires author approval, intellectual-property/data-rights checks, journal choice, and integration of overlapping acknowledgements.
 
-The next actual research test should be **a matched-source bridge feasibility and outcome-independent protocol**, not a re-fit of already opened 21-clade moderators or a fourth rebranding of negative Iris results.
+The next actual research test is **an independent same-taxa/phylogeny replication of the Petunieae within-fine-pigment-class expression-history test**, preferably Iochrominae after verifying exact source access. Do not retrofit another favourable gene subset onto the outcome-open Petunieae sample or re-fit the existing 21-clade moderators.
