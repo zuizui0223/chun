@@ -62,6 +62,7 @@ def chart_data(source: Path) -> tuple[dict, dict]:
         "patristic_distance": xx.tolist(),
         "expression_rms": yy.tolist(),
         "rho": rr,
+        "null_mean_rho": observed["null_mean_rho"],
         "pair_count": len(ii),
         "tip_count": len(names),
         "gene_count": standardized.shape[1],
@@ -99,8 +100,8 @@ def fig5a(data: dict, out: Path) -> None:
     ax.set_title("Fig. 5A  Gene-expression history inside identical pigment-presence states",
                  fontsize=12, loc="left")
     ax.text(.02,.98,
-            f"47 tips; 183 same-six-bit-pigment pairs\nSpearman rho = {data['rho']:+.3f}; "
-            "within-class permutation P = 0.0001",
+            f"47 tips; 183 same-six-bit-pigment pairs\nObserved Spearman rho = {data['rho']:+.3f}\n"
+            f"Within-class permutation null mean rho = {data['null_mean_rho']:+.3f}; P = 0.0001",
             transform=ax.transAxes, va="top", ha="left", fontsize=9.2,
             bbox={"facecolor":"white","edgecolor":"none","alpha":0.86,"boxstyle":"round,pad=0.3"})
     ax.text(.98,.02,
