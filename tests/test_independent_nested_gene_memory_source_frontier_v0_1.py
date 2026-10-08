@@ -9,7 +9,7 @@ FRONTIER = ROOT / "data/independent_nested_gene_memory_source_frontier_v0_1.json
 
 def test_independent_expression_bridge_remains_unreplicated() -> None:
     d = json.loads(FRONTIER.read_text(encoding="utf-8"))
-    assert d["status"].startswith("INDEPENDENT_MATCHED_RADIATION_SOURCE_PREFLIGHT")
+    assert d["status"] == "INDEPENDENT_SOURCE_FRONTIER_AUDITED_NO_NEW_COMPLETE_MATCHED_REPLICATE"
     assert d["admission_status"]["independently_replicated_petunieae_exact_sixbit_conditional_21gene_test"] is False
     assert d["admission_status"]["numeric_new_radiations_admitted"] == 0
     assert d["admission_status"]["no_figure_digitization_as_raw_numeric_source"] is True
