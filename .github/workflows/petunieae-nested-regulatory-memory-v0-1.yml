@@ -6,6 +6,9 @@ on:
       - 'data/petunieae_nested_regulatory_memory_preregistered_design_v0_1.json'
       - 'results/petunieae_nested_regulatory_memory_v0_1/**'
       - 'scripts/analyze_petunieae_nested_regulatory_memory_v0_1.py'
+      - 'scripts/audit_petunieae_fine_pigment_state_retention_v0_1.py'
+      - 'tests/test_petunieae_fine_pigment_state_retention_v0_1.py'
+      - 'results/petunieae_fine_pigment_state_retention_v0_1/coverage_v0_1.json'
       - 'tests/test_petunieae_nested_regulatory_memory_v0_1.py'
       - 'requirements/requirements-repository-integrity.txt'
       - '.github/workflows/petunieae-nested-regulatory-memory-v0-1.yml'
@@ -66,8 +69,25 @@ jobs:
           print('PUBLISHED_RESULT_REPLAY_PASS')
           PY
 
+      - name: Audit frozen six-compound source-to-retained-state coverage
+        run: |
+          python scripts/audit_petunieae_fine_pigment_state_retention_v0_1.py \
+            --source build/petunieae_frozen_source \
+            --design data/petunieae_nested_regulatory_memory_preregistered_design_v0_1.json \
+            --out build/petunieae_nested_regulatory_memory/coverage_v0_1.json
+          python - <<'PY'
+          import json
+          a=json.load(open('build/petunieae_nested_regulatory_memory/coverage_v0_1.json'))
+          b=json.load(open('results/petunieae_fine_pigment_state_retention_v0_1/coverage_v0_1.json'))
+          assert a==b,('source-coverage drift',a,b)
+          assert a['retained_variable_anthocyanidin_compounds']==['Del_mgg','Pet_mgg','Malv_mgg']
+          assert a['retained_constant_zero_anthocyanidin_compounds']==['Pel_mgg','Cyan_mgg','Peon_mgg']
+          assert a['excluded_tips']==12
+          print('PETUNIEAE_SIXBIT_EFFECTIVE_THREE_COMPONENT_COVERAGE_PASS')
+          PY
+
       - name: Test program invariants without requiring source download
-        run: pytest -q tests/test_petunieae_nested_regulatory_memory_v0_1.py tests/test_integrated_temporal_mechanisms_gate_v0_1.py
+        run: pytest -q tests/test_petunieae_nested_regulatory_memory_v0_1.py tests/test_integrated_temporal_mechanisms_gate_v0_1.py tests/test_petunieae_fine_pigment_state_retention_v0_1.py
 
       - uses: actions/upload-artifact@v4
         if: always()
