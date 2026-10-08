@@ -48,7 +48,8 @@ def test_figure5a_is_descriptive_and_never_claims_pair_independence(tmp_path):
     assert (tmp_path/"figure5a.png").stat().st_size>10000
     svg=(tmp_path/"figure5a.svg").read_text()
     assert "Pairs are not independent replicates" in svg
-    assert "Taxon-vector permutations supply inference" in svg
+    assert "taxon-vector permutation supplies inference" in svg
+    assert "Only Del/Pet/Malv vary after the rare-state gate" in svg
 
 
 def test_figure5_sources_are_frozen_and_no_claim_promotion():
@@ -61,3 +62,17 @@ def test_figure5_sources_are_frozen_and_no_claim_promotion():
     assert heldout["neighbor_loss"]==pytest.approx(decomp["nearest_two_mse"],abs=1e-10)
     assert decomp["random_two_expected_mse"]>decomp["nearest_two_mse"]>decomp["state_only_mse"]
     assert reg["primary_conditional_expression_memory"]["rho"]==pytest.approx(0.607443846759381,abs=1e-10)
+
+
+def test_figure5_retained_pigment_scope_qualifications_are_source_backed():
+    coverage=mod.load_json(mod.COVERAGE)
+    assert coverage["unfiltered_ingroup_tips"]==59
+    assert coverage["retained_tips"]==47
+    assert coverage["excluded_tips"]==12
+    assert coverage["retained_variable_anthocyanidin_compounds"]==[
+        "Del_mgg","Pet_mgg","Malv_mgg"
+    ]
+    assert coverage["retained_constant_zero_anthocyanidin_compounds"]==[
+        "Pel_mgg","Cyan_mgg","Peon_mgg"
+    ]
+    assert coverage["three_bit_reduction_preserves_fine_partition"] is True
