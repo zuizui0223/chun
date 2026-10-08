@@ -37,7 +37,7 @@ def test_iochrominae_publications_and_tree_objects_cannot_be_conflated() -> None
 
 def test_no_other_candidate_is_falsely_promoted() -> None:
     d = json.loads(FRONTIER.read_text(encoding="utf-8"))
-    assert len(d["candidates"]) == 5
+    assert len(d["candidates"]) == 7
     assert all(x.get("current_status",x.get("status","")).startswith(("HOLD_","PIGMENT_","INDEPENDENT_","SMALL_"))
                for x in d["candidates"])
 
@@ -56,3 +56,29 @@ def test_original_iochrominae_tree_http401_is_source_access_hold_not_negative_re
     assert receipt["expression_2018_28taxa_qpcr_numeric_table_recovered"] is False
     assert receipt["phylogenetic_tree_members_examined"] is False
     assert receipt["changed_frozen_science"] is False
+
+
+def test_epimedium_not_qualified_as_an_independent_same_tip_gene_memory_replication():
+    d=json.loads(FRONTIER.read_text(encoding="utf-8"))
+    by={x["id"]:x for x in d["candidates"]}
+    epi=by["EPIMEDIUM_MI2023_EIGHT_ACCESSIONS"]
+    assert epi["source_paper_doi"]=="10.3389/fpls.2023.1133616"
+    assert epi["qPCR_accession_n"]==8
+    assert epi["qpcr_pathway_gene_n"]==12
+    assert epi["qPCR_to_tree_accession_crosswalk_verified"] is False
+    assert epi["exact_molecular_sample_tree_source_match"] is False
+    assert epi["replicate_admitted"] is False
+    assert epi["current_status"].startswith("HOLD_")
+    assert {"Epimedium acuminatum","Epimedium leptorrhizum"} <= set(epi["known_polymorphism_in_molecular_A_plus_taxa"])
+
+
+def test_iochroma_2025_backcross_samples_are_not_independent_species_tips():
+    d=json.loads(FRONTIER.read_text(encoding="utf-8"))
+    by={x["id"]:x for x in d["candidates"]}
+    w=by["IOCHROMA_WHEELER2025_SIX_SPECIES"]
+    assert w["source_paper_doi"]=="10.1093/g3journal/jkaf230"
+    assert w["source_data_doi"]=="10.17605/OSF.IO/J5M8F"
+    assert w["comparative_rnaseq_n"]==6
+    assert w["within_species_backcross_individuals"]==24
+    assert w["replicate_admitted"] is False
+    assert w["current_status"].startswith("SMALL_")
