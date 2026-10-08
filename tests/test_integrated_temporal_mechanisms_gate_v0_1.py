@@ -82,7 +82,7 @@ def test_proposal_cannot_relabel_distinct_evidence_tiers_as_joint_causal_result(
     ):
         assert phrase.lower() in manuscript.lower()
     assert "SINGLE-ARTICLE_SUBMISSION_HOLD" in decision
-    assert "0 exact matches" in decision
+    assert "0 exact named analysis-unit matches" in decision
     for row in d["governance"]["prior_art"]:
         assert row["doi"] in manuscript or row["doi"] in decision
 
