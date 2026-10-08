@@ -1,0 +1,65 @@
+{
+  "version": "v0.1",
+  "status": "PETUNIEAE_FROZEN_RARE_STATE_FILTER_COVERAGE_AUDITED",
+  "source_verified": true,
+  "unfiltered_ingroup_tips": 59,
+  "retained_tips": 47,
+  "excluded_tips": 12,
+  "fine_states_unfiltered": 15,
+  "fine_states_retained": 6,
+  "unfiltered_sixbit_state_counts": {
+    "100011": 1,
+    "100111": 1,
+    "101111": 4,
+    "110100": 1,
+    "000000": 6,
+    "000010": 6,
+    "000011": 6,
+    "000100": 10,
+    "000101": 1,
+    "000110": 6,
+    "000111": 13,
+    "001111": 1,
+    "010000": 1,
+    "010110": 1,
+    "011111": 1
+  },
+  "retained_sixbit_state_counts": {
+    "000000": 6,
+    "000010": 6,
+    "000011": 6,
+    "000100": 10,
+    "000110": 6,
+    "000111": 13
+  },
+  "retained_compound_positive_tips": {
+    "Pel_mgg": 0,
+    "Cyan_mgg": 0,
+    "Peon_mgg": 0,
+    "Del_mgg": 29,
+    "Pet_mgg": 31,
+    "Malv_mgg": 19
+  },
+  "excluded_compound_positive_tips": {
+    "Pel_mgg": 7,
+    "Cyan_mgg": 4,
+    "Peon_mgg": 6,
+    "Del_mgg": 10,
+    "Pet_mgg": 9,
+    "Malv_mgg": 9
+  },
+  "retained_variable_anthocyanidin_compounds": [
+    "Del_mgg",
+    "Pet_mgg",
+    "Malv_mgg"
+  ],
+  "retained_constant_zero_anthocyanidin_compounds": [
+    "Pel_mgg",
+    "Cyan_mgg",
+    "Peon_mgg"
+  ],
+  "all_rare_branch_positive_removed": true,
+  "three_bit_reduction_preserves_fine_partition": true,
+  "primary_cohort_or_result_changed": false,
+  "claim_boundary": "The 47-tip molecular-memory result conditions on the six-source-compound assay, but only the Del/Pet/Malv derivatives vary after its frozen rare-state filtering. No tested inference covers within-class regulatory memory for retained Pel/Cyan/Peon-positive species."
+}
