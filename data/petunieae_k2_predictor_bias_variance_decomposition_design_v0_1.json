@@ -1,0 +1,28 @@
+{
+  "version": "v0.1",
+  "status": "EXPLORATORY_DIAGNOSTIC_FIXED_AFTER_PRIMARY_PREDICTION_FAIL_BEFORE_DECOMPOSITION_OUTCOME",
+  "source": "results/petunieae_nested_regulatory_leaveoneout_prediction_v0_1/result_v0_1.json",
+  "source_design": "data/petunieae_nested_regulatory_leaveoneout_prediction_design_v0_1.json",
+  "question": "How much of the observed nearest-two prediction failure is explained by using only two donors, versus the information gained by selecting those two donors using phylogenetic proximity?",
+  "fixed_units": "Same 47 held-out tips, 21 fixed log1p TPM10K genes, six exact six-bit pigment-presence classes, no source/feature/threshold changes",
+  "same_fold_error": "training-only among-other-46-species gene variance as already frozen",
+  "derivation": "For the m=n_state-1 eligible other-species donors of one held-out tip and gene, the expected squared error of uniformly sampling a pair of donors WITHOUT REPLACEMENT equals (target - full-donor-class mean)^2 + [(m-2)/(2*(m-1))]*popvariance among the m donor measurements. This is an exact finite-population identity, conditional on the observed data; not an evolutionary process model.",
+  "outputs": [
+    "L_state: already frozen full-state-donor MSE",
+    "L_random2: exact expected random-two-donor MSE",
+    "L_nearest2: already frozen 2-phylogenetic-nearest MSE",
+    "small_donor_penalty=L_random2-L_state",
+    "locality_gain_over_random2=L_random2-L_nearest2",
+    "net_penalty=L_nearest2-L_state=small_donor_penalty-locality_gain_over_random2",
+    "normalized_by_state_baseline: each contrast / L_state"
+  ],
+  "rule": "For each heldout tip, average all 21 fixed genes after dividing by frozen fold-specific training variance; then mean equally over 47 tips. Only the random-two expected prediction error is new.",
+  "interpretation": "If both small_donor_penalty and locality_gain_over_random2 are positive and penalty exceeds gain, small-k donor-mean variance can explain the signed net failure despite a useful phylogenetic locality effect.",
+  "inference": "Descriptive exact algebra only. No new P value, no new k choice, no alternative gene selection, no claims of independent replication or biological causation.",
+  "governance": {
+    "primary_gain_from_old_result": -0.0990780619015505,
+    "primary_decision": "NOT_SUPPORTED",
+    "primary_result_never_reclassified": true,
+    "remaining_independent_radiation_source_hold": true
+  }
+}
