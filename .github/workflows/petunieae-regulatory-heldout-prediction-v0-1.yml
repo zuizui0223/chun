@@ -1,0 +1,64 @@
+name: Petunieae within-pigment-state heldout expression prediction v0.1
+
+on:
+  pull_request:
+    paths:
+      - 'data/petunieae_nested_regulatory_leaveoneout_prediction_design_v0_1.json'
+      - 'scripts/run_petunieae_nested_regulatory_leaveoneout_prediction_v0_1.py'
+      - 'tests/test_petunieae_nested_regulatory_leaveoneout_prediction_v0_1.py'
+      - '.github/workflows/petunieae-regulatory-heldout-prediction-v0-1.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  actions: read
+
+jobs:
+  heldout-prediction:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install pinned dependencies
+        run: python -m pip install --disable-pip-version-check -r requirements/requirements-repository-integrity.txt
+      - name: Test predeclared non-leaking predictor
+        run: pytest -q tests/test_petunieae_nested_regulatory_leaveoneout_prediction_v0_1.py
+      - name: Recover SHA-frozen public data through prior deposited GitHub artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: petunieae-prospective-osf-v0-1
+          repository: zuizui0223/chun
+          run-id: 34182646549
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          path: build/petunieae_frozen_source
+      - name: Perform frozen 9999-permutation tip-heldout prediction
+        run: |
+          python scripts/run_petunieae_nested_regulatory_leaveoneout_prediction_v0_1.py \
+            --source build/petunieae_frozen_source \
+            --design data/petunieae_nested_regulatory_leaveoneout_prediction_design_v0_1.json \
+            --original-design data/petunieae_nested_regulatory_memory_preregistered_design_v0_1.json \
+            --out build/petunieae_regulatory_heldout_prediction_v0_1.json
+      - name: Enforce no prospective or cross-radiation promotion
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          r=json.loads(Path('build/petunieae_regulatory_heldout_prediction_v0_1.json').read_text())
+          assert r['retained_tips']==47
+          assert r['neighbor_k']==2
+          assert r['expression_genes']==21
+          assert r['permutations']==9999
+          assert r['not_prospective_independent_validation'] is True
+          assert r['original_paper1_and_el_science_unchanged'] is True
+          assert r['source_verified'] is True
+          print('PETUNIEAE_RETROSPECTIVE_PREDICTION_RESULT',r['decision'],r['observed_relative_prediction_gain'],r['p_one_sided'])
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: petunieae-regulatory-heldout-prediction-v0-1
+          path: build/petunieae_regulatory_heldout_prediction_v0_1.json
+          if-no-files-found: warn
