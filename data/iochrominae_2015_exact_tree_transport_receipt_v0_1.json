@@ -1,0 +1,50 @@
+{
+  "version": "v0.1",
+  "status": "HOLD_ORIGINAL_TREE_ARCHIVE_DOWNLOAD_NOT_VERIFIED",
+  "source_doi": "10.5061/dryad.0732g",
+  "dataset_id": 3546,
+  "version_id": 3567,
+  "file_id": 21811,
+  "file": "ModeandTempoFlColor.zip",
+  "expected_size_bytes": 686186,
+  "expected_md5": "78957f5320749f5c022de78e8ad1ab32",
+  "metadata_source_confirmed": true,
+  "source_archive_bytes_recovered": false,
+  "tested_hosted_run_id": 37763678309,
+  "tested_hosted_job_id": 113265978606,
+  "artifact_name": "iochrominae-2015-source-identity-v0-1",
+  "attempts": [
+    {
+      "route": "https://datadryad.org/api/v2/files/21811/download",
+      "result": "HTTP_401_UNAUTHORIZED"
+    },
+    {
+      "route": "https://datadryad.org/api/v2/datasets/doi%3A10.5061%2Fdryad.0732g/download",
+      "result": "HTTP_401_UNAUTHORIZED"
+    }
+  ],
+  "separate_later_tree": {
+    "doi": "10.5061/dryad.5jn7b",
+    "dataset_id": 22075,
+    "version_id": 22139,
+    "files": [
+      {
+        "name": "README_for_Smith_and_Kriebel_2018.txt",
+        "bytes": 849,
+        "md5": "169efea4f0bc67970ff1310b699121ba"
+      },
+      {
+        "name": "Smith_and_Kriebel_2018.zip",
+        "bytes": 993968,
+        "md5": "a4318f07ddd7e2dd1ce8297c057ead6b"
+      }
+    ],
+    "not_a_substitute_for_original_2015_tree": true
+  },
+  "expression_2018_28taxa_qpcr_numeric_table_recovered": false,
+  "phylogenetic_tree_members_examined": false,
+  "state_frequencies_opened": false,
+  "additional_replicate_admitted": false,
+  "next_source_requirement": "Authenticated retrieval of the exact Smith-Goldberg tree archive through legitimate Dryad credentials or author-supplied matching bytes, AND separately 2018 Larter species-level seven-gene qPCR numerical matrix and pigment identity with a pinned taxon crosswalk.",
+  "changed_frozen_science": false
+}
