@@ -32,6 +32,28 @@ The already existing Petunieae analysis showed that exact six-anthocyanidin pigm
 
 This is the first **directly matched** bridge in the present integrated work, but it is one retrospective radiation, not a new cross-radiation estimate of the causes of relative-depth visible-colour memory. Exact fine code is compound *presence*, not equal pigment quantities, and gene expression is not a genetically proven causal route. See `docs/PETUNIEAE_NESTED_REGULATORY_MEMORY_RESULT_V0_1.md`.
 
+## New decisive result: historical signal does not automatically deliver better prediction
+
+The same 47-tip Petunieae source now has a separately predeclared **leave-one-species-out prediction** test (design commit `0c6721f`). Both predictions retain each held-out tip's exact six-compound presence/absence pigment class:
+
+- **Phenotype-class baseline:** mean of every other species with the same six-bit pigment code.
+- **Phylogenetic predictor:** mean of the two closest species with that same code on the frozen tree.
+- **Scoring:** mean 21-gene squared prediction error divided by variance estimated exclusively among the other 46 tips; 47 held-out targets, fixed k=2, no post-outcome gene selection or kernel tuning.
+
+The class mean gave standardized MSE **1.138379**; the two-nearest relatives gave **1.251167**, a **9.91% deterioration** (gain −0.099078). The frozen primary condition required **positive** gain, so **NOT_SUPPORTED** is the final result. Although the observed gain was markedly less negative than the within-pigment-class shuffled reference (null mean −0.234744, permutation P=0.0014), this relative-to-null P value **cannot reverse a failed positive-gain rule**.
+
+The direction is robust descriptively to omitting each pigment code from evaluation (all six pooled gains negative); those six omissions do not constitute independent replications.
+
+### Why the two estimands can disagree
+
+A phylogenetic distance–expression distance association tests whether two taxa are *more similar on average* when closer on the tree. The prediction test instead compares one narrow nearest-neighbour rule against a stable class-wide mean. Under a simple exchangeable independent within-class null with per-gene variance σ², the expected target-versus-m-donor-mean squared prediction error is σ²(1+1/m). For a two-species local mean, m=2 gives 1.5σ²; for the baseline with the other m=5, 9 or 12 species, the reference is respectively 1.2σ², 1.111σ² or 1.083σ². Thus small donor number introduces a mathematical variance penalty even before considering any evolutionary effect. These values are **illustrative null expectations**, not estimates of the actual Petunieae molecular process. The significant within-class permutation result suggests phylogenetic locality counteracts some of that penalty, but it did not overcome it for the frozen k=2 predictor.
+
+This strengthens the interpretation: **detectable hidden historical structure ≠ a guarantee of accurate interspecific molecular transfer**. It does not prove no phylogenetic predictor could succeed: other k values, shrinkage models or gene-specific predictors are not tested and must not be optimized on these opened data to rescue the primary failure.
+
+### One-paper publication decision after the new outcome
+
+The integration proposal is **not promoted to replace the original two submissions**. A stronger cross-radiation flower-colour evolution paper remains a viable research target, and Petunieae is now a matched *single-radiation* bridge, but its positive conditional phylogenetic correlation is tempered by a failed prediction-gain test and its cohort still does not link molecular repetition with the original 32-radiation memory-decay rates. The prospective visible-colour Schistanthe PASS and biochemical Gesnerioideae FAIL remain distinct evidence tiers. Independent same-tip phenotype–pigment–expression validation is the next discriminatory science; another post hoc Petunieae tuning run would not resolve the generalization question.
+
 ## Contribution vs existing prior art
 
 - **Not new:** convergent red visible colour via different pigment routes and phylogenetic structure of pigment-route use (Ng & Smith 2016, DOI 10.1111/nph.13576).
