@@ -38,6 +38,7 @@ def test_figure5a_is_descriptive_and_never_claims_pair_independence(tmp_path):
        "patristic_distance":rng.uniform(.1,1.2,size=20).tolist(),
        "expression_rms":rng.uniform(.2,1.5,size=20).tolist(),
        "rho":0.607443846759381,
+       "null_mean_rho":0.16539849544922783,
        "pair_count":20,
        "tip_count":11,
        "gene_count":21,
