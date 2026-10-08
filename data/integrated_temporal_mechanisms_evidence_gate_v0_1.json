@@ -77,7 +77,22 @@
     "camellia_in_temporal32": false,
     "temporal_and_hidden_share_source": true,
     "current_same_radiation_quantitative_mechanism_memory_association_estimated": false,
-    "valid_claim": "Parallel evidence for heterogeneity and nested evolutionary structure; no demonstrated causal relationship between mechanism reuse and temporal memory strength"
+    "valid_claim": "Parallel evidence for heterogeneity and nested evolutionary structure; no demonstrated causal relationship between mechanism reuse and temporal memory strength",
+    "new_single_radiation_matched_petunieae_bridge": {
+      "status": "POSITIVE_EXPLORATORY",
+      "source": "results/petunieae_nested_regulatory_memory_v0_1/result_v0_1.json",
+      "prospective_status": "RETROSPECTIVE_SOURCE_VALUES_ALREADY_EXPOSED_NEW_PRIMARY_STATISTIC_PROTOCOL_FROZEN_BEFORE_THIS_ANALYSIS",
+      "same_tree_tips": 47,
+      "exact_six_anthocyanidin_presence_class_pair_count": 183,
+      "gene_expression_dimensions": 21,
+      "expression_distance_tree_distance_spearman_rho": 0.607443846759381,
+      "within_fine_permutation_one_sided_p": 0.0001,
+      "leave_one_tip_out_positive_count": 47,
+      "linked_prior_petunieae_fine_pigment_memory_centered_auc": 0.18794,
+      "earlier_pigment_memory_test_is_same_47_tip_source": true,
+      "interpretation": "Nested fine-pigment conditional expression phylogenetic organization on one shared tree; not a genetic causality test and not linked to the 32-radiation temporal decay coefficients",
+      "not_joint_32_by_7_mechanism_memory_slope": true
+    }
   },
   "prospectively_testable_bridge": {
     "biological_target": "Within the same phylogeny, compare depth-dependent retention of visible color, biochemical pigment identity, and gene/pathway modules among appropriately matched taxa",
@@ -94,7 +109,7 @@
         "system": "Petunieae",
         "n_retained_biochemical_tips": 47,
         "source": "data/petunieae_hidden_memory_design_v0_1.json",
-        "status": "same-tip biochemical phylogenetic data admitted retrospectively; does not itself provide all gene-module transition events"
+        "status": "Same-source 47-tip biochemistry and gene-expression conditional phylogenetic association completed retrospectively; generalization still requires independent same-tip radiations"
       },
       {
         "system": "Iochrominae",
@@ -115,7 +130,7 @@
     "all_replication_tiers_kept_separate": true,
     "causal_ecology_not_identified": true,
     "representation_levels_not_treated_as_interchangeable": true,
-    "submission_decision": "HOLD_NEW_INTEGRATED_PAPER_PENDING_DIRECT_MATCHED_BRIDGE_OR_EXPLICIT_EVIDENCE_SYNTHESIS_JOURNAL_STRATEGY",
+    "submission_decision": "HOLD_INTEGRATED_GENERALIZATION_PENDING_INDEPENDENT_MATCHED_RADIATION_OR_HONEST_SINGLE_SYSTEM_ARTICLE_STRATEGY",
     "prior_art": [
       {
         "doi": "10.1111/nph.13576",
