@@ -34,6 +34,51 @@ For anthocyanin gain, literature-compatible exact recurrence was 0.333–1.0, wh
 Repeatability is hierarchical rather than all-or-none. Standardized molecular contrasts show transition-class-dependent modular reuse without one invariant A/F/C/P programme, while a robust macroevolutionary colour pattern can persist without robust identification of individual historical events."""
 
 
+SIMPSON_CLARIFICATIONS = [
+    {
+        "label": "abstract anthocyanin index floor",
+        "old": "For anthocyanin gain, literature-compatible exact recurrence was 0.333–1.0, whereas standardized remeasurement fixed it at 0.333",
+        "new": "For anthocyanin gain, the complete-signature index narrowed from 0.333–1.0 to its 0.333 floor"
+    },
+    {
+        "label": "abstract yellow index floor",
+        "old": "For yellow development, exact recurrence narrowed from 0.5–1.0 to 0.5",
+        "new": "For yellow development, the index narrowed from 0.5–1.0 to its 0.5 floor"
+    },
+    {
+        "label": "methods index definition",
+        "old": "Two summary statistics were retained: exact-signature recurrence, which asks how many independent clusters share one complete four-axis signature, and pairwise axis concordance, the fraction of A/F/C/P directions matching across cluster pairs.",
+        "new": "Two summary statistics were retained: exact-signature Simpson concentration (R = sum_s(c_s/n)^2, with c_s counting the dependence clusters with a given complete A/F/C/P signature), and pairwise axis concordance (the mean fraction of matching A/F/C/P directions across distinct-cluster pairs). Simpson concentration includes self-matches: its minimum is 1/n when no two distinct clusters share a complete signature, and the fraction of distinct-cluster pairs with identical complete signatures is (nR - 1)/(n - 1)."
+    },
+    {
+        "label": "results anthocyanin index floor",
+        "old": "Candidate-free remeasurement reduced exact-signature recurrence to **0.333 exactly** and pairwise concordance to **0.333–0.5**.",
+        "new": "Candidate-free remeasurement reduced exact-signature Simpson concentration to **0.333 exactly**, its three-cluster floor (zero matching complete signatures between distinct clusters), and pairwise concordance to **0.333–0.5**."
+    },
+    {
+        "label": "results yellow index floor",
+        "old": "Candidate-free measurement point-identified exact-signature recurrence at **0.5** and pairwise concordance at **0.75**.",
+        "new": "Candidate-free measurement point-identified exact-signature Simpson concentration at **0.5**, its two-cluster floor (zero matching complete signatures between distinct clusters), and pairwise concordance at **0.75**."
+    },
+    {
+        "label": "discussion cross-class Simpson floor",
+        "old": "Yellow development is more repeatable: both standardized trajectories share A down, C up, and P down while differing at F, yielding exact recurrence 0.5 and pairwise concordance 0.75. Evolution therefore reuses selected modules without replaying one invariant four-axis programme.",
+        "new": "The two yellow-development trajectories share A down, C up, and P down while differing at F, with pairwise axis concordance of 0.75. Their exact-signature concentration of 0.5 is the two-cluster floor, just as the anthocyanin value of 0.333 is the three-cluster floor: neither class contains an identical complete signature across distinct clusters. Differences in those mathematical floors do not establish that one class has stronger exact whole-package replay. These contrasts instead show partial alignment of transcript-module directions without one invariant four-axis programme."
+    }
+]
+
+
+def apply_simpson_clarifications(text: str) -> str:
+    """Submission-wording-only fixes. Never touch frozen source science or numerical estimates."""
+    for edit in SIMPSON_CLARIFICATIONS:
+        old = edit["old"]
+        count = text.count(old)
+        if count != 1:
+            raise SystemExit(f'{edit["label"]}: expected one source span, found {count}')
+        text = text.replace(old, edit["new"], 1)
+    return text
+
+
 def abstract_word_count(text: str) -> int:
     block = text.split("## ABSTRACT", 1)[1].split("**Key words:**", 1)[0]
     body = "\n".join(line for line in block.splitlines() if not line.startswith("#"))
@@ -92,6 +137,8 @@ def main() -> int:
     suffix = out.split("**Key words:**", 1)[1]
     out = prefix + "\n\n" + AJB_ABSTRACT_V10_034 + "\n\n**Key words:**" + suffix
 
+    # Editorial metric-definition correction after frozen v0.3.4 provenance is built.
+    out = apply_simpson_clarifications(out)
     words = abstract_word_count(out)
     if words > 250:
         raise SystemExit(f"AJB v1.0 v0.3.4 abstract exceeds 250 words: {words}")
@@ -119,6 +166,8 @@ def main() -> int:
         "v0_3_4_running_head_restored": True,
         "event_boundary_clarified": True,
         "candidate_free_definition_clarified": True,
+        "simpson_index_definition_clarified": True,
+        "simpson_metric_estimates_unchanged": True,
         "abstract_word_count": words,
         "biological_headline": "hierarchical transition-class-dependent molecular repeatability with separate macro pattern and event identity",
         "novelty_headline": "hierarchical transition-class-dependent molecular repeatability plus separate macro pattern/event identity",

@@ -104,6 +104,11 @@ def main() -> int:
         "P=0.078125",
         "agreement remained only two",
         "The strict×dominant shared robust event count was therefore zero",
+        "exact-signature Simpson concentration (R = sum_s(c_s/n)^2",
+        "the fraction of distinct-cluster pairs with identical complete signatures is (nR - 1)/(n - 1)",
+        "its three-cluster floor (zero matching complete signatures between distinct clusters)",
+        "its two-cluster floor (zero matching complete signatures between distinct clusters)",
+        "Differences in those mathematical floors do not establish that one class has stronger exact whole-package replay",
     ]
     absent = [x for x in required_claims if x not in manuscript]
     if absent:
@@ -115,6 +120,8 @@ def main() -> int:
         "first demonstration that repeated flower colour", "first pathway-level", "first micro-to-macro",
         "anthocyanin-axis ascertainment remained enriched after dependence collapse",
         "ecological Fig. 6",
+        "Yellow development is more repeatable:",
+        "which asks how many independent clusters share one complete four-axis signature",
         "# Standardized remeasurement reveals partial mechanistic replay during repeated flower-colour evolution",
     ]
     retained = [x for x in forbidden if x in manuscript]
@@ -254,6 +261,8 @@ def main() -> int:
     submission_summary = json.loads((root / "provenance/submission_v1_0_build_summary.json").read_text(encoding="utf-8"))
     if submission_summary.get("event_boundary_clarified") is not True or submission_summary.get("candidate_free_definition_clarified") is not True:
         raise SystemExit("submission v1.0 did not preserve v0.3.4 boundary flags")
+    if submission_summary.get("simpson_index_definition_clarified") is not True or submission_summary.get("simpson_metric_estimates_unchanged") is not True:
+        raise SystemExit("submission v1.0 does not preserve the exact-signature index definition")
 
     files = sorted(p for p in root.rglob("*") if p.is_file() and p != a.out)
     entries = [{"path": str(p.relative_to(root)), "bytes": p.stat().st_size, "sha256": sha256(p)} for p in files]
