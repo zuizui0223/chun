@@ -1,0 +1,121 @@
+{
+  "version": "v0.1",
+  "status": "PRE_OUTCOME_COMMIT_FOR_NEW_RETROSPECTIVE_ANALYSIS",
+  "research_question": "Within species sharing the same exact six-anthocyanidin presence/absence signature, does phylogenetic proximity predict similarity of pathway-wide flower-petal gene expression?",
+  "temporal_order": {
+    "source_data": "Already public and prior CHUN Petunieae analyses outcome-exposed",
+    "specific_new_primary_statistic": "Protocol frozen before computing current conditional gene-expression distance correlation",
+    "honest_label": "RETROSPECTIVE_SOURCE_REANALYSIS_WITH_PREDECLARED_NEW_TEST_NOT_PROSPECTIVE_REPLICATION"
+  },
+  "source": {
+    "article_doi": "10.1098/rspb.2023.0275",
+    "osf_node": "zg9cu",
+    "frozen_artifact_id": 10039433384,
+    "frozen_artifact_run_id": 34182646549,
+    "processed_csv_path": "processed/phyloCCA__tpm10k-mgg-combined-with-flavs.csv",
+    "processed_csv_sha256": "5843d4cd4eb253046f97349fa6bd285ca77e43e7a9c3aaa0e78fae3e8e391edd",
+    "tree_path": "processed/phyloCCA__11genestre_dated_pruned.tre",
+    "tree_sha256": "95b4a688d3d71417b712b37a2b04cdc22a9431be3172d6509def4435f5fd8614",
+    "source_script_sha256": "abbb43dbec756ca34e9f501b7eb9aaecb7330009b79739b8c1171d9cccce13b8",
+    "source_manifest": "source_manifest.json",
+    "duplicated_source_identity_verified": true
+  },
+  "frame": {
+    "source_rows": 60,
+    "source_outgroup": "BROW",
+    "outgroup_excluded_rows": 59,
+    "all_21_expression_genes_available_from_header": true,
+    "cohort_selection": "Use the EXACT existing 47-tip frozen biochemical-resolution profile: after excluding outgroup, discard all taxa in six-bit anthocyanidin fine states with fewer than five members. No new eligibility thresholds.",
+    "n_retained_expected": 47,
+    "coarse_counts_expected": {
+      "0": 6,
+      "1": 41
+    },
+    "fine_state_count_expected": 6,
+    "same_fine_unordered_pairs_expected": 183,
+    "fine_six_compounds_order": [
+      "Pel_mgg",
+      "Cyan_mgg",
+      "Peon_mgg",
+      "Del_mgg",
+      "Pet_mgg",
+      "Malv_mgg"
+    ],
+    "fine_presence_rule": "each compound >0 is present; zero is absent; fine state is the 6-bit vector in fixed order"
+  },
+  "primary": {
+    "raw_gene_expression_columns": [
+      "CHS",
+      "CHI",
+      "F3H",
+      "F3primeH",
+      "F35H",
+      "DFR",
+      "FLS",
+      "ANS",
+      "UFGT",
+      "AAT",
+      "5GT",
+      "MTlike",
+      "GST",
+      "3RT",
+      "MYB27",
+      "AN11",
+      "MYBFL",
+      "MYB12",
+      "AN1",
+      "JAF13",
+      "MybsG6"
+    ],
+    "transform": "log1p of TPM10K raw value; each column z-scored among frozen 47 tips (population std ddof=0); zero-variance columns assigned zero vector, not outcome-selected for deletion",
+    "pair_universe": "unordered pairs of retained species with identical six-bit fine anthocyanidin presence signature; pairs cannot cross fine groups",
+    "tree_score": "patristic distance on the frozen 11genestre dated tree; rank Spearman is invariant to the division by twice tree height, so no absolute time interpretation",
+    "expression_distance": "Euclidean RMS across all 21 fixed z-scored log1p expression columns, each species retains its complete multigene vector",
+    "estimand": "Spearman rho between patristic distance and expression RMS distance among exactly same-fine-status unordered taxon pairs",
+    "sign_prediction": "rho > 0, i.e. expression vectors are more similar at shorter phylogenetic separation even when fine compound presence/absence state is identical",
+    "conditional_null": "Permute entire 21-gene expression vectors among tip labels strictly WITHIN each exact six-bit pigment signature; hold tree distances, six-bit labels, and all cross-gene covariance intact",
+    "permutations": 9999,
+    "random_seed": 20261008,
+    "monte_carlo_p": "(1 + number of permuted rho >= observed rho)/(10000)",
+    "positive_decision": "observed rho > 0 and one-sided p <= 0.05",
+    "negative_decision": "otherwise, report NOT_SUPPORTED without redefining gene list, fine states or percentile cutoffs",
+    "pair_dependency": "Pairs are not treated as independent observations; all inference uses taxon-label permutations conditional on fine-state membership"
+  },
+  "secondary": {
+    "exploratory_only": true,
+    "pigment_columns": [
+      "Pel_mgg",
+      "Cyan_mgg",
+      "Peon_mgg",
+      "Del_mgg",
+      "Pet_mgg",
+      "Malv_mgg",
+      "myr_mgg",
+      "quer_mgg",
+      "kaem_mgg"
+    ],
+    "pigment_transform": "log1p(100*x) mass-fraction units, then zscore across same 47 taxa and RMS pair distance",
+    "statistic": "Spearman rho between patristic distance and pigment concentration RMS among EXACT same-fine pairs, with 9999 within-fine whole-profile permutations using seed 20261009",
+    "interpretation": "Concentration-level within-state memory; exploratory and no claim of different persistence rate versus gene-expression module from raw rho difference alone",
+    "leave_one_tip_out": "Descriptive sign stability for primary statistic across each of 47 leave-one-tip-out samples; no bootstrap pair-independence assumptions"
+  },
+  "no_post_hoc": {
+    "no_fine_state_merging": true,
+    "no_pheno_threshold_optimization": true,
+    "no_post_hoc_significance_gene_selection": true,
+    "no_ancestral_branch_event_claim": true,
+    "no_ecological_causation_claim": true,
+    "no_absolute_time_ma_claim": true,
+    "one_radiation_only": true,
+    "science_freezes_unchanged": [
+      "Camellia Paper 1 v0.2.2",
+      "Camellia framing v0.3.4",
+      "Evolution Letters v0.3"
+    ]
+  },
+  "integration_promotion_rule": {
+    "if_primary_positive": "Report a retrospective same-tree hidden regulatory-history result and keep it explicitly one-radiation; the seven-case mechanisms and 32-clade temporal atlas are still not directly linked across radiations",
+    "if_primary_nonpositive": "Do not hide failure; report source-specific lack of measurable pathway-wide residual gene-expression memory under the fixed estimator",
+    "journal_claim": "Not enough to claim that molecular mechanism variation causes temporal colour-memory decay; at least another independent, same-taxa/source matched radiation is required to generalize"
+  }
+}
