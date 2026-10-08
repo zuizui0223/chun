@@ -82,7 +82,7 @@ In the prespecified secondary analysis, distances based on concentrations of nin
 
 ### 6. Cross-radiation molecular explanation remains untested despite the Petunieae bridge
 
-The main standardized 32-radiation temporal cohort and curated seven-case mechanistic benchmark still share no exact analytic unit. The new Petunieae result gives a **single-radiation biological bridge between fine biochemical states and pathway-wide expression**; it does not identify which developmental, ecological or selection processes explain variation in relative-time flower-colour memory among the 32 other radiations. An independent common-tree phenotype/pigment/expression system is required for cross-radiation validation.
+The main standardized 32-radiation temporal cohort and curated seven-case mechanistic benchmark still share no exact analytic unit. The new Petunieae result gives a **single-radiation biological bridge between fine biochemical states and pathway-wide expression**; it does not identify which developmental, ecological or selection processes explain variation in relative-time flower-colour memory among the 32 other radiations. An independent common-tree phenotype/pigment/expression system is required for cross-radiation validation. This is not evidence that molecular-route variation causes temporal memory decay across the original 32 radiations.
 
 ## Discussion
 
