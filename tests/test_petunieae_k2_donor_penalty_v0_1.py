@@ -60,3 +60,25 @@ def test_diagnostic_refuses_changes_to_original_prediction_result():
     prior={"baseline_loss":-100.,"neighbor_loss":1.,"observed_relative_prediction_gain":0.}
     with pytest.raises(ValueError,match="pre-existing frozen prediction result drift"):
         mod.decompose(x,fine,names,D,prior)
+
+
+def test_real_exact_decomposition_keeps_original_prediction_fail_frozen():
+    import json
+    gate=json.loads((ROOT/"data/petunieae_k2_predictor_bias_variance_decomposition_design_v0_1.json").read_text(encoding="utf-8"))
+    result=json.loads((ROOT/"results/petunieae_k2_donor_penalty_diagnostic_v0_1/result_v0_1.json").read_text(encoding="utf-8"))
+    original=json.loads((ROOT/"results/petunieae_nested_regulatory_leaveoneout_prediction_v0_1/result_v0_1.json").read_text(encoding="utf-8"))
+    assert gate["status"]=="EXPLORATORY_DIAGNOSTIC_FIXED_AFTER_PRIMARY_PREDICTION_FAIL_BEFORE_DECOMPOSITION_OUTCOME"
+    assert result["status"]=="POST_OUTCOME_EXACT_PREDICTOR_DECOMPOSITION_DESCRIPTIVE_ONLY"
+    assert result["sample_tips"]==47 and result["genes"]==21 and result["donors_k"]==2
+    assert result["state_only_mse"]==pytest.approx(original["baseline_loss"],abs=1e-12)
+    assert result["nearest_two_mse"]==pytest.approx(original["neighbor_loss"],abs=1e-12)
+    assert result["random_two_expected_mse"]==pytest.approx(1.405938861662,abs=1e-9)
+    assert result["small_donor_penalty"]==pytest.approx(result["random_two_expected_mse"]-result["state_only_mse"],abs=1e-9)
+    assert result["locality_gain_over_random_two"]==pytest.approx(result["random_two_expected_mse"]-result["nearest_two_mse"],abs=1e-9)
+    assert result["net_nearest_two_penalty"]==pytest.approx(result["nearest_two_mse"]-result["state_only_mse"],abs=1e-9)
+    assert result["small_donor_penalty"]>result["locality_gain_over_random_two"]>0
+    assert result["net_nearest_two_penalty"]>0
+    assert result["no_new_p_value"] is True
+    assert result["frozen_primary_decision"]==original["decision"]=="NOT_SUPPORTED"
+    assert len(result["per_state_descriptive"])==6
+    assert sum(row["locality_gain"]>0 for row in result["per_state_descriptive"])==6
