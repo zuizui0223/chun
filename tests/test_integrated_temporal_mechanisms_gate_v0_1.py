@@ -105,3 +105,29 @@ def test_integrated_single_radiation_bridge_is_matched_but_not_cross_radiation_c
     assert d["cross_tier_linkage"]["current_same_radiation_quantitative_mechanism_memory_association_estimated"] is False
     assert "RETROSPECTIVE" in b["prospective_status"]
     assert "independent" in d["governance"]["submission_decision"].lower()
+
+
+def test_predeclared_nearest_two_prediction_failure_is_not_promoted_to_success() -> None:
+    d = _gate()
+    bridge = d["cross_tier_linkage"]["new_single_radiation_matched_petunieae_bridge"]
+    recorded = bridge["heldout_prediction"]
+    result = json.loads((ROOT / recorded["source"]).read_text(encoding="utf-8"))
+    design = json.loads((ROOT / recorded["design"]).read_text(encoding="utf-8"))
+    assert recorded["status"] == "NOT_SUPPORTED_PREDECLARED_POSITIVE_GAIN"
+    assert result["decision"] == "NOT_SUPPORTED"
+    assert recorded["state_only_loss"] == pytest.approx(result["baseline_loss"], rel=0, abs=1e-12)
+    assert recorded["two_nearest_loss"] == pytest.approx(result["neighbor_loss"], rel=0, abs=1e-12)
+    assert recorded["relative_gain"] == pytest.approx(
+        result["observed_relative_prediction_gain"], rel=0, abs=1e-12
+    )
+    assert recorded["relative_gain"] < 0
+    assert result["p_one_sided"] == recorded["within_class_whole_vector_permutation_p_greater_observed"] == 0.0014
+    assert result["neighbor_k"] == design["predictor_2"]["k"] == 2
+    assert result["retained_tips"] == design["retained_taxa"] == 47
+    assert result["not_prospective_independent_validation"] is True
+    assert "K2_PREDICTIVE_TRANSFER_FAIL" in d["governance"]["single_paper_status_after_heldout"]
+    manuscript = MANUSCRIPT.read_text(encoding="utf-8")
+    decision_doc = DECISION.read_text(encoding="utf-8")
+    assert "1.13838" in manuscript and "1.25117" in manuscript
+    assert "positive-gain requirement" in manuscript
+    assert "9.91%" in decision_doc
