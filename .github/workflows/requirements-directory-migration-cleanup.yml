@@ -1,9 +1,9 @@
 name: Cleanup requirements migration artifacts
 
 on:
-  push:
+  pull_request:
     branches:
-      - chore/requirements-directory-migration
+      - main
   workflow_dispatch:
 
 permissions:
