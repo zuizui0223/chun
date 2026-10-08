@@ -1,0 +1,50 @@
+{
+  "version": "v0.1",
+  "status": "FIXED_BEFORE_OPENING_NEW_PREDICTION_OUTCOME",
+  "research_question": "Given an unobserved Petunieae species' six-bit anthocyanidin presence identity, does its nearest phylogenetic neighbor within that state predict its pathway-gene expression better than the mean expression of the other species with that state?",
+  "data_use": "RETROSPECTIVE_REUSE_OF_OUTCOME_OPENED_47_TIP_SOURCE_NOT_PROSPECTIVE_EXTERNAL_VALIDATION",
+  "source_design_reference": "data/petunieae_nested_regulatory_memory_preregistered_design_v0_1.json",
+  "source_digest_gate": "inherit exact three source SHA256 checks from Petunieae nested regulatory-memory runner",
+  "retained_taxa": 47,
+  "class_counts": {
+    "000000": 6,
+    "000010": 6,
+    "000011": 6,
+    "000100": 10,
+    "000110": 6,
+    "000111": 13
+  },
+  "expression_cols": "inherit 21 fixed gene columns from original precomputed primary design",
+  "predictor_1": {
+    "name": "PIGMENT_STATE_ONLY_MEAN",
+    "rule": "For each held-out tip i, predict each gene's log1p TPM10K from the arithmetic mean among every other retained species with the same exact six-bit anthocyanidin presence code"
+  },
+  "predictor_2": {
+    "name": "PIGMENT_STATE_PLUS_PHYLOGENETIC_NEIGHBORS",
+    "k": 2,
+    "rule": "For each held-out tip i, find the two *closest patristic-distance* species among all other retained species with the same exact six-bit anthocyanidin presence code, breaking exact distance ties lexically by original tree tip names before outcome values are inspected; use their equal-weight arithmetic mean log1p TPM10K vector; do not optimize k after result"
+  },
+  "loss": {
+    "name": "FOLD_TRAINING_STANDARDIZED_MEAN_SQUARED_ERROR",
+    "rule": "For each held-out tip, compute per-gene training-only (other 46 species) variance of the log1p expression column. Its squared prediction residual divided by that training variance is averaged over the 21 fixed genes. If any training variance is exactly zero, divide by 1 instead of dropping the column. Average losses equally across held-out tips.",
+    "gain": "(mean state-only loss - mean neighbor loss)/mean state-only loss",
+    "primary_expected_direction": "gain > 0",
+    "success_rule": "gain > 0 AND within-exact-fine-class label-permutation one-sided P <= 0.05"
+  },
+  "null": {
+    "iterations": 9999,
+    "seed": 20261008,
+    "permutation_unit": "Whole 21-gene expression vector per tip, reassigned within each fixed six-bit anthocyanidin presence class; keep source phylogeny, fine-code membership, molecular expression covariance intact",
+    "p_value": "(1+number of permuted gains >= observed gain)/(iterations+1)",
+    "validity_note": "Permutations test a state-conditioned phylogenetic locality prediction; they cannot convert this retrospective, already outcome-exposed dataset into a prospective new radiation."
+  },
+  "sensitivity": {
+    "leave_one_fine_class_out": "descriptive only after primary; report sign and range of gains for each class excluded, without substitution for primary result",
+    "alternate_k": "none; do not search k",
+    "gene_subsets": "none; do not choose successful genes after outcome",
+    "metric_substitutions": "none"
+  },
+  "result_boundary": "A positive held-out-tip within-source result would show improved retrospective prediction of gene expression by phylogenetic proximity beyond fine chemical class. It would not show new independent cross-radiation validation, biological causation, ancestral mutational events, or external predictive accuracy.",
+  "frozen_original_science_unchanged": true,
+  "design_committed_before_new_outcome": true
+}
