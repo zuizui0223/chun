@@ -68,3 +68,40 @@ def test_training_standardization_excludes_test_tip_and_zero_variance_safe():
     assert len(r["per_tip_state_only_mse"])==12
     assert len(r["per_tip_neighbor_mse"])==12
     assert np.isfinite(r["state_only_mse"])
+
+
+def test_frozen_real_result_fails_positive_gain_despite_significant_null_contrast():
+    import json
+    design=json.loads((ROOT/"data/petunieae_nested_regulatory_leaveoneout_prediction_design_v0_1.json").read_text(encoding="utf-8"))
+    result=json.loads((ROOT/"results/petunieae_nested_regulatory_leaveoneout_prediction_v0_1/result_v0_1.json").read_text(encoding="utf-8"))
+    assert result["retained_tips"]==design["retained_taxa"]==47
+    assert result["fine_state_counts"]==design["class_counts"]
+    assert result["expression_genes"]==21
+    assert result["neighbor_k"]==design["predictor_2"]["k"]==2
+    assert result["permutations"]==design["null"]["iterations"]==9999
+    assert result["seed"]==design["null"]["seed"]==20261008
+    assert result["baseline_loss"]==pytest.approx(1.138379056242746,abs=1e-12)
+    assert result["neighbor_loss"]==pytest.approx(1.2511674468445935,abs=1e-12)
+    assert result["observed_relative_prediction_gain"]==pytest.approx(-0.0990780619015505,abs=1e-12)
+    assert result["permutation_null_mean"]==pytest.approx(-0.23474390394882988,abs=1e-12)
+    assert result["p_one_sided"]==0.0014
+    assert result["p_one_sided"]<=0.05
+    assert result["observed_relative_prediction_gain"]<0
+    assert result["decision"]=="NOT_SUPPORTED"
+    assert sum(x["relative_gain"]>0 for x in result["per_class_descriptive"])==1
+    assert result["leave_one_fine_class_out_descriptive"]["positive"]==0
+    assert result["not_prospective_independent_validation"] is True
+    assert result["original_paper1_and_el_science_unchanged"] is True
+
+
+def test_exchangeable_two_donor_variance_penalty_does_not_imply_no_phylogenetic_information():
+    # Under an independent-within-class equal-variance null, donor-mean MSE
+    # is proportional to (1 + 1/m); this is an interpretation control only.
+    null_neighbor=1+1/2
+    for n_class in (6,10,13):
+        donor_baseline=n_class-1
+        null_baseline=1+1/donor_baseline
+        assert null_neighbor>null_baseline
+    assert null_neighbor/(1+1/5)==pytest.approx(1.25)
+    assert null_neighbor/(1+1/9)==pytest.approx(1.35)
+    assert null_neighbor/(1+1/12)==pytest.approx(18/13)
