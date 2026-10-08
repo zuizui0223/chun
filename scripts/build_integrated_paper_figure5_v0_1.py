@@ -32,6 +32,7 @@ DESIGN = ROOT / "data/petunieae_nested_regulatory_leaveoneout_prediction_design_
 REG = ROOT / "results/petunieae_nested_regulatory_memory_v0_1/result_v0_1.json"
 HELDOUT = ROOT / "results/petunieae_nested_regulatory_leaveoneout_prediction_v0_1/result_v0_1.json"
 DECOMP = ROOT / "results/petunieae_k2_donor_penalty_diagnostic_v0_1/result_v0_1.json"
+COVERAGE = ROOT / "results/petunieae_fine_pigment_state_retention_v0_1/coverage_v0_1.json"
 
 def sha256(path: Path) -> str:
     return hashlib.sha256(path.read_bytes()).hexdigest()
@@ -42,6 +43,11 @@ def load_json(path: Path) -> dict:
 def chart_data(source: Path) -> tuple[dict, dict]:
     original, design = load_json(ORIGINAL), load_json(DESIGN)
     reg, heldout, decomposed = load_json(REG), load_json(HELDOUT), load_json(DECOMP)
+    coverage = load_json(COVERAGE)
+    if coverage['retained_tips'] != 47 or coverage['excluded_tips'] != 12 or not coverage['three_bit_reduction_preserves_fine_partition']:
+        raise ValueError('frozen pigment support boundary drift')
+    if coverage['retained_variable_anthocyanidin_compounds'] != ['Del_mgg', 'Pet_mgg', 'Malv_mgg']:
+        raise ValueError('non-representative variable pigment claim')
     distance, fine, names, xlog = load_source(source, design, original)
     # Use the original once-log1p expression with column z-score.
     x = np.asarray(xlog, dtype=float)
@@ -67,6 +73,9 @@ def chart_data(source: Path) -> tuple[dict, dict]:
         "tip_count": len(names),
         "gene_count": standardized.shape[1],
         "fine_codes": [fine[int(i)] for i in ii],
+        "variable_compounds": ['Del', 'Pet', 'Malv'],
+        "retained_tips": coverage['retained_tips'],
+        "unfiltered_tips": coverage['unfiltered_ingroup_tips'],
     }
     values = [
         heldout["baseline_loss"],
@@ -105,7 +114,7 @@ def fig5a(data: dict, out: Path) -> None:
             transform=ax.transAxes, va="top", ha="left", fontsize=9.2,
             bbox={"facecolor":"white","edgecolor":"none","alpha":0.86,"boxstyle":"round,pad=0.3"})
     ax.text(.98,.02,
-            "Pairs are not independent replicates.\nTaxon-vector permutations supply inference.",
+            "Only Del/Pet/Malv vary after the rare-state gate (47/59 taxa).\nPairs are not independent replicates; taxon-vector permutation supplies inference.",
             transform=ax.transAxes,ha="right",va="bottom",fontsize=8.5,
             bbox={"facecolor":"white","edgecolor":"none","alpha":0.9,"boxstyle":"round,pad=0.2"})
     ax.spines[["top","right"]].set_visible(False)
@@ -150,6 +159,8 @@ def build(source: Path, out_dir: Path) -> dict:
         "source_verified":True,
         "observed_pair_count":data_a["pair_count"],
         "fine_pigment_class_count":6,
+        "retained_variable_anthocyanidins":data_a['variable_compounds'],
+        "retained_tips_of_total": [data_a['retained_tips'],data_a['unfiltered_tips']],
         "observed_rho":data_a["rho"],
         "prediction_comparison":dict(zip(data_b["methods"],data_b["mse"])),
         "frozen_prediction_decision":data_b["result"],
@@ -161,7 +172,7 @@ def build(source: Path, out_dir: Path) -> dict:
         "figure_paths":[p.name for p in files],
         "source_sha256":{
             str(p.relative_to(ROOT)):sha256(p)
-            for p in (ORIGINAL,DESIGN,REG,HELDOUT,DECOMP)
+            for p in (ORIGINAL,DESIGN,REG,HELDOUT,DECOMP,COVERAGE)
         },
         "no_new_significance_test":True,
         "non_independent_species_pairs_disclosed":True,
