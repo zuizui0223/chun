@@ -1,6 +1,6 @@
 {
   "version": "v0.1",
-  "status": "INDEPENDENT_MATCHED_RADIATION_SOURCE_PREFLIGHT_NO_NEW_OUTCOMES_OR_REPLICATION",
+  "status": "INDEPENDENT_SOURCE_FRONTIER_AUDITED_NO_NEW_COMPLETE_MATCHED_REPLICATE",
   "created_on": "2026-10-08",
   "goal": "Obtain an independent radiation with published branch-length tree, species-level pigment identity, and numeric petal-pathway expression values to replicate the Petunieae within-fine-pigment-class conditional test.",
   "essential_rule": "Species-level tree, expression, and measured pigment signatures must join by auditable taxon keys. Article-level trends or photographed figure bars cannot substitute for an exact source numeric matrix.",
@@ -38,7 +38,11 @@
         "status": "ALTERNATIVE_LATER_SAME_CLADE_TOPOLOGY_NOT_ORIGINAL_LARTER2018_COMPARATIVE_TREE",
         "use": "sensitivity only after frozen published-source crosswalk; never silently substitute for original 2015 tree"
       },
-      "access_note": "Current Dryad client documentation states file/archive downloading may require authenticated access; previous anonymous 2019 frozen-source attempts did not recover exact objects. Authentication is not assumed to be connected."
+      "access_note": "Current Dryad client documentation states file/archive downloading may require authenticated access; previous anonymous 2019 frozen-source attempts did not recover exact objects. Authentication is not assumed to be connected.",
+      "species_gene_expression_values_not_publicly_confirmed_in_supplement_pdf": true,
+      "source_supplement_type": "msy117_supp.pdf (publisher supplementary material primarily figures and tables; no independently admitted species-by-gene quantitative raw data matrix)",
+      "original_published_comparative_note": "Molecular Biology and Evolution article explicitly uses Smith and Goldberg 2015 tree; species-level qPCR values shown in Fig. 3A but figure bars are not an admitted raw numeric table.",
+      "reference_repository_or_publisher_url": "https://academic.oup.com/mbe/article/35/9/2159/5034462"
     },
     {
       "id": "IOCHROMINAE_LARTER2019_DVDY",
@@ -81,6 +85,39 @@
       "sampled_species": 5,
       "status": "SMALL_SOURCE_PANEL_NOT_A_CROSS_RADIATION_47_TIP_REPLICATION",
       "next_source_action": "Retain as independent biological prior art, not a sufficiently powered identical-phylogeny replication of the Petunieae estimate."
+    },
+    {
+      "id": "EPIMEDIUM_MI2023_EIGHT_ACCESSIONS",
+      "source_paper_doi": "10.3389/fpls.2023.1133616",
+      "phylogeny_paper_doi": "10.3389/fpls.2023.1234148",
+      "qPCR_accession_n": 8,
+      "qpcr_pathway_gene_n": 12,
+      "independent_phylogeny_species_rows": 57,
+      "qPCR_to_tree_accession_crosswalk_verified": false,
+      "phenotype_sampling_unit": "GARDEN_ACCESSIONS_FROM_UNSPECIFIED_WILD_POPULATIONS",
+      "exact_molecular_sample_tree_source_match": false,
+      "known_polymorphism_in_molecular_A_plus_taxa": [
+        "Epimedium acuminatum",
+        "Epimedium leptorrhizum"
+      ],
+      "current_status": "HOLD_MOLECULAR_ACCESSION_TO_TREE_CROSSWALK_UNRESOLVED",
+      "source_provenance": "docs/EPIMEDIUM_PROVENANCE_EVENT_GATE_V0_2.md",
+      "interpretation": "HPLC and qPCR samples are useful mechanistic endpoint observations but cannot be treated as matched sequenced species/individuals or independent transition events.",
+      "replicate_admitted": false,
+      "next_source_action": "Require voucher/accession/population crosswalk to tree source, and a defined independent fine pigment class and adequately populated within-class taxon-pair sample before testing phylogenetic memory."
+    },
+    {
+      "id": "IOCHROMA_WHEELER2025_SIX_SPECIES",
+      "source_paper_doi": "10.1093/g3journal/jkaf230",
+      "source_data_doi": "10.17605/OSF.IO/J5M8F",
+      "comparative_rnaseq_n": 6,
+      "within_species_backcross_individuals": 24,
+      "supported_claim": "MYB12-like F3primeH regulatory and flavonol-pigment association",
+      "current_status": "SMALL_SIX_SPECIES_RNASEQ_COMPARATIVE_PANEL_NOT_A_28_TAXON_REPLACEMENT",
+      "expression_original_tree_same_tip_eligibility_verified": false,
+      "biological_unit_boundary": "24 within-species backcross samples are not 24 independent tips on the Iochrominae species phylogeny.",
+      "use_policy": "Potential alternative public numeric source for smaller retrospective study; do not pool backcross samples with species or claim it reproduces the 28-taxon Larter 2018 design.",
+      "replicate_admitted": false
     }
   ],
   "admission_status": {
