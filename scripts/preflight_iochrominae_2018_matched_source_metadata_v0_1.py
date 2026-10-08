@@ -52,13 +52,23 @@ def metadata_one(doi:str,timeout:int=20)->dict:
         if not isinstance(versions,list):
             raise ValueError("versions schema missing")
         for v in versions:
-            ident=v.get("id")
-            out["versions"].append({"id":ident,"versionNumber":v.get("versionNumber")})
+            version_url=get_href(v,"self")
+            out["versions"].append({"version_url":version_url,"versionNumber":v.get("versionNumber")})
         if versions:
-            version=sorted(versions,key=lambda v:v.get("versionNumber",0))[-1]
-            ident=version.get("id")
-            if not ident:raise ValueError("latest version without ID")
-            files=get_json(f"{DRYAD_API}/versions/{ident}/files",timeout)
+            # Dryad /versions entries advertise their IDs via their self href,
+            # not necessarily an integer "id" field.
+            version_href=get_href(ds,"stash:version")
+            if not version_href:
+                latest=sorted(versions,key=lambda v:v.get("versionNumber",0))[-1]
+                version_href=get_href(latest,"self")
+            if not version_href or "/versions/" not in version_href:
+                raise ValueError("latest version href missing")
+            if version_href.startswith("/"):
+                version_href="https://datadryad.org"+version_href
+            if not version_href.startswith(f"{DRYAD_API}/versions/"):
+                raise ValueError("unexpected source version hostname or path")
+            out["latest_version_url"]=version_href
+            files=get_json(version_href+"/files",timeout)
             # Dryad file metadata only; do not follow any data/download URLs.
             embeds=files.get("_embedded",{}).get("stash:files",[])
             if not isinstance(embeds,list):raise ValueError("file metadata schema missing")
