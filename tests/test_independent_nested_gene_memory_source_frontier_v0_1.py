@@ -32,7 +32,7 @@ def test_iochrominae_publications_and_tree_objects_cannot_be_conflated() -> None
     assert dev["source_data_doi"] == "10.5061/dryad.p5dq84v"
     assert dev["current_status"].startswith("HOLD_")
     assert dev["required_archive"]["md5"] == "76b46e384fb7c9bf1ef3fbd7d1e5d2f0"
-    assert "cannot be relabeled" in dev["use_policy"]
+    assert "do not change the frozen exact-profile denominator" in dev["use_policy"]
 
 
 def test_no_other_candidate_is_falsely_promoted() -> None:
