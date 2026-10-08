@@ -7,6 +7,9 @@ on:
       - 'results/petunieae_nested_regulatory_leaveoneout_prediction_v0_1/result_v0_1.json'
       - 'scripts/run_petunieae_nested_regulatory_leaveoneout_prediction_v0_1.py'
       - 'tests/test_petunieae_nested_regulatory_leaveoneout_prediction_v0_1.py'
+      - 'data/petunieae_k2_predictor_bias_variance_decomposition_design_v0_1.json'
+      - 'scripts/diagnose_petunieae_k2_donor_penalty_v0_1.py'
+      - 'tests/test_petunieae_k2_donor_penalty_v0_1.py'
       - '.github/workflows/petunieae-regulatory-heldout-prediction-v0-1.yml'
   workflow_dispatch:
 
@@ -42,6 +45,30 @@ jobs:
             --design data/petunieae_nested_regulatory_leaveoneout_prediction_design_v0_1.json \
             --original-design data/petunieae_nested_regulatory_memory_preregistered_design_v0_1.json \
             --out build/petunieae_regulatory_heldout_prediction_v0_1.json
+      - name: Test exact donor-population expectation algebra
+        run: pytest -q tests/test_petunieae_k2_donor_penalty_v0_1.py
+      - name: Compute descriptive two-donor bias variance decomposition
+        run: |
+          python scripts/diagnose_petunieae_k2_donor_penalty_v0_1.py \
+            --source build/petunieae_frozen_source \
+            --original-design data/petunieae_nested_regulatory_memory_preregistered_design_v0_1.json \
+            --prediction-design data/petunieae_nested_regulatory_leaveoneout_prediction_design_v0_1.json \
+            --frozen-result results/petunieae_nested_regulatory_leaveoneout_prediction_v0_1/result_v0_1.json \
+            --out build/petunieae_k2_donor_penalty_diagnostic_v0_1.json
+      - name: Verify primary failure remains unchanged after diagnostic
+        run: |
+          python - <<'PY'
+          import json
+          a=json.load(open('build/petunieae_k2_donor_penalty_diagnostic_v0_1.json'))
+          b=json.load(open('results/petunieae_nested_regulatory_leaveoneout_prediction_v0_1/result_v0_1.json'))
+          assert a['frozen_primary_decision']==b['decision']=='NOT_SUPPORTED'
+          assert a['algebraic_identity_pass'] is True
+          assert a['no_new_p_value'] is True
+          assert abs(a['state_only_mse']-b['baseline_loss'])<1e-10
+          assert abs(a['nearest_two_mse']-b['neighbor_loss'])<1e-10
+          print('DONOR_VARIANCE_EXACT_IDENTITY_PASS')
+          print(json.dumps({k:a[k] for k in ['state_only_mse','random_two_expected_mse','nearest_two_mse','small_donor_penalty','locality_gain_over_random_two','net_nearest_two_penalty']},indent=2))
+          PY
       - name: Enforce no prospective or cross-radiation promotion
         run: |
           python - <<'PY'
@@ -75,5 +102,7 @@ jobs:
         if: always()
         with:
           name: petunieae-regulatory-heldout-prediction-v0-1
-          path: build/petunieae_regulatory_heldout_prediction_v0_1.json
+          path: |
+            build/petunieae_regulatory_heldout_prediction_v0_1.json
+            build/petunieae_k2_donor_penalty_diagnostic_v0_1.json
           if-no-files-found: warn
