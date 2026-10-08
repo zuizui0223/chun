@@ -125,3 +125,43 @@ def test_yellow_modular_recurrence_contract() -> None:
     assert yellow["pairwise_axis_concordance"]["maximum"] == pytest.approx(
         0.75, rel=0, abs=1e-15
     )
+
+
+def test_exact_signature_concentration_floor_is_zero_matching_pairs() -> None:
+    """For n clusters, Simpson R=1/n means zero identical unordered cluster pairs."""
+    _, _, candidate_free = _current_recurrence_contract()
+
+    for transition_class, n_clusters, n_completions in (
+        ("anthocyanin_gain", 3, 3),
+        ("yellow_development", 2, 1),
+    ):
+        signature_map = candidate_free[transition_class]
+        assert len(signature_map) == n_clusters
+        result = rec.bounds(signature_map)
+        assert result["n_exact_completions"] == n_completions
+
+        # R = sum_s (c_s/n)^2, so the fraction of pairs with an identical
+        # COMPLETE signature is M = (n*R - 1)/(n - 1).
+        for bound in ("minimum", "maximum"):
+            concentration = result["exact_signature_recurrence"][bound]
+            assert concentration == pytest.approx(
+                1 / n_clusters, rel=0, abs=1e-15
+            )
+            matching_pair_fraction = (
+                n_clusters * concentration - 1
+            ) / (n_clusters - 1)
+            assert matching_pair_fraction == pytest.approx(
+                0.0, rel=0, abs=1e-15
+            )
+
+
+def test_yellow_sign_only_modular_agreement_is_three_of_four_axes() -> None:
+    """Directional module reuse is not identical complete-signature replay."""
+    _, _, candidate_free = _current_recurrence_contract()
+    signatures = candidate_free["yellow_development"]
+    assert set(signatures) == {"CNITIDISSIMA", "CPERPETUA"}
+
+    cn = dict(zip(rec.AXES, signatures["CNITIDISSIMA"]))
+    cp = dict(zip(rec.AXES, signatures["CPERPETUA"]))
+    assert {a for a in rec.AXES if cn[a] == cp[a]} == {"A", "C", "P"}
+    assert {a for a in rec.AXES if cn[a] != cp[a]} == {"F"}
