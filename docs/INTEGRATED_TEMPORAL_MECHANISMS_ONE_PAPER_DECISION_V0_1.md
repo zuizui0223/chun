@@ -50,6 +50,22 @@ A phylogenetic distance–expression distance association tests whether two taxa
 
 This strengthens the interpretation: **detectable hidden historical structure ≠ a guarantee of accurate interspecific molecular transfer**. It does not prove no phylogenetic predictor could succeed: other k values, shrinkage models or gene-specific predictors are not tested and must not be optimized on these opened data to rescue the primary failure.
 
+### Exact explanation of the frozen k=2 failure — descriptive diagnostic
+
+An outcome-exposed but formula-fixed finite-population decomposition distinguishes the **few-donor variance penalty** from the **phylogenetic-locality gain**. Using the same 47 held-out species, all 21 fixed genes and the same training-fold variance weighting:
+
+| Donors | Exact or observed standardized MSE |
+|---|---:|
+| All other species in the same exact pigment class | **1.138379** |
+| Uniformly selected two donors from that class (analytical expectation) | 1.405939 |
+| Two nearest relatives in that class (frozen prediction) | 1.251167 |
+
+Consequently the penalty for using two donors instead of the complete pigment-state mean is **+0.267560 MSE** (+23.50% relative to that baseline). Choosing the closest relatives recovers **0.154771 MSE** (13.60 baseline-percentage points) over arbitrary two donors. The net difference remains **+0.112788 MSE** (+9.91%).
+
+This is a mathematically exact conditional expectation of sampling two donor means without replacement, not a newly fitted predictive model, independent prospective study, new permutation P value, evolutionary-rate estimate or proof of ecological causation. It explains the apparent coexistence of phylogenetic signal with a weaker-than-class-mean fixed k=2 predictor. The earlier one-sided permutation P=0.0014 is consistent with a source-specific locality advantage relative to shuffled tip assignments; the frozen positive-gain criterion against the **full** class mean still fails.
+
+The strongest outcome is therefore **nested historical structure with a measurable but insufficient nearest-relative predictor gain at this donor budget**. That is a useful empirical distinction but, by itself, does not close the cross-radiation causal bridge needed to justify one general-evolution paper over both existing submission routes.
+
 ### One-paper publication decision after the new outcome
 
 The integration proposal is **not promoted to replace the original two submissions**. A stronger cross-radiation flower-colour evolution paper remains a viable research target, and Petunieae is now a matched *single-radiation* bridge, but its positive conditional phylogenetic correlation is tempered by a failed prediction-gain test and its cohort still does not link molecular repetition with the original 32-radiation memory-decay rates. The prospective visible-colour Schistanthe PASS and biochemical Gesnerioideae FAIL remain distinct evidence tiers. Independent same-tip phenotype–pigment–expression validation is the next discriminatory science; another post hoc Petunieae tuning run would not resolve the generalization question.
