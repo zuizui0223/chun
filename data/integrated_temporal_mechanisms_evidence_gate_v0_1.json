@@ -1,0 +1,142 @@
+{
+  "version": "v0.1",
+  "status": "INTEGRATED_SINGLE_PAPER_CANDIDATE_NOT_SUBMISSION_AUTHORIZED",
+  "scope": "chun temporal arm only; FCP remains independent",
+  "original_submission_routes_unchanged": true,
+  "question": "What is repeated, retained and lost across visible phenotypes, biochemical identity, molecular modules and evolutionary time?",
+  "evidence": {
+    "temporal": {
+      "source": "data/flowerclades51_fine_time_persistence_clades_v0_1.csv",
+      "eligible_clades": 32,
+      "negative_slopes": 23,
+      "median_slope": -0.1897,
+      "interpretation": "Relative-divergence description of fine visible-colour pair similarity; not an independent replication of resolution-profile AUC and not calibrated absolute time"
+    },
+    "resolutions": {
+      "source": "manuscript/CROSS_RADIATION_EVOLUTION_LETTERS_V0_3_TEMPORAL_MEMORY_CANDIDATE.md",
+      "source_universe_clades": 51,
+      "completed_clades": 28,
+      "winner_counts": {
+        "coarse": 3,
+        "intermediate": 0,
+        "fine": 3,
+        "tied": 6,
+        "no_signal": 16
+      },
+      "prospectively_falsified_iris_intermediate_optimum": true,
+      "caveat": "28 clades share one source and ontology; 16 no-signal results are not evidence of no nested structure"
+    },
+    "hidden": {
+      "source": "data/flowerclades51_hidden_fine_memory_clades_v0_1.csv",
+      "eligible_clades": 21,
+      "positive_centered_effects": 18,
+      "median_centered_auc_effect": 0.02700779596581926,
+      "clade_one_sided_wilcoxon_p": 0.00003337860107421875,
+      "exploratory_post_outcome": true,
+      "independent_visible_validation": {
+        "system": "Rhododendron sect. Schistanthe",
+        "retained_tips": 129,
+        "effect": 0.06416,
+        "p": 0.0033,
+        "terminal": "PASS",
+        "source": "results/schistanthe_hidden_memory_v0_1/result_v0_1.json"
+      },
+      "cross_representation": {
+        "retrospective_petunieae": {
+          "effect": 0.18794,
+          "p": 0.0001,
+          "source": "results/petunieae_hidden_memory_v0_1/summary_v0_1.json"
+        },
+        "prospective_gesnerioideae": {
+          "effect": -0.00779,
+          "p": 0.5005,
+          "terminal": "FAIL",
+          "source": "docs/HIERARCHICAL_EVOLUTIONARY_MEMORY_SYNTHESIS_V0_4.md"
+        }
+      }
+    },
+    "mechanism": {
+      "source": "data/cross_clade_mechanistic_recurrence_levels_v0_1.csv",
+      "systems": 7,
+      "units_heterogeneous": true,
+      "rates_not_poolable": true,
+      "case_camellia": {
+        "source": "data/paper1_fig2_candidate_free_signature_v0_2.csv",
+        "anthocyanin_clusters": 3,
+        "yellow_clusters": 2,
+        "cross_cluster_complete_signature_matched_pairs_anthocyanin": 0,
+        "cross_cluster_complete_signature_matched_pairs_yellow": 0,
+        "yellow_directional_axis_matches": 3,
+        "yellow_four_axes": 4,
+        "caveat": "Same-system contrasts include within-cultivar/developmental series, not independently reconstructed macroevolutionary events; score 1/3 and 1/2 are n-dependent Simpson floors"
+      }
+    }
+  },
+  "cross_tier_linkage": {
+    "direct_named_analytic_unit_intersection_temporal32_mechanistic7": 0,
+    "camellia_in_temporal32": false,
+    "temporal_and_hidden_share_source": true,
+    "current_same_radiation_quantitative_mechanism_memory_association_estimated": false,
+    "valid_claim": "Parallel evidence for heterogeneity and nested evolutionary structure; no demonstrated causal relationship between mechanism reuse and temporal memory strength"
+  },
+  "prospectively_testable_bridge": {
+    "biological_target": "Within the same phylogeny, compare depth-dependent retention of visible color, biochemical pigment identity, and gene/pathway modules among appropriately matched taxa",
+    "primary_test": "After the tree/tip join and trait ontologies are frozen, test whether within-coarse fine-state retention and molecular implementation concordance show a reproducible distance-dependent relationship",
+    "admissibility": {
+      "same_taxa_source": "required before cross-tier inference",
+      "independently_admitted_radiations": "at least two is a proposed validation target, not a result",
+      "no_post_hoc_rescue_of_frozen_HOLD": "required",
+      "independent_source_and_tree_audit": "required",
+      "no_expected_sign_from_prior_outcomes": "freeze an explicit prediction or competing sign hypotheses before new decisive outcomes"
+    },
+    "public_first_candidates": [
+      {
+        "system": "Petunieae",
+        "n_retained_biochemical_tips": 47,
+        "source": "data/petunieae_hidden_memory_design_v0_1.json",
+        "status": "same-tip biochemical phylogenetic data admitted retrospectively; does not itself provide all gene-module transition events"
+      },
+      {
+        "system": "Iochrominae",
+        "reported_species": 28,
+        "source": "docs/RESOLUTION_PROFILE_TRAINING_INVENTORY_V0_4.md",
+        "status": "published same-system pigment/expression phylogeny; repository exact-source recovery is HOLD; do not substitute data without new frozen provenance gate"
+      },
+      {
+        "system": "Camellia",
+        "source": "docs/PAPER1_EVOLUTIONARY_EVENT_BOUNDARY_AMENDMENT_V0_1.md",
+        "status": "illustrative standardized transcript-contrast case; cannot map its five comparisons directly to accepted-species transition branches"
+      }
+    ]
+  },
+  "governance": {
+    "freeze": "Paper 1 science v0.2.2, framing v0.3.4, AJB v1.0 and Evolution Letters v0.3 are unchanged",
+    "no_actual_joint_parameter": true,
+    "all_replication_tiers_kept_separate": true,
+    "causal_ecology_not_identified": true,
+    "representation_levels_not_treated_as_interchangeable": true,
+    "submission_decision": "HOLD_NEW_INTEGRATED_PAPER_PENDING_DIRECT_MATCHED_BRIDGE_OR_EXPLICIT_EVIDENCE_SYNTHESIS_JOURNAL_STRATEGY",
+    "prior_art": [
+      {
+        "doi": "10.1111/nph.13576",
+        "lesson": "Ng & Smith 2016 already found phylogenetic signal in pigment mechanisms within convergent red flowers"
+      },
+      {
+        "doi": "10.1093/molbev/msy117",
+        "lesson": "Larter et al. 2018 already found pathway-level regulatory convergence by transition type"
+      },
+      {
+        "doi": "10.1111/brv.12672",
+        "lesson": "Multilevel convergence is established conceptual prior art"
+      },
+      {
+        "doi": "10.1146/annurev-ecolsys-102924-043757",
+        "lesson": "2026 evo-biochemistry/evo-devo integration review covers historical contingency and many-to-one mappings"
+      },
+      {
+        "doi": "10.3732/ajb.1500163",
+        "lesson": "Tempo and mode of floral colour evolution among clades already studied"
+      }
+    ]
+  }
+}
