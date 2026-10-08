@@ -25,7 +25,7 @@ from scipy.stats import rankdata
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "scripts"))
 from run_petunieae_nested_regulatory_leaveoneout_prediction_v0_1 import load_source
-from analyze_petunieae_nested_regulatory_memory_v0_1 import zscale_log, within_state_pairs
+from analyze_petunieae_nested_regulatory_memory_v0_1 import within_state_pairs
 
 ORIGINAL = ROOT / "data/petunieae_nested_regulatory_memory_preregistered_design_v0_1.json"
 DESIGN = ROOT / "data/petunieae_nested_regulatory_leaveoneout_prediction_design_v0_1.json"
@@ -43,7 +43,6 @@ def chart_data(source: Path) -> tuple[dict, dict]:
     original, design = load_json(ORIGINAL), load_json(DESIGN)
     reg, heldout, decomposed = load_json(REG), load_json(HELDOUT), load_json(DECOMP)
     distance, fine, names, xlog = load_source(source, design, original)
-    genes, ignored = zscale_log(xlog, 1.0)  # Already log1p: DO NOT log again.
     # Use the original once-log1p expression with column z-score.
     x = np.asarray(xlog, dtype=float)
     sd = x.std(axis=0, ddof=0)
