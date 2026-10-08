@@ -131,3 +131,23 @@ def test_predeclared_nearest_two_prediction_failure_is_not_promoted_to_success()
     assert "1.13838" in manuscript and "1.25117" in manuscript
     assert "positive-gain requirement" in manuscript
     assert "9.91%" in decision_doc
+
+
+def test_retained_pigment_state_coverage_limits_six_compound_generalization() -> None:
+    d=_gate()
+    b=d["cross_tier_linkage"]["new_single_radiation_matched_petunieae_bridge"]
+    source=b["fine_state_coverage"]
+    cov=json.loads((ROOT/source["source"]).read_text(encoding="utf-8"))
+    assert (source["unfiltered_ingroup_tips"],source["retained_tips"],source["excluded_tips"]) == (59,47,12)
+    assert source["retained_fine_states"] == cov["fine_states_retained"] == 6
+    assert source["unfiltered_fine_states"] == cov["fine_states_unfiltered"] == 15
+    assert source["actually_variable_compounds"] == cov["retained_variable_anthocyanidin_compounds"]
+    assert source["structurally_absent_on_retained_frame"] == cov["retained_constant_zero_anthocyanidin_compounds"]
+    assert source["all_pelargonidin_cyanidin_peonidin_positive_taxa_excluded"] is True
+    assert cov["three_bit_reduction_preserves_fine_partition"] is True
+    manuscript=MANUSCRIPT.read_text(encoding="utf-8")
+    decision=DECISION.read_text(encoding="utf-8")
+    assert "all taxa showing detectable pelargonidin, cyanidin or peonidin" in manuscript
+    assert "six nominal assay dimensions reduce to three" in manuscript
+    assert "Pelargonidin, cyanidin and peonidin are constant zero" in decision
+    assert b["fine_state_coverage"]["no_source_outcome_reopened"] is True
