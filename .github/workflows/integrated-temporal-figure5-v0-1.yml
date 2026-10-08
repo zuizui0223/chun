@@ -8,6 +8,7 @@ on:
       - 'results/petunieae_nested_regulatory_memory_v0_1/result_v0_1.json'
       - 'results/petunieae_nested_regulatory_leaveoneout_prediction_v0_1/result_v0_1.json'
       - 'results/petunieae_k2_donor_penalty_diagnostic_v0_1/result_v0_1.json'
+      - 'results/petunieae_fine_pigment_state_retention_v0_1/coverage_v0_1.json'
       - '.github/workflows/integrated-temporal-figure5-v0-1.yml'
   workflow_dispatch:
 
@@ -49,6 +50,8 @@ jobs:
           m=json.loads(Path('build/integrated-temporal-mechanistic-figure5-v0-1/figure5_manifest_v0_1.json').read_text())
           assert m['status']=='INTEGRATED_FIGURE_5_SOURCE_VERIFIED'
           assert m['observed_pair_count']==183
+          assert m['retained_variable_anthocyanidins']==['Del','Pet','Malv']
+          assert m['retained_tips_of_total']==[47,59]
           assert abs(m['observed_rho']-0.607443846759381)<1e-10
           assert m['frozen_prediction_decision']=='NOT_SUPPORTED'
           assert m['non_independent_species_pairs_disclosed'] is True
