@@ -119,6 +119,28 @@
           "no_new_p_value": true,
           "interpretation": "Phylogenetic donor choice beats a random 2-donor comparison, but does not compensate for variance penalty relative to class-wide mean; not a causal explanation."
         }
+      },
+      "fine_state_coverage": {
+        "source": "results/petunieae_fine_pigment_state_retention_v0_1/coverage_v0_1.json",
+        "unfiltered_ingroup_tips": 59,
+        "retained_tips": 47,
+        "excluded_tips": 12,
+        "unfiltered_fine_states": 15,
+        "retained_fine_states": 6,
+        "nominal_assayed_anthocyanidin_classes": 6,
+        "actually_variable_compounds": [
+          "Del_mgg",
+          "Pet_mgg",
+          "Malv_mgg"
+        ],
+        "structurally_absent_on_retained_frame": [
+          "Pel_mgg",
+          "Cyan_mgg",
+          "Peon_mgg"
+        ],
+        "all_pelargonidin_cyanidin_peonidin_positive_taxa_excluded": true,
+        "no_source_outcome_reopened": true,
+        "inferential_boundary": "The nested expression-memory test applies to retained delphinidin branch derivative pigment-presence classes, not all six variable anthocyanidin types or all flower colour routes."
       }
     }
   },
