@@ -91,7 +91,21 @@
       "linked_prior_petunieae_fine_pigment_memory_centered_auc": 0.18794,
       "earlier_pigment_memory_test_is_same_47_tip_source": true,
       "interpretation": "Nested fine-pigment conditional expression phylogenetic organization on one shared tree; not a genetic causality test and not linked to the 32-radiation temporal decay coefficients",
-      "not_joint_32_by_7_mechanism_memory_slope": true
+      "not_joint_32_by_7_mechanism_memory_slope": true,
+      "heldout_prediction": {
+        "source": "results/petunieae_nested_regulatory_leaveoneout_prediction_v0_1/result_v0_1.json",
+        "design": "data/petunieae_nested_regulatory_leaveoneout_prediction_design_v0_1.json",
+        "status": "NOT_SUPPORTED_PREDECLARED_POSITIVE_GAIN",
+        "training_test": "47 leave-one-species-out folds in one already outcome-open retrospective radiation",
+        "state_only_loss": 1.138379056242746,
+        "two_nearest_loss": 1.2511674468445935,
+        "relative_gain": -0.0990780619015505,
+        "within_class_whole_vector_permutation_p_greater_observed": 0.0014,
+        "null_mean_gain": -0.23474390394882988,
+        "required_success": "gain greater than zero AND one-sided permutation P<=0.05",
+        "interpretation": "Phylogenetic proximity contains detectable class-conditioned information relative to shuffled assignments, but mean of two nearest relatives is not more accurate than the larger same-pigment-class donor mean.",
+        "caveat": "Difference in prediction performance is specific to the frozen k=2 fixed predictor; no optimized k, no external test, and no causal inference"
+      }
     }
   },
   "prospectively_testable_bridge": {
@@ -152,6 +166,7 @@
         "doi": "10.3732/ajb.1500163",
         "lesson": "Tempo and mode of floral colour evolution among clades already studied"
       }
-    ]
+    ],
+    "single_paper_status_after_heldout": "HOLD_1_RETROSPECTIVE_MATCHED_RADIATION_POSITIVE_STRUCTURE_BUT_K2_PREDICTIVE_TRANSFER_FAIL_AND_NO_INDEPENDENT_MATCHED_VALIDATION"
   }
 }
