@@ -104,7 +104,21 @@
         "null_mean_gain": -0.23474390394882988,
         "required_success": "gain greater than zero AND one-sided permutation P<=0.05",
         "interpretation": "Phylogenetic proximity contains detectable class-conditioned information relative to shuffled assignments, but mean of two nearest relatives is not more accurate than the larger same-pigment-class donor mean.",
-        "caveat": "Difference in prediction performance is specific to the frozen k=2 fixed predictor; no optimized k, no external test, and no causal inference"
+        "caveat": "Difference in prediction performance is specific to the frozen k=2 fixed predictor; no optimized k, no external test, and no causal inference",
+        "post_outcome_exact_donor_count_diagnostic": {
+          "source": "results/petunieae_k2_donor_penalty_diagnostic_v0_1/result_v0_1.json",
+          "design": "data/petunieae_k2_predictor_bias_variance_decomposition_design_v0_1.json",
+          "status": "POST_OUTCOME_EXACT_DESCRIPTION_NO_NEW_TEST",
+          "expected_random_two_mse": 1.405938861662,
+          "class_mean_mse": 1.138379056242746,
+          "nearest_two_mse": 1.2511674468445935,
+          "random_two_vs_class_penalty_relative": 0.23503578,
+          "locality_recovery_relative": 0.13595771,
+          "net_worse_relative": 0.0990780619015505,
+          "primary_not_supported_unchanged": true,
+          "no_new_p_value": true,
+          "interpretation": "Phylogenetic donor choice beats a random 2-donor comparison, but does not compensate for variance penalty relative to class-wide mean; not a causal explanation."
+        }
       }
     }
   },
