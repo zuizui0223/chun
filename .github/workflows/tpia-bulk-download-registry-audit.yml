@@ -3,7 +3,7 @@ name: TPIA bulk download registry audit
 on:
   pull_request:
     paths:
-      - 'requirements-tpia-http.txt'
+      - 'requirements/requirements-tpia-http.txt'
       - 'scripts/audit_tpia_bulk_download_registry.py'
       - '.github/workflows/tpia-bulk-download-registry-audit.yml'
   workflow_dispatch:
@@ -20,7 +20,7 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
-      - run: python -m pip install --disable-pip-version-check -r requirements-tpia-http.txt
+      - run: python -m pip install --disable-pip-version-check -r requirements/requirements-tpia-http.txt
       - name: Query TPIA public bulk download registry
         run: |
           mkdir -p build/tpia_bulk

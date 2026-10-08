@@ -3,7 +3,7 @@ name: ANR live diagnostic and freeze
 on:
   pull_request:
     paths:
-      - 'requirements-source-http-sequence.txt'
+      - 'requirements/requirements-source-http-sequence.txt'
       - 'data/anr_reference_copy_targets_v0_1.csv'
       - 'data/orthology_resolution_by_feature_v0_2.csv'
       - 'data/micro_accessibility_node_score_harmonized_v0_2.csv'
@@ -34,7 +34,7 @@ jobs:
         run: |
           sudo apt-get update -qq
           sudo apt-get install -y -qq mafft fasttree unzip
-          python -m pip install --disable-pip-version-check -r requirements-source-http-sequence.txt
+          python -m pip install --disable-pip-version-check -r requirements/requirements-source-http-sequence.txt
 
       - name: Recover Longjing43 GFF and protein sources
         run: |

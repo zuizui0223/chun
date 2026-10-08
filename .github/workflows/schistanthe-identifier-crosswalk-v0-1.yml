@@ -3,7 +3,7 @@ name: Schistanthe identifier crosswalk v0.1
 on:
   pull_request:
     paths:
-      - 'requirements-schistanthe.txt'
+      - 'requirements/requirements-schistanthe.txt'
       - 'scripts/preflight_schistanthe_identifier_crosswalk_v0_1.py'
       - 'tests/test_schistanthe_identifier_crosswalk_v0_1.py'
       - 'data/schistanthe_identifier_crosswalk_v0_1.json'
@@ -23,7 +23,7 @@ jobs:
         with:
           python-version: '3.12'
       - name: Install runtime
-        run: python -m pip install --disable-pip-version-check -r requirements-schistanthe.txt
+        run: python -m pip install --disable-pip-version-check -r requirements/requirements-schistanthe.txt
       - name: Unit tests
         run: pytest -q tests/test_schistanthe_identifier_crosswalk_v0_1.py
       - name: Recover exact source

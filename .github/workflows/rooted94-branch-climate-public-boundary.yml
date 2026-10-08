@@ -3,7 +3,7 @@ name: Rooted94 branch climate public-data boundary
 on:
   pull_request:
     paths:
-      - 'requirements-rooted94-climate.txt'
+      - 'requirements/requirements-rooted94-climate.txt'
       - 'scripts/fetch_pmc_cloud_media_v0_1.py'
       - 'scripts/test_rooted_transition_climate_contrasts.py'
       - '.github/workflows/rooted94-branch-climate-public-boundary.yml'
@@ -27,7 +27,7 @@ jobs:
         with:
           python-version: '3.12'
       - name: Install dependencies
-        run: python -m pip install --disable-pip-version-check -r requirements-rooted94-climate.txt
+        run: python -m pip install --disable-pip-version-check -r requirements/requirements-rooted94-climate.txt
       - name: Download frozen rooted tree and transition posterior artifacts
         env:
           GH_TOKEN: ${{ github.token }}

@@ -3,7 +3,7 @@ name: CnFLS2 primer to tea FLS paralog audit
 on:
   pull_request:
     paths:
-      - 'requirements-source-http-sequence.txt'
+      - 'requirements/requirements-source-http-sequence.txt'
       - 'data/cnitidissima_fls_source_transcripts_v0_1.csv'
       - 'scripts/map_cnitidissima_fls2_primer_to_tea_fls.py'
       - '.github/workflows/cnitidissima-fls2-primer-to-tea-paralog.yml'
@@ -22,7 +22,7 @@ jobs:
         with:
           python-version: '3.12'
       - name: Install dependencies
-        run: python -m pip install --disable-pip-version-check -r requirements-source-http-sequence.txt
+        run: python -m pip install --disable-pip-version-check -r requirements/requirements-source-http-sequence.txt
       - name: Map source CnFLS2 qRT-PCR primer to tea FLS source paralogs
         run: python scripts/map_cnitidissima_fls2_primer_to_tea_fls.py --output-dir build/cnfls2_primer_map
       - name: Report

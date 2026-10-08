@@ -3,7 +3,7 @@ name: TPIA2 crosswalk sequence fetch
 on:
   pull_request:
     paths:
-      - 'requirements-tpia-sequence.txt'
+      - 'requirements/requirements-tpia-sequence.txt'
       - 'data/tpia_yunkang10_priority_crosswalk_v0_1.csv'
       - 'data/tpia_crosswalk_sequence_identity_v0_1.csv'
       - 'data/tpia_within_family_paralog_identity_v0_1.csv'
@@ -25,7 +25,7 @@ jobs:
         with:
           python-version: '3.12'
       - name: Install dependencies
-        run: python -m pip install --disable-pip-version-check -r requirements-tpia-sequence.txt
+        run: python -m pip install --disable-pip-version-check -r requirements/requirements-tpia-sequence.txt
       - name: Fetch YK10/SCZV1/SCZV2 CDS and transcript sequences
         run: |
           python scripts/fetch_tpia_crosswalk_sequences.py \

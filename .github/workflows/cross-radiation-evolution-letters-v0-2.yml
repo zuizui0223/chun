@@ -3,7 +3,7 @@ name: Cross-radiation Evolution Letters manuscript v0.2
 on:
   pull_request:
     paths:
-      - 'requirements-cross-radiation.txt'
+      - 'requirements/requirements-cross-radiation.txt'
       - 'manuscript/CROSS_RADIATION_EVOLUTION_LETTERS_V0_2.md'
       - 'data/cross_radiation_el_reference_manifest_v0_1.json'
       - 'data/cross_radiation_evolution_letters_submission_gate_v0_2.json'
@@ -25,7 +25,7 @@ jobs:
         with:
           python-version: '3.12'
       - name: Install figure runtime
-        run: python -m pip install --disable-pip-version-check -r requirements-cross-radiation.txt
+        run: python -m pip install --disable-pip-version-check -r requirements/requirements-cross-radiation.txt
       - name: Validate manuscript, references, science receipts, and Evolution Letters gates
         run: |
           mkdir -p build/cross_radiation_el_v0_2

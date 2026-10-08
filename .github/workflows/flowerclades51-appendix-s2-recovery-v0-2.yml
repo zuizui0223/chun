@@ -3,7 +3,7 @@ name: Flowerclades51 Appendix S2 recovery v0.2
 on:
   pull_request:
     paths:
-      - 'requirements-flowerclades51.txt'
+      - 'requirements/requirements-flowerclades51.txt'
       - 'scripts/recover_flowerclades51_appendix_s2_v0_2.py'
       - 'tests/test_recover_flowerclades51_appendix_s2_v0_2.py'
       - 'data/flowerclades51_appendix_s2_source_recovery_v0_2.json'
@@ -24,7 +24,7 @@ jobs:
           python-version: '3.12'
       - name: Unit tests
         run: |
-          python -m pip install --disable-pip-version-check -r requirements-flowerclades51.txt
+          python -m pip install --disable-pip-version-check -r requirements/requirements-flowerclades51.txt
           pytest -q tests/test_recover_flowerclades51_appendix_s2_v0_2.py
       - name: Recover exact Appendix S2 source only
         run: python scripts/recover_flowerclades51_appendix_s2_v0_2.py --outdir build/appendix_s2_v0_2

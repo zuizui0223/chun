@@ -3,7 +3,7 @@ name: Rhododendron30 source preflight v0.1
 on:
   pull_request:
     paths:
-      - 'requirements-rhododendron-source.txt'
+      - 'requirements/requirements-rhododendron-source.txt'
       - 'scripts/run_rhododendron30_source_preflight_v0_1.py'
       - 'data/rhododendron30_source_preflight_receipt_v0_1.json'
       - '.github/workflows/rhododendron30-source-preflight-v0-1.yml'
@@ -23,7 +23,7 @@ jobs:
         with:
           python-version: '3.12'
       - name: Install tree parser
-        run: python -m pip install --disable-pip-version-check -r requirements-rhododendron-source.txt
+        run: python -m pip install --disable-pip-version-check -r requirements/requirements-rhododendron-source.txt
       - name: Assert chemistry outcomes remain unopened
         run: test ! -e results/rhododendron30_biochemical_resolution_profile_v0_1
       - name: Run species/tree-only preflight

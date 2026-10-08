@@ -3,7 +3,7 @@ name: CSNG source unigene provenance audit
 on:
   pull_request:
     paths:
-      - 'requirements-source-csng-audit.txt'
+      - 'requirements/requirements-source-csng-audit.txt'
       - 'scripts/fetch_pmc_oa_supplement_manifest.py'
       - 'scripts/extract_pdf_term_context.py'
       - '.github/workflows/csng-unigene-provenance-audit.yml'
@@ -22,7 +22,7 @@ jobs:
         with:
           python-version: '3.12'
       - name: Install dependencies
-        run: python -m pip install --disable-pip-version-check -r requirements-source-csng-audit.txt
+        run: python -m pip install --disable-pip-version-check -r requirements/requirements-source-csng-audit.txt
       - name: Fetch PMC6471635 OA package
         run: |
           python scripts/fetch_pmc_oa_supplement_manifest.py \

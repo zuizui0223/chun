@@ -3,7 +3,7 @@ name: Camellia visible-state section concentration
 on:
   push:
     paths:
-      - 'requirements-small-numpy.txt'
+      - 'requirements/requirements-small-numpy.txt'
       - 'data/fan2026_chelsa_species_compact_v0_1.csv'
       - 'data/camellia_visible_state_section_concentration_v0_1.csv'
       - 'scripts/analyze_visible_state_section_concentration.py'
@@ -24,7 +24,7 @@ jobs:
         with:
           python-version: '3.12'
       - name: Install dependency
-        run: python -m pip install --disable-pip-version-check -r requirements-small-numpy.txt
+        run: python -m pip install --disable-pip-version-check -r requirements/requirements-small-numpy.txt
       - name: Recompute frozen result
         run: |
           python scripts/analyze_visible_state_section_concentration.py \

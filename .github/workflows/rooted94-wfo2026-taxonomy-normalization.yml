@@ -3,7 +3,7 @@ name: Rooted94 WFO 2026-06 taxonomy normalization
 on:
   pull_request:
     paths:
-      - 'requirements-rooted94-tree.txt'
+      - 'requirements/requirements-rooted94-tree.txt'
       - 'scripts/normalize_rooted94_wfo2026_classification.py'
       - 'data/wfo2026_06_curated_legacy_overrides_v0_1.csv'
       - '.github/workflows/rooted94-wfo2026-taxonomy-normalization.yml'
@@ -28,7 +28,7 @@ jobs:
         with:
           python-version: '3.12'
       - name: Install dependencies
-        run: python -m pip install --disable-pip-version-check -r requirements-rooted94-tree.txt
+        run: python -m pip install --disable-pip-version-check -r requirements/requirements-rooted94-tree.txt
       - name: Download frozen rooted94 topology
         env:
           GH_TOKEN: ${{ github.token }}

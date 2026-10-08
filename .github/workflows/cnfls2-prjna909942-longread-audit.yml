@@ -3,7 +3,7 @@ name: CnFLS2 PRJNA909942 long-read audit
 on:
   pull_request:
     paths:
-      - 'requirements-cnfls2-http.txt'
+      - 'requirements/requirements-cnfls2-http.txt'
       - 'scripts/audit_prjna909942_longread_runs.py'
       - '.github/workflows/cnfls2-prjna909942-longread-audit.yml'
   workflow_dispatch:
@@ -21,7 +21,7 @@ jobs:
         with:
           python-version: '3.12'
       - name: Install requests
-        run: python -m pip install --disable-pip-version-check -r requirements-cnfls2-http.txt
+        run: python -m pip install --disable-pip-version-check -r requirements/requirements-cnfls2-http.txt
       - name: Identify PRJNA909942 long-read run
         run: python scripts/audit_prjna909942_longread_runs.py --out-dir build/cnfls2_longread_audit
       - name: Report

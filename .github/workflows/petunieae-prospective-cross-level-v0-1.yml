@@ -2,7 +2,7 @@ name: Petunieae prospective cross-level v0.1
 on:
   pull_request:
     paths:
-      - 'requirements-petunieae-cross-level.txt'
+      - 'requirements/requirements-petunieae-cross-level.txt'
       - 'docs/PETUNIEAE_PROSPECTIVE_CROSS_LEVEL_GATE_V0_1.md'
       - 'scripts/ingest_petunieae_osf_v0_1.py'
       - 'scripts/analyze_petunieae_prospective_bridge_v0_1.py'
@@ -29,7 +29,7 @@ jobs:
         with:
           python-version: '3.12'
       - name: Install pinned analysis dependencies
-        run: python -m pip install --disable-pip-version-check -r requirements-petunieae-cross-level.txt
+        run: python -m pip install --disable-pip-version-check -r requirements/requirements-petunieae-cross-level.txt
       - name: Verify gate predates source acquisition and analysis
         run: |
           test -s docs/PETUNIEAE_PROSPECTIVE_CROSS_LEVEL_GATE_V0_1.md
