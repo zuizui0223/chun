@@ -1,0 +1,73 @@
+{
+  "version": "v0.1",
+  "status": "POST_OUTCOME_EXACT_PREDICTOR_DECOMPOSITION_DESCRIPTIVE_ONLY",
+  "sample_tips": 47,
+  "genes": 21,
+  "donors_k": 2,
+  "fine_classes": 6,
+  "state_only_mse": 1.138379056242746,
+  "random_two_expected_mse": 1.405938861662,
+  "nearest_two_mse": 1.2511674468445935,
+  "small_donor_penalty": 0.267559805419,
+  "locality_gain_over_random_two": 0.154771414817,
+  "net_nearest_two_penalty": 0.112788390602,
+  "small_donor_penalty_relative_to_state_mean": 0.23503578,
+  "locality_gain_relative_to_state_mean": 0.13595771,
+  "net_penalty_relative_to_state_mean": 0.0990780619015505,
+  "algebraic_identity_pass": true,
+  "frozen_primary_decision": "NOT_SUPPORTED",
+  "no_new_p_value": true,
+  "frozen_primary_outcome_unchanged": true,
+  "formula": "E_random2[MSE]=MSE_classmean + E_tips,genes[((m−2)/(2(m−1)))*within-class donor population variance / training-fold variance]",
+  "per_state_descriptive": [
+    {
+      "fine_code": "000000",
+      "retained_tips": 6,
+      "baseline_mse": 2.39636,
+      "random_two_expected_mse": 2.80797,
+      "phylogeny_two_mse": 2.56854,
+      "locality_gain": 0.23942
+    },
+    {
+      "fine_code": "000010",
+      "retained_tips": 6,
+      "baseline_mse": 1.22749,
+      "random_two_expected_mse": 1.51135,
+      "phylogeny_two_mse": 1.37361,
+      "locality_gain": 0.13774
+    },
+    {
+      "fine_code": "000011",
+      "retained_tips": 6,
+      "baseline_mse": 1.91765,
+      "random_two_expected_mse": 2.2286,
+      "phylogeny_two_mse": 1.885,
+      "locality_gain": 0.3436
+    },
+    {
+      "fine_code": "000100",
+      "retained_tips": 10,
+      "baseline_mse": 0.53645,
+      "random_two_expected_mse": 0.71669,
+      "phylogeny_two_mse": 0.66257,
+      "locality_gain": 0.05411
+    },
+    {
+      "fine_code": "000110",
+      "retained_tips": 6,
+      "baseline_mse": 1.04241,
+      "random_two_expected_mse": 1.29615,
+      "phylogeny_two_mse": 1.21061,
+      "locality_gain": 0.08553
+    },
+    {
+      "fine_code": "000111",
+      "retained_tips": 13,
+      "baseline_mse": 0.6643,
+      "random_two_expected_mse": 0.91137,
+      "phylogeny_two_mse": 0.76558,
+      "locality_gain": 0.14579
+    }
+  ],
+  "boundary": "The random two-donor result is an exact conditional expectation under sampling two donors without replacement from the fixed same-pigment-class pool; not observed new data, not a second biological replication, not a causally identified evolutionary mechanism, and no new significance test. The primary k=2 predictor gain remains negative."
+}
