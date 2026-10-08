@@ -40,3 +40,19 @@ def test_no_other_candidate_is_falsely_promoted() -> None:
     assert len(d["candidates"]) == 5
     assert all(x.get("current_status",x.get("status","")).startswith(("HOLD_","PIGMENT_","INDEPENDENT_","SMALL_"))
                for x in d["candidates"])
+
+
+def test_original_iochrominae_tree_http401_is_source_access_hold_not_negative_result():
+    receipt=json.loads((ROOT/"data/iochrominae_2015_exact_tree_transport_receipt_v0_1.json").read_text(encoding="utf-8"))
+    gate=json.loads((ROOT/"data/iochrominae_2015_published_tree_archive_identity_gate_v0_1.json").read_text(encoding="utf-8"))
+    assert receipt["source_doi"] == gate["source_doi"] == "10.5061/dryad.0732g"
+    assert receipt["file"] == gate["filename"]
+    assert receipt["expected_md5"] == gate["expected_md5"]
+    assert receipt["metadata_source_confirmed"] is True
+    assert receipt["source_archive_bytes_recovered"] is False
+    assert receipt["additional_replicate_admitted"] is False
+    assert len(receipt["attempts"]) == 2
+    assert all(x["result"] == "HTTP_401_UNAUTHORIZED" for x in receipt["attempts"])
+    assert receipt["expression_2018_28taxa_qpcr_numeric_table_recovered"] is False
+    assert receipt["phylogenetic_tree_members_examined"] is False
+    assert receipt["changed_frozen_science"] is False
