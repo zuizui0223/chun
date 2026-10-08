@@ -179,6 +179,10 @@
       {
         "doi": "10.3732/ajb.1500163",
         "lesson": "Tempo and mode of floral colour evolution among clades already studied"
+      },
+      {
+        "doi": "10.1111/2041-210X.12111",
+        "lesson": "Guénard et al. 2013 explicitly cautioned that statistically significant phylogenetic signal does not guarantee practically accurate trait prediction; the new Petunieae donor-budget decomposition is a source-specific demonstration, not discovery of this general idea."
       }
     ],
     "single_paper_status_after_heldout": "HOLD_1_RETROSPECTIVE_MATCHED_RADIATION_POSITIVE_STRUCTURE_BUT_K2_PREDICTIVE_TRANSFER_FAIL_AND_NO_INDEPENDENT_MATCHED_VALIDATION"
