@@ -1,6 +1,6 @@
 {
   "version": "v0.1",
-  "status": "INDEPENDENT_MATCHED_RADIATION_SOURCE_PREFLIGHT_NO_NEW_OUTCOMES",
+  "status": "INDEPENDENT_MATCHED_RADIATION_SOURCE_PREFLIGHT_NO_NEW_OUTCOMES_OR_REPLICATION",
   "created_on": "2026-10-08",
   "goal": "Obtain an independent radiation with published branch-length tree, species-level pigment identity, and numeric petal-pathway expression values to replicate the Petunieae within-fine-pigment-class conditional test.",
   "essential_rule": "Species-level tree, expression, and measured pigment signatures must join by auditable taxon keys. Article-level trends or photographed figure bars cannot substitute for an exact source numeric matrix.",
@@ -26,8 +26,19 @@
       "numeric_species_by_gene_expression_table_verified": false,
       "numeric_species_by_pigment_identity_verified": false,
       "current_status": "HOLD_2018_ROWLEVEL_EXPRESSION_AND_MATCHED_TREE_NOT_VERIFIED",
-      "next_source_action": "Retrieve original publisher Supplementary Material and original cited tree object independently; audit archive member and row schema before reading outcome values.",
-      "distinction": "This 2018 comparative qPCR paper is NOT the same source object as Larter et al. 2019 developmental Dvdy Dryad package; a 2019 package cannot be relabeled as 2018 qPCR data."
+      "next_source_action": "Verify 2015 published Smith-Goldberg tree from DOI 10.5061/dryad.0732g and species×7-gene qPCR numeric table from the 2018 MBE article/supplement independently; freeze taxon crosswalk before new expression outcome. Do not substitute 2018 shape study tree or 2019 development source silently.",
+      "distinction": "This 2018 comparative qPCR paper is NOT the same source object as Larter et al. 2019 developmental Dvdy Dryad package; a 2019 package cannot be relabeled as 2018 qPCR data.",
+      "original_analysis_tree_doi": "10.3732/ajb.1500163",
+      "original_tree_data_doi": "10.5061/dryad.0732g",
+      "original_tree_reference_status": "SOURCE_PUBLICATION_AND_DATA_DOI_IDENTIFIED_BYTES_NOT_VERIFIED",
+      "distinct_2018_shape_tree": {
+        "doi": "10.5061/dryad.5jn7b",
+        "source_paper_doi": "10.1111/evo.13416",
+        "contains_reported_MCC_tree": true,
+        "status": "ALTERNATIVE_LATER_SAME_CLADE_TOPOLOGY_NOT_ORIGINAL_LARTER2018_COMPARATIVE_TREE",
+        "use": "sensitivity only after frozen published-source crosswalk; never silently substitute for original 2015 tree"
+      },
+      "access_note": "Current Dryad client documentation states file/archive downloading may require authenticated access; previous anonymous 2019 frozen-source attempts did not recover exact objects. Authentication is not assumed to be connected."
     },
     {
       "id": "IOCHROMINAE_LARTER2019_DVDY",
