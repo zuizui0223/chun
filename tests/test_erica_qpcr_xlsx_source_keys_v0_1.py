@@ -54,7 +54,9 @@ def fixture(broken_id=False):
 class TestSourceKeyAudit(unittest.TestCase):
     def test_key_decomposition_and_no_inference(self):
         result = mod.source_key_audit(fixture())
-        self.assertEqual(result["status"], "SOURCE_KEYS_ADMITTED_FOR_SCHEMA_ONLY")
+        self.assertEqual(result["status"], "HOLD_UNRESOLVED_PATHWAY_MEASUREMENTS")
+        self.assertEqual(result["quantitative_pathway_measurements"], 3)
+        self.assertEqual(result["nonnumeric_reference_control_count"], 0)
         self.assertEqual(result["measurements"], 3)
         self.assertEqual(result["taxon_count_from_measurement_ids"], 2)
         self.assertEqual(result["gene_count_from_measurement_ids"], 3)
