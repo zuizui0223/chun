@@ -77,9 +77,14 @@ def lexical_tip_overlap(data:bytes, member:list[dict], reference:dict)->list[dic
                     })
                 results.append({"archive_member":e["name"],"parse_status":"PARSED",
                                 "trees_examined_max_30":observed})
-            except (OSError,UnicodeError,ValueError,IndexError,TypeError) as exc:
+            except Exception as exc:
+                # Some original NEXUS alignments end in .nex and contain
+                # malformed/alternative character definitions for Bio.Nexus.
+                # Preserve source identity and diagnose per-member rather than
+                # aborting the entire independently verified ZIP archive.
                 results.append({"archive_member":e["name"],"parse_status":"HOLD_PARSE",
-                                "error":type(exc).__name__+": "+str(exc)[:240]})
+                                "error":type(exc).__name__+": "+str(exc)[:240],
+                                "no_tree_information_inferred":True})
     return results
 
 def run(reference:dict, timeout:int=20, fetcher=None):
