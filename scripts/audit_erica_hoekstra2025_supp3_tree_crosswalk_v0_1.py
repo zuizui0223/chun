@@ -192,7 +192,25 @@ def main():
     for route in result["routes"]:print("ERICA_SOURCE_ROUTE",route)
     for m in result.get("members",[]):print("ERICA_TREE_ARCHIVE_MEMBER",m)
     for tree in result.get("parsed_tree_candidates",[]):
-        print("ERICA_TREE_TIP_LEXICAL_CROSSWALK",json.dumps(tree)[:12000])
+        if tree["parse_status"]!="PARSED":
+            print("ERICA_TREE_SOURCE_MEMBER_PARSE_HOLD",tree["archive_member"],tree.get("error"))
+            continue
+        for x in tree["trees_examined_max_30"]:
+            c=x["unverified_voucher_prefix_candidates"]
+            print("ERICA_TREE_VOUCHER_CANDIDATE_SUMMARY",json.dumps({
+                "source_tree":tree["archive_member"].split("/")[-1],
+                "terminal_samples":x["tip_count"],
+                "taxon_lineage_candidates":c["candidate_source_lineages"],
+                "candidate_colour_counts":c["candidate_lineages_by_visible_colour"],
+                "possible_unordered_pairs_not_admitted":c["possible_pair_upper_bound_for_these_label_candidates"],
+                "candidate_tip_names":[{"source":r["source_qpcr_taxon"],"colour":r["visible_colour"],
+                     "original_qpcr_tip_keys":r["raw_qpcr_epithet_tip_candidates"],
+                     "published_table2_tip_keys":r["published_table2_epithet_tip_candidates"]}
+                      for r in c["candidate_rows"] if r["union_unverified_voucher_candidates"]],
+                "unmatched_source_lineage_names":[r["source_qpcr_taxon"]
+                    for r in c["candidate_rows"] if not r["union_unverified_voucher_candidates"]],
+                "voucher_identity_and_sampling_not_yet_admitted":True
+            },sort_keys=True))
     print("NO_NEW_PHYLOGENETIC_MEMORY_TEST")
 
 if __name__=="__main__":main()
