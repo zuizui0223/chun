@@ -141,6 +141,27 @@
         "all_pelargonidin_cyanidin_peonidin_positive_taxa_excluded": true,
         "no_source_outcome_reopened": true,
         "inferential_boundary": "The nested expression-memory test applies to retained delphinidin branch derivative pigment-presence classes, not all six variable anthocyanidin types or all flower colour routes."
+      },
+      "pigment_abundance_adjusted_regulatory_memory": {
+        "source": "results/petunieae_pigment_adjusted_regulatory_memory_v0_1/result_v0_1.json",
+        "design": "data/petunieae_pigment_abundance_adjusted_regulatory_memory_design_v0_1.json",
+        "status": "RETROSPECTIVE_SUPPORT_AFTER_NINE_PIGMENT_AND_FINE_STATE_LINEAR_ADJUSTMENT",
+        "cohort_tips": 47,
+        "same_fine_state_pairs": 183,
+        "original_gene_expression_distance_rho": 0.607443846759381,
+        "pigment_abundance_adjusted_gene_expression_distance_rho": 0.511199259788796,
+        "residual_permutation_null_mean": 0.09532723294992239,
+        "centered_residual_rho": 0.4158720268388736,
+        "upper_tail_permutation_p": 0.0002,
+        "residual_variance_fraction": 0.48172362996774737,
+        "zero_variance_assayed_pigment_components": [
+          "Pel_mgg",
+          "Cyan_mgg",
+          "Peon_mgg"
+        ],
+        "caveat": "One already outcome-exposed phylogeny, null residual exchangeability approximate, controls only linear effects of assayed nine pigment quantities plus six fine-state labels, no genetically identified causal transition and no new generalization to original 32-radiation temporal-decay rates",
+        "original_two_nearest_predictor_fail_retained": true,
+        "original_frozen_AJB_and_EL_unchanged": true
       }
     }
   },
@@ -207,6 +228,7 @@
         "lesson": "Guénard et al. 2013 explicitly cautioned that statistically significant phylogenetic signal does not guarantee practically accurate trait prediction; the new Petunieae donor-budget decomposition is a source-specific demonstration, not discovery of this general idea."
       }
     ],
-    "single_paper_status_after_heldout": "HOLD_1_RETROSPECTIVE_MATCHED_RADIATION_POSITIVE_STRUCTURE_BUT_K2_PREDICTIVE_TRANSFER_FAIL_AND_NO_INDEPENDENT_MATCHED_VALIDATION"
+    "single_paper_status_after_heldout": "HOLD_1_RETROSPECTIVE_MATCHED_RADIATION_POSITIVE_STRUCTURE_BUT_K2_PREDICTIVE_TRANSFER_FAIL_AND_NO_INDEPENDENT_MATCHED_VALIDATION",
+    "single_paper_status_after_pigment_adjustment": "HOLD_ONE_RETROSPECTIVE_MATCHED_RADIATION_WITH_ADJUSTED_REGULATORY_MEMORY_POSITIVE_BUT_INDEPENDENT_GENERALIZATION_AND_CAUSAL_MECHANISM_UNTESTED"
   }
 }
