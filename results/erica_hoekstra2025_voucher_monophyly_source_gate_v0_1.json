@@ -1,0 +1,258 @@
+{
+  "version": "v0.1",
+  "date": "2026-10-10",
+  "role": "ORIGINAL_SEQUENCED_2025_IQTREE_SOURCE_ONLY_NOT_QPCR_EXPRESSION_INFERENCE",
+  "status": "HOLD_MULTIPLE_TIP_IDENTITY_NONMONOPHYLY_AND_PREDECLARED_PAIR_SUPPORT",
+  "source_original_archive_doi": "10.3897/phytokeys.257.139457.suppl3",
+  "source_original_md5": "d4363c6e604784b58c91d8a1d824a1f1",
+  "hosted_monophyly_run_id": 38062647910,
+  "original_source_tip_tree_sha_count": "3 distinct IQ-TREE molecular partition trees; not 3 independent evolutionary histories",
+  "source_taxa_2019_from_table2": 27,
+  "candidate_taxa_any_voucher": 22,
+  "unambiguous_unique_tip_taxa": 11,
+  "unambiguous_same_colour_pairs": 20,
+  "predeclared_min_taxa": 20,
+  "predeclared_min_pairs": 40,
+  "predeclared_min_colour_states_with_three_tips": 2,
+  "subset_criterion": "exactly one 2025 sampled source tip per labelled 2019 single-colour taxon; this is a descriptive strict safety subset and still requires same-taxon voucher verification",
+  "full_22_not_admitted_as_single_species_tips": true,
+  "monophyly_method": "for each prefix-matched species candidate set, compute MRCA on each original .treefile; compare its full descendants with candidate tip set",
+  "trees": [
+    {
+      "ambiguous_species": [
+        {
+          "monophyletic": false,
+          "n_vouchers": 2,
+          "source": "Erica_cerenthoides",
+          "unmatched_descendants": 2
+        },
+        {
+          "monophyletic": false,
+          "n_vouchers": 2,
+          "source": "Erica_discolor",
+          "unmatched_descendants": 10
+        },
+        {
+          "monophyletic": false,
+          "n_vouchers": 3,
+          "source": "Erica_unicolor",
+          "unmatched_descendants": 2
+        },
+        {
+          "monophyletic": false,
+          "n_vouchers": 2,
+          "source": "Erica_prolata",
+          "unmatched_descendants": 1
+        },
+        {
+          "monophyletic": false,
+          "n_vouchers": 3,
+          "source": "Erica_monadelphia",
+          "unmatched_descendants": 22
+        },
+        {
+          "monophyletic": false,
+          "n_vouchers": 4,
+          "source": "Erica_coccinea",
+          "unmatched_descendants": 2
+        },
+        {
+          "monophyletic": false,
+          "n_vouchers": 3,
+          "source": "Erica_regia",
+          "unmatched_descendants": 1
+        },
+        {
+          "monophyletic": false,
+          "n_vouchers": 12,
+          "source": "Erica_abietina",
+          "unmatched_descendants": 32
+        },
+        {
+          "monophyletic": false,
+          "n_vouchers": 7,
+          "source": "Erica_viscaria",
+          "unmatched_descendants": 7
+        },
+        {
+          "monophyletic": false,
+          "n_vouchers": 3,
+          "source": "Erica_vestita",
+          "unmatched_descendants": 20
+        },
+        {
+          "monophyletic": false,
+          "n_vouchers": 2,
+          "source": "Erica_stagnalis",
+          "unmatched_descendants": 2
+        }
+      ],
+      "monophyly": {
+        "False": 11
+      },
+      "multi": 11,
+      "single": 11,
+      "source_candidate": 22,
+      "tree": "iqtree_allGenes_MF_MERGE_v2_20240810.treefile"
+    },
+    {
+      "ambiguous_species": [
+        {
+          "monophyletic": false,
+          "n_vouchers": 2,
+          "source": "Erica_cerenthoides",
+          "unmatched_descendants": 5
+        },
+        {
+          "monophyletic": false,
+          "n_vouchers": 2,
+          "source": "Erica_discolor",
+          "unmatched_descendants": 15
+        },
+        {
+          "monophyletic": false,
+          "n_vouchers": 3,
+          "source": "Erica_unicolor",
+          "unmatched_descendants": 2
+        },
+        {
+          "monophyletic": false,
+          "n_vouchers": 2,
+          "source": "Erica_prolata",
+          "unmatched_descendants": 1
+        },
+        {
+          "monophyletic": false,
+          "n_vouchers": 2,
+          "source": "Erica_monadelphia",
+          "unmatched_descendants": 696
+        },
+        {
+          "monophyletic": false,
+          "n_vouchers": 4,
+          "source": "Erica_coccinea",
+          "unmatched_descendants": 1
+        },
+        {
+          "monophyletic": false,
+          "n_vouchers": 3,
+          "source": "Erica_regia",
+          "unmatched_descendants": 1
+        },
+        {
+          "monophyletic": false,
+          "n_vouchers": 12,
+          "source": "Erica_abietina",
+          "unmatched_descendants": 33
+        },
+        {
+          "monophyletic": false,
+          "n_vouchers": 7,
+          "source": "Erica_viscaria",
+          "unmatched_descendants": 11
+        },
+        {
+          "monophyletic": false,
+          "n_vouchers": 3,
+          "source": "Erica_vestita",
+          "unmatched_descendants": 20
+        },
+        {
+          "monophyletic": false,
+          "n_vouchers": 2,
+          "source": "Erica_stagnalis",
+          "unmatched_descendants": 2
+        }
+      ],
+      "monophyly": {
+        "False": 11
+      },
+      "multi": 11,
+      "single": 11,
+      "source_candidate": 22,
+      "tree": "iqtree_nuclear_MF_MERGE_v2_20240810.treefile"
+    },
+    {
+      "ambiguous_species": [
+        {
+          "monophyletic": false,
+          "n_vouchers": 2,
+          "source": "Erica_cerenthoides",
+          "unmatched_descendants": 2
+        },
+        {
+          "monophyletic": false,
+          "n_vouchers": 2,
+          "source": "Erica_discolor",
+          "unmatched_descendants": 3
+        },
+        {
+          "monophyletic": false,
+          "n_vouchers": 3,
+          "source": "Erica_unicolor",
+          "unmatched_descendants": 8
+        },
+        {
+          "monophyletic": false,
+          "n_vouchers": 2,
+          "source": "Erica_prolata",
+          "unmatched_descendants": 4
+        },
+        {
+          "monophyletic": false,
+          "n_vouchers": 2,
+          "source": "Erica_monadelphia",
+          "unmatched_descendants": 21
+        },
+        {
+          "monophyletic": false,
+          "n_vouchers": 4,
+          "source": "Erica_coccinea",
+          "unmatched_descendants": 5
+        },
+        {
+          "monophyletic": false,
+          "n_vouchers": 3,
+          "source": "Erica_regia",
+          "unmatched_descendants": 1
+        },
+        {
+          "monophyletic": false,
+          "n_vouchers": 12,
+          "source": "Erica_abietina",
+          "unmatched_descendants": 29
+        },
+        {
+          "monophyletic": false,
+          "n_vouchers": 7,
+          "source": "Erica_viscaria",
+          "unmatched_descendants": 24
+        },
+        {
+          "monophyletic": false,
+          "n_vouchers": 3,
+          "source": "Erica_vestita",
+          "unmatched_descendants": 33
+        },
+        {
+          "monophyletic": false,
+          "n_vouchers": 2,
+          "source": "Erica_stagnalis",
+          "unmatched_descendants": 6
+        }
+      ],
+      "monophyly": {
+        "False": 11
+      },
+      "multi": 11,
+      "single": 11,
+      "source_candidate": 22,
+      "tree": "iqtree_chloroplast_partitioned_MF_merge.treefile"
+    }
+  ],
+  "findings": "All 11 multi-accession prefix candidate sets are nonmonophyletic within each of the 3 original 2025 phylogenies; candidate labels include subspecies and accessions, and cannot be collapsed into one phylogenetic event without a justified unit/source rule.",
+  "new_regulatory_expression_statistic_calculated": false,
+  "independent_replication_admitted": false,
+  "negative_biological_evidence_claimed": false,
+  "original_camellia_AJB_and_EL_unchanged": true
+}
