@@ -80,6 +80,25 @@ The original Wheeler et al. (2023; DOI 10.1098/rspb.2023.0275) study covered wid
 
 **Implication:** the integrated paper must present the Petunieae expression result as a *restricted biochemical-within-state mechanism example*, not evidence that complete floral pigment pathways universally harbour the same kind of nested memory. Independent validation should preferentially sample pigment classes across the other anthocyanidin branches rather than merely reproduce a delphinidin-only filtered frame. Source: `results/petunieae_fine_pigment_state_retention_v0_1/coverage_v0_1.json`.
 
+## New source-specific adjudication: measured pigment amounts do not exhaust residual regulatory history
+
+A further, separately fixed retrospective within-Petunieae test asked whether the original 21-gene expression-distance/phylogenetic-distance association simply reflects **different measured concentrations within the same binary anthocyanidin states**. The original 47-tip matched source, 183 same-fine-state pairs, 21 gene axes and six retained pigment-state classes were unchanged. Six exact state fixed-effect indicators and nine source pigment-abundance columns (including three zero-variance assays) formed a linear nuisance model of rank 12; the gene-expression residuals contained 48.17% of the original standardized sum of squares.
+
+A constrained, within-fine-state, complete residual-vector permutation test (9,999 draws) gave:
+
+- unadjusted expression-distance/tree-distance rho: **+0.60744**;
+- after pigment concentration and six-state adjustment: **+0.51120**;
+- residual-permutation null mean rho: **+0.09533**;
+- centered effect: **+0.41587**;
+- one-sided permutation **P = 0.0002**;
+- descriptive leave-one-tip-out rho: **47/47 positive**.
+
+This directly narrows one concrete alternative explanation: the source-level relationship is **not exhausted by linear variation in the nine assayed pigment concentrations**. It does **not** isolate causal developmental regulation, eliminate unmeasured biochemistry or phylogenetically patterned source effects, or change the failed k=2 held-out prediction. The permutation assumes residual-vector exchangeability under the fitted nuisance model and is a retrospective source-specific test, not independent prospective validation. The six retained anthocyanidin-presence codes only vary in Del/Pet/Malv after the frozen 12-tip rare-state exclusions.
+
+See `docs/PETUNIEAE_PIGMENT_ABUNDANCE_ADJUSTED_REGULATORY_MEMORY_V0_1.md` and the frozen source result in `results/petunieae_pigment_adjusted_regulatory_memory_v0_1/result_v0_1.json`.
+
+The **one-paper submission ceiling is unchanged**: cross-radiation temporal-memory slopes and molecular-implementation levels remain unmatched quantitatively; no ecological or mutational cause of cross-lineage memory loss has been established. The Camellia AJB and frozen EL submission routes should not be deprecated on the strength of one outcome-opened source.
+
 ## Contribution vs existing prior art
 
 - **Not new:** convergent red visible colour via different pigment routes and phylogenetic structure of pigment-route use (Ng & Smith 2016, DOI 10.1111/nph.13576).
