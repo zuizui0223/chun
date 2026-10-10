@@ -41,6 +41,50 @@ def source_admission(data:bytes):
                             "format":TREE_SUFFIXES.get(pathlib.PurePosixPath(m.filename).suffix.lower())})
     return members
 
+def voucher_prefix_candidates(tips:list[str], reference:dict)->dict:
+    """Source-label prefix candidates only; never voucher-verified taxa.
+
+    E.g. qPCR Erica_abietina vs tree abietina_KG123. Published Table2
+    spellings are tested independently, not silently substituted as synonyms.
+    """
+    rows=[r for r in reference["taxa"] if r["phenotypically_fixed_sample"]]
+    if len(rows)!=27 or len(set(r["collapsed_species_lineage"] for r in rows))!=27:
+        raise ValueError("original fixed-colour source lineage gate changed")
+    out=[]
+    colour_counts={}
+    for r in rows:
+        qname=r["collapsed_species_lineage"].removeprefix("Erica_")
+        printed=r["table2_taxon"].replace(" ","_")
+        def matches(key):
+            return sorted({t for t in tips if t==key or t.startswith(key+"_")})
+        literal=matches(qname)
+        published=matches(printed)
+        any_candidates=sorted(set(literal+published))
+        out.append({
+            "source_qpcr_taxon":r["qpcr_label"],
+            "table2_published_name":r["table2_taxon"],
+            "visible_colour":r["table2_visible_colour"],
+            "raw_qpcr_epithet_tip_candidates":literal,
+            "published_table2_epithet_tip_candidates":published,
+            "union_unverified_voucher_candidates":any_candidates,
+            "requires_taxon_and_sequence_voucher_verification":True,
+            "no_taxonomic_synonym_automatically_applied":True
+        })
+        if any_candidates:
+            c=r["table2_visible_colour"]
+            colour_counts[c]=colour_counts.get(c,0)+1
+    total=sum(bool(x["union_unverified_voucher_candidates"]) for x in out)
+    potential={c:n*(n-1)//2 for c,n in sorted(colour_counts.items())}
+    return {
+        "candidate_source_lineages":total,
+        "candidate_lineages_by_visible_colour":dict(sorted(colour_counts.items())),
+        "potential_within_colour_unordered_lineage_pairs_not_admitted":potential,
+        "possible_pair_upper_bound_for_these_label_candidates":sum(potential.values()),
+        "candidate_rows":out,
+        "not_a_voucher_or_sequenced_tip_crosswalk":True,
+        "not_a_final_sample_or_inference_denominator":True
+    }
+
 def lexical_tip_overlap(data:bytes, member:list[dict], reference:dict)->list[dict]:
     rows=reference["taxa"]
     names=sorted({r["collapsed_species_lineage"] for r in rows
@@ -66,12 +110,14 @@ def lexical_tip_overlap(data:bytes, member:list[dict], reference:dict)->list[dic
                     distinct=set(tips)
                     exact=sorted(distinct.intersection(names))
                     obs_branch=sum(x.branch_length is not None for x in t.get_terminals())
+                    candidates=voucher_prefix_candidates(tips,reference)
                     observed.append({
                         "ordinal":i+1,"tip_count":len(tips),
                         "source_tip_name_sample":tips[:20],
                         "tip_name_exact_match_count":len(exact),
                         "exact_2019_qpcr_lineage_names":exact,
                         "tips_with_branch_lengths":obs_branch,
+                        "unverified_voucher_prefix_candidates":candidates,
                         "has_both_expected_taxa_and_tree":bool(exact) and obs_branch>0,
                         "no_sequence_sampling_or_imputation_status_inferred":True
                     })
