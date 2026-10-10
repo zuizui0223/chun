@@ -34,8 +34,8 @@ jobs:
       - name: Audit qPCR source taxon/stage/gene IDs without opening outcome
         run: |
           if [ -f build/erica_source_original.xlsx ]; then
-            python scripts/audit_erica_qpcr_source_keys_v0_1.py \\
-              --source build/erica_source_original.xlsx \\
+            python scripts/audit_erica_qpcr_source_keys_v0_1.py \
+              --source build/erica_source_original.xlsx \
               --out build/erica_qpcr_source_keys_v0_1.json
           else
             echo 'SOURCE_ACCESS_HOLD_SKIP_KEY_AUDIT'
