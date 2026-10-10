@@ -1,0 +1,88 @@
+{
+  "version": "v0.1",
+  "status": "FIXED_BEFORE_ANY_ERICA_TREE_EXPRESSION_OUTCOME_SOURCE_PREVIOUSLY_AVAILABLE",
+  "date_fixed": "2026-10-10",
+  "role": "RETROSPECTIVE_PUBLIC_SOURCE_FUTURE_TREE_ADMISSION_HYPOTHESIS",
+  "source": {
+    "qpcr_dataset_doi": "10.25413/sun.9980498",
+    "study_article_doi": "10.3389/fpls.2019.01565",
+    "source_table": "Table 2",
+    "crosswalk": "data/erica_table2_visible_colour_qpcr_taxon_crosswalk_v0_1.json",
+    "original_archive_action_run": 38046569468,
+    "original_qpcr_numeric_values_previously_recovered": true,
+    "source_pigment_sixbit_values_measured": false,
+    "original_2016_phylogeny_study": "S18291",
+    "later_phylogeny_must_be_identified_as_sensitivity": true
+  },
+  "question": "Does a lineage's developmentally structured anthocyanin-pathway gene-expression profile retain ancestry within a shared visible flower-colour state?",
+  "unit": "one independently sampled, source-labelled taxon/tip, never individual gene, developmental stage, qPCR technical replicate, or independent flower-colour morph of the same taxon",
+  "frame": {
+    "from_table2": 30,
+    "one_multimorph_plukenetii_lineage_excluded_from_primary": true,
+    "eligible_single_colour_taxon_labels_before_tree_join": 27,
+    "original_color_counts": {
+      "red": 14,
+      "pink": 6,
+      "white": 5,
+      "yellow": 2
+    },
+    "upper_bound_within_color_unordered_pairs": 117,
+    "do_not_assert_actual_joined_tree_tips": true,
+    "tree_admission": "require original 2016 observed-tip branch-length tree, or a separately designated 2024 sequenced-only sensitivity; nonsequenced phylogenetic imputations not admitted",
+    "aliases": "explicit voucher/name source crosswalk, do not use automated fuzzy/orthographic string substitutions",
+    "eligible_joined_tips_at_least": 20,
+    "eligible_within_visible_color_pairs_at_least": 40,
+    "eligible_distinct_color_states_with_at_least_3_tips": 2,
+    "source_observation_gate_not_a_biological_sign_test": true
+  },
+  "molecular_features": {
+    "original_genes": [
+      "ANS",
+      "CHI",
+      "CHS",
+      "DFR",
+      "F3'H",
+      "F3H",
+      "UDP3-O-GST"
+    ],
+    "flower_age_stages": [
+      "juvenile",
+      "intermediate",
+      "adult"
+    ],
+    "primary_feature_axis": "7 pathway genes × 3 development stages =21 fixed developmentally ordered features per independently matched tip",
+    "fold_expression": "use original source Fold Change 2^-ΔΔCt numeric values; require strictly positive and finite and comparable calibration across taxa, otherwise HOLD",
+    "transform": "log2 of source fold-change, then per feature equal-weight population zscore among admitted tips",
+    "zero_variance_rule": "do not silently select response axes; if any fixed 21 feature has zero variance, flag structural HOLD and separately report invariant component",
+    "stage_axis_homology": "published juvenile/intermediate/adult categories are relative developmental states, not directly matched chronological times; do not infer absolute heterochrony or use developmental stages as tips"
+  },
+  "primary_test": {
+    "pair_universe": "unordered pairs of distinct non-polymorphic sequenced taxa carrying exactly identical visible red/pink/white/yellow Table 2 codes; same-color pair count determined after prospective tip join",
+    "predictor": "patristic distance from originally chosen nonimputed branch-length source tree",
+    "outcome": "equal-weight RMS Euclidean distance in all 21 stage-by-gene fixed standardized log2 fold-change features",
+    "statistic": "Spearman rho across within-visible-color unordered pairs (dependent pair observations)",
+    "null": "9,999 independent permutations of intact 21-coordinate species expression vectors within the fixed visible-color class, preserving stage covariance, with observed phylogeny, tip labels, and color classes unchanged",
+    "seed": 20261010,
+    "permutations": 9999,
+    "one_sided_p": "(1 + number null rho >= observed rho)/10000",
+    "pass_rule": "positive observed-minus-null-mean Spearman rho AND p<=0.05 AND source support gates passed",
+    "not_supported_rule": "if support gates passed and pass criterion not met, NOT_SUPPORTED for this estimand, no pooling or recoding",
+    "structural_hold_rule": "if required observed taxon, calibrated qPCR, biochemical-unit, or branch-length tree not admitted, HOLD not biological FAIL"
+  },
+  "secondary_descriptive": {
+    "age_collapsed": "within gene, mean log2 fold-change across the three stages, then standardize across admitted tips and recompute same-colour correlation; descriptive only, no new p value",
+    "per_stage": "three separate 7-gene stage contrasts descriptive only (no stage selected based on outcome)",
+    "sensitivity": "2024 sequenced-only tree as explicitly independent source sensitivity after source and imputed-tip gate; never substituted silently",
+    "biology": "A positive result means developmental-expression conservation conditional on visible flower colour, NOT the Petunieae pigment-chemistry-identical estimand, independent causal mutation events, fitness selection, or absolute decay time."
+  },
+  "firewall": {
+    "do_not_test_before_source_tree_is_admitted": true,
+    "does_not_reuse_petunieae_sixbit_identity": true,
+    "do_not_recode_red_plus_pink_after_outcome": true,
+    "do_not_select_stage_genes_or_tip_set_by_test_sign": true,
+    "no_spatial_sister_fcp_claim": true,
+    "source_not_independent_prospective_replication": true,
+    "original_frozen_camellia_ajb_and_el_unchanged": true,
+    "universal_memory_law_not_asserted": true
+  }
+}
