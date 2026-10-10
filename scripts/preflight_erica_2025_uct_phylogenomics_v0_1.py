@@ -128,6 +128,26 @@ def run(timeout:int=20,urlopen=None):
         except (OSError,ValueError,zipfile.BadZipFile) as exc:
             receipt.setdefault("download_holds",[]).append({
                 "name":f["name"],"error":type(exc).__name__+": "+str(exc)[:300]})
+    # Follow exact article README rather than guessing unseen tree filenames.
+    readmes=[f for f in cc if f["name"].lower() in ("readme.txt","readme.md")]
+    if len(readmes)==1 and 0<readmes[0]["size"]<=16_000:
+        f=readmes[0]
+        u=f["download_url"]
+        host=urllib.parse.urlparse(u or "").hostname
+        if u and host and (host.endswith(".figshare.com") or host=="figshare.com"):
+            try:
+                raw=get(u,timeout=timeout,urlopen=urlopen,maxsize=16_000)
+                if len(raw)!=f["size"] or (f["advertised_md5"] and
+                        hashlib.md5(raw).hexdigest()!=f["advertised_md5"]):
+                    raise ValueError("original README byte identity mismatch")
+                plain=raw.decode("utf-8")
+                receipt["readme_source_sha256"]=hashlib.sha256(raw).hexdigest()
+                receipt["readme_text"]=plain[:12000]
+                receipt["readme_references"]=re.findall(r"https?://[^\\s<>\\\"]+",plain)
+                receipt["readme_source_identity_verified"]=True
+                payloads[f["name"]]=raw
+            except (OSError,ValueError,UnicodeError) as exc:
+                receipt["readme_hold"]=type(exc).__name__+": "+str(exc)[:300]
     if receipt.get("recovered_files"):
         receipt["actual_file_bytes_verified"]=True
         receipt["status"]="PASS_2025_SOURCE_BYTES_INVENTORY_NO_TREE_TIP_JOIN"
@@ -148,6 +168,8 @@ def main():
     print("ERICA_2025_SOURCE_LIST",json.dumps(r.get("files",[]))[:12000])
     print("ERICA_2025_RECOVERED",json.dumps(r.get("recovered_files",[]))[:16000])
     print("ERICA_2025_HOLDS",json.dumps(r.get("download_holds",[]))[:3000])
+    print("ERICA_2025_README_VERIFIED",r.get("readme_source_identity_verified",False))
+    print("ERICA_2025_README_TEXT",r.get("readme_text","")[:7000])
     if a.archive_dir and payloads:
         a.archive_dir.mkdir(parents=True,exist_ok=True)
         for filename,content in payloads.items():
