@@ -143,7 +143,7 @@ def run(timeout:int=20,urlopen=None):
                 plain=raw.decode("utf-8")
                 receipt["readme_source_sha256"]=hashlib.sha256(raw).hexdigest()
                 receipt["readme_text"]=plain[:12000]
-                receipt["readme_references"]=re.findall(r"https?://[^\\s<>\\\"]+",plain)
+                receipt["readme_references"]=re.findall(r"https?://\\S+", plain)
                 receipt["readme_source_identity_verified"]=True
                 payloads[f["name"]]=raw
             except (OSError,ValueError,UnicodeError) as exc:
