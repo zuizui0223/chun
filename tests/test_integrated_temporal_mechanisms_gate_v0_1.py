@@ -151,3 +151,38 @@ def test_retained_pigment_state_coverage_limits_six_compound_generalization() ->
     assert "six nominal assay dimensions reduce to three" in manuscript
     assert "Pelargonidin, cyanidin and peonidin are constant zero" in decision
     assert b["fine_state_coverage"]["no_source_outcome_reopened"] is True
+
+
+def test_pigment_abundance_adjusted_gene_memory_keeps_positive_and_negative_evidence_distinct() -> None:
+    gate = _gate()
+    bridge = gate["cross_tier_linkage"]["new_single_radiation_matched_petunieae_bridge"]
+    field = bridge["pigment_abundance_adjusted_regulatory_memory"]
+    recorded = json.loads((ROOT / field["source"]).read_text(encoding="utf-8"))
+    design = json.loads((ROOT / field["design"]).read_text(encoding="utf-8"))
+    assert field["status"] == "RETROSPECTIVE_SUPPORT_AFTER_NINE_PIGMENT_AND_FINE_STATE_LINEAR_ADJUSTMENT"
+    assert recorded["status"] == "PETUNIEAE_PIGMENT_ABUNDANCE_ADJUSTED_REGULATORY_MEMORY_RETROSPECTIVE"
+    assert design["status"] == "RETROSPECTIVE_NEW_ESTIMAND_FIXED_BEFORE_RESIDUALIZED_OUTCOME_CALCULATION"
+    assert recorded["n_tips"] == field["cohort_tips"] == 47
+    assert recorded["n_pairs"] == field["same_fine_state_pairs"] == 183
+    assert recorded["n_gene_axes"] == 21 and recorded["n_pigment_axes"] == 9
+    assert recorded["nuisance_rank"] == 12
+    assert recorded["unadjusted_rho_on_this_frame"] == pytest.approx(field["original_gene_expression_distance_rho"],abs=1e-12)
+    assert recorded["abundance_adjusted_rho"] == pytest.approx(field["pigment_abundance_adjusted_gene_expression_distance_rho"],abs=1e-12)
+    assert recorded["permutation_null_mean"] == pytest.approx(field["residual_permutation_null_mean"],abs=1e-12)
+    assert recorded["permutation_centered_rho"] == pytest.approx(field["centered_residual_rho"],abs=1e-12)
+    assert recorded["p_one_sided"] == field["upper_tail_permutation_p"] == 0.0002
+    assert recorded["decision"] == "RETROSPECTIVE_SUPPORT"
+    assert recorded["leave_one_tip_out_descriptive"]["positive_count"] == 47
+    assert recorded["zero_variance_pigment_columns"] == field["zero_variance_assayed_pigment_components"]
+    assert recorded["no_causal_independence_claimed"] is True
+    assert recorded["does_not_replace_original_k2_prediction_fail"] is True
+    assert bridge["heldout_prediction"]["status"] == "NOT_SUPPORTED_PREDECLARED_POSITIVE_GAIN"
+    assert gate["governance"]["no_actual_joint_parameter"] is True
+    assert "GENERALIZATION" in gate["governance"]["single_paper_status_after_pigment_adjustment"]
+
+    man = MANUSCRIPT.read_text(encoding="utf-8")
+    decision = DECISION.read_text(encoding="utf-8")
+    for token in ("+0.51120", "+0.09533", "0.0002", "rank **12**"):
+        assert token in man
+    assert "0.0002" in decision and "does not exhaust" in decision.lower()
+    assert "not an independent" in decision.lower() or "not independent" in decision.lower()
