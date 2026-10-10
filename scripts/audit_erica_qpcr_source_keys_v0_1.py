@@ -102,6 +102,8 @@ def source_key_audit(data: bytes) -> dict:
         "parsed_measurements": len(parsed),
         "unparsed_measurement_ids": unparsed[:15],
         "nonnumeric_fold_change_ids": nonnumeric[:15],
+        "nonnumeric_fold_change_count": len(nonnumeric),
+        "unparsed_measurement_count": len(unparsed),
         "taxon_count_from_measurement_ids": len(taxa),
         "taxa_with_row_counts": dict(sorted(taxa.items())),
         "stages": dict(sorted(stages.items())),
@@ -133,6 +135,8 @@ def main():
     print("ERICA_GENE_PANEL", sorted(r["genes_with_row_counts"]))
     print("ERICA_ALL_TAXA", sorted(r["taxa_with_row_counts"]))
     print("ERICA_UNPARSED", r["unparsed_measurement_ids"])
+    print("ERICA_MISSING_OR_NONNUMERIC_FOLD_CHANGE_COUNT", r["nonnumeric_fold_change_count"])
+    print("ERICA_MISSING_OR_NONNUMERIC_FOLD_CHANGE_FIRST", r["nonnumeric_fold_change_ids"])
     print("INDEPENDENT_PHYLOGENETIC_MEMORY_NOT_YET_TESTED")
 
 
