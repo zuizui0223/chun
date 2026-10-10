@@ -184,5 +184,5 @@ def test_pigment_abundance_adjusted_gene_memory_keeps_positive_and_negative_evid
     decision = DECISION.read_text(encoding="utf-8")
     for token in ("+0.51120", "+0.09533", "0.0002", "rank **12**"):
         assert token in man
-    assert "0.0002" in decision and "does not exhaust" in decision.lower()
+    assert "0.0002" in decision and "do not exhaust" in decision.lower()
     assert "not an independent" in decision.lower() or "not independent" in decision.lower()
