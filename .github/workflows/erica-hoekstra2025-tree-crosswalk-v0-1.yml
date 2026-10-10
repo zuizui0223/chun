@@ -1,0 +1,62 @@
+name: Erica Hoekstra 2025 real tree source and 27-lineage tip overlap
+
+on:
+  pull_request:
+    paths:
+      - 'scripts/audit_erica_hoekstra2025_supp3_tree_crosswalk_v0_1.py'
+      - 'tests/test_erica_hoekstra2025_supp3_tree_crosswalk_v0_1.py'
+      - '.github/workflows/erica-hoekstra2025-tree-crosswalk-v0-1.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  source_only:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install pinned phylogenetics dependencies
+        run: python -m pip install --disable-pip-version-check -r requirements/requirements-repository-integrity.txt
+      - name: Test exact source ZIP and taxon-unit join only
+        run: python -m unittest discover -s tests -p 'test_erica_hoekstra2025_supp3_tree_crosswalk_v0_1.py' -v
+      - name: Recover real 2025 Erica phylogeny Supplement 3 and count exact source IDs
+        run: |
+          python scripts/audit_erica_hoekstra2025_supp3_tree_crosswalk_v0_1.py \
+            --crosswalk data/erica_table2_visible_colour_qpcr_taxon_crosswalk_v0_1.json \
+            --out build/erica_hoekstra2025_source_receipt_v0_1.json \
+            --zip-out build/erica_hoekstra2025_original_sup3.zip \
+            --timeout 17
+      - name: Disallow untested memory or unobserved-tip claims
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          r=json.loads(Path('build/erica_hoekstra2025_source_receipt_v0_1.json').read_text())
+          assert r['source_doi']=='10.3897/phytokeys.257.139457.suppl3'
+          assert r['original_zenodo_record']==15606575
+          assert r['classification']=='DISTINCT_2025_PHYLOGENY_SOURCE_ONLY'
+          assert r['status'] in ('HOLD_ZENODO_TREE_BYTES_UNAVAILABLE',
+                                 'PASS_EXACT_2025_ZIP_SOURCE_NO_EVOLUTIONARY_MEMORY_INFERENCE')
+          assert not r['observed_sequence_tips_admitted']
+          assert not r['original_2016_tree_substituted']
+          assert not r['tree_chosen_for_memory_estimator']
+          assert not r['visible_colour_expression_tree_admission']
+          assert not r['independent_gene_memory_replication']
+          assert r['frozen_AJB_and_EL_unchanged']
+          if r['file_source_verified']:
+              assert Path('build/erica_hoekstra2025_original_sup3.zip').is_file()
+          print('ERICA_2025_TIP_SOURCE_GOVERNANCE_PASS',r['status'])
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: erica-hoekstra2025-supp3-source-v0-1
+          path: |
+            build/erica_hoekstra2025_source_receipt_v0_1.json
+            build/erica_hoekstra2025_original_sup3.zip
+          if-no-files-found: warn

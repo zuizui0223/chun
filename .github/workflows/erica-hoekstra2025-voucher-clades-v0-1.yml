@@ -1,0 +1,65 @@
+name: Erica 2025 voucher clade coherence gate before gene-expression inference
+
+on:
+  pull_request:
+    paths:
+      - 'scripts/audit_erica_hoekstra2025_voucher_monophyly_v0_1.py'
+      - 'tests/test_erica_hoekstra2025_voucher_monophyly_v0_1.py'
+      - '.github/workflows/erica-hoekstra2025-voucher-clades-v0-1.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  actions: read
+
+jobs:
+  no_outcome:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install exact required Biopython
+        run: python -m pip install --disable-pip-version-check biopython==1.88
+      - name: Test voucher-resolution source policy
+        run: python -m unittest discover -s tests -p 'test_erica_hoekstra2025_voucher_monophyly_v0_1.py' -v
+      - name: Fetch original byte-verified IQTREE archive from previous successful run
+        uses: actions/download-artifact@v4
+        with:
+          name: erica-hoekstra2025-supp3-source-v0-1
+          repository: zuizui0223/chun
+          run-id: 38062290346
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          path: build/hoeks_original
+      - name: Compute source-only full-voucher monophyly and non-target clade contamination
+        run: |
+          python scripts/audit_erica_hoekstra2025_voucher_monophyly_v0_1.py \
+            --zip build/hoeks_original/erica_hoekstra2025_original_sup3.zip \
+            --crosswalk data/erica_table2_visible_colour_qpcr_taxon_crosswalk_v0_1.json \
+            --out build/erica_2025_voucher_monophyly_v0_1.json
+      - name: Require no false taxon event or independent memory result
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          r=json.loads(Path('build/erica_2025_voucher_monophyly_v0_1.json').read_text())
+          assert r['source_archive_published_md5']=='d4363c6e604784b58c91d8a1d824a1f1'
+          assert len(r['trees'])==3
+          assert r['new_gene_expression_phylogenetic_statistic'] is False
+          assert r['original_2016_tree_replaced'] is False
+          assert r['same_specimen_qpcr_voucher_identity_proven'] is False
+          assert r['admitted_independent_replication'] is False
+          assert r['original_AJB_EL_science_unchanged']
+          assert all(t['n_source_candidate_lineages']==22 for t in r['trees'])
+          assert all(t['single_voucher_candidate_lineages']==11 for t in r['trees'])
+          assert all(t['single_voucher_possible_pairs']==20 for t in r['trees'])
+          print('ERICA_MULTIVOUCHER_PHYLOGENY_SOURCE_COHERENCE_AUDIT_PASS')
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: erica-hoekstra2025-voucher-monophyly-source-v0-1
+          path: build/erica_2025_voucher_monophyly_v0_1.json
+          if-no-files-found: warn
