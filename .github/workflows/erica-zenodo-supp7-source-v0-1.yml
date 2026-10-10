@@ -1,0 +1,60 @@
+name: Erica 2024 Zenodo preserved phylogeny source v0.1
+
+on:
+  pull_request:
+    paths:
+      - 'scripts/audit_erica_zenodo_supp7_tree_source_v0_1.py'
+      - 'tests/test_erica_zenodo_supp7_tree_source_v0_1.py'
+      - '.github/workflows/erica-zenodo-supp7-source-v0-1.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  source_only:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Verify exact 2024 DOI source admission and HOLD semantics
+        run: python -m unittest discover -s tests -p 'test_erica_zenodo_supp7_tree_source_v0_1.py' -v
+      - name: Recover 2024 tree ZIP via Zenodo archival record 12730704
+        run: |
+          python scripts/audit_erica_zenodo_supp7_tree_source_v0_1.py \
+            --out build/erica_zenodo_supp7_source_receipt_v0_1.json \
+            --archive build/erica_zenodo_supp7_source.zip
+      - name: Enforce zero new phylogenetic or biochemical inference
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          r=json.loads(Path('build/erica_zenodo_supp7_source_receipt_v0_1.json').read_text())
+          assert r['zenodo_record_id']==12730704
+          assert r['expected_dataset_doi']=='10.3897/phytokeys.244.124565.suppl7'
+          assert not r['is_original_2016_tree']
+          assert not r['selected_tree']
+          assert not r['expression_tree_taxon_join_verified']
+          assert not r['pigment_identity_join_verified']
+          assert not r['imputed_tip_exclusion_verified']
+          assert not r['new_evolutionary_memory_estimate']
+          assert not r['independent_replication_admitted']
+          assert r['frozen_submissions_unchanged']
+          if r['status'].startswith('PASS_'):
+              assert Path('build/erica_zenodo_supp7_source.zip').exists()
+              assert len(r['members'])>0
+          else:
+              assert r['status']=='HOLD_ZENODO_2024_TREE_SOURCE_NOT_ADMITTED'
+          print('ZENODO_TREE_SOURCE_GOVERNANCE_PASS',r['status'])
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: erica-zenodo-supp7-source-v0-1
+          path: |
+            build/erica_zenodo_supp7_source_receipt_v0_1.json
+            build/erica_zenodo_supp7_source.zip
+          if-no-files-found: warn
