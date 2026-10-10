@@ -54,7 +54,7 @@ class TreeCandidateTests(unittest.TestCase):
               "an_unrelated_voucher"]
         r=m.voucher_prefix_candidates(tips,REF)
         by={x["source_qpcr_taxon"]:x for x in r["candidate_rows"]}
-        assert r["candidate_source_lineages"]==4
+        assert r["candidate_source_lineages"]==5
         assert r["not_a_voucher_or_sequenced_tip_crosswalk"]
         assert by["Erica_abietina"]["raw_qpcr_epithet_tip_candidates"]==["abietina_MP123"]
         # The published spelling can match independently even when the
@@ -63,6 +63,7 @@ class TreeCandidateTests(unittest.TestCase):
         assert by["Erica_cerenthoides"]["published_table2_epithet_tip_candidates"]==["cerinthoides_X7"]
         assert by["Erica_sparmanii"]["published_table2_epithet_tip_candidates"]==["sparmannii_X9"]
         assert by["Erica_hematocodon"]["published_table2_epithet_tip_candidates"]==[]
+        assert by["Erica_hematocodon"]["raw_qpcr_epithet_tip_candidates"]==["hematocodon_X8"]
         assert r["not_a_final_sample_or_inference_denominator"]
 
     def test_html_masquerading_as_zip_is_hold(self):
