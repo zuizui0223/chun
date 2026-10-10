@@ -1,0 +1,51 @@
+name: Erica Pirie 2016 TreeBASE S18291 phylogeny source preflight
+
+on:
+  pull_request:
+    paths:
+      - 'scripts/preflight_erica_treebase_s18291_source_v0_1.py'
+      - 'tests/test_erica_treebase_s18291_source_preflight_v0_1.py'
+      - '.github/workflows/erica-treebase-s18291-source-preflight-v0-1.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  source_only:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Test TreeBASE parsing and non-replication gates
+        run: python -m unittest discover -s tests -p 'test_erica_treebase_s18291_source_preflight_v0_1.py' -v
+      - name: Fetch study-level TreeBASE S18291 source, no tree selection
+        run: python scripts/preflight_erica_treebase_s18291_source_v0_1.py --out build/erica_treebase_s18291_receipt_v0_1.json --save-export build/erica_treebase_source_export.txt --timeout 15
+      - name: Enforce independent-memory non-inference
+        run: |
+          python - <<'PY'
+          import json,pathlib
+          r=json.loads(pathlib.Path("build/erica_treebase_s18291_receipt_v0_1.json").read_text())
+          assert r["treebase_study_id"]=="S18291"
+          assert not r["selected_evolutionary_tree"]
+          assert not r["patristic_distance_matrix_computed"]
+          assert not r["taxon_crosswalk_verified"]
+          assert not r["pigment_gene_memory_test_performed"]
+          assert not r["independent_replication_admitted"]
+          assert r["original_ajb_el_submission_unchanged"]
+          assert r["status"] in (
+            "HOLD_TREEBASE_SOURCE_TREE_UNRECOVERED",
+            "SOURCE_TREE_EXPORT_RECOVERED_TAXON_AND_TREE_SELECTION_NOT_YET_ADMITTED")
+          print("TREEBASE_ERICA_FAIL_CLOSED_PASS",r["status"])
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: erica-treebase-s18291-source-preflight-v0-1
+          path: |
+            build/erica_treebase_s18291_receipt_v0_1.json
+            build/erica_treebase_source_export.txt
+          if-no-files-found: warn
