@@ -136,6 +136,8 @@ def main():
         args.save_xlsx.write_bytes(payload)
     print("ERICA_SOURCE_ONLY_STATUS", result["status"])
     print("ERICA_SHEETS", [(s["name"], s["nonempty_xml_rows"]) for s in result.get("sheets", [])])
+    for sh in result.get("sheets", []):
+        print("ERICA_SOURCE_FIRST_FIVE_ROWS", sh["name"], json.dumps(sh["first_five_rows"], ensure_ascii=False))
     if "transport_or_structure_error" in result:
         print("SOURCE_HOLD_CAUSE", result["transport_or_structure_error"])
     print("INDEPENDENT_MEMORY_REPLICATION_NOT_TESTED")
