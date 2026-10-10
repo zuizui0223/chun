@@ -1,0 +1,628 @@
+{
+  "version": "v0.1",
+  "date": "2026-10-10",
+  "status": "SOURCE_TREE_RECOVERED_22_LEXICAL_TAXA_STRICT_IDENTITY_SUPPORT_HOLD",
+  "source_study_doi": "10.3897/phytokeys.257.139457",
+  "source_archive_doi": "10.3897/phytokeys.257.139457.suppl3",
+  "zenodo_record": 15606575,
+  "zip_name": "oo_1344866.zip",
+  "published_original_zip_md5": "d4363c6e604784b58c91d8a1d824a1f1",
+  "verified_action_run": 38061975401,
+  "expanded_action_run": 38062290346,
+  "expression_source": "data/erica_table2_visible_colour_qpcr_taxon_crosswalk_v0_1.json",
+  "original_2016_tree_replaced": false,
+  "all_22_source_taxa_match_vouchers_verified": false,
+  "strict_unique_tip_gate": {
+    "predeclared_min_taxa": 20,
+    "predeclared_min_same_colour_pairs": 40,
+    "unambiguous_candidate_count": 11,
+    "unambiguous_possible_pairs": 20,
+    "status": "HOLD_FAILS_20_TAXON_40_PAIR_ADMISSION_GATE_NOT_NEGATIVE_BIOLOGY"
+  },
+  "trees": [
+    {
+      "source_tree_filename": "iqtree_allGenes_MF_MERGE_v2_20240810.treefile",
+      "original_tree_tip_count": 771,
+      "unverified_epithet_prefix_taxa": 22,
+      "by_colour": {
+        "pink": 6,
+        "red": 12,
+        "white": 2,
+        "yellow": 2
+      },
+      "possible_pairs_before_voucher_resolution": 83,
+      "unique_candidate_tip_taxa": 11,
+      "unique_candidate_tip_by_colour": {
+        "red": 5,
+        "pink": 5,
+        "white": 1
+      },
+      "unique_candidate_tip_possible_pairs": 20,
+      "unique_candidate_tip_source_candidates": [
+        {
+          "taxon": "Erica_cameronii",
+          "colour": "red",
+          "tip": "cameronii_ANA"
+        },
+        {
+          "taxon": "Erica_tetrathecoides",
+          "colour": "pink",
+          "tip": "tetrathecoides_MP1252"
+        },
+        {
+          "taxon": "Erica_sessiliflora",
+          "colour": "white",
+          "tip": "sessiliflora_MP604"
+        },
+        {
+          "taxon": "Erica_massonii",
+          "colour": "red",
+          "tip": "massonii_MP811"
+        },
+        {
+          "taxon": "Erica_squarrosa",
+          "colour": "pink",
+          "tip": "squarrosa_EO11742"
+        },
+        {
+          "taxon": "Erica_hematocodon",
+          "colour": "red",
+          "tip": "haematocodon_MP1033"
+        },
+        {
+          "taxon": "Erica_hirtiflora",
+          "colour": "pink",
+          "tip": "hirtiflora_MP958"
+        },
+        {
+          "taxon": "Erica_leucotrachela",
+          "colour": "red",
+          "tip": "leucotrachela_ANA"
+        },
+        {
+          "taxon": "Erica_pillansii",
+          "colour": "red",
+          "tip": "pillansii_pil_MP813"
+        },
+        {
+          "taxon": "Erica_parviflora",
+          "colour": "pink",
+          "tip": "parviflora_EO12492"
+        },
+        {
+          "taxon": "Erica_verticiliata",
+          "colour": "pink",
+          "tip": "verticillata_ANA"
+        }
+      ],
+      "ambiguous_multi_voucher_taxa": [
+        {
+          "taxon": "Erica_cerenthoides",
+          "colour": "red",
+          "voucher_count": 2,
+          "tip_ids": [
+            "cerinthoides_ANA",
+            "cerinthoides_MP653"
+          ]
+        },
+        {
+          "taxon": "Erica_discolor",
+          "colour": "red",
+          "voucher_count": 2,
+          "tip_ids": [
+            "discolor_heb_MP1214",
+            "discolor_spe_MP1217"
+          ]
+        },
+        {
+          "taxon": "Erica_unicolor",
+          "colour": "red",
+          "voucher_count": 3,
+          "tip_ids": [
+            "unicolor_geo_JP273",
+            "unicolor_mut_MP1245",
+            "unicolor_uni_MP1249"
+          ]
+        },
+        {
+          "taxon": "Erica_prolata",
+          "colour": "pink",
+          "voucher_count": 2,
+          "tip_ids": [
+            "prolata_EO11935",
+            "prolata_EO12748"
+          ]
+        },
+        {
+          "taxon": "Erica_monadelphia",
+          "colour": "red",
+          "voucher_count": 3,
+          "tip_ids": [
+            "monadelphia_FO",
+            "monadelphia_FO2_CP",
+            "monadelphia_FO2_ITS"
+          ]
+        },
+        {
+          "taxon": "Erica_coccinea",
+          "colour": "yellow",
+          "voucher_count": 4,
+          "tip_ids": [
+            "coccinea_coc_MP1020",
+            "coccinea_coc_MP1053",
+            "coccinea_coc_MP598",
+            "coccinea_uni_EO12849"
+          ]
+        },
+        {
+          "taxon": "Erica_regia",
+          "colour": "red",
+          "voucher_count": 3,
+          "tip_ids": [
+            "regia_mar_MP930",
+            "regia_reg_ANA",
+            "regia_reg_MP922"
+          ]
+        },
+        {
+          "taxon": "Erica_abietina",
+          "colour": "red",
+          "voucher_count": 12,
+          "tip_ids": [
+            "abietina_abi_ANA",
+            "abietina_abi_MP1013",
+            "abietina_atr_MP1029",
+            "abietina_aur_MP1320",
+            "abietina_aur_MP499",
+            "abietina_aur_MP514",
+            "abietina_aur_MP717",
+            "abietina_con_CM6",
+            "abietina_dia_CM11",
+            "abietina_dia_MP1015",
+            "abietina_per_MP1071",
+            "abietina_pet_EO"
+          ]
+        },
+        {
+          "taxon": "Erica_viscaria",
+          "colour": "white",
+          "voucher_count": 7,
+          "tip_ids": [
+            "viscaria_lon_ANA",
+            "viscaria_lon_MP1270",
+            "viscaria_lon_MP504",
+            "viscaria_lon_MP678",
+            "viscaria_mac_MP808",
+            "viscaria_pen_EO12466",
+            "viscaria_vis_MdV4"
+          ]
+        },
+        {
+          "taxon": "Erica_vestita",
+          "colour": "red",
+          "voucher_count": 3,
+          "tip_ids": [
+            "vestita_ANA",
+            "vestita_EO12702",
+            "vestita_MP1079"
+          ]
+        },
+        {
+          "taxon": "Erica_stagnalis",
+          "colour": "yellow",
+          "voucher_count": 2,
+          "tip_ids": [
+            "stagnalis_min_EO12740",
+            "stagnalis_sta_MP668"
+          ]
+        }
+      ],
+      "not_voucher_verified": true
+    },
+    {
+      "source_tree_filename": "iqtree_nuclear_MF_MERGE_v2_20240810.treefile",
+      "original_tree_tip_count": 749,
+      "unverified_epithet_prefix_taxa": 22,
+      "by_colour": {
+        "pink": 6,
+        "red": 12,
+        "white": 2,
+        "yellow": 2
+      },
+      "possible_pairs_before_voucher_resolution": 83,
+      "unique_candidate_tip_taxa": 11,
+      "unique_candidate_tip_by_colour": {
+        "red": 5,
+        "pink": 5,
+        "white": 1
+      },
+      "unique_candidate_tip_possible_pairs": 20,
+      "unique_candidate_tip_source_candidates": [
+        {
+          "taxon": "Erica_cameronii",
+          "colour": "red",
+          "tip": "cameronii_ANA"
+        },
+        {
+          "taxon": "Erica_tetrathecoides",
+          "colour": "pink",
+          "tip": "tetrathecoides_MP1252"
+        },
+        {
+          "taxon": "Erica_sessiliflora",
+          "colour": "white",
+          "tip": "sessiliflora_MP604"
+        },
+        {
+          "taxon": "Erica_massonii",
+          "colour": "red",
+          "tip": "massonii_MP811"
+        },
+        {
+          "taxon": "Erica_squarrosa",
+          "colour": "pink",
+          "tip": "squarrosa_EO11742"
+        },
+        {
+          "taxon": "Erica_hematocodon",
+          "colour": "red",
+          "tip": "haematocodon_MP1033"
+        },
+        {
+          "taxon": "Erica_hirtiflora",
+          "colour": "pink",
+          "tip": "hirtiflora_MP958"
+        },
+        {
+          "taxon": "Erica_leucotrachela",
+          "colour": "red",
+          "tip": "leucotrachela_ANA"
+        },
+        {
+          "taxon": "Erica_pillansii",
+          "colour": "red",
+          "tip": "pillansii_pil_MP813"
+        },
+        {
+          "taxon": "Erica_parviflora",
+          "colour": "pink",
+          "tip": "parviflora_EO12492"
+        },
+        {
+          "taxon": "Erica_verticiliata",
+          "colour": "pink",
+          "tip": "verticillata_ANA"
+        }
+      ],
+      "ambiguous_multi_voucher_taxa": [
+        {
+          "taxon": "Erica_cerenthoides",
+          "colour": "red",
+          "voucher_count": 2,
+          "tip_ids": [
+            "cerinthoides_ANA",
+            "cerinthoides_MP653"
+          ]
+        },
+        {
+          "taxon": "Erica_discolor",
+          "colour": "red",
+          "voucher_count": 2,
+          "tip_ids": [
+            "discolor_heb_MP1214",
+            "discolor_spe_MP1217"
+          ]
+        },
+        {
+          "taxon": "Erica_unicolor",
+          "colour": "red",
+          "voucher_count": 3,
+          "tip_ids": [
+            "unicolor_geo_JP273",
+            "unicolor_mut_MP1245",
+            "unicolor_uni_MP1249"
+          ]
+        },
+        {
+          "taxon": "Erica_prolata",
+          "colour": "pink",
+          "voucher_count": 2,
+          "tip_ids": [
+            "prolata_EO11935",
+            "prolata_EO12748"
+          ]
+        },
+        {
+          "taxon": "Erica_monadelphia",
+          "colour": "red",
+          "voucher_count": 2,
+          "tip_ids": [
+            "monadelphia_FO",
+            "monadelphia_FO2_ITS"
+          ]
+        },
+        {
+          "taxon": "Erica_coccinea",
+          "colour": "yellow",
+          "voucher_count": 4,
+          "tip_ids": [
+            "coccinea_coc_MP1020",
+            "coccinea_coc_MP1053",
+            "coccinea_coc_MP598",
+            "coccinea_uni_EO12849"
+          ]
+        },
+        {
+          "taxon": "Erica_regia",
+          "colour": "red",
+          "voucher_count": 3,
+          "tip_ids": [
+            "regia_mar_MP930",
+            "regia_reg_ANA",
+            "regia_reg_MP922"
+          ]
+        },
+        {
+          "taxon": "Erica_abietina",
+          "colour": "red",
+          "voucher_count": 12,
+          "tip_ids": [
+            "abietina_abi_ANA",
+            "abietina_abi_MP1013",
+            "abietina_atr_MP1029",
+            "abietina_aur_MP1320",
+            "abietina_aur_MP499",
+            "abietina_aur_MP514",
+            "abietina_aur_MP717",
+            "abietina_con_CM6",
+            "abietina_dia_CM11",
+            "abietina_dia_MP1015",
+            "abietina_per_MP1071",
+            "abietina_pet_EO"
+          ]
+        },
+        {
+          "taxon": "Erica_viscaria",
+          "colour": "white",
+          "voucher_count": 7,
+          "tip_ids": [
+            "viscaria_lon_ANA",
+            "viscaria_lon_MP1270",
+            "viscaria_lon_MP504",
+            "viscaria_lon_MP678",
+            "viscaria_mac_MP808",
+            "viscaria_pen_EO12466",
+            "viscaria_vis_MdV4"
+          ]
+        },
+        {
+          "taxon": "Erica_vestita",
+          "colour": "red",
+          "voucher_count": 3,
+          "tip_ids": [
+            "vestita_ANA",
+            "vestita_EO12702",
+            "vestita_MP1079"
+          ]
+        },
+        {
+          "taxon": "Erica_stagnalis",
+          "colour": "yellow",
+          "voucher_count": 2,
+          "tip_ids": [
+            "stagnalis_min_EO12740",
+            "stagnalis_sta_MP668"
+          ]
+        }
+      ],
+      "not_voucher_verified": true
+    },
+    {
+      "source_tree_filename": "iqtree_chloroplast_partitioned_MF_merge.treefile",
+      "original_tree_tip_count": 744,
+      "unverified_epithet_prefix_taxa": 22,
+      "by_colour": {
+        "pink": 6,
+        "red": 12,
+        "white": 2,
+        "yellow": 2
+      },
+      "possible_pairs_before_voucher_resolution": 83,
+      "unique_candidate_tip_taxa": 11,
+      "unique_candidate_tip_by_colour": {
+        "red": 5,
+        "pink": 5,
+        "white": 1
+      },
+      "unique_candidate_tip_possible_pairs": 20,
+      "unique_candidate_tip_source_candidates": [
+        {
+          "taxon": "Erica_cameronii",
+          "colour": "red",
+          "tip": "cameronii_ANA"
+        },
+        {
+          "taxon": "Erica_tetrathecoides",
+          "colour": "pink",
+          "tip": "tetrathecoides_MP1252"
+        },
+        {
+          "taxon": "Erica_sessiliflora",
+          "colour": "white",
+          "tip": "sessiliflora_MP604"
+        },
+        {
+          "taxon": "Erica_massonii",
+          "colour": "red",
+          "tip": "massonii_MP811"
+        },
+        {
+          "taxon": "Erica_squarrosa",
+          "colour": "pink",
+          "tip": "squarrosa_EO11742"
+        },
+        {
+          "taxon": "Erica_hematocodon",
+          "colour": "red",
+          "tip": "haematocodon_MP1033"
+        },
+        {
+          "taxon": "Erica_hirtiflora",
+          "colour": "pink",
+          "tip": "hirtiflora_MP958"
+        },
+        {
+          "taxon": "Erica_leucotrachela",
+          "colour": "red",
+          "tip": "leucotrachela_ANA"
+        },
+        {
+          "taxon": "Erica_pillansii",
+          "colour": "red",
+          "tip": "pillansii_pil_MP813"
+        },
+        {
+          "taxon": "Erica_parviflora",
+          "colour": "pink",
+          "tip": "parviflora_EO12492"
+        },
+        {
+          "taxon": "Erica_verticiliata",
+          "colour": "pink",
+          "tip": "verticillata_ANA"
+        }
+      ],
+      "ambiguous_multi_voucher_taxa": [
+        {
+          "taxon": "Erica_cerenthoides",
+          "colour": "red",
+          "voucher_count": 2,
+          "tip_ids": [
+            "cerinthoides_ANA",
+            "cerinthoides_MP653"
+          ]
+        },
+        {
+          "taxon": "Erica_discolor",
+          "colour": "red",
+          "voucher_count": 2,
+          "tip_ids": [
+            "discolor_heb_MP1214",
+            "discolor_spe_MP1217"
+          ]
+        },
+        {
+          "taxon": "Erica_unicolor",
+          "colour": "red",
+          "voucher_count": 3,
+          "tip_ids": [
+            "unicolor_geo_JP273",
+            "unicolor_mut_MP1245",
+            "unicolor_uni_MP1249"
+          ]
+        },
+        {
+          "taxon": "Erica_prolata",
+          "colour": "pink",
+          "voucher_count": 2,
+          "tip_ids": [
+            "prolata_EO11935",
+            "prolata_EO12748"
+          ]
+        },
+        {
+          "taxon": "Erica_monadelphia",
+          "colour": "red",
+          "voucher_count": 2,
+          "tip_ids": [
+            "monadelphia_FO",
+            "monadelphia_FO2_CP"
+          ]
+        },
+        {
+          "taxon": "Erica_coccinea",
+          "colour": "yellow",
+          "voucher_count": 4,
+          "tip_ids": [
+            "coccinea_coc_MP1020",
+            "coccinea_coc_MP1053",
+            "coccinea_coc_MP598",
+            "coccinea_uni_EO12849"
+          ]
+        },
+        {
+          "taxon": "Erica_regia",
+          "colour": "red",
+          "voucher_count": 3,
+          "tip_ids": [
+            "regia_mar_MP930",
+            "regia_reg_ANA",
+            "regia_reg_MP922"
+          ]
+        },
+        {
+          "taxon": "Erica_abietina",
+          "colour": "red",
+          "voucher_count": 12,
+          "tip_ids": [
+            "abietina_abi_ANA",
+            "abietina_abi_MP1013",
+            "abietina_atr_MP1029",
+            "abietina_aur_MP1320",
+            "abietina_aur_MP499",
+            "abietina_aur_MP514",
+            "abietina_aur_MP717",
+            "abietina_con_CM6",
+            "abietina_dia_CM11",
+            "abietina_dia_MP1015",
+            "abietina_per_MP1071",
+            "abietina_pet_EO"
+          ]
+        },
+        {
+          "taxon": "Erica_viscaria",
+          "colour": "white",
+          "voucher_count": 7,
+          "tip_ids": [
+            "viscaria_lon_ANA",
+            "viscaria_lon_MP1270",
+            "viscaria_lon_MP504",
+            "viscaria_lon_MP678",
+            "viscaria_mac_MP808",
+            "viscaria_pen_EO12466",
+            "viscaria_vis_MdV4"
+          ]
+        },
+        {
+          "taxon": "Erica_vestita",
+          "colour": "red",
+          "voucher_count": 3,
+          "tip_ids": [
+            "vestita_ANA",
+            "vestita_EO12702",
+            "vestita_MP1079"
+          ]
+        },
+        {
+          "taxon": "Erica_stagnalis",
+          "colour": "yellow",
+          "voucher_count": 2,
+          "tip_ids": [
+            "stagnalis_min_EO12740",
+            "stagnalis_sta_MP668"
+          ]
+        }
+      ],
+      "not_voucher_verified": true
+    }
+  ],
+  "inference": {
+    "new_regulatory_memory_rho": null,
+    "new_p_value": null,
+    "admitted_independent_replication": false,
+    "genetic_divergence_not_absolute_time": true,
+    "source_2019_qPCR_not_same_individuals_as_2025_vouchers": true,
+    "original_frozen_AJB_EL_unchanged": true
+  },
+  "note": "Original 2025 IQTREE tree tips are accession-labelled and the 2019 source lacks original sample voucher crosswalk. Some species have 2–12 candidate tips, often subspecies with possible phenotypic heterogeneity. Cannot silently choose one. Unique lexical one-tip subset fails predeclared support. Other 22 are source candidates only, not admitted matched species endpoints."
+}
