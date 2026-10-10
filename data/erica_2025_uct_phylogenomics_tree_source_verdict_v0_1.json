@@ -1,0 +1,33 @@
+{
+  "version": "v0.1",
+  "inspection_date": "2026-10-10",
+  "status": "PASS_EXACT_SOURCE_INVENTORY_NOT_AN_ERICA_SPECIES_TREE_SOURCE",
+  "publication": {
+    "citation": "Musker, Nuerk and Pirie 2025, PhytoKeys 251:87-118",
+    "doi": "10.3897/phytokeys.251.136373",
+    "data_doi": "10.25375/uct.27134208",
+    "figshare_article_id": 27134208
+  },
+  "hosted_receipt": {
+    "workflow_run": 38061210098,
+    "verified_original_readme": true,
+    "five_synthetic_source_admission_tests_passed": true
+  },
+  "actual_original_file_inventory": [
+    {"name":"ALL_Erica303_combined_HybPiper.fasta","file_id":49503738,"size_bytes":2303729,"source_md5":"3bde17e4177bfe582600c0172eed13fb","role":"target-reference-sequence-FASTA-not-a-species-tree"},
+    {"name":"ALL_Erica303_genomic_HybPiper.fasta","file_id":49503729,"size_bytes":1022367,"source_md5":"d6392eb528b6e045d5b233ab9c8bcd1c","role":"target-reference-sequence-FASTA-not-a-species-tree"},
+    {"name":"ALL_Erica303_transcripts_HybPiper.fasta","file_id":49503735,"size_bytes":1280870,"source_md5":"536e14add569fd0580f09f75567657be","role":"target-reference-sequence-FASTA-not-a-species-tree"},
+    {"name":"Readme.txt","file_id":49503732,"size_bytes":2044,"source_md5":"25a06755f332affaa209c0c4cd176c02","role":"original-source-description-target-design"}
+  ],
+  "readme_supported_scope": "FASTA target reference sequences for 303 target-capture genes from Erica grandiflora, Erica cinerea and several Rhododendron transcriptomes; designed to be used with HybPiper, not a 30-sampled-Erica-species-tip phylogenetic outcome tree.",
+  "record_contains_newick_nexus_species_tree": false,
+  "match_to_2019_30_qpcr_taxon_labels_possible_from_these_files": false,
+  "independent_regulatory_phylogenetic_memory_rho_calculated": false,
+  "independent_replication_admitted": false,
+  "alternative_2025_study_might_have_separate_unverified_tree_outputs": true,
+  "original_2016_treebase_s18291_unrecovered": true,
+  "original_2024_supp7_unrecovered": true,
+  "source_only_result_does_not_prove_no_other_public_erica_trees_exist": true,
+  "original_camellia_ajb_and_el_submission_unchanged": true,
+  "conclusion": "Stop treating Figshare article 27134208 as a tree archive. It is target-reference-marker source data. A separately archived actual inferred tree with species/tip coverage is required for a branch-distance analysis."
+}
