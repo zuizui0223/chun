@@ -5,6 +5,8 @@ on:
     paths:
       - 'scripts/preflight_erica_qpcr_xlsx_source_v0_1.py'
       - 'tests/test_erica_qpcr_xlsx_source_preflight_v0_1.py'
+      - 'tests/test_erica_qpcr_xlsx_source_keys_v0_1.py'
+      - 'scripts/audit_erica_qpcr_source_keys_v0_1.py'
       - '.github/workflows/erica-qpcr-xlsx-source-preflight-v0-1.yml'
   workflow_dispatch:
 
@@ -21,12 +23,23 @@ jobs:
         with:
           python-version: '3.12'
       - name: Verify fail-closed transport and workbook parsing tests
-        run: python -m unittest discover -s tests -p 'test_erica_qpcr_xlsx_source_preflight_v0_1.py' -v
+        run: |
+          python -m unittest discover -s tests -p 'test_erica_qpcr_xlsx_source_preflight_v0_1.py' -v
+          python -m unittest discover -s tests -p 'test_erica_qpcr_xlsx_source_keys_v0_1.py' -v
       - name: Fetch 28-taxon qPCR XLSX from published repository link
         run: |
           python scripts/preflight_erica_qpcr_xlsx_source_v0_1.py \
             --out build/erica_qpcr_source_receipt_v0_1.json \
             --save-xlsx build/erica_source_original.xlsx
+      - name: Audit qPCR source taxon/stage/gene IDs without opening outcome
+        run: |
+          if [ -f build/erica_source_original.xlsx ]; then
+            python scripts/audit_erica_qpcr_source_keys_v0_1.py \\
+              --source build/erica_source_original.xlsx \\
+              --out build/erica_qpcr_source_keys_v0_1.json
+          else
+            echo 'SOURCE_ACCESS_HOLD_SKIP_KEY_AUDIT'
+          fi
       - name: Enforce source-only gate regardless of transport result
         run: |
           python - <<'PY'
@@ -54,4 +67,5 @@ jobs:
           path: |
             build/erica_qpcr_source_receipt_v0_1.json
             build/erica_source_original.xlsx
+            build/erica_qpcr_source_keys_v0_1.json
           if-no-files-found: warn
