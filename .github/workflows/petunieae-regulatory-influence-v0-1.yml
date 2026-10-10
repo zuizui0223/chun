@@ -1,0 +1,73 @@
+name: Petunieae regulatory influence audit v0.1 (post-outcome)
+
+on:
+  pull_request:
+    paths:
+      - 'scripts/audit_petunieae_regulatory_influence_v0_1.py'
+      - 'tests/test_petunieae_regulatory_influence_v0_1.py'
+      - '.github/workflows/petunieae-regulatory-influence-v0-1.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  actions: read
+
+jobs:
+  diagnostic:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install pinned repository-science dependencies
+        run: python -m pip install --disable-pip-version-check -r requirements/requirements-repository-integrity.txt
+      - name: Synthetic influence tests and frozen original-result checks
+        run: pytest -q tests/test_petunieae_regulatory_influence_v0_1.py
+      - name: Retrieve exact original SHA-audited Petunieae data
+        uses: actions/download-artifact@v4
+        with:
+          name: petunieae-prospective-osf-v0-1
+          repository: zuizui0223/chun
+          run-id: 34182646549
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          path: build/petunieae_frozen_source
+      - name: Run all 21 leave-one-gene and six leave-one-code refit diagnostics
+        run: |
+          python scripts/audit_petunieae_regulatory_influence_v0_1.py \
+            --source build/petunieae_frozen_source \
+            --out build/petunieae_regulatory_influence_v0_1.json
+      - name: Check original result and forbid significance or universality upgrades
+        run: |
+          python - <<'PY'
+          import json, math
+          r=json.load(open("build/petunieae_regulatory_influence_v0_1.json"))
+          assert r["source_SHA256_verified"] is True
+          assert r["n_tips"]==47 and r["n_gene_axes"]==21
+          assert r["n_fine_codes"]==6 and r["same_code_pairs"]==183
+          assert abs(r["original_adjusted_rho_recomputed"]-0.511199259788796)<1e-10
+          assert len(r["leave_one_gene_out"])==21
+          assert len(r["leave_one_fine_code_out_refit"])==6
+          assert len(r["per_code_original_fit_descriptive"])==6
+          for entries, field in [
+             (r["leave_one_gene_out"], "rho"),
+             (r["leave_one_fine_code_out_refit"], "rho"),
+             (r["per_code_original_fit_descriptive"], "within_class_rho"),
+          ]:
+              assert all(math.isfinite(x[field]) for x in entries)
+          assert r["new_p_values"]==0
+          assert r["not_independent_replication"] is True
+          assert r["no_causal_or_adaptive_inference"] is True
+          assert r["does_not_rescue_k2_prediction_fail"] is True
+          assert r["original_frozen_ajb_and_el_unchanged"] is True
+          print("RETROSPECTIVE_INFLUENCE_AUDIT_VALIDATION_PASS")
+          print("LEAVE_ONE_GENE",r["leave_one_gene_out_summary"])
+          print("LEAVE_ONE_CLASS",r["leave_one_fine_code_out_summary"])
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: petunieae-regulatory-influence-v0-1
+          path: build/petunieae_regulatory_influence_v0_1.json
+          if-no-files-found: warn
