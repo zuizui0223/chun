@@ -1,0 +1,48 @@
+name: Erica 2024 PhytoKeys phylogeny ZIP source-only audit
+
+on:
+  pull_request:
+    paths:
+      - 'scripts/preflight_erica_2024_tree_bundle_v0_1.py'
+      - 'tests/test_erica_2024_tree_bundle_v0_1.py'
+      - '.github/workflows/erica-2024-tree-source-preflight-v0-1.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  source_only:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Confirm distinct later phylogeny source and fail-closed parsing
+        run: python -m unittest discover -s tests -p 'test_erica_2024_tree_bundle_v0_1.py' -v
+      - name: Retrieve published 2024 supplementary 7 tree files if accessible
+        run: python scripts/preflight_erica_2024_tree_bundle_v0_1.py --out build/erica_2024_tree_source_receipt_v0_1.json --save-zip build/erica_2024_supp7_trees.zip --timeout 12
+      - name: Enforce no imputation and no independent memory claim
+        run: |
+          python - <<'PY'
+          import json,pathlib
+          r=json.loads(pathlib.Path('build/erica_2024_tree_source_receipt_v0_1.json').read_text())
+          assert r['supplement_doi']=='10.3897/phytokeys.244.124565.suppl7'
+          assert r['source_role']=='ALTERNATIVE_LATER_TREE_NOT_ORIGINAL_2016'
+          assert r['selection_of_phylogenetic_tree']=='NOT_PERFORMED'
+          assert r['taxon_crosswalk_checked'] is False
+          assert r['no_imputed_species_admitted'] is True
+          assert r['independent_regulatory_memory_replication'] is False
+          assert r['first_submission_contracts_unchanged'] is True
+          print('ERICA_LATER_TREE_SOURCE_FIREWALL_PASS',r['status'])
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: erica-2024-tree-source-preflight-v0-1
+          path: |
+            build/erica_2024_tree_source_receipt_v0_1.json
+            build/erica_2024_supp7_trees.zip
+          if-no-files-found: warn
