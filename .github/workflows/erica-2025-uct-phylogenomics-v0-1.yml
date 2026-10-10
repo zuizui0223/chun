@@ -1,0 +1,57 @@
+name: Erica 2025 UCT phylogenomic tree source preflight
+
+on:
+  pull_request:
+    paths:
+      - 'scripts/preflight_erica_2025_uct_phylogenomics_v0_1.py'
+      - 'tests/test_erica_2025_uct_phylogenomics_v0_1.py'
+      - '.github/workflows/erica-2025-uct-phylogenomics-v0-1.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  source_audit:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Validate metadata and exact tree archive identities
+        run: python -m unittest discover -s tests -p 'test_erica_2025_uct_phylogenomics_v0_1.py' -v
+      - name: Fetch authentic 2025 phylogenomics data record and modest-size tree candidates
+        run: |
+          python scripts/preflight_erica_2025_uct_phylogenomics_v0_1.py \
+            --out build/erica_2025_source_receipt_v0_1.json \
+            --archive-dir build/erica_2025_source_files \
+            --timeout 15
+      - name: Reject false tree-to-expression admission and preserve first submission
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          r=json.loads(Path('build/erica_2025_source_receipt_v0_1.json').read_text())
+          assert r['target_article_id']==27134208
+          assert r['expected_doi']=='10.25375/uct.27134208'
+          assert r['selected_phylogeny'] is False
+          assert r['same_taxa_expression_tree_join_verified'] is False
+          assert r['observed_sequenced_tips_only_unverified'] is True
+          assert r['independent_memory_test_performed'] is False
+          assert r['frozen_AJB_EL_unchanged'] is True
+          assert r['original_2016_and_2024_tree_distinction_maintained'] is True
+          assert r['status'] in ['HOLD_PHYLOGENOMIC_SOURCE_METADATA_UNAVAILABLE',
+                                'PASS_2025_METADATA_FILE_INVENTORY_ONLY',
+                                'PASS_2025_SOURCE_BYTES_INVENTORY_NO_TREE_TIP_JOIN']
+          print('ERICA_2025_SOURCE_ONLY_GATE_PASS',r['status'])
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: erica-2025-phylogenomics-source-v0-1
+          path: |
+            build/erica_2025_source_receipt_v0_1.json
+            build/erica_2025_source_files/
+          if-no-files-found: warn
