@@ -1,0 +1,51 @@
+name: Erica 2016 published supplement ZIP source inspection
+
+on:
+  pull_request:
+    paths:
+      - 'scripts/audit_erica_pirie2016_publisher_supplements_v0_1.py'
+      - 'tests/test_erica_pirie2016_publisher_supplements_v0_1.py'
+      - '.github/workflows/erica-pirie2016-publisher-supplements-v0-1.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  preflight:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 6
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Test source ZIP distinction
+        run: python -m unittest discover -s tests -p 'test_erica_pirie2016_publisher_supplements_v0_1.py' -v
+      - name: Fetch only official 2016 Springer source archives
+        run: |
+          python scripts/audit_erica_pirie2016_publisher_supplements_v0_1.py \
+            --out build/pirie2016_publisher_supplement_receipt_v0_1.json \
+            --archive-dir build/pirie2016_original_source_zips --timeout 20
+      - name: Require no false raw phylogeny inference
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          r=json.loads(Path('build/pirie2016_publisher_supplement_receipt_v0_1.json').read_text())
+          assert r['original_publication_doi']=='10.1186/s12862-016-0764-3'
+          assert r['original_2016_treebase_S18291_unchanged_HOLD']
+          assert not r['new_phylogenetic_tree_admitted']
+          assert r['no_species_tip_or_branch_distance_computed']
+          assert not r['new_regulatory_memory_replicate']
+          assert r['AJB_and_EL_frozen_science_unchanged']
+          print('PIRIE2016_SOURCE_FIREWALL_PASS',r['status'])
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: erica-pirie2016-supplement-source-v0-1
+          path: |
+            build/pirie2016_publisher_supplement_receipt_v0_1.json
+            build/pirie2016_original_source_zips/
+          if-no-files-found: warn

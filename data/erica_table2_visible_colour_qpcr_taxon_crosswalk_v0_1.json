@@ -1,0 +1,292 @@
+{
+  "version": "v0.1",
+  "status": "SOURCE_TABLE2_EXPLICIT_VISIBLE_COLOUR_CROSSWALK_UNVERIFIED_TREE_TIPS",
+  "source_article_doi": "10.3389/fpls.2019.01565",
+  "source_table": "Table 2",
+  "source_url": "https://www.frontiersin.org/journals/plant-science/articles/10.3389/fpls.2019.01565/full",
+  "measurement_source_doi": "10.25413/sun.9980498",
+  "measurement_units_not_species": 30,
+  "description": "Manually source-transcribed Table 2 visible-colour labels joined exactly to raw qPCR ID_REF taxa by an explicit row-level crosswalk; NOT a six-anthocyanidin pigment assay, genealogy or molecular-event test.",
+  "taxa": [
+    {
+      "qpcr_label": "Erica_cameronii",
+      "table2_taxon": "cameronii",
+      "table2_group": "A",
+      "table2_visible_colour": "red",
+      "collapsed_species_lineage": "Erica_cameronii",
+      "phenotypically_fixed_sample": true,
+      "spelling_mapping": "EXACT_TABLE2_EPITHET"
+    },
+    {
+      "qpcr_label": "Erica_tetrathecoides",
+      "table2_taxon": "tetrathecoides",
+      "table2_group": "A",
+      "table2_visible_colour": "pink",
+      "collapsed_species_lineage": "Erica_tetrathecoides",
+      "phenotypically_fixed_sample": true,
+      "spelling_mapping": "EXACT_TABLE2_EPITHET"
+    },
+    {
+      "qpcr_label": "Erica_cerenthoides",
+      "table2_taxon": "cerinthoides",
+      "table2_group": "B",
+      "table2_visible_colour": "red",
+      "collapsed_species_lineage": "Erica_cerenthoides",
+      "phenotypically_fixed_sample": true,
+      "spelling_mapping": "SOURCE_PRINTED_SPELLING_DIFFERS_OR_SUBSPECIFIC_NAME"
+    },
+    {
+      "qpcr_label": "Erica_sparmanii",
+      "table2_taxon": "sparmannii",
+      "table2_group": "B",
+      "table2_visible_colour": "white",
+      "collapsed_species_lineage": "Erica_sparmanii",
+      "phenotypically_fixed_sample": true,
+      "spelling_mapping": "SOURCE_PRINTED_SPELLING_DIFFERS_OR_SUBSPECIFIC_NAME"
+    },
+    {
+      "qpcr_label": "Erica_discolor",
+      "table2_taxon": "discolor",
+      "table2_group": "C",
+      "table2_visible_colour": "red",
+      "collapsed_species_lineage": "Erica_discolor",
+      "phenotypically_fixed_sample": true,
+      "spelling_mapping": "EXACT_TABLE2_EPITHET"
+    },
+    {
+      "qpcr_label": "Erica_unicolor",
+      "table2_taxon": "unicolor",
+      "table2_group": "C",
+      "table2_visible_colour": "red",
+      "collapsed_species_lineage": "Erica_unicolor",
+      "phenotypically_fixed_sample": true,
+      "spelling_mapping": "EXACT_TABLE2_EPITHET"
+    },
+    {
+      "qpcr_label": "Erica_prolata",
+      "table2_taxon": "prolata",
+      "table2_group": "C",
+      "table2_visible_colour": "pink",
+      "collapsed_species_lineage": "Erica_prolata",
+      "phenotypically_fixed_sample": true,
+      "spelling_mapping": "EXACT_TABLE2_EPITHET"
+    },
+    {
+      "qpcr_label": "Erica_plukenetii_plukenetii_white",
+      "table2_taxon": "plukenetii plukenetii",
+      "table2_group": "D",
+      "table2_visible_colour": "white",
+      "collapsed_species_lineage": "Erica_plukenetii_plukenetii",
+      "phenotypically_fixed_sample": false,
+      "spelling_mapping": "SOURCE_PRINTED_SPELLING_DIFFERS_OR_SUBSPECIFIC_NAME"
+    },
+    {
+      "qpcr_label": "Erica_plukenetii_plukenetii_pink",
+      "table2_taxon": "plukenetii plukenetii",
+      "table2_group": "D",
+      "table2_visible_colour": "pink",
+      "collapsed_species_lineage": "Erica_plukenetii_plukenetii",
+      "phenotypically_fixed_sample": false,
+      "spelling_mapping": "SOURCE_PRINTED_SPELLING_DIFFERS_OR_SUBSPECIFIC_NAME"
+    },
+    {
+      "qpcr_label": "Erica_plukenetii_plukenetii_red",
+      "table2_taxon": "plukenetii plukenetii",
+      "table2_group": "D",
+      "table2_visible_colour": "red",
+      "collapsed_species_lineage": "Erica_plukenetii_plukenetii",
+      "phenotypically_fixed_sample": false,
+      "spelling_mapping": "SOURCE_PRINTED_SPELLING_DIFFERS_OR_SUBSPECIFIC_NAME"
+    },
+    {
+      "qpcr_label": "Erica_plukenetii_breviflora",
+      "table2_taxon": "plukenetii breviflora",
+      "table2_group": "D",
+      "table2_visible_colour": "white",
+      "collapsed_species_lineage": "Erica_plukenetii_breviflora",
+      "phenotypically_fixed_sample": true,
+      "spelling_mapping": "EXACT_TABLE2_EPITHET"
+    },
+    {
+      "qpcr_label": "Erica_monadelphia",
+      "table2_taxon": "monadelphia",
+      "table2_group": "E",
+      "table2_visible_colour": "red",
+      "collapsed_species_lineage": "Erica_monadelphia",
+      "phenotypically_fixed_sample": true,
+      "spelling_mapping": "EXACT_TABLE2_EPITHET"
+    },
+    {
+      "qpcr_label": "Erica_coccinea",
+      "table2_taxon": "coccinea",
+      "table2_group": "E",
+      "table2_visible_colour": "yellow",
+      "collapsed_species_lineage": "Erica_coccinea",
+      "phenotypically_fixed_sample": true,
+      "spelling_mapping": "EXACT_TABLE2_EPITHET"
+    },
+    {
+      "qpcr_label": "Erica_mammosa",
+      "table2_taxon": "mammosa",
+      "table2_group": "F",
+      "table2_visible_colour": "red",
+      "collapsed_species_lineage": "Erica_mammosa",
+      "phenotypically_fixed_sample": true,
+      "spelling_mapping": "EXACT_TABLE2_EPITHET"
+    },
+    {
+      "qpcr_label": "Erica_sessiliflora",
+      "table2_taxon": "sessiliflora",
+      "table2_group": "F",
+      "table2_visible_colour": "white",
+      "collapsed_species_lineage": "Erica_sessiliflora",
+      "phenotypically_fixed_sample": true,
+      "spelling_mapping": "EXACT_TABLE2_EPITHET"
+    },
+    {
+      "qpcr_label": "Erica_filipendula",
+      "table2_taxon": "filipendula",
+      "table2_group": "F",
+      "table2_visible_colour": "white",
+      "collapsed_species_lineage": "Erica_filipendula",
+      "phenotypically_fixed_sample": true,
+      "spelling_mapping": "EXACT_TABLE2_EPITHET"
+    },
+    {
+      "qpcr_label": "Erica_massonii",
+      "table2_taxon": "massonii",
+      "table2_group": "G",
+      "table2_visible_colour": "red",
+      "collapsed_species_lineage": "Erica_massonii",
+      "phenotypically_fixed_sample": true,
+      "spelling_mapping": "EXACT_TABLE2_EPITHET"
+    },
+    {
+      "qpcr_label": "Erica_squarrosa",
+      "table2_taxon": "squarrosa",
+      "table2_group": "G",
+      "table2_visible_colour": "pink",
+      "collapsed_species_lineage": "Erica_squarrosa",
+      "phenotypically_fixed_sample": true,
+      "spelling_mapping": "EXACT_TABLE2_EPITHET"
+    },
+    {
+      "qpcr_label": "Erica_regia",
+      "table2_taxon": "regia",
+      "table2_group": "H",
+      "table2_visible_colour": "red",
+      "collapsed_species_lineage": "Erica_regia",
+      "phenotypically_fixed_sample": true,
+      "spelling_mapping": "EXACT_TABLE2_EPITHET"
+    },
+    {
+      "qpcr_label": "Erica_abietina",
+      "table2_taxon": "abietina",
+      "table2_group": "H",
+      "table2_visible_colour": "red",
+      "collapsed_species_lineage": "Erica_abietina",
+      "phenotypically_fixed_sample": true,
+      "spelling_mapping": "EXACT_TABLE2_EPITHET"
+    },
+    {
+      "qpcr_label": "Erica_viscaria",
+      "table2_taxon": "viscaria",
+      "table2_group": "H",
+      "table2_visible_colour": "white",
+      "collapsed_species_lineage": "Erica_viscaria",
+      "phenotypically_fixed_sample": true,
+      "spelling_mapping": "EXACT_TABLE2_EPITHET"
+    },
+    {
+      "qpcr_label": "Erica_vestita",
+      "table2_taxon": "vestita",
+      "table2_group": "H",
+      "table2_visible_colour": "red",
+      "collapsed_species_lineage": "Erica_vestita",
+      "phenotypically_fixed_sample": true,
+      "spelling_mapping": "EXACT_TABLE2_EPITHET"
+    },
+    {
+      "qpcr_label": "Erica_hematocodon",
+      "table2_taxon": "haematocodon",
+      "table2_group": "I",
+      "table2_visible_colour": "red",
+      "collapsed_species_lineage": "Erica_hematocodon",
+      "phenotypically_fixed_sample": true,
+      "spelling_mapping": "SOURCE_PRINTED_SPELLING_DIFFERS_OR_SUBSPECIFIC_NAME"
+    },
+    {
+      "qpcr_label": "Erica_hirtiflora",
+      "table2_taxon": "hirtiflora",
+      "table2_group": "I",
+      "table2_visible_colour": "pink",
+      "collapsed_species_lineage": "Erica_hirtiflora",
+      "phenotypically_fixed_sample": true,
+      "spelling_mapping": "EXACT_TABLE2_EPITHET"
+    },
+    {
+      "qpcr_label": "Erica_stagnalis",
+      "table2_taxon": "stagnalis",
+      "table2_group": "J",
+      "table2_visible_colour": "yellow",
+      "collapsed_species_lineage": "Erica_stagnalis",
+      "phenotypically_fixed_sample": true,
+      "spelling_mapping": "EXACT_TABLE2_EPITHET"
+    },
+    {
+      "qpcr_label": "Erica_leucotrachela",
+      "table2_taxon": "leucotrachela",
+      "table2_group": "J",
+      "table2_visible_colour": "red",
+      "collapsed_species_lineage": "Erica_leucotrachela",
+      "phenotypically_fixed_sample": true,
+      "spelling_mapping": "EXACT_TABLE2_EPITHET"
+    },
+    {
+      "qpcr_label": "Erica_pillansii",
+      "table2_taxon": "pillansii",
+      "table2_group": "J",
+      "table2_visible_colour": "red",
+      "collapsed_species_lineage": "Erica_pillansii",
+      "phenotypically_fixed_sample": true,
+      "spelling_mapping": "EXACT_TABLE2_EPITHET"
+    },
+    {
+      "qpcr_label": "Erica_parviflora",
+      "table2_taxon": "parviflora",
+      "table2_group": "J",
+      "table2_visible_colour": "pink",
+      "collapsed_species_lineage": "Erica_parviflora",
+      "phenotypically_fixed_sample": true,
+      "spelling_mapping": "EXACT_TABLE2_EPITHET"
+    },
+    {
+      "qpcr_label": "Erica_verticiliata",
+      "table2_taxon": "verticillata",
+      "table2_group": "J",
+      "table2_visible_colour": "pink",
+      "collapsed_species_lineage": "Erica_verticiliata",
+      "phenotypically_fixed_sample": true,
+      "spelling_mapping": "SOURCE_PRINTED_SPELLING_DIFFERS_OR_SUBSPECIFIC_NAME"
+    },
+    {
+      "qpcr_label": "Erica_annectans",
+      "table2_taxon": "annectans",
+      "table2_group": "J",
+      "table2_visible_colour": "red",
+      "collapsed_species_lineage": "Erica_annectans",
+      "phenotypically_fixed_sample": true,
+      "spelling_mapping": "EXACT_TABLE2_EPITHET"
+    }
+  ],
+  "restrictions": {
+    "morphs_of_plukenetii_plukenetii_not_independent_lineage": 3,
+    "tree_tip_join_verified": false,
+    "same_biochemical_state_measured": false,
+    "within_lineage_morph_pairs_not_phylogenetic_pairs": true,
+    "group_letters_are_not_evolutionary_events": true,
+    "phenotype_table_not_new_pigment_assay": true,
+    "independent_memory_replication_admitted": false,
+    "existing_AJB_EL_science_unchanged": true
+  }
+}

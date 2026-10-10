@@ -1,0 +1,64 @@
+name: Erica original Table2 visible colour to qPCR taxon support gate v0.1
+
+on:
+  pull_request:
+    paths:
+      - 'data/erica_table2_visible_colour_qpcr_taxon_crosswalk_v0_1.json'
+      - 'scripts/audit_erica_table2_visible_colour_crosswalk_v0_1.py'
+      - 'tests/test_erica_table2_visible_colour_crosswalk_v0_1.py'
+      - '.github/workflows/erica-table2-colour-crosswalk-v0-1.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  actions: read
+
+jobs:
+  source_only:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 7
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Source table2 and morph de-duplication unit tests
+        run: python -m unittest discover -s tests -p 'test_erica_table2_visible_colour_crosswalk_v0_1.py' -v
+      - name: Acquire unchanged original Erica seven-gene RT-qPCR source archive
+        uses: actions/download-artifact@v4
+        with:
+          name: erica-qPCR-source-only-v0-1
+          repository: zuizui0223/chun
+          run-id: 38046569468
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          path: build/original_erica_qpcr_source
+      - name: Source-only Table 2 × all 30 actual expression-key join
+        run: |
+          python scripts/audit_erica_table2_visible_colour_crosswalk_v0_1.py \
+            --source-xlsx build/original_erica_qpcr_source/erica_source_original.xlsx \
+            --crosswalk data/erica_table2_visible_colour_qpcr_taxon_crosswalk_v0_1.json \
+            --out build/erica_table2_colour_crosswalk_v0_1.json
+      - name: Do not overclaim actual tree-pair observations or biochemistry
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          r=json.loads(Path('build/erica_table2_colour_crosswalk_v0_1.json').read_text())
+          assert r['status'].startswith('PASS_TABLE2_VISIBLE_COLOUR_QPCR_KEYS_ONLY')
+          assert r['raw_qpcr_id_labels']==30
+          assert r['lineage_labels_after_collapsing_colour_morphs']==28
+          assert r['single_visible_colour_lineages']==27
+          assert r['total_theoretical_pairs_before_tree_join']==117
+          assert r['no_imputed_or_unsequenced_phylogeny_tips_admitted']
+          assert r['no_true_phylogenetic_pair_count_computed']
+          assert r['no_sixbit_or_full_anthocyanidin_pigment_profile_measured']
+          assert r['no_cross_radiation_regulatory_memory_test']
+          assert r['original_AJB_and_EL_submissions_unchanged']
+          print('SOURCE_ONLY_30_KEY_VISIBLE_COLOUR_JOIN_PASS')
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: erica-table2-visible-colour-crosswalk-v0-1
+          path: build/erica_table2_colour_crosswalk_v0_1.json
+          if-no-files-found: warn
