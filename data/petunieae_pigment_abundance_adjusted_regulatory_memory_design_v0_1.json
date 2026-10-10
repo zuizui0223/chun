@@ -1,0 +1,74 @@
+{
+  "version": "v0.1",
+  "status": "RETROSPECTIVE_NEW_ESTIMAND_FIXED_BEFORE_RESIDUALIZED_OUTCOME_CALCULATION",
+  "question": "Within species sharing the same exact anthocyanidin-presence class, is the gene-expression phylogenetic distance association retained after accounting for the measured continuous pigment concentration profile?",
+  "source": {
+    "original_design": "data/petunieae_nested_regulatory_memory_preregistered_design_v0_1.json",
+    "prior_result": "results/petunieae_nested_regulatory_memory_v0_1/result_v0_1.json",
+    "coverage_audit": "results/petunieae_fine_pigment_state_retention_v0_1/coverage_v0_1.json",
+    "source_artifact_id": 10039433384,
+    "source_run_id": 34182646549,
+    "source_identity": "Use frozen SHA-256 values for phyloCCA table, tree and R source; no alternative source"
+  },
+  "frame": {
+    "retained_tips": 47,
+    "original_ingroup_tips": 59,
+    "exact_sixbit_states": 6,
+    "same_class_pairs": 183,
+    "retained_variable_anthocyanidins": [
+      "Del_mgg",
+      "Pet_mgg",
+      "Malv_mgg"
+    ],
+    "absent_after_rare_filter": [
+      "Pel_mgg",
+      "Cyan_mgg",
+      "Peon_mgg"
+    ],
+    "cohort_rule": "Inherit exactly the previously frozen >=5 observations per six-bit fine-state filter; no recovery or alteration of the 12 excluded taxa"
+  },
+  "covariate_adjustment": {
+    "columns": [
+      "Pel_mgg",
+      "Cyan_mgg",
+      "Peon_mgg",
+      "Del_mgg",
+      "Pet_mgg",
+      "Malv_mgg",
+      "myr_mgg",
+      "quer_mgg",
+      "kaem_mgg"
+    ],
+    "transformation": "For each 47-species numeric pigment column apply log1p(100 * mg/g), population z-score across 47 species; assign zero to zero-variance columns, never outcome-select columns",
+    "fixed_effects": "Six nonoverlapping exact six-bit pigment-presence class dummies, no intercept; regress 21 gene-expression vectors simultaneously on those 6 dummies and all 9 fixed pigment columns using Moore-Penrose pseudo-inverse rcond=1e-12",
+    "expression_transform": "The exact same 21 prespecified gene TPM10K values as the prior primary analysis, log1p and population z-score across 47 tips",
+    "projection": "M=I−D@pinv(D), where D contains frozen state dummies and pigment covariates; residual gene-expression matrix R=M@expression"
+  },
+  "test": {
+    "pair_universe": "183 unordered pairs of the 47 retained taxa sharing the exact same six-bit pigment-presence class",
+    "predictor": "Negative? No: positive patristic distance on published source tree",
+    "outcome": "RMS Euclidean distance between each pair's residual 21-gene expression vector",
+    "estimator": "Spearman rho of patristic distances vs residual expression RMS across the frozen 183 pairs",
+    "null": "Freedman–Lane-style constrained within-exact-class whole-21-gene-residual-vector permutation; for each permutation P, generate projected residual Rb=M@P@R; recompute 183-pair RMS and Spearman rho. Whole vectors preserve across-gene covariance. Classes and tree/pigment covariates remain fixed.",
+    "permutation_unit": "Taxon-level 21-gene residual vector within each exact pigment-presence state; species-pair observations are dependent and are never inferential replicates",
+    "permutations": 9999,
+    "seed": 20261010,
+    "decision": "RETROSPECTIVE_SUPPORT if observed rho > mean null rho AND upper-tail (1 + #null>=observed)/10000 <=0.05; otherwise NOT_SUPPORTED",
+    "interpretation": "Tests whether gene-expression residual structure is associated with ancestry beyond linear source pigment abundance profiles and fine-state fixed effects, under an approximate residual-exchangeability permutation null; DOES NOT ESTABLISH causal independence, molecular architecture or adaptation"
+  },
+  "robustness": {
+    "leave_one_species_out": "Descriptive: re-fit pigment nuisance and recalculate rank correlation on the remaining 46 retained tips, 47 times; no new P-values, no threshold changes",
+    "output_diagnostics": "Matrix rank of nuisance covariates, number of zero-variance pigment assays, original rho and residual rho, null mean/quantiles, observed P, residual variance fraction",
+    "guardrails": [
+      "No gene-by-gene P hunting",
+      "No alternate pigment subsets after results",
+      "No alternate state codings or rare-state cutoff changes",
+      "No post-hoc switching from residualization to partial Mantel as primary",
+      "No claim about taxa excluded by frozen filter"
+    ]
+  },
+  "evidence_status": "Retrospective one-radiation, post-source-exposure. Specific new statistic frozen before opening it, not a prospectively independent biological validation.",
+  "science_freeze_unchanged": true,
+  "original_positive_rho_unchanged": 0.607443846759381,
+  "original_k2_prediction_failure_unchanged": true
+}
