@@ -1,0 +1,115 @@
+name: Petunieae within-pigment-state heldout expression prediction v0.1
+
+on:
+  pull_request:
+    paths:
+      - 'data/petunieae_nested_regulatory_leaveoneout_prediction_design_v0_1.json'
+      - 'results/petunieae_nested_regulatory_leaveoneout_prediction_v0_1/result_v0_1.json'
+      - 'scripts/run_petunieae_nested_regulatory_leaveoneout_prediction_v0_1.py'
+      - 'tests/test_petunieae_nested_regulatory_leaveoneout_prediction_v0_1.py'
+      - 'data/petunieae_k2_predictor_bias_variance_decomposition_design_v0_1.json'
+      - 'results/petunieae_k2_donor_penalty_diagnostic_v0_1/result_v0_1.json'
+      - 'docs/PETUNIEAE_K2_DONOR_PENALTY_DECOMPOSITION_V0_1.md'
+      - 'scripts/diagnose_petunieae_k2_donor_penalty_v0_1.py'
+      - 'tests/test_petunieae_k2_donor_penalty_v0_1.py'
+      - '.github/workflows/petunieae-regulatory-heldout-prediction-v0-1.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  actions: read
+
+jobs:
+  heldout-prediction:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install pinned dependencies
+        run: python -m pip install --disable-pip-version-check -r requirements/requirements-repository-integrity.txt
+      - name: Test predeclared non-leaking predictor
+        run: pytest -q tests/test_petunieae_nested_regulatory_leaveoneout_prediction_v0_1.py
+      - name: Recover SHA-frozen public data through prior deposited GitHub artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: petunieae-prospective-osf-v0-1
+          repository: zuizui0223/chun
+          run-id: 34182646549
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          path: build/petunieae_frozen_source
+      - name: Perform frozen 9999-permutation tip-heldout prediction
+        run: |
+          python scripts/run_petunieae_nested_regulatory_leaveoneout_prediction_v0_1.py \
+            --source build/petunieae_frozen_source \
+            --design data/petunieae_nested_regulatory_leaveoneout_prediction_design_v0_1.json \
+            --original-design data/petunieae_nested_regulatory_memory_preregistered_design_v0_1.json \
+            --out build/petunieae_regulatory_heldout_prediction_v0_1.json
+      - name: Test exact donor-population expectation algebra
+        run: pytest -q tests/test_petunieae_k2_donor_penalty_v0_1.py
+      - name: Compute descriptive two-donor bias variance decomposition
+        run: |
+          python scripts/diagnose_petunieae_k2_donor_penalty_v0_1.py \
+            --source build/petunieae_frozen_source \
+            --original-design data/petunieae_nested_regulatory_memory_preregistered_design_v0_1.json \
+            --prediction-design data/petunieae_nested_regulatory_leaveoneout_prediction_design_v0_1.json \
+            --frozen-result results/petunieae_nested_regulatory_leaveoneout_prediction_v0_1/result_v0_1.json \
+            --out build/petunieae_k2_donor_penalty_diagnostic_v0_1.json
+      - name: Verify primary failure remains unchanged after diagnostic
+        run: |
+          python - <<'PY'
+          import json
+          a=json.load(open('build/petunieae_k2_donor_penalty_diagnostic_v0_1.json'))
+          b=json.load(open('results/petunieae_nested_regulatory_leaveoneout_prediction_v0_1/result_v0_1.json'))
+          assert a['frozen_primary_decision']==b['decision']=='NOT_SUPPORTED'
+          assert a['algebraic_identity_pass'] is True
+          assert a['no_new_p_value'] is True
+          assert abs(a['state_only_mse']-b['baseline_loss'])<1e-10
+          assert abs(a['nearest_two_mse']-b['neighbor_loss'])<1e-10
+          recorded=json.load(open('results/petunieae_k2_donor_penalty_diagnostic_v0_1/result_v0_1.json'))
+          for key in ['state_only_mse','random_two_expected_mse','nearest_two_mse',
+                      'small_donor_penalty','locality_gain_over_random_two','net_nearest_two_penalty']:
+              assert abs(a[key]-recorded[key])<1e-8,(key,a[key],recorded[key])
+          assert 0<a['locality_gain_over_random_two']<a['small_donor_penalty']
+          print('DONOR_VARIANCE_EXACT_IDENTITY_PASS')
+          print(json.dumps({k:a[k] for k in ['state_only_mse','random_two_expected_mse','nearest_two_mse','small_donor_penalty','locality_gain_over_random_two','net_nearest_two_penalty']},indent=2))
+          PY
+      - name: Enforce no prospective or cross-radiation promotion
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          r=json.loads(Path('build/petunieae_regulatory_heldout_prediction_v0_1.json').read_text())
+          assert r['retained_tips']==47
+          assert r['neighbor_k']==2
+          assert r['expression_genes']==21
+          assert r['permutations']==9999
+          assert r['not_prospective_independent_validation'] is True
+          assert r['original_paper1_and_el_science_unchanged'] is True
+          assert r['source_verified'] is True
+          # A P value against shuffled assignments cannot override a failed
+          # positive-gain requirement against the pigment-class mean baseline.
+          assert r['decision']=='NOT_SUPPORTED'
+          assert r['observed_relative_prediction_gain']<0
+          assert r['p_one_sided']<=0.05
+          recorded=json.loads(Path('results/petunieae_nested_regulatory_leaveoneout_prediction_v0_1/result_v0_1.json').read_text())
+          assert recorded['decision']=='NOT_SUPPORTED'
+          for key in ['baseline_loss','neighbor_loss','observed_relative_prediction_gain',
+                      'permutation_null_mean','permutation_null_q025','permutation_null_q975']:
+              assert abs(r[key]-recorded[key])<=1e-7, (key,r[key],recorded[key])
+          assert abs(r['p_one_sided']-recorded['p_one_sided'])<=0.0001
+          assert r['fine_state_counts']==recorded['fine_state_counts']
+          assert r['leave_one_fine_class_out_descriptive']['positive']==recorded['leave_one_fine_class_out_descriptive']['positive']==0
+          print('PETUNIEAE_RETROSPECTIVE_PREDICTION_REPLAY_PASS',
+                r['decision'],r['observed_relative_prediction_gain'],r['p_one_sided'])
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: petunieae-regulatory-heldout-prediction-v0-1
+          path: |
+            build/petunieae_regulatory_heldout_prediction_v0_1.json
+            build/petunieae_k2_donor_penalty_diagnostic_v0_1.json
+          if-no-files-found: warn

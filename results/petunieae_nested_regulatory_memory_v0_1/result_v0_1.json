@@ -1,0 +1,64 @@
+{
+  "analysis_role": "RETROSPECTIVE_PREDECLARED_TEST_PETUNIEAE_ONE_RADIATION",
+  "coarse_state_counts": {
+    "0": 6,
+    "1": 41
+  },
+  "design_commit": "91b10bede74ead47953b7a838adf64d95c59b7ed",
+  "expression_feature_count": 21,
+  "fine_state_counts": {
+    "000000": 6,
+    "000010": 6,
+    "000011": 6,
+    "000100": 10,
+    "000110": 6,
+    "000111": 13
+  },
+  "interpretation_boundary": [
+    "Retrospective source, one radiation; not independent prospective replication",
+    "Same fine code refers to six-anthocyanidin presence bits, not identical pigment concentration or exact visible flower hue",
+    "Whole-vector within-fine taxon permutations preserve expression covariance but assume exchangeability within fine code under no conditional phylogenetic structure",
+    "A positive result is phylogenetic organization of expression within an identical pigment-presence class, not proof that a molecular implementation caused color memory decay",
+    "Secondary pigment magnitude result is exploratory; raw rho difference between expression and pigments is not a tested difference in memory rates",
+    "Original AJB and EL scientific freezes are unchanged"
+  ],
+  "pigment_feature_count": 9,
+  "primary_conditional_expression_memory": {
+    "leave_one_tip_out": {
+      "max_rho": 0.6441634426428526,
+      "median_rho": 0.6040078989509116,
+      "min_rho": 0.5853811389053253,
+      "n": 47,
+      "positive_count": 47
+    },
+    "n_permutations": 9999,
+    "null_mean_rho": 0.16539849544922783,
+    "null_q025": -0.008197185343449931,
+    "null_q975": 0.36428251598343137,
+    "p_one_sided": 0.0001,
+    "random_seed": 20261008,
+    "rho": 0.607443846759381,
+    "same_fine_unordered_pairs": 183,
+    "status": "POSITIVE_EXPLORATORY"
+  },
+  "retained_tips": 47,
+  "secondary_conditional_pigment_concentration_memory": {
+    "n_permutations": 9999,
+    "null_mean_rho": 0.0420720712547691,
+    "null_q025": -0.11272901233566013,
+    "null_q975": 0.27051001340364766,
+    "p_one_sided": 0.0554,
+    "random_seed": 20261009,
+    "rho": 0.219859118115024,
+    "same_fine_unordered_pairs": 183
+  },
+  "source_article_doi": "10.1098/rspb.2023.0275",
+  "source_hash_verified": true,
+  "version": "v0.1",
+  "zero_variance_expression_columns": [],
+  "zero_variance_pigment_columns": [
+    "Pel_mgg",
+    "Cyan_mgg",
+    "Peon_mgg"
+  ]
+}

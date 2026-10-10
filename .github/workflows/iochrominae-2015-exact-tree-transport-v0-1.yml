@@ -1,0 +1,54 @@
+name: Iochrominae 2015 original tree archive transport v0.1
+
+on:
+  pull_request:
+    paths:
+      - 'data/iochrominae_2015_published_tree_archive_identity_gate_v0_1.json'
+      - 'scripts/recover_iochrominae_2015_exact_tree_archive_v0_1.py'
+      - 'tests/test_iochrominae_2015_exact_tree_archive_transport_v0_1.py'
+      - '.github/workflows/iochrominae-2015-exact-tree-transport-v0-1.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  source:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install test environment
+        run: python -m pip install --disable-pip-version-check pytest==9.1.1
+      - name: Verify source gate invariants
+        run: pytest -q tests/test_iochrominae_2015_exact_tree_archive_transport_v0_1.py
+      - name: Try documented public source download (no credentials)
+        run: |
+          python scripts/recover_iochrominae_2015_exact_tree_archive_v0_1.py \
+            --gate data/iochrominae_2015_published_tree_archive_identity_gate_v0_1.json \
+            --out-dir build/iochrominae_2015_verified_source \
+            --summary build/iochrominae_2015_exact_tree_transport_v0_1.json \
+            --timeout 25
+      - name: Fail closed on biological inference
+        run: |
+          python - <<'PY'
+          import json
+          r=json.load(open('build/iochrominae_2015_exact_tree_transport_v0_1.json'))
+          assert r['tree_members_opened'] is False
+          assert r['tree_tips_read'] is False
+          assert r['qpcr_outcomes_opened'] is False
+          assert r['pigment_outcomes_opened'] is False
+          assert r['independent_replication_pass'] is False
+          print('SOURCE_ONLY_IDENTITY_GATE',r['status'])
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: iochrominae-2015-source-identity-v0-1
+          path: |
+            build/iochrominae_2015_exact_tree_transport_v0_1.json
+            build/iochrominae_2015_verified_source/ModeandTempoFlColor.zip
+          if-no-files-found: warn

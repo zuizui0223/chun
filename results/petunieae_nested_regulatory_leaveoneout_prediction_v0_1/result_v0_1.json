@@ -1,0 +1,81 @@
+{
+  "retained_tips": 47,
+  "fine_state_counts": {
+    "000000": 6,
+    "000010": 6,
+    "000011": 6,
+    "000100": 10,
+    "000110": 6,
+    "000111": 13
+  },
+  "expression_genes": 21,
+  "neighbor_k": 2,
+  "baseline_loss": 1.138379056242746,
+  "neighbor_loss": 1.2511674468445935,
+  "observed_relative_prediction_gain": -0.0990780619015505,
+  "permutation_null_mean": -0.23474390394882988,
+  "permutation_null_q025": -0.32588986271980896,
+  "permutation_null_q975": -0.145810929344269,
+  "p_one_sided": 0.0014,
+  "decision": "NOT_SUPPORTED",
+  "permutations": 9999,
+  "seed": 20261008,
+  "per_class_descriptive": [
+    {
+      "fine_code": "000000",
+      "tips": 6,
+      "state_only_loss": 2.396356747255448,
+      "neighbor_loss": 2.5685444723851574,
+      "relative_gain": -0.07185396136318858
+    },
+    {
+      "fine_code": "000010",
+      "tips": 6,
+      "state_only_loss": 1.227493314178834,
+      "neighbor_loss": 1.3736083217691644,
+      "relative_gain": -0.11903527775063938
+    },
+    {
+      "fine_code": "000011",
+      "tips": 6,
+      "state_only_loss": 1.9176536765647425,
+      "neighbor_loss": 1.885003618056059,
+      "relative_gain": 0.01702604537393445
+    },
+    {
+      "fine_code": "000100",
+      "tips": 10,
+      "state_only_loss": 0.53645205964594,
+      "neighbor_loss": 0.662573852236209,
+      "relative_gain": -0.2351035667073583
+    },
+    {
+      "fine_code": "000110",
+      "tips": 6,
+      "state_only_loss": 1.0424058479118479,
+      "neighbor_loss": 1.2106147720300817,
+      "relative_gain": -0.16136605953927707
+    },
+    {
+      "fine_code": "000111",
+      "tips": 13,
+      "state_only_loss": 0.6642951947295714,
+      "neighbor_loss": 0.7655772595300789,
+      "relative_gain": -0.15246544849950106
+    }
+  ],
+  "leave_one_fine_class_out_descriptive": {
+    "n": 6,
+    "positive": 0,
+    "min": -0.13088643834819397,
+    "median": -0.09336266295288972,
+    "max": -0.08391972563046757
+  },
+  "version": "v0.1",
+  "status": "RETROSPECTIVE_OUTCOME_OPENED_SOURCE_PREDICTION_STUDY",
+  "source_verified": true,
+  "new_prediction_design_status": "FIXED_BEFORE_OPENING_NEW_PREDICTION_OUTCOME",
+  "substantive_boundary": "A positive held-out-tip within-source result would show improved retrospective prediction of gene expression by phylogenetic proximity beyond fine chemical class. It would not show new independent cross-radiation validation, biological causation, ancestral mutational events, or external predictive accuracy.",
+  "not_prospective_independent_validation": true,
+  "original_paper1_and_el_science_unchanged": true
+}

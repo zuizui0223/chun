@@ -1,0 +1,136 @@
+{
+  "version": "v0.1",
+  "status": "INDEPENDENT_SOURCE_FRONTIER_AUDITED_NO_NEW_COMPLETE_MATCHED_REPLICATE",
+  "created_on": "2026-10-08",
+  "goal": "Obtain an independent radiation with published branch-length tree, species-level pigment identity, and numeric petal-pathway expression values to replicate the Petunieae within-fine-pigment-class conditional test.",
+  "essential_rule": "Species-level tree, expression, and measured pigment signatures must join by auditable taxon keys. Article-level trends or photographed figure bars cannot substitute for an exact source numeric matrix.",
+  "candidates": [
+    {
+      "id": "IOCHROMINAE_LARTER2018_QPCR",
+      "source_paper_doi": "10.1093/molbev/msy117",
+      "original_publication": "Larter et al. 2018 Molecular Biology and Evolution",
+      "reported_species": 28,
+      "reported_pathway_expression_genes": 7,
+      "reported_pigment_states": [
+        "delphinidin",
+        "cyanidin",
+        "pelargonidin",
+        "none"
+      ],
+      "time_tree_reference": "Smith and Goldberg 2015 previously published time-calibrated MCC tree",
+      "evidenced_by": [
+        "https://academic.oup.com/mbe/article/35/9/2159/5034462",
+        "https://pubmed.ncbi.nlm.nih.gov/29878153/"
+      ],
+      "species_level_tree_raw_bytes_verified": false,
+      "numeric_species_by_gene_expression_table_verified": false,
+      "numeric_species_by_pigment_identity_verified": false,
+      "current_status": "HOLD_2018_ROWLEVEL_EXPRESSION_AND_MATCHED_TREE_NOT_VERIFIED",
+      "next_source_action": "Verify 2015 published Smith-Goldberg tree from DOI 10.5061/dryad.0732g and species×7-gene qPCR numeric table from the 2018 MBE article/supplement independently; freeze taxon crosswalk before new expression outcome. Do not substitute 2018 shape study tree or 2019 development source silently.",
+      "distinction": "This 2018 comparative qPCR paper is NOT the same source object as Larter et al. 2019 developmental Dvdy Dryad package; a 2019 package cannot be relabeled as 2018 qPCR data.",
+      "original_analysis_tree_doi": "10.3732/ajb.1500163",
+      "original_tree_data_doi": "10.5061/dryad.0732g",
+      "original_tree_reference_status": "SOURCE_PUBLICATION_AND_DATA_DOI_IDENTIFIED_BYTES_NOT_VERIFIED",
+      "distinct_2018_shape_tree": {
+        "doi": "10.5061/dryad.5jn7b",
+        "source_paper_doi": "10.1111/evo.13416",
+        "contains_reported_MCC_tree": true,
+        "status": "ALTERNATIVE_LATER_SAME_CLADE_TOPOLOGY_NOT_ORIGINAL_LARTER2018_COMPARATIVE_TREE",
+        "use": "sensitivity only after frozen published-source crosswalk; never silently substitute for original 2015 tree"
+      },
+      "access_note": "Current Dryad client documentation states file/archive downloading may require authenticated access; previous anonymous 2019 frozen-source attempts did not recover exact objects. Authentication is not assumed to be connected.",
+      "species_gene_expression_values_not_publicly_confirmed_in_supplement_pdf": true,
+      "source_supplement_type": "msy117_supp.pdf (publisher supplementary material primarily figures and tables; no independently admitted species-by-gene quantitative raw data matrix)",
+      "original_published_comparative_note": "Molecular Biology and Evolution article explicitly uses Smith and Goldberg 2015 tree; species-level qPCR values shown in Fig. 3A but figure bars are not an admitted raw numeric table.",
+      "reference_repository_or_publisher_url": "https://academic.oup.com/mbe/article/35/9/2159/5034462"
+    },
+    {
+      "id": "IOCHROMINAE_LARTER2019_DVDY",
+      "source_data_doi": "10.5061/dryad.p5dq84v",
+      "source_roles": [
+        "floral pigmentation development source",
+        "biochemical profile candidate"
+      ],
+      "required_readme": {
+        "file_id": 108458,
+        "bytes": 4072,
+        "md5": "2e4a251725ad4c13975fc09481da302d"
+      },
+      "required_archive": {
+        "file_id": 108456,
+        "bytes": 3054999,
+        "md5": "76b46e384fb7c9bf1ef3fbd7d1e5d2f0"
+      },
+      "current_status": "HOLD_EXACT_BYTES_NOT_RECOVERED_AFTER_MULTIPLE_SOURCE_TRANSPORT_ATTEMPTS",
+      "reference": "data/iochrominae_preservation_mirror_hold_v0_4.json",
+      "use_policy": "Retain original HOLD; do not change the frozen exact-profile denominator or claim this 2019 source fills the 2018 qPCR replication table."
+    },
+    {
+      "id": "SOLANACEAE_NG2018_PIGMENT",
+      "publication_doi": "10.1111/evo.13589",
+      "reported_pigment_taxa": 75,
+      "status": "PIGMENT_COMPARATIVE_PANEL_NOT_A_VERIFIED_SAME_TAXA_PATHWAY_EXPRESSION_PANEL",
+      "next_source_action": "Do not admit for expression-memory replication until independent full species-by-gene expression table and source tree are found."
+    },
+    {
+      "id": "BRASSICACEAE_COMPARATIVE_PETAL_TRANSCRIPTOMES",
+      "geo_accession": "GSE93879",
+      "reported_species_approx": 10,
+      "status": "INDEPENDENT_PETAL_EXPRESSION_PRESENT_BUT_FULL_MATCHED_MASS_SPECTROMETRY_PIGMENT_STATES_NOT_VERIFIED_AND_SMALL_CLADES",
+      "next_source_action": "Do not merge it into Iochrominae/Petunieae evidence or treat cross-species transcriptomes as a matched pigment network."
+    },
+    {
+      "id": "PASSIFLORA_CORONA_PIGMENTS_QPCR",
+      "source_url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC11991006/",
+      "sampled_species": 5,
+      "status": "SMALL_SOURCE_PANEL_NOT_A_CROSS_RADIATION_47_TIP_REPLICATION",
+      "next_source_action": "Retain as independent biological prior art, not a sufficiently powered identical-phylogeny replication of the Petunieae estimate."
+    },
+    {
+      "id": "EPIMEDIUM_MI2023_EIGHT_ACCESSIONS",
+      "source_paper_doi": "10.3389/fpls.2023.1133616",
+      "phylogeny_paper_doi": "10.3389/fpls.2023.1234148",
+      "qPCR_accession_n": 8,
+      "qpcr_pathway_gene_n": 12,
+      "independent_phylogeny_species_rows": 57,
+      "qPCR_to_tree_accession_crosswalk_verified": false,
+      "phenotype_sampling_unit": "GARDEN_ACCESSIONS_FROM_UNSPECIFIED_WILD_POPULATIONS",
+      "exact_molecular_sample_tree_source_match": false,
+      "known_polymorphism_in_molecular_A_plus_taxa": [
+        "Epimedium acuminatum",
+        "Epimedium leptorrhizum"
+      ],
+      "current_status": "HOLD_MOLECULAR_ACCESSION_TO_TREE_CROSSWALK_UNRESOLVED",
+      "source_provenance": "docs/EPIMEDIUM_PROVENANCE_EVENT_GATE_V0_2.md",
+      "interpretation": "HPLC and qPCR samples are useful mechanistic endpoint observations but cannot be treated as matched sequenced species/individuals or independent transition events.",
+      "replicate_admitted": false,
+      "next_source_action": "Require voucher/accession/population crosswalk to tree source, and a defined independent fine pigment class and adequately populated within-class taxon-pair sample before testing phylogenetic memory."
+    },
+    {
+      "id": "IOCHROMA_WHEELER2025_SIX_SPECIES",
+      "source_paper_doi": "10.1093/g3journal/jkaf230",
+      "source_data_doi": "10.17605/OSF.IO/J5M8F",
+      "comparative_rnaseq_n": 6,
+      "within_species_backcross_individuals": 24,
+      "supported_claim": "MYB12-like F3primeH regulatory and flavonol-pigment association",
+      "current_status": "SMALL_SIX_SPECIES_RNASEQ_COMPARATIVE_PANEL_NOT_A_28_TAXON_REPLACEMENT",
+      "expression_original_tree_same_tip_eligibility_verified": false,
+      "biological_unit_boundary": "24 within-species backcross samples are not 24 independent tips on the Iochrominae species phylogeny.",
+      "use_policy": "Potential alternative public numeric source for smaller retrospective study; do not pool backcross samples with species or claim it reproduces the 28-taxon Larter 2018 design.",
+      "replicate_admitted": false
+    }
+  ],
+  "admission_status": {
+    "independently_replicated_petunieae_exact_sixbit_conditional_21gene_test": false,
+    "numeric_new_radiations_admitted": 0,
+    "no_post_hoc_state_binning": true,
+    "no_figure_digitization_as_raw_numeric_source": true,
+    "all_source_holds_retained": true
+  },
+  "source_access_audit": [
+    "docs/IOCHROMINAE_DRYAD_ACCESS_RECHECK_V0_3.md",
+    "data/iochrominae_preservation_mirror_hold_v0_4.json",
+    "docs/RESOLUTION_PROFILE_TRAINING_INVENTORY_V0_4.md"
+  ],
+  "scientific_boundary": "The 2018 and 2019 Iochrominae study objects are separate. No independent replication is added, and no prior HOLD changes. The 47-tip Petunieae result remains one retrospective same-phylogeny analysis, not a general law."
+}

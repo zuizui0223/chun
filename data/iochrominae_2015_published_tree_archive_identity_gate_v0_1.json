@@ -1,0 +1,30 @@
+{
+  "version": "v0.1",
+  "status": "ORIGINAL_2015_TREE_ARCHIVE_IDENTITY_FROZEN_BEFORE_BYTES",
+  "source_doi": "10.5061/dryad.0732g",
+  "original_tree_article_doi": "10.3732/ajb.1500163",
+  "tree_role": "PUBLISHED_TREE_DATA_SOURCE_FOR_LARTER2018_COMPARATIVE_EXPRESSION",
+  "dryad_dataset_id": 3546,
+  "dryad_version_id": 3567,
+  "filename": "ModeandTempoFlColor.zip",
+  "expected_size_bytes": 686186,
+  "expected_md5": "78957f5320749f5c022de78e8ad1ab32",
+  "public_api_source": "https://datadryad.org/api/v2/versions/3567/files",
+  "preceding_metadata_receipt_artifact_id": 11543635286,
+  "permissible_steps": [
+    "Query public dataset/file metadata to recover a documented download URL",
+    "Attempt HTTP GET of exact original archive via ordinary public download endpoint",
+    "Verify exact expected size and MD5 before admitting original archive bytes",
+    "Report source-transport HOLD if archive is unavailable or hash differs"
+  ],
+  "not_permitted": [
+    "Open archived phylogenetic tree member content or tips before raw source admission",
+    "Use the later 2018 shape-study tree as original Smith–Goldberg phylogeny",
+    "Open Iochrominae qPCR gene expression row values",
+    "Compute pigment-class support, phylogenetic correlations or permutation outcomes",
+    "Treat metadata-only confirmation as an independent replication"
+  ],
+  "current_numeric_2018_qpcr_table_verified": false,
+  "current_original_tree_payload_verified": false,
+  "independent_replication_status": "HOLD"
+}

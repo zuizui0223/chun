@@ -1,0 +1,78 @@
+name: Petunieae pigment-abundance-adjusted regulatory memory v0.1
+
+on:
+  pull_request:
+    paths:
+      - 'data/petunieae_pigment_abundance_adjusted_regulatory_memory_design_v0_1.json'
+      - 'scripts/analyze_petunieae_pigment_adjusted_regulatory_memory_v0_1.py'
+      - 'tests/test_petunieae_pigment_adjusted_regulatory_memory_v0_1.py'
+      - 'results/petunieae_pigment_adjusted_regulatory_memory_v0_1/**'
+      - '.github/workflows/petunieae-pigment-adjusted-regulatory-memory-v0-1.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  actions: read
+
+jobs:
+  analyze:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install pinned numerical dependencies
+        run: python -m pip install --disable-pip-version-check -r requirements/requirements-repository-integrity.txt
+      - name: Test frozen within-fine chemistry-adjustment analysis design
+        run: pytest -q tests/test_petunieae_pigment_adjusted_regulatory_memory_v0_1.py
+      - name: Retrieve exact SHA-audited source from original public artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: petunieae-prospective-osf-v0-1
+          repository: zuizui0223/chun
+          run-id: 34182646549
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          path: build/petunieae_frozen_source
+      - name: Execute 9999 within-class full-residual-vector permutations
+        run: |
+          python scripts/analyze_petunieae_pigment_adjusted_regulatory_memory_v0_1.py \
+            --source build/petunieae_frozen_source \
+            --design data/petunieae_pigment_abundance_adjusted_regulatory_memory_design_v0_1.json \
+            --original-design data/petunieae_nested_regulatory_memory_preregistered_design_v0_1.json \
+            --out build/petunieae_pigment_adjusted_regulatory_memory_v0_1.json
+      - name: Require source and inferential firewall
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          result=json.loads(Path('build/petunieae_pigment_adjusted_regulatory_memory_v0_1.json').read_text())
+          assert result['n_tips']==47 and result['n_pairs']==183
+          assert result['n_gene_axes']==21 and result['n_pigment_axes']==9
+          assert result['permutations']==9999
+          assert result['source_SHA256_verified'] is True
+          assert result['no_causal_independence_claimed'] is True
+          assert result['does_not_replace_original_21gene_result'] is True
+          assert result['does_not_replace_original_k2_prediction_fail'] is True
+          assert result['does_not_replace_ajb_or_el_science'] is True
+          assert result['decision'] in ['RETROSPECTIVE_SUPPORT','NOT_SUPPORTED']
+          recorded=json.loads(Path('results/petunieae_pigment_adjusted_regulatory_memory_v0_1/result_v0_1.json').read_text())
+          for key in ['abundance_adjusted_rho','unadjusted_rho_on_this_frame','permutation_null_mean',
+                      'permutation_centered_rho','permutation_null_q025','permutation_null_q975',
+                      'residual_sum_of_squares_fraction']:
+              assert abs(result[key]-recorded[key])<1e-9,(key,result[key],recorded[key])
+          assert result['nuisance_rank']==recorded['nuisance_rank']==12
+          assert result['p_one_sided']==recorded['p_one_sided']==0.0002
+          assert result['decision']==recorded['decision']=='RETROSPECTIVE_SUPPORT'
+          assert result['leave_one_tip_out_descriptive']==recorded['leave_one_tip_out_descriptive']
+          print('PIGMENT_ADJUSTED_GENE_MEMORY_REPLAY_PASS')
+          print('PIGMENT_ADJUSTED_GENE_MEMORY_OUTCOME',result['decision'],
+                result['abundance_adjusted_rho'],result['permutation_centered_rho'],result['p_one_sided'])
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: petunieae-pigment-adjusted-regulatory-memory-v0-1
+          path: build/petunieae_pigment_adjusted_regulatory_memory_v0_1.json
+          if-no-files-found: warn

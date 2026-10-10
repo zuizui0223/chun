@@ -1,0 +1,49 @@
+name: Iochrominae 2018 independent source metadata v0.1
+
+on:
+  pull_request:
+    paths:
+      - 'scripts/preflight_iochrominae_2018_matched_source_metadata_v0_1.py'
+      - 'tests/test_iochrominae_2018_matched_source_preflight_v0_1.py'
+      - 'data/independent_nested_gene_memory_source_frontier_v0_1.json'
+      - '.github/workflows/iochrominae-2018-source-preflight-v0-1.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  preflight:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install testing dependencies
+        run: python -m pip install --disable-pip-version-check pytest==9.1.1
+      - name: Source metadata-only test
+        run: pytest -q tests/test_iochrominae_2018_matched_source_preflight_v0_1.py
+      - name: Public Dryad original-tree and alternative-tree metadata receipt
+        run: |
+          python scripts/preflight_iochrominae_2018_matched_source_metadata_v0_1.py \
+            --out build/iochrominae_2018_source_preflight_v0_1.json \
+            --timeout 20
+      - name: Confirm unopened outcome ceiling
+        run: |
+          python - <<'PY'
+          import json
+          r=json.load(open('build/iochrominae_2018_source_preflight_v0_1.json'))
+          assert r['direct_replication_completed'] is False
+          assert r['no_trait_or_expression_rows_opened'] is True
+          assert r['required_numeric_2018_qpcr_species_matrix_verified'] is False
+          assert r['status'].startswith('HOLD_')
+          print('IOCHROMINAE_SOURCE_PREFLIGHT_FAIL_CLOSED')
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: iochrominae-2018-source-metadata-v0-1
+          path: build/iochrominae_2018_source_preflight_v0_1.json
+          if-no-files-found: warn

@@ -1,0 +1,66 @@
+name: Integrated temporal-mechanistic Figure 5 source-verified build v0.1
+
+on:
+  pull_request:
+    paths:
+      - 'scripts/build_integrated_paper_figure5_v0_1.py'
+      - 'tests/test_integrated_paper_figure5_v0_1.py'
+      - 'results/petunieae_nested_regulatory_memory_v0_1/result_v0_1.json'
+      - 'results/petunieae_nested_regulatory_leaveoneout_prediction_v0_1/result_v0_1.json'
+      - 'results/petunieae_k2_donor_penalty_diagnostic_v0_1/result_v0_1.json'
+      - 'results/petunieae_fine_pigment_state_retention_v0_1/coverage_v0_1.json'
+      - '.github/workflows/integrated-temporal-figure5-v0-1.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  actions: read
+
+jobs:
+  figure5:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install pinned dependencies
+        run: python -m pip install --disable-pip-version-check -r requirements/requirements-repository-integrity.txt
+      - name: Validate graphical scientific contracts
+        run: pytest -q tests/test_integrated_paper_figure5_v0_1.py
+      - name: Fetch frozen published Petunieae source
+        uses: actions/download-artifact@v4
+        with:
+          name: petunieae-prospective-osf-v0-1
+          repository: zuizui0223/chun
+          run-id: 34182646549
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          path: build/petunieae_frozen_source
+      - name: Build publication draft Figure 5 panels
+        run: |
+          python scripts/build_integrated_paper_figure5_v0_1.py \
+            --source build/petunieae_frozen_source \
+            --out-dir build/integrated-temporal-mechanistic-figure5-v0-1
+      - name: Require exact frozen data semantics
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          m=json.loads(Path('build/integrated-temporal-mechanistic-figure5-v0-1/figure5_manifest_v0_1.json').read_text())
+          assert m['status']=='INTEGRATED_FIGURE_5_SOURCE_VERIFIED'
+          assert m['observed_pair_count']==183
+          assert m['retained_variable_anthocyanidins']==['Del','Pet','Malv']
+          assert m['retained_tips_of_total']==[47,59]
+          assert abs(m['observed_rho']-0.607443846759381)<1e-10
+          assert m['frozen_prediction_decision']=='NOT_SUPPORTED'
+          assert m['non_independent_species_pairs_disclosed'] is True
+          assert m['no_new_significance_test'] is True
+          assert len(m['figure_paths'])==4
+          print('INTEGRATED_FIGURE5_SCIENCE_AND_RENDER_PASS')
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: integrated-temporal-figure5-v0-1
+          path: build/integrated-temporal-mechanistic-figure5-v0-1/
+          if-no-files-found: error
