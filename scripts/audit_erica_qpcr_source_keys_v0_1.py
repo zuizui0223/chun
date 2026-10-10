@@ -89,9 +89,21 @@ def source_key_audit(data: bytes) -> dict:
     for taxon in sorted(taxa):
         found = {gene for (t, gene), n in taxa_gene.items() if t == taxon}
         per_taxon_genes[taxon] = len(found)
+    # The explicitly named PTB1_REF is the qPCR normalization control and
+    # has no fold-change-to-itself value. Do not call its intentionally blank
+    # 30 taxa x 3 stages rows failed pathway-gene measurements.
+    by_id = {r["A"].strip(): ID_PATTERN.fullmatch(r["A"].strip()) for r in expressions}
+    missing_reference = [k for k in nonnumeric if by_id[k] is not None and
+                         by_id[k].group("gene") == "PTB1_REF"]
+    missing_pathway = [k for k in nonnumeric if k not in set(missing_reference)]
+    pathway_genes = sorted(g for g in genes if g != "PTB1_REF")
+    pathway_numeric_count = len(expressions) - len(nonnumeric)
+    expected_pathway_measurements = len(taxa_stage) * len(pathway_genes)
     status = ("SOURCE_KEYS_ADMITTED_FOR_SCHEMA_ONLY"
-              if not unparsed and not nonnumeric and len(parsed) == len(expressions)
-              else "HOLD_UNRESOLVED_MEASUREMENT_KEYS_OR_NUMERIC_VALUES")
+              if not unparsed and not missing_pathway and
+                 len(parsed) == len(expressions) and
+                 pathway_numeric_count == expected_pathway_measurements
+              else "HOLD_UNRESOLVED_PATHWAY_MEASUREMENTS")
     return {
         "version": "v0.1",
         "status": status,
@@ -103,6 +115,10 @@ def source_key_audit(data: bytes) -> dict:
         "unparsed_measurement_ids": unparsed[:15],
         "nonnumeric_fold_change_ids": nonnumeric[:15],
         "nonnumeric_fold_change_count": len(nonnumeric),
+        "nonnumeric_reference_control_count": len(missing_reference),
+        "nonnumeric_pathway_measurement_count": len(missing_pathway),
+        "quantitative_pathway_measurements": pathway_numeric_count,
+        "quantitative_pathway_genes": pathway_genes,
         "unparsed_measurement_count": len(unparsed),
         "taxon_count_from_measurement_ids": len(taxa),
         "taxa_with_row_counts": dict(sorted(taxa.items())),
@@ -133,6 +149,10 @@ def main():
               "taxon_stage_combinations", "complete_fixed_gene_panel_taxa"]:
         print("ERICA_SOURCE_KEY_AUDIT", k, r[k])
     print("ERICA_GENE_PANEL", sorted(r["genes_with_row_counts"]))
+    print("ERICA_PATHWAY_GENE_PANEL", r["quantitative_pathway_genes"])
+    print("ERICA_PATHWAY_NUMERIC", r["quantitative_pathway_measurements"])
+    print("ERICA_REFERENCE_CONTROL_NOT_EXPECTED_FOLD_CHANGE", r["nonnumeric_reference_control_count"])
+    print("ERICA_PATHWAY_MISSING", r["nonnumeric_pathway_measurement_count"])
     print("ERICA_ALL_TAXA", sorted(r["taxa_with_row_counts"]))
     print("ERICA_UNPARSED", r["unparsed_measurement_ids"])
     print("ERICA_MISSING_OR_NONNUMERIC_FOLD_CHANGE_COUNT", r["nonnumeric_fold_change_count"])
