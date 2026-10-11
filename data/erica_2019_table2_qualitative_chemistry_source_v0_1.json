@@ -1,0 +1,183 @@
+{
+  "version": "v0.1",
+  "date": "2026-10-11",
+  "status": "SOURCE_TABLE2_QUALITATIVE_CHEMISTRY_AVAILABLE_EXACT_NUMERIC_METABOLITE_PROFILE_UNVERIFIED",
+  "source_article_doi": "10.3389/fpls.2019.01565",
+  "primary_source": "Le Maitre, Pirie and Bellstedt 2019 original Table 2, published as PMC6892755; author reported UPLC-MS/MS testing",
+  "publication_url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC6892755/",
+  "source_scope": "All 30 original measurement/morph rows; each output is a normalized transcription of published Table2 qualitative gene expression and anthocyanin production terms. This is NOT a measured peak-area matrix, compound-by-taxon assay, or a reconstruction from Supplementary Figure 2.",
+  "rows": [
+    {
+      "qpcr_label": "Erica_cameronii",
+      "table2_gene_expression_category": "NORMAL",
+      "table2_anthocyanin_production_category": "NORMAL_ANTHOCYANIN"
+    },
+    {
+      "qpcr_label": "Erica_tetrathecoides",
+      "table2_gene_expression_category": "NORMAL",
+      "table2_anthocyanin_production_category": "NORMAL_ANTHOCYANIN"
+    },
+    {
+      "qpcr_label": "Erica_cerenthoides",
+      "table2_gene_expression_category": "NORMAL",
+      "table2_anthocyanin_production_category": "NORMAL_ANTHOCYANIN"
+    },
+    {
+      "qpcr_label": "Erica_sparmanii",
+      "table2_gene_expression_category": "UDP_GST_NOT_EXPRESSED",
+      "table2_anthocyanin_production_category": "VERY_LITTLE_ANTHOCYANIN"
+    },
+    {
+      "qpcr_label": "Erica_discolor",
+      "table2_gene_expression_category": "NORMAL",
+      "table2_anthocyanin_production_category": "NORMAL_ANTHOCYANIN"
+    },
+    {
+      "qpcr_label": "Erica_unicolor",
+      "table2_gene_expression_category": "NORMAL",
+      "table2_anthocyanin_production_category": "NORMAL_ANTHOCYANIN"
+    },
+    {
+      "qpcr_label": "Erica_prolata",
+      "table2_gene_expression_category": "NORMAL",
+      "table2_anthocyanin_production_category": "NORMAL_ANTHOCYANIN"
+    },
+    {
+      "qpcr_label": "Erica_plukenetii_plukenetii_white",
+      "table2_gene_expression_category": "ANS_NOT_EXPRESSED",
+      "table2_anthocyanin_production_category": "NO_POST_ANS_INTERMEDIATES_PROCYANIDINS"
+    },
+    {
+      "qpcr_label": "Erica_plukenetii_plukenetii_pink",
+      "table2_gene_expression_category": "NORMAL",
+      "table2_anthocyanin_production_category": "NORMAL_ANTHOCYANIN"
+    },
+    {
+      "qpcr_label": "Erica_plukenetii_plukenetii_red",
+      "table2_gene_expression_category": "NORMAL",
+      "table2_anthocyanin_production_category": "NORMAL_ANTHOCYANIN"
+    },
+    {
+      "qpcr_label": "Erica_plukenetii_breviflora",
+      "table2_gene_expression_category": "UDP_GST_NOT_EXPRESSED",
+      "table2_anthocyanin_production_category": "VERY_LITTLE_ANTHOCYANIN"
+    },
+    {
+      "qpcr_label": "Erica_monadelphia",
+      "table2_gene_expression_category": "NORMAL",
+      "table2_anthocyanin_production_category": "NORMAL_ANTHOCYANIN"
+    },
+    {
+      "qpcr_label": "Erica_coccinea",
+      "table2_gene_expression_category": "F3PRIMEH_NOT_EXPRESSED",
+      "table2_anthocyanin_production_category": "PELARGONIDIN_HEXOSE_NOT_CYANIDIN"
+    },
+    {
+      "qpcr_label": "Erica_mammosa",
+      "table2_gene_expression_category": "NORMAL",
+      "table2_anthocyanin_production_category": "NORMAL_ANTHOCYANIN"
+    },
+    {
+      "qpcr_label": "Erica_sessiliflora",
+      "table2_gene_expression_category": "DFR_NOT_EXPRESSED",
+      "table2_anthocyanin_production_category": "NO_POST_DFR_INTERMEDIATES_KAEMPFEROL_QUERCETIN"
+    },
+    {
+      "qpcr_label": "Erica_filipendula",
+      "table2_gene_expression_category": "NORMAL",
+      "table2_anthocyanin_production_category": "NO_POST_DFR_INTERMEDIATES_KAEMPFEROL_QUERCETIN"
+    },
+    {
+      "qpcr_label": "Erica_massonii",
+      "table2_gene_expression_category": "NORMAL",
+      "table2_anthocyanin_production_category": "NORMAL_ANTHOCYANIN"
+    },
+    {
+      "qpcr_label": "Erica_squarrosa",
+      "table2_gene_expression_category": "NORMAL",
+      "table2_anthocyanin_production_category": "NORMAL_ANTHOCYANIN"
+    },
+    {
+      "qpcr_label": "Erica_regia",
+      "table2_gene_expression_category": "NORMAL",
+      "table2_anthocyanin_production_category": "NORMAL_ANTHOCYANIN"
+    },
+    {
+      "qpcr_label": "Erica_abietina",
+      "table2_gene_expression_category": "NORMAL",
+      "table2_anthocyanin_production_category": "NORMAL_ANTHOCYANIN"
+    },
+    {
+      "qpcr_label": "Erica_viscaria",
+      "table2_gene_expression_category": "BHLH_NOT_EXPRESSED",
+      "table2_anthocyanin_production_category": "NO_INTERMEDIATES_EXCEPT_QUERCETINS"
+    },
+    {
+      "qpcr_label": "Erica_vestita",
+      "table2_gene_expression_category": "NORMAL",
+      "table2_anthocyanin_production_category": "NORMAL_ANTHOCYANIN"
+    },
+    {
+      "qpcr_label": "Erica_hematocodon",
+      "table2_gene_expression_category": "NORMAL",
+      "table2_anthocyanin_production_category": "NORMAL_ANTHOCYANIN"
+    },
+    {
+      "qpcr_label": "Erica_hirtiflora",
+      "table2_gene_expression_category": "NORMAL",
+      "table2_anthocyanin_production_category": "NORMAL_ANTHOCYANIN"
+    },
+    {
+      "qpcr_label": "Erica_stagnalis",
+      "table2_gene_expression_category": "NORMAL",
+      "table2_anthocyanin_production_category": "PELARGONIDIN_HEXOSE_NOT_CYANIDIN"
+    },
+    {
+      "qpcr_label": "Erica_leucotrachela",
+      "table2_gene_expression_category": "NORMAL",
+      "table2_anthocyanin_production_category": "NORMAL_ANTHOCYANIN"
+    },
+    {
+      "qpcr_label": "Erica_pillansii",
+      "table2_gene_expression_category": "NORMAL",
+      "table2_anthocyanin_production_category": "NORMAL_ANTHOCYANIN"
+    },
+    {
+      "qpcr_label": "Erica_parviflora",
+      "table2_gene_expression_category": "NORMAL",
+      "table2_anthocyanin_production_category": "NORMAL_ANTHOCYANIN"
+    },
+    {
+      "qpcr_label": "Erica_verticiliata",
+      "table2_gene_expression_category": "NORMAL",
+      "table2_anthocyanin_production_category": "NORMAL_ANTHOCYANIN"
+    },
+    {
+      "qpcr_label": "Erica_annectans",
+      "table2_gene_expression_category": "NORMAL",
+      "table2_anthocyanin_production_category": "NORMAL_ANTHOCYANIN"
+    }
+  ],
+  "available_public_data": {
+    "original_rt_qpcr_numeric": "Original SUNScholarData 87kB XLSX; 630/630 pathway fold-change data were independently downloaded and verified in GitHub Actions run 38046569468",
+    "original_upLC_msms_graphic": "2019 article Supplementary Figure 2 is published as PDF (~3.3 MB) for all studied species; not an individually machine-readable per-compound numeric matrix by its published resource type",
+    "published_table2_chemical_categories": "QUALITATIVE_DESCRIPTORS_ONLY",
+    "public_named_2019_raw_compound_peak_area_spreadsheet": "NOT_IDENTIFIED_IN_AUTHORS_DATA_AVAILABILITY_STATEMENT_OR_SUPPLEMENT_INDEX",
+    "other_unidentified_sources_might_exist": true
+  },
+  "source_publication_biological_notes": {
+    "authors_red_vs_pink_UPLC_MS_MS": "Published Results and Discussion say pink- versus red-flowered Erica could not be qualitatively distinguished by anthocyanins measured in UPLC-MS/MS; observed phenotypic distinctions may involve pigment quantity, vacuolar pH, metals, cell morphology or other pigments, not proven identical detailed pigment profiles.",
+    "yellow_pathway": "Published yellow examples E. coccinea and E. stagnalis produced pelargonidin-hexose rather than cyanidin-hexose",
+    "white_multiple_routes": "White examples with anthocyanin-pathway disruptions include UDP-GST loss, ANS loss, DFR loss and bHLH regulator loss; these source-reported mechanisms are not necessarily independent dated phylogenetic events."
+  },
+  "limitations": {
+    "normal_category_NOT_identical_six_compound_presence_profile": true,
+    "no_quantitative_species_by_compound_chemical_matrix_admitted": true,
+    "no_machine_reconstructed_PDF_peak_values": true,
+    "no_reclassification_or_reanalysis_of_original_negative_erica_result": true,
+    "table2_gene_categories_NOT_a_replacement_for_real_qPCR_values": true,
+    "no_new_evolutionary_memory_p_value": true,
+    "no_independent_exact_pigment_identity_replication": true,
+    "original_AJB_EL_frozen": true
+  }
+}
