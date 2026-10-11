@@ -1,0 +1,60 @@
+name: Erica–Petunieae conditional-memory evidence comparability audit v0.1
+
+on:
+  pull_request:
+    paths:
+      - 'scripts/audit_erica_petunieae_source_support_comparability_v0_1.py'
+      - 'tests/test_erica_petunieae_source_support_comparability_v0_1.py'
+      - 'results/erica_petunieae_source_support_comparability_v0_1/result_v0_1.json'
+      - 'docs/ERICA_PETUNIEAE_SOURCE_SUPPORT_COMPARABILITY_V0_1.md'
+      - '.github/workflows/erica-petunieae-comparability-v0-1.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  audit:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install exact pytest version
+        run: python -m pip install --disable-pip-version-check pytest==9.1.1
+      - name: Check fixed source units, state-pair composition and no scientific upgrades
+        run: pytest -q tests/test_erica_petunieae_source_support_comparability_v0_1.py
+      - name: Audit pair source support using immutable existing outcome tables
+        run: |
+          python scripts/audit_erica_petunieae_source_support_comparability_v0_1.py \
+            --erica-colour-source data/erica_table2_visible_colour_qpcr_taxon_crosswalk_v0_1.json \
+            --erica-outcome results/erica_voucher_averaged_developmental_memory_v0_1/result_v0_1.json \
+            --petunieae-gene-outcome results/petunieae_nested_regulatory_memory_v0_1/result_v0_1.json \
+            --petunieae-pigment-adjusted results/petunieae_pigment_adjusted_regulatory_memory_v0_1/result_v0_1.json \
+            --out build/erica_petunieae_source_support_comparability_v0_1.json
+      - name: Enforce frozen descriptive report identity, original conclusions unchanged
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          a=json.loads(Path('build/erica_petunieae_source_support_comparability_v0_1.json').read_text())
+          b=json.loads(Path('results/erica_petunieae_source_support_comparability_v0_1/result_v0_1.json').read_text())
+          assert a==b
+          assert a['erica']['state_support']['total_within_state_pairs']==83
+          assert a['erica']['state_support']['within_state_pairs']['red']==66
+          assert a['erica']['same_visible_hue_pairs_within_original_comparison_group']==6
+          assert a['petunieae']['state_support']['total_within_state_pairs']==183
+          assert a['petunieae']['state_support']['within_state_pairs']['000111']==78
+          assert a['scientific_inference']['effect_sizes_not_same_parameter']
+          assert a['scientific_inference']['no_new_p_values_computed']
+          assert a['scientific_inference']['original_camellia_AJB_and_EL_science_unchanged']
+          print('EVIDENCE_COMPARABILITY_SOURCE_AUDIT_PASS_NOT_A_META_ANALYSIS')
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: erica-petunieae-source-support-comparability-v0-1
+          path: build/erica_petunieae_source_support_comparability_v0_1.json
+          if-no-files-found: warn
