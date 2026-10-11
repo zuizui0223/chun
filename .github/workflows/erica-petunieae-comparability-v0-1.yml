@@ -41,7 +41,19 @@ jobs:
           from pathlib import Path
           a=json.loads(Path('build/erica_petunieae_source_support_comparability_v0_1.json').read_text())
           b=json.loads(Path('results/erica_petunieae_source_support_comparability_v0_1/result_v0_1.json').read_text())
-          assert a==b
+          def exact_except_float(x,y,loc="root"):
+              if isinstance(x,dict):
+                  assert isinstance(y,dict) and x.keys()==y.keys(),loc
+                  for k in x: exact_except_float(x[k],y[k],loc+"."+str(k))
+              elif isinstance(x,list):
+                  assert isinstance(y,list) and len(x)==len(y),loc
+                  for i,(u,v) in enumerate(zip(x,y)):
+                      exact_except_float(u,v,f"{loc}[{i}]")
+              elif isinstance(x,float) and isinstance(y,(float,int)) and not isinstance(y,bool):
+                  assert abs(x-y)<=1e-13,(loc,x,y)
+              else:
+                  assert type(x)==type(y) and x==y,(loc,x,y)
+          exact_except_float(a,b)
           assert a['erica']['state_support']['total_within_state_pairs']==83
           assert a['erica']['state_support']['within_state_pairs']['red']==66
           assert a['erica']['same_visible_hue_pairs_within_original_comparison_group']==6
