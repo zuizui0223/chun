@@ -1,0 +1,109 @@
+{
+  "version": "v0.1",
+  "status": "EVIDENCE_ESTIMANDS_NOT_EQUIVALENT_CANNOT_TEST_EFFECT_DIFFERENCE",
+  "role": "POST_OUTCOME_SOURCE_SUPPORT_AND_COMPARABILITY_AUDIT_NO_NEW_HYPOTHESIS_TEST",
+  "erica": {
+    "source_article_doi": "10.3389/fpls.2019.01565",
+    "unit": "2019 named taxa / same visible red-pink-white-yellow class",
+    "tree": "2025 molecular branch length averaged over candidate accessions; source qPCR flowers are not the actual DNA specimens",
+    "phenotype_condition": "visible flower hue, not chemically identical anthocyanidin-presence state",
+    "state_support": {
+      "tip_counts": {
+        "pink": 6,
+        "red": 12,
+        "white": 2,
+        "yellow": 2
+      },
+      "within_state_pairs": {
+        "pink": 15,
+        "red": 66,
+        "white": 1,
+        "yellow": 1
+      },
+      "total_within_state_pairs": 83,
+      "pair_share_by_state": {
+        "pink": 0.18072289156626506,
+        "red": 0.7951807228915663,
+        "white": 0.012048192771084338,
+        "yellow": 0.012048192771084338
+      },
+      "largest_single_state_pair_share": 0.7951807228915663,
+      "inverse_pair_share_concentration": 1.5031638664630156,
+      "inverse_concentration_is_not_independent_replication_count": true
+    },
+    "source_original_A_to_J_close_relative_groups_represented": {
+      "A": 2,
+      "B": 1,
+      "C": 3,
+      "E": 2,
+      "F": 1,
+      "G": 2,
+      "H": 4,
+      "I": 2,
+      "J": 5
+    },
+    "same_visible_hue_pairs_within_original_comparison_group": 6,
+    "same_visible_hue_pairs_across_original_comparison_groups": 77,
+    "within_original_group_pair_counts": {
+      "C": 1,
+      "H": 3,
+      "J": 2
+    },
+    "fraction_same_visible_hue_pairs_within_original_comparison_group": 0.07228915662650602,
+    "estimated_conditional_rho": 0.041496998446748666,
+    "permutation_p": 0.4988,
+    "retrospective_decision": "NOT_SUPPORTED_EXPLORATORY_TAXON_NAME_LEVEL",
+    "source_original_tip_primary_still_HOLD": true
+  },
+  "petunieae": {
+    "source_article_doi": "10.1098/rspb.2023.0275",
+    "unit": "47 species on exact same published tree and six nominal chemical-presence bit codes",
+    "phenotype_condition": "exact original six-bit anthocyanidin-presence codes in the retained 47, only Del/Pet/Malv vary",
+    "state_support": {
+      "tip_counts": {
+        "000000": 6,
+        "000010": 6,
+        "000011": 6,
+        "000100": 10,
+        "000110": 6,
+        "000111": 13
+      },
+      "within_state_pairs": {
+        "000000": 15,
+        "000010": 15,
+        "000011": 15,
+        "000100": 45,
+        "000110": 15,
+        "000111": 78
+      },
+      "total_within_state_pairs": 183,
+      "pair_share_by_state": {
+        "000000": 0.08196721311475409,
+        "000010": 0.08196721311475409,
+        "000011": 0.08196721311475409,
+        "000100": 0.2459016393442623,
+        "000110": 0.08196721311475409,
+        "000111": 0.4262295081967213
+      },
+      "largest_single_state_pair_share": 0.4262295081967213,
+      "inverse_pair_share_concentration": 3.7172827172827176,
+      "inverse_concentration_is_not_independent_replication_count": true
+    },
+    "adjusted_expression_rho": 0.511199259788796,
+    "adjusted_expression_permutation_p": 0.0002,
+    "adjusted_retrospective_decision": "RETROSPECTIVE_SUPPORT",
+    "original_nearest_two_prediction_still_FAIL": true
+  },
+  "scientific_inference": {
+    "population_level_cross_taxon_effect_difference_tested": false,
+    "effect_sizes_not_same_parameter": true,
+    "statistical_power_not_directly_comparable": true,
+    "pair_share_concentration_is_descriptive_only": true,
+    "visible_red_in_erica_may_hide_biochemical_routes": true,
+    "cannot_claim_plant_general_expression_memory_law": true,
+    "cannot_claim_erica_biological_memory_absent": true,
+    "no_new_p_values_computed": true,
+    "no_gene_or_colour_posthoc_reselection": true,
+    "original_camellia_AJB_and_EL_science_unchanged": true
+  }
+}
