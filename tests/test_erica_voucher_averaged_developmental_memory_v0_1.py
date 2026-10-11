@@ -59,3 +59,24 @@ def test_exact_tree_checksum_and_frozen_gene_matrix_before_outcomes():
         m.source_tip_mean_distances(b"not the published real molecular ZIP",
                                    source,[r["qpcr_source_taxon"] for r in m.frozen_taxon_frame(
                                        source,json.loads(DESIGN.read_text()))])
+
+def test_exact_retrospective_result_is_negative_and_not_relabelled():
+    result=json.loads((ROOT/"results/erica_voucher_averaged_developmental_memory_v0_1/result_v0_1.json").read_text())
+    design=json.loads(DESIGN.read_text())
+    assert result["status"]=="NOT_SUPPORTED_EXPLORATORY_TAXON_NAME_LEVEL"
+    assert result["design_status"]==design["status"]
+    assert result["n_taxa"]==22 and result["n_source_same_visible_colour_pairs"]==83
+    assert result["n_features"]==21 and result["n_original_qpcr_measurements"]==630
+    assert result["observed_rho"]==pytest.approx(0.041496998446748666,rel=0,abs=1e-13)
+    assert result["null_mean_rho"]==pytest.approx(0.04662583717756352,rel=0,abs=1e-13)
+    assert result["null_centered_rho"]==pytest.approx(
+        result["observed_rho"]-result["null_mean_rho"],rel=0,abs=1e-13)
+    assert result["p_one_sided"]==0.4988
+    assert result["n_permutations"]==9999 and result["seed"]==20261011
+    assert result["original_qpcr_workbook_sha256"]=="8255c52517a6ea7e8391d9d02a769decd6cba594f5ecc2e3527b22939426496e"
+    assert result["source_md5_verified"]
+    assert result["voucher_uncertainty_integrated_uniformly"]
+    assert result["qPCR_and_DNA_same_specimens"] is False
+    assert result["independent_exact_pigment_chemical_memory_replication"] is False
+    assert result["original_2016_Erica_primary_test_HOLD"] is True
+    assert result["original_AJB_EL_science_unchanged"] is True
