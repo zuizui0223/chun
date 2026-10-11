@@ -1,0 +1,70 @@
+name: Erica source-only accession distance uncertainty v0.1
+
+on:
+  pull_request:
+    paths:
+      - 'scripts/audit_erica_voucher_choice_phylogenetic_distance_bounds_v0_1.py'
+      - 'tests/test_erica_voucher_choice_distance_bounds_v0_1.py'
+      - 'results/erica_2019_subspecies_to_2025_voucher_prefix_gate_v0_1.json'
+      - '.github/workflows/erica-voucher-distance-bounds-v0-1.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  actions: read
+
+jobs:
+  source_only:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install pinned source-only dependencies
+        run: python -m pip install --disable-pip-version-check biopython==1.88 pytest==9.1.1
+      - name: Verify fail-closed source vs memory distinctions
+        run: python -m pytest -q tests/test_erica_voucher_choice_distance_bounds_v0_1.py
+      - name: Retrieve exact previous original ZIP, no new network URL guessing
+        uses: actions/download-artifact@v4
+        with:
+          name: erica-hoekstra2025-supp3-source-v0-1
+          repository: zuizui0223/chun
+          run-id: 38062290346
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          path: build/hoekstra2025_original
+      - name: Compute 83 source-only same-colour patristic distance choice envelopes for each tree
+        run: |
+          python scripts/audit_erica_voucher_choice_phylogenetic_distance_bounds_v0_1.py \
+            --source-zip build/hoekstra2025_original/erica_hoekstra2025_original_sup3.zip \
+            --subspecies-result results/erica_2019_subspecies_to_2025_voucher_prefix_gate_v0_1.json \
+            --out build/erica_source_only_voucher_distance_bounds_v0_1.json
+      - name: Require no single accession selection and no new regulatory-memory inference
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          r=json.loads(Path('build/erica_source_only_voucher_distance_bounds_v0_1.json').read_text())
+          assert r['source_archive_original_md5']=='d4363c6e604784b58c91d8a1d824a1f1'
+          assert len(r['trees'])==3
+          assert r['no_favourable_voucher_selected']
+          assert r['qPCR_expression_matrix_not_opened']
+          assert r['new_regulatory_memory_rho'] is None
+          assert r['new_p_value'] is None
+          assert not r['independent_regulatory_memory_replication']
+          assert r['original_AJB_EL_unchanged']
+          for t in r['trees']:
+              assert t['source_taxon_candidate_count']==22
+              assert t['within_visible_colour_candidate_taxon_pairs']==83
+              assert t['source_only_fixed_pair_count']==31
+              assert len(t['subspecies_constrained_multivoucher_monophyly'])==8
+              assert t['no_expression_association_test']
+          print('ERICA_SOURCE_ONLY_DISTANCE_BOUNDS_PASS')
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: erica-voucher-distance-envelopes-source-v0-1
+          path: build/erica_source_only_voucher_distance_bounds_v0_1.json
+          if-no-files-found: warn

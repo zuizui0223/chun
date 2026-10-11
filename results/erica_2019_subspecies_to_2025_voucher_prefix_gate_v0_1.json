@@ -1,0 +1,1435 @@
+{
+  "version": "v0.1",
+  "status": "HOLD_PUBLISHED_SUBSPECIES_RESOLVES_3_TIPS_BUT_14_TAXA_31_PAIRS_BELOW_SOURCE_GATE",
+  "analysis_role": "RETROSPECTIVE_SOURCE_ONLY_SUBSPECIFIC_NAME_RECONCILIATION",
+  "source_article_doi": "10.3389/fpls.2019.01565",
+  "target_tree_source_doi": "10.3897/phytokeys.257.139457.suppl3",
+  "comparison": "2019 originally printed subsp. identity vs 2025 labelled IQTREE DNA voucher candidates",
+  "original_phylogenetic_source_2016_still_not_REPLACED": true,
+  "prior_one_tip_candidate_taxa": 11,
+  "prior_one_tip_candidate_pairs": 20,
+  "current_one_tip_candidate_taxa": 14,
+  "current_one_tip_candidate_pairs": 31,
+  "original_design_min_taxa": 20,
+  "original_design_min_same_colour_pairs": 40,
+  "source_gate_is_not_the_gene_expression_test": true,
+  "no_voucher_or_exact_sample_equivalence_proven": true,
+  "no_gene_expression_phylogenetic_rho": true,
+  "no_permutation_p_value": true,
+  "no_independent_replication_admitted": true,
+  "frozen_AJB_EL_unchanged": true,
+  "trees": [
+    {
+      "tree": "iqtree_allGenes_MF_MERGE_v2_20240810.treefile",
+      "original_tree_tips": 771,
+      "published_subspecies_rules_used": 7,
+      "matched_taxon_candidates": 22,
+      "matched_by_colour": {
+        "pink": 6,
+        "red": 12,
+        "white": 2,
+        "yellow": 2
+      },
+      "unique_candidate_taxa": 14,
+      "unique_by_colour": {
+        "pink": 5,
+        "red": 7,
+        "white": 1,
+        "yellow": 1
+      },
+      "multiple_voucher_taxa": 8,
+      "ambiguous_taxa": [
+        "Erica_cerenthoides",
+        "Erica_prolata",
+        "Erica_monadelphia",
+        "Erica_coccinea",
+        "Erica_regia",
+        "Erica_abietina",
+        "Erica_viscaria",
+        "Erica_vestita"
+      ],
+      "missing_source_taxa": [
+        "Erica_sparmanii",
+        "Erica_plukenetii_breviflora",
+        "Erica_mammosa",
+        "Erica_filipendula",
+        "Erica_annectans"
+      ],
+      "max_same_colour_pairs_all_candidate_taxa_not_admitted": 83,
+      "max_same_colour_pairs_one_tip_candidates_not_admitted": 31,
+      "source_taxa": [
+        {
+          "qpcr_source_taxon": "Erica_cameronii",
+          "visible_colour": "red",
+          "published_subspecies_rule": null,
+          "source_rule": "2019_SPECIES_LEVEL_PREFIX_CANDIDATES_ONLY",
+          "original_name_stem_tip_candidates": [
+            "cameronii_ANA"
+          ],
+          "remaining_tip_candidates": [
+            "cameronii_ANA"
+          ],
+          "remaining_count": 1,
+          "identity_classification": "UNIQUE_TREE_TIP_CANDIDATE_NOT_VOUCHER_VERIFIED",
+          "not_the_same_2019_flower_sample_confirmed": true
+        },
+        {
+          "qpcr_source_taxon": "Erica_tetrathecoides",
+          "visible_colour": "pink",
+          "published_subspecies_rule": null,
+          "source_rule": "2019_SPECIES_LEVEL_PREFIX_CANDIDATES_ONLY",
+          "original_name_stem_tip_candidates": [
+            "tetrathecoides_MP1252"
+          ],
+          "remaining_tip_candidates": [
+            "tetrathecoides_MP1252"
+          ],
+          "remaining_count": 1,
+          "identity_classification": "UNIQUE_TREE_TIP_CANDIDATE_NOT_VOUCHER_VERIFIED",
+          "not_the_same_2019_flower_sample_confirmed": true
+        },
+        {
+          "qpcr_source_taxon": "Erica_cerenthoides",
+          "visible_colour": "red",
+          "published_subspecies_rule": null,
+          "source_rule": "2019_SPECIES_LEVEL_PREFIX_CANDIDATES_ONLY",
+          "original_name_stem_tip_candidates": [
+            "cerinthoides_ANA",
+            "cerinthoides_MP653"
+          ],
+          "remaining_tip_candidates": [
+            "cerinthoides_ANA",
+            "cerinthoides_MP653"
+          ],
+          "remaining_count": 2,
+          "identity_classification": "MULTIPLE_2025_VOUCHERS_STILL_UNRESOLVED",
+          "not_the_same_2019_flower_sample_confirmed": true
+        },
+        {
+          "qpcr_source_taxon": "Erica_sparmanii",
+          "visible_colour": "white",
+          "published_subspecies_rule": null,
+          "source_rule": "2019_SPECIES_LEVEL_PREFIX_CANDIDATES_ONLY",
+          "original_name_stem_tip_candidates": [],
+          "remaining_tip_candidates": [],
+          "remaining_count": 0,
+          "identity_classification": "NO_TREE_PREFIX_CANDIDATE",
+          "not_the_same_2019_flower_sample_confirmed": true
+        },
+        {
+          "qpcr_source_taxon": "Erica_discolor",
+          "visible_colour": "red",
+          "published_subspecies_rule": "discolor_spe_",
+          "source_rule": "PUBLISHED_2019_SUBSPECIFIC_PREFIX",
+          "original_name_stem_tip_candidates": [
+            "discolor_heb_MP1214",
+            "discolor_spe_MP1217"
+          ],
+          "remaining_tip_candidates": [
+            "discolor_spe_MP1217"
+          ],
+          "remaining_count": 1,
+          "identity_classification": "UNIQUE_TREE_TIP_CANDIDATE_NOT_VOUCHER_VERIFIED",
+          "not_the_same_2019_flower_sample_confirmed": true
+        },
+        {
+          "qpcr_source_taxon": "Erica_unicolor",
+          "visible_colour": "red",
+          "published_subspecies_rule": "unicolor_uni_",
+          "source_rule": "PUBLISHED_2019_SUBSPECIFIC_PREFIX",
+          "original_name_stem_tip_candidates": [
+            "unicolor_geo_JP273",
+            "unicolor_mut_MP1245",
+            "unicolor_uni_MP1249"
+          ],
+          "remaining_tip_candidates": [
+            "unicolor_uni_MP1249"
+          ],
+          "remaining_count": 1,
+          "identity_classification": "UNIQUE_TREE_TIP_CANDIDATE_NOT_VOUCHER_VERIFIED",
+          "not_the_same_2019_flower_sample_confirmed": true
+        },
+        {
+          "qpcr_source_taxon": "Erica_prolata",
+          "visible_colour": "pink",
+          "published_subspecies_rule": null,
+          "source_rule": "2019_SPECIES_LEVEL_PREFIX_CANDIDATES_ONLY",
+          "original_name_stem_tip_candidates": [
+            "prolata_EO11935",
+            "prolata_EO12748"
+          ],
+          "remaining_tip_candidates": [
+            "prolata_EO11935",
+            "prolata_EO12748"
+          ],
+          "remaining_count": 2,
+          "identity_classification": "MULTIPLE_2025_VOUCHERS_STILL_UNRESOLVED",
+          "not_the_same_2019_flower_sample_confirmed": true
+        },
+        {
+          "qpcr_source_taxon": "Erica_plukenetii_breviflora",
+          "visible_colour": "white",
+          "published_subspecies_rule": null,
+          "source_rule": "2019_SPECIES_LEVEL_PREFIX_CANDIDATES_ONLY",
+          "original_name_stem_tip_candidates": [],
+          "remaining_tip_candidates": [],
+          "remaining_count": 0,
+          "identity_classification": "NO_TREE_PREFIX_CANDIDATE",
+          "not_the_same_2019_flower_sample_confirmed": true
+        },
+        {
+          "qpcr_source_taxon": "Erica_monadelphia",
+          "visible_colour": "red",
+          "published_subspecies_rule": null,
+          "source_rule": "2019_SPECIES_LEVEL_PREFIX_CANDIDATES_ONLY",
+          "original_name_stem_tip_candidates": [
+            "monadelphia_FO",
+            "monadelphia_FO2_CP",
+            "monadelphia_FO2_ITS"
+          ],
+          "remaining_tip_candidates": [
+            "monadelphia_FO",
+            "monadelphia_FO2_CP",
+            "monadelphia_FO2_ITS"
+          ],
+          "remaining_count": 3,
+          "identity_classification": "MULTIPLE_2025_VOUCHERS_STILL_UNRESOLVED",
+          "not_the_same_2019_flower_sample_confirmed": true
+        },
+        {
+          "qpcr_source_taxon": "Erica_coccinea",
+          "visible_colour": "yellow",
+          "published_subspecies_rule": "coccinea_coc_",
+          "source_rule": "PUBLISHED_2019_SUBSPECIFIC_PREFIX",
+          "original_name_stem_tip_candidates": [
+            "coccinea_coc_MP1020",
+            "coccinea_coc_MP1053",
+            "coccinea_coc_MP598",
+            "coccinea_uni_EO12849"
+          ],
+          "remaining_tip_candidates": [
+            "coccinea_coc_MP1020",
+            "coccinea_coc_MP1053",
+            "coccinea_coc_MP598"
+          ],
+          "remaining_count": 3,
+          "identity_classification": "MULTIPLE_2025_VOUCHERS_STILL_UNRESOLVED",
+          "not_the_same_2019_flower_sample_confirmed": true
+        },
+        {
+          "qpcr_source_taxon": "Erica_mammosa",
+          "visible_colour": "red",
+          "published_subspecies_rule": null,
+          "source_rule": "2019_SPECIES_LEVEL_PREFIX_CANDIDATES_ONLY",
+          "original_name_stem_tip_candidates": [],
+          "remaining_tip_candidates": [],
+          "remaining_count": 0,
+          "identity_classification": "NO_TREE_PREFIX_CANDIDATE",
+          "not_the_same_2019_flower_sample_confirmed": true
+        },
+        {
+          "qpcr_source_taxon": "Erica_sessiliflora",
+          "visible_colour": "white",
+          "published_subspecies_rule": null,
+          "source_rule": "2019_SPECIES_LEVEL_PREFIX_CANDIDATES_ONLY",
+          "original_name_stem_tip_candidates": [
+            "sessiliflora_MP604"
+          ],
+          "remaining_tip_candidates": [
+            "sessiliflora_MP604"
+          ],
+          "remaining_count": 1,
+          "identity_classification": "UNIQUE_TREE_TIP_CANDIDATE_NOT_VOUCHER_VERIFIED",
+          "not_the_same_2019_flower_sample_confirmed": true
+        },
+        {
+          "qpcr_source_taxon": "Erica_filipendula",
+          "visible_colour": "white",
+          "published_subspecies_rule": null,
+          "source_rule": "2019_SPECIES_LEVEL_PREFIX_CANDIDATES_ONLY",
+          "original_name_stem_tip_candidates": [],
+          "remaining_tip_candidates": [],
+          "remaining_count": 0,
+          "identity_classification": "NO_TREE_PREFIX_CANDIDATE",
+          "not_the_same_2019_flower_sample_confirmed": true
+        },
+        {
+          "qpcr_source_taxon": "Erica_massonii",
+          "visible_colour": "red",
+          "published_subspecies_rule": null,
+          "source_rule": "2019_SPECIES_LEVEL_PREFIX_CANDIDATES_ONLY",
+          "original_name_stem_tip_candidates": [
+            "massonii_MP811"
+          ],
+          "remaining_tip_candidates": [
+            "massonii_MP811"
+          ],
+          "remaining_count": 1,
+          "identity_classification": "UNIQUE_TREE_TIP_CANDIDATE_NOT_VOUCHER_VERIFIED",
+          "not_the_same_2019_flower_sample_confirmed": true
+        },
+        {
+          "qpcr_source_taxon": "Erica_squarrosa",
+          "visible_colour": "pink",
+          "published_subspecies_rule": null,
+          "source_rule": "2019_SPECIES_LEVEL_PREFIX_CANDIDATES_ONLY",
+          "original_name_stem_tip_candidates": [
+            "squarrosa_EO11742"
+          ],
+          "remaining_tip_candidates": [
+            "squarrosa_EO11742"
+          ],
+          "remaining_count": 1,
+          "identity_classification": "UNIQUE_TREE_TIP_CANDIDATE_NOT_VOUCHER_VERIFIED",
+          "not_the_same_2019_flower_sample_confirmed": true
+        },
+        {
+          "qpcr_source_taxon": "Erica_regia",
+          "visible_colour": "red",
+          "published_subspecies_rule": "regia_reg_",
+          "source_rule": "PUBLISHED_2019_SUBSPECIFIC_PREFIX",
+          "original_name_stem_tip_candidates": [
+            "regia_mar_MP930",
+            "regia_reg_ANA",
+            "regia_reg_MP922"
+          ],
+          "remaining_tip_candidates": [
+            "regia_reg_ANA",
+            "regia_reg_MP922"
+          ],
+          "remaining_count": 2,
+          "identity_classification": "MULTIPLE_2025_VOUCHERS_STILL_UNRESOLVED",
+          "not_the_same_2019_flower_sample_confirmed": true
+        },
+        {
+          "qpcr_source_taxon": "Erica_abietina",
+          "visible_colour": "red",
+          "published_subspecies_rule": "abietina_abi_",
+          "source_rule": "PUBLISHED_2019_SUBSPECIFIC_PREFIX",
+          "original_name_stem_tip_candidates": [
+            "abietina_abi_ANA",
+            "abietina_abi_MP1013",
+            "abietina_atr_MP1029",
+            "abietina_aur_MP1320",
+            "abietina_aur_MP499",
+            "abietina_aur_MP514",
+            "abietina_aur_MP717",
+            "abietina_con_CM6",
+            "abietina_dia_CM11",
+            "abietina_dia_MP1015",
+            "abietina_per_MP1071",
+            "abietina_pet_EO"
+          ],
+          "remaining_tip_candidates": [
+            "abietina_abi_ANA",
+            "abietina_abi_MP1013"
+          ],
+          "remaining_count": 2,
+          "identity_classification": "MULTIPLE_2025_VOUCHERS_STILL_UNRESOLVED",
+          "not_the_same_2019_flower_sample_confirmed": true
+        },
+        {
+          "qpcr_source_taxon": "Erica_viscaria",
+          "visible_colour": "white",
+          "published_subspecies_rule": "viscaria_lon_",
+          "source_rule": "PUBLISHED_2019_SUBSPECIFIC_PREFIX",
+          "original_name_stem_tip_candidates": [
+            "viscaria_lon_ANA",
+            "viscaria_lon_MP1270",
+            "viscaria_lon_MP504",
+            "viscaria_lon_MP678",
+            "viscaria_mac_MP808",
+            "viscaria_pen_EO12466",
+            "viscaria_vis_MdV4"
+          ],
+          "remaining_tip_candidates": [
+            "viscaria_lon_ANA",
+            "viscaria_lon_MP1270",
+            "viscaria_lon_MP504",
+            "viscaria_lon_MP678"
+          ],
+          "remaining_count": 4,
+          "identity_classification": "MULTIPLE_2025_VOUCHERS_STILL_UNRESOLVED",
+          "not_the_same_2019_flower_sample_confirmed": true
+        },
+        {
+          "qpcr_source_taxon": "Erica_vestita",
+          "visible_colour": "red",
+          "published_subspecies_rule": null,
+          "source_rule": "2019_SPECIES_LEVEL_PREFIX_CANDIDATES_ONLY",
+          "original_name_stem_tip_candidates": [
+            "vestita_ANA",
+            "vestita_EO12702",
+            "vestita_MP1079"
+          ],
+          "remaining_tip_candidates": [
+            "vestita_ANA",
+            "vestita_EO12702",
+            "vestita_MP1079"
+          ],
+          "remaining_count": 3,
+          "identity_classification": "MULTIPLE_2025_VOUCHERS_STILL_UNRESOLVED",
+          "not_the_same_2019_flower_sample_confirmed": true
+        },
+        {
+          "qpcr_source_taxon": "Erica_hematocodon",
+          "visible_colour": "red",
+          "published_subspecies_rule": null,
+          "source_rule": "2019_SPECIES_LEVEL_PREFIX_CANDIDATES_ONLY",
+          "original_name_stem_tip_candidates": [
+            "haematocodon_MP1033"
+          ],
+          "remaining_tip_candidates": [
+            "haematocodon_MP1033"
+          ],
+          "remaining_count": 1,
+          "identity_classification": "UNIQUE_TREE_TIP_CANDIDATE_NOT_VOUCHER_VERIFIED",
+          "not_the_same_2019_flower_sample_confirmed": true
+        },
+        {
+          "qpcr_source_taxon": "Erica_hirtiflora",
+          "visible_colour": "pink",
+          "published_subspecies_rule": null,
+          "source_rule": "2019_SPECIES_LEVEL_PREFIX_CANDIDATES_ONLY",
+          "original_name_stem_tip_candidates": [
+            "hirtiflora_MP958"
+          ],
+          "remaining_tip_candidates": [
+            "hirtiflora_MP958"
+          ],
+          "remaining_count": 1,
+          "identity_classification": "UNIQUE_TREE_TIP_CANDIDATE_NOT_VOUCHER_VERIFIED",
+          "not_the_same_2019_flower_sample_confirmed": true
+        },
+        {
+          "qpcr_source_taxon": "Erica_stagnalis",
+          "visible_colour": "yellow",
+          "published_subspecies_rule": "stagnalis_sta_",
+          "source_rule": "PUBLISHED_2019_SUBSPECIFIC_PREFIX",
+          "original_name_stem_tip_candidates": [
+            "stagnalis_min_EO12740",
+            "stagnalis_sta_MP668"
+          ],
+          "remaining_tip_candidates": [
+            "stagnalis_sta_MP668"
+          ],
+          "remaining_count": 1,
+          "identity_classification": "UNIQUE_TREE_TIP_CANDIDATE_NOT_VOUCHER_VERIFIED",
+          "not_the_same_2019_flower_sample_confirmed": true
+        },
+        {
+          "qpcr_source_taxon": "Erica_leucotrachela",
+          "visible_colour": "red",
+          "published_subspecies_rule": null,
+          "source_rule": "2019_SPECIES_LEVEL_PREFIX_CANDIDATES_ONLY",
+          "original_name_stem_tip_candidates": [
+            "leucotrachela_ANA"
+          ],
+          "remaining_tip_candidates": [
+            "leucotrachela_ANA"
+          ],
+          "remaining_count": 1,
+          "identity_classification": "UNIQUE_TREE_TIP_CANDIDATE_NOT_VOUCHER_VERIFIED",
+          "not_the_same_2019_flower_sample_confirmed": true
+        },
+        {
+          "qpcr_source_taxon": "Erica_pillansii",
+          "visible_colour": "red",
+          "published_subspecies_rule": null,
+          "source_rule": "2019_SPECIES_LEVEL_PREFIX_CANDIDATES_ONLY",
+          "original_name_stem_tip_candidates": [
+            "pillansii_pil_MP813"
+          ],
+          "remaining_tip_candidates": [
+            "pillansii_pil_MP813"
+          ],
+          "remaining_count": 1,
+          "identity_classification": "UNIQUE_TREE_TIP_CANDIDATE_NOT_VOUCHER_VERIFIED",
+          "not_the_same_2019_flower_sample_confirmed": true
+        },
+        {
+          "qpcr_source_taxon": "Erica_parviflora",
+          "visible_colour": "pink",
+          "published_subspecies_rule": null,
+          "source_rule": "2019_SPECIES_LEVEL_PREFIX_CANDIDATES_ONLY",
+          "original_name_stem_tip_candidates": [
+            "parviflora_EO12492"
+          ],
+          "remaining_tip_candidates": [
+            "parviflora_EO12492"
+          ],
+          "remaining_count": 1,
+          "identity_classification": "UNIQUE_TREE_TIP_CANDIDATE_NOT_VOUCHER_VERIFIED",
+          "not_the_same_2019_flower_sample_confirmed": true
+        },
+        {
+          "qpcr_source_taxon": "Erica_verticiliata",
+          "visible_colour": "pink",
+          "published_subspecies_rule": null,
+          "source_rule": "2019_SPECIES_LEVEL_PREFIX_CANDIDATES_ONLY",
+          "original_name_stem_tip_candidates": [
+            "verticillata_ANA"
+          ],
+          "remaining_tip_candidates": [
+            "verticillata_ANA"
+          ],
+          "remaining_count": 1,
+          "identity_classification": "UNIQUE_TREE_TIP_CANDIDATE_NOT_VOUCHER_VERIFIED",
+          "not_the_same_2019_flower_sample_confirmed": true
+        },
+        {
+          "qpcr_source_taxon": "Erica_annectans",
+          "visible_colour": "red",
+          "published_subspecies_rule": null,
+          "source_rule": "2019_SPECIES_LEVEL_PREFIX_CANDIDATES_ONLY",
+          "original_name_stem_tip_candidates": [],
+          "remaining_tip_candidates": [],
+          "remaining_count": 0,
+          "identity_classification": "NO_TREE_PREFIX_CANDIDATE",
+          "not_the_same_2019_flower_sample_confirmed": true
+        }
+      ],
+      "no_expression_outcome_ever_calculated": true
+    },
+    {
+      "tree": "iqtree_nuclear_MF_MERGE_v2_20240810.treefile",
+      "original_tree_tips": 749,
+      "published_subspecies_rules_used": 7,
+      "matched_taxon_candidates": 22,
+      "matched_by_colour": {
+        "pink": 6,
+        "red": 12,
+        "white": 2,
+        "yellow": 2
+      },
+      "unique_candidate_taxa": 14,
+      "unique_by_colour": {
+        "pink": 5,
+        "red": 7,
+        "white": 1,
+        "yellow": 1
+      },
+      "multiple_voucher_taxa": 8,
+      "ambiguous_taxa": [
+        "Erica_cerenthoides",
+        "Erica_prolata",
+        "Erica_monadelphia",
+        "Erica_coccinea",
+        "Erica_regia",
+        "Erica_abietina",
+        "Erica_viscaria",
+        "Erica_vestita"
+      ],
+      "missing_source_taxa": [
+        "Erica_sparmanii",
+        "Erica_plukenetii_breviflora",
+        "Erica_mammosa",
+        "Erica_filipendula",
+        "Erica_annectans"
+      ],
+      "max_same_colour_pairs_all_candidate_taxa_not_admitted": 83,
+      "max_same_colour_pairs_one_tip_candidates_not_admitted": 31,
+      "source_taxa": [
+        {
+          "qpcr_source_taxon": "Erica_cameronii",
+          "visible_colour": "red",
+          "published_subspecies_rule": null,
+          "source_rule": "2019_SPECIES_LEVEL_PREFIX_CANDIDATES_ONLY",
+          "original_name_stem_tip_candidates": [
+            "cameronii_ANA"
+          ],
+          "remaining_tip_candidates": [
+            "cameronii_ANA"
+          ],
+          "remaining_count": 1,
+          "identity_classification": "UNIQUE_TREE_TIP_CANDIDATE_NOT_VOUCHER_VERIFIED",
+          "not_the_same_2019_flower_sample_confirmed": true
+        },
+        {
+          "qpcr_source_taxon": "Erica_tetrathecoides",
+          "visible_colour": "pink",
+          "published_subspecies_rule": null,
+          "source_rule": "2019_SPECIES_LEVEL_PREFIX_CANDIDATES_ONLY",
+          "original_name_stem_tip_candidates": [
+            "tetrathecoides_MP1252"
+          ],
+          "remaining_tip_candidates": [
+            "tetrathecoides_MP1252"
+          ],
+          "remaining_count": 1,
+          "identity_classification": "UNIQUE_TREE_TIP_CANDIDATE_NOT_VOUCHER_VERIFIED",
+          "not_the_same_2019_flower_sample_confirmed": true
+        },
+        {
+          "qpcr_source_taxon": "Erica_cerenthoides",
+          "visible_colour": "red",
+          "published_subspecies_rule": null,
+          "source_rule": "2019_SPECIES_LEVEL_PREFIX_CANDIDATES_ONLY",
+          "original_name_stem_tip_candidates": [
+            "cerinthoides_ANA",
+            "cerinthoides_MP653"
+          ],
+          "remaining_tip_candidates": [
+            "cerinthoides_ANA",
+            "cerinthoides_MP653"
+          ],
+          "remaining_count": 2,
+          "identity_classification": "MULTIPLE_2025_VOUCHERS_STILL_UNRESOLVED",
+          "not_the_same_2019_flower_sample_confirmed": true
+        },
+        {
+          "qpcr_source_taxon": "Erica_sparmanii",
+          "visible_colour": "white",
+          "published_subspecies_rule": null,
+          "source_rule": "2019_SPECIES_LEVEL_PREFIX_CANDIDATES_ONLY",
+          "original_name_stem_tip_candidates": [],
+          "remaining_tip_candidates": [],
+          "remaining_count": 0,
+          "identity_classification": "NO_TREE_PREFIX_CANDIDATE",
+          "not_the_same_2019_flower_sample_confirmed": true
+        },
+        {
+          "qpcr_source_taxon": "Erica_discolor",
+          "visible_colour": "red",
+          "published_subspecies_rule": "discolor_spe_",
+          "source_rule": "PUBLISHED_2019_SUBSPECIFIC_PREFIX",
+          "original_name_stem_tip_candidates": [
+            "discolor_heb_MP1214",
+            "discolor_spe_MP1217"
+          ],
+          "remaining_tip_candidates": [
+            "discolor_spe_MP1217"
+          ],
+          "remaining_count": 1,
+          "identity_classification": "UNIQUE_TREE_TIP_CANDIDATE_NOT_VOUCHER_VERIFIED",
+          "not_the_same_2019_flower_sample_confirmed": true
+        },
+        {
+          "qpcr_source_taxon": "Erica_unicolor",
+          "visible_colour": "red",
+          "published_subspecies_rule": "unicolor_uni_",
+          "source_rule": "PUBLISHED_2019_SUBSPECIFIC_PREFIX",
+          "original_name_stem_tip_candidates": [
+            "unicolor_geo_JP273",
+            "unicolor_mut_MP1245",
+            "unicolor_uni_MP1249"
+          ],
+          "remaining_tip_candidates": [
+            "unicolor_uni_MP1249"
+          ],
+          "remaining_count": 1,
+          "identity_classification": "UNIQUE_TREE_TIP_CANDIDATE_NOT_VOUCHER_VERIFIED",
+          "not_the_same_2019_flower_sample_confirmed": true
+        },
+        {
+          "qpcr_source_taxon": "Erica_prolata",
+          "visible_colour": "pink",
+          "published_subspecies_rule": null,
+          "source_rule": "2019_SPECIES_LEVEL_PREFIX_CANDIDATES_ONLY",
+          "original_name_stem_tip_candidates": [
+            "prolata_EO11935",
+            "prolata_EO12748"
+          ],
+          "remaining_tip_candidates": [
+            "prolata_EO11935",
+            "prolata_EO12748"
+          ],
+          "remaining_count": 2,
+          "identity_classification": "MULTIPLE_2025_VOUCHERS_STILL_UNRESOLVED",
+          "not_the_same_2019_flower_sample_confirmed": true
+        },
+        {
+          "qpcr_source_taxon": "Erica_plukenetii_breviflora",
+          "visible_colour": "white",
+          "published_subspecies_rule": null,
+          "source_rule": "2019_SPECIES_LEVEL_PREFIX_CANDIDATES_ONLY",
+          "original_name_stem_tip_candidates": [],
+          "remaining_tip_candidates": [],
+          "remaining_count": 0,
+          "identity_classification": "NO_TREE_PREFIX_CANDIDATE",
+          "not_the_same_2019_flower_sample_confirmed": true
+        },
+        {
+          "qpcr_source_taxon": "Erica_monadelphia",
+          "visible_colour": "red",
+          "published_subspecies_rule": null,
+          "source_rule": "2019_SPECIES_LEVEL_PREFIX_CANDIDATES_ONLY",
+          "original_name_stem_tip_candidates": [
+            "monadelphia_FO",
+            "monadelphia_FO2_ITS"
+          ],
+          "remaining_tip_candidates": [
+            "monadelphia_FO",
+            "monadelphia_FO2_ITS"
+          ],
+          "remaining_count": 2,
+          "identity_classification": "MULTIPLE_2025_VOUCHERS_STILL_UNRESOLVED",
+          "not_the_same_2019_flower_sample_confirmed": true
+        },
+        {
+          "qpcr_source_taxon": "Erica_coccinea",
+          "visible_colour": "yellow",
+          "published_subspecies_rule": "coccinea_coc_",
+          "source_rule": "PUBLISHED_2019_SUBSPECIFIC_PREFIX",
+          "original_name_stem_tip_candidates": [
+            "coccinea_coc_MP1020",
+            "coccinea_coc_MP1053",
+            "coccinea_coc_MP598",
+            "coccinea_uni_EO12849"
+          ],
+          "remaining_tip_candidates": [
+            "coccinea_coc_MP1020",
+            "coccinea_coc_MP1053",
+            "coccinea_coc_MP598"
+          ],
+          "remaining_count": 3,
+          "identity_classification": "MULTIPLE_2025_VOUCHERS_STILL_UNRESOLVED",
+          "not_the_same_2019_flower_sample_confirmed": true
+        },
+        {
+          "qpcr_source_taxon": "Erica_mammosa",
+          "visible_colour": "red",
+          "published_subspecies_rule": null,
+          "source_rule": "2019_SPECIES_LEVEL_PREFIX_CANDIDATES_ONLY",
+          "original_name_stem_tip_candidates": [],
+          "remaining_tip_candidates": [],
+          "remaining_count": 0,
+          "identity_classification": "NO_TREE_PREFIX_CANDIDATE",
+          "not_the_same_2019_flower_sample_confirmed": true
+        },
+        {
+          "qpcr_source_taxon": "Erica_sessiliflora",
+          "visible_colour": "white",
+          "published_subspecies_rule": null,
+          "source_rule": "2019_SPECIES_LEVEL_PREFIX_CANDIDATES_ONLY",
+          "original_name_stem_tip_candidates": [
+            "sessiliflora_MP604"
+          ],
+          "remaining_tip_candidates": [
+            "sessiliflora_MP604"
+          ],
+          "remaining_count": 1,
+          "identity_classification": "UNIQUE_TREE_TIP_CANDIDATE_NOT_VOUCHER_VERIFIED",
+          "not_the_same_2019_flower_sample_confirmed": true
+        },
+        {
+          "qpcr_source_taxon": "Erica_filipendula",
+          "visible_colour": "white",
+          "published_subspecies_rule": null,
+          "source_rule": "2019_SPECIES_LEVEL_PREFIX_CANDIDATES_ONLY",
+          "original_name_stem_tip_candidates": [],
+          "remaining_tip_candidates": [],
+          "remaining_count": 0,
+          "identity_classification": "NO_TREE_PREFIX_CANDIDATE",
+          "not_the_same_2019_flower_sample_confirmed": true
+        },
+        {
+          "qpcr_source_taxon": "Erica_massonii",
+          "visible_colour": "red",
+          "published_subspecies_rule": null,
+          "source_rule": "2019_SPECIES_LEVEL_PREFIX_CANDIDATES_ONLY",
+          "original_name_stem_tip_candidates": [
+            "massonii_MP811"
+          ],
+          "remaining_tip_candidates": [
+            "massonii_MP811"
+          ],
+          "remaining_count": 1,
+          "identity_classification": "UNIQUE_TREE_TIP_CANDIDATE_NOT_VOUCHER_VERIFIED",
+          "not_the_same_2019_flower_sample_confirmed": true
+        },
+        {
+          "qpcr_source_taxon": "Erica_squarrosa",
+          "visible_colour": "pink",
+          "published_subspecies_rule": null,
+          "source_rule": "2019_SPECIES_LEVEL_PREFIX_CANDIDATES_ONLY",
+          "original_name_stem_tip_candidates": [
+            "squarrosa_EO11742"
+          ],
+          "remaining_tip_candidates": [
+            "squarrosa_EO11742"
+          ],
+          "remaining_count": 1,
+          "identity_classification": "UNIQUE_TREE_TIP_CANDIDATE_NOT_VOUCHER_VERIFIED",
+          "not_the_same_2019_flower_sample_confirmed": true
+        },
+        {
+          "qpcr_source_taxon": "Erica_regia",
+          "visible_colour": "red",
+          "published_subspecies_rule": "regia_reg_",
+          "source_rule": "PUBLISHED_2019_SUBSPECIFIC_PREFIX",
+          "original_name_stem_tip_candidates": [
+            "regia_mar_MP930",
+            "regia_reg_ANA",
+            "regia_reg_MP922"
+          ],
+          "remaining_tip_candidates": [
+            "regia_reg_ANA",
+            "regia_reg_MP922"
+          ],
+          "remaining_count": 2,
+          "identity_classification": "MULTIPLE_2025_VOUCHERS_STILL_UNRESOLVED",
+          "not_the_same_2019_flower_sample_confirmed": true
+        },
+        {
+          "qpcr_source_taxon": "Erica_abietina",
+          "visible_colour": "red",
+          "published_subspecies_rule": "abietina_abi_",
+          "source_rule": "PUBLISHED_2019_SUBSPECIFIC_PREFIX",
+          "original_name_stem_tip_candidates": [
+            "abietina_abi_ANA",
+            "abietina_abi_MP1013",
+            "abietina_atr_MP1029",
+            "abietina_aur_MP1320",
+            "abietina_aur_MP499",
+            "abietina_aur_MP514",
+            "abietina_aur_MP717",
+            "abietina_con_CM6",
+            "abietina_dia_CM11",
+            "abietina_dia_MP1015",
+            "abietina_per_MP1071",
+            "abietina_pet_EO"
+          ],
+          "remaining_tip_candidates": [
+            "abietina_abi_ANA",
+            "abietina_abi_MP1013"
+          ],
+          "remaining_count": 2,
+          "identity_classification": "MULTIPLE_2025_VOUCHERS_STILL_UNRESOLVED",
+          "not_the_same_2019_flower_sample_confirmed": true
+        },
+        {
+          "qpcr_source_taxon": "Erica_viscaria",
+          "visible_colour": "white",
+          "published_subspecies_rule": "viscaria_lon_",
+          "source_rule": "PUBLISHED_2019_SUBSPECIFIC_PREFIX",
+          "original_name_stem_tip_candidates": [
+            "viscaria_lon_ANA",
+            "viscaria_lon_MP1270",
+            "viscaria_lon_MP504",
+            "viscaria_lon_MP678",
+            "viscaria_mac_MP808",
+            "viscaria_pen_EO12466",
+            "viscaria_vis_MdV4"
+          ],
+          "remaining_tip_candidates": [
+            "viscaria_lon_ANA",
+            "viscaria_lon_MP1270",
+            "viscaria_lon_MP504",
+            "viscaria_lon_MP678"
+          ],
+          "remaining_count": 4,
+          "identity_classification": "MULTIPLE_2025_VOUCHERS_STILL_UNRESOLVED",
+          "not_the_same_2019_flower_sample_confirmed": true
+        },
+        {
+          "qpcr_source_taxon": "Erica_vestita",
+          "visible_colour": "red",
+          "published_subspecies_rule": null,
+          "source_rule": "2019_SPECIES_LEVEL_PREFIX_CANDIDATES_ONLY",
+          "original_name_stem_tip_candidates": [
+            "vestita_ANA",
+            "vestita_EO12702",
+            "vestita_MP1079"
+          ],
+          "remaining_tip_candidates": [
+            "vestita_ANA",
+            "vestita_EO12702",
+            "vestita_MP1079"
+          ],
+          "remaining_count": 3,
+          "identity_classification": "MULTIPLE_2025_VOUCHERS_STILL_UNRESOLVED",
+          "not_the_same_2019_flower_sample_confirmed": true
+        },
+        {
+          "qpcr_source_taxon": "Erica_hematocodon",
+          "visible_colour": "red",
+          "published_subspecies_rule": null,
+          "source_rule": "2019_SPECIES_LEVEL_PREFIX_CANDIDATES_ONLY",
+          "original_name_stem_tip_candidates": [
+            "haematocodon_MP1033"
+          ],
+          "remaining_tip_candidates": [
+            "haematocodon_MP1033"
+          ],
+          "remaining_count": 1,
+          "identity_classification": "UNIQUE_TREE_TIP_CANDIDATE_NOT_VOUCHER_VERIFIED",
+          "not_the_same_2019_flower_sample_confirmed": true
+        },
+        {
+          "qpcr_source_taxon": "Erica_hirtiflora",
+          "visible_colour": "pink",
+          "published_subspecies_rule": null,
+          "source_rule": "2019_SPECIES_LEVEL_PREFIX_CANDIDATES_ONLY",
+          "original_name_stem_tip_candidates": [
+            "hirtiflora_MP958"
+          ],
+          "remaining_tip_candidates": [
+            "hirtiflora_MP958"
+          ],
+          "remaining_count": 1,
+          "identity_classification": "UNIQUE_TREE_TIP_CANDIDATE_NOT_VOUCHER_VERIFIED",
+          "not_the_same_2019_flower_sample_confirmed": true
+        },
+        {
+          "qpcr_source_taxon": "Erica_stagnalis",
+          "visible_colour": "yellow",
+          "published_subspecies_rule": "stagnalis_sta_",
+          "source_rule": "PUBLISHED_2019_SUBSPECIFIC_PREFIX",
+          "original_name_stem_tip_candidates": [
+            "stagnalis_min_EO12740",
+            "stagnalis_sta_MP668"
+          ],
+          "remaining_tip_candidates": [
+            "stagnalis_sta_MP668"
+          ],
+          "remaining_count": 1,
+          "identity_classification": "UNIQUE_TREE_TIP_CANDIDATE_NOT_VOUCHER_VERIFIED",
+          "not_the_same_2019_flower_sample_confirmed": true
+        },
+        {
+          "qpcr_source_taxon": "Erica_leucotrachela",
+          "visible_colour": "red",
+          "published_subspecies_rule": null,
+          "source_rule": "2019_SPECIES_LEVEL_PREFIX_CANDIDATES_ONLY",
+          "original_name_stem_tip_candidates": [
+            "leucotrachela_ANA"
+          ],
+          "remaining_tip_candidates": [
+            "leucotrachela_ANA"
+          ],
+          "remaining_count": 1,
+          "identity_classification": "UNIQUE_TREE_TIP_CANDIDATE_NOT_VOUCHER_VERIFIED",
+          "not_the_same_2019_flower_sample_confirmed": true
+        },
+        {
+          "qpcr_source_taxon": "Erica_pillansii",
+          "visible_colour": "red",
+          "published_subspecies_rule": null,
+          "source_rule": "2019_SPECIES_LEVEL_PREFIX_CANDIDATES_ONLY",
+          "original_name_stem_tip_candidates": [
+            "pillansii_pil_MP813"
+          ],
+          "remaining_tip_candidates": [
+            "pillansii_pil_MP813"
+          ],
+          "remaining_count": 1,
+          "identity_classification": "UNIQUE_TREE_TIP_CANDIDATE_NOT_VOUCHER_VERIFIED",
+          "not_the_same_2019_flower_sample_confirmed": true
+        },
+        {
+          "qpcr_source_taxon": "Erica_parviflora",
+          "visible_colour": "pink",
+          "published_subspecies_rule": null,
+          "source_rule": "2019_SPECIES_LEVEL_PREFIX_CANDIDATES_ONLY",
+          "original_name_stem_tip_candidates": [
+            "parviflora_EO12492"
+          ],
+          "remaining_tip_candidates": [
+            "parviflora_EO12492"
+          ],
+          "remaining_count": 1,
+          "identity_classification": "UNIQUE_TREE_TIP_CANDIDATE_NOT_VOUCHER_VERIFIED",
+          "not_the_same_2019_flower_sample_confirmed": true
+        },
+        {
+          "qpcr_source_taxon": "Erica_verticiliata",
+          "visible_colour": "pink",
+          "published_subspecies_rule": null,
+          "source_rule": "2019_SPECIES_LEVEL_PREFIX_CANDIDATES_ONLY",
+          "original_name_stem_tip_candidates": [
+            "verticillata_ANA"
+          ],
+          "remaining_tip_candidates": [
+            "verticillata_ANA"
+          ],
+          "remaining_count": 1,
+          "identity_classification": "UNIQUE_TREE_TIP_CANDIDATE_NOT_VOUCHER_VERIFIED",
+          "not_the_same_2019_flower_sample_confirmed": true
+        },
+        {
+          "qpcr_source_taxon": "Erica_annectans",
+          "visible_colour": "red",
+          "published_subspecies_rule": null,
+          "source_rule": "2019_SPECIES_LEVEL_PREFIX_CANDIDATES_ONLY",
+          "original_name_stem_tip_candidates": [],
+          "remaining_tip_candidates": [],
+          "remaining_count": 0,
+          "identity_classification": "NO_TREE_PREFIX_CANDIDATE",
+          "not_the_same_2019_flower_sample_confirmed": true
+        }
+      ],
+      "no_expression_outcome_ever_calculated": true
+    },
+    {
+      "tree": "iqtree_chloroplast_partitioned_MF_merge.treefile",
+      "original_tree_tips": 744,
+      "published_subspecies_rules_used": 7,
+      "matched_taxon_candidates": 22,
+      "matched_by_colour": {
+        "pink": 6,
+        "red": 12,
+        "white": 2,
+        "yellow": 2
+      },
+      "unique_candidate_taxa": 14,
+      "unique_by_colour": {
+        "pink": 5,
+        "red": 7,
+        "white": 1,
+        "yellow": 1
+      },
+      "multiple_voucher_taxa": 8,
+      "ambiguous_taxa": [
+        "Erica_cerenthoides",
+        "Erica_prolata",
+        "Erica_monadelphia",
+        "Erica_coccinea",
+        "Erica_regia",
+        "Erica_abietina",
+        "Erica_viscaria",
+        "Erica_vestita"
+      ],
+      "missing_source_taxa": [
+        "Erica_sparmanii",
+        "Erica_plukenetii_breviflora",
+        "Erica_mammosa",
+        "Erica_filipendula",
+        "Erica_annectans"
+      ],
+      "max_same_colour_pairs_all_candidate_taxa_not_admitted": 83,
+      "max_same_colour_pairs_one_tip_candidates_not_admitted": 31,
+      "source_taxa": [
+        {
+          "qpcr_source_taxon": "Erica_cameronii",
+          "visible_colour": "red",
+          "published_subspecies_rule": null,
+          "source_rule": "2019_SPECIES_LEVEL_PREFIX_CANDIDATES_ONLY",
+          "original_name_stem_tip_candidates": [
+            "cameronii_ANA"
+          ],
+          "remaining_tip_candidates": [
+            "cameronii_ANA"
+          ],
+          "remaining_count": 1,
+          "identity_classification": "UNIQUE_TREE_TIP_CANDIDATE_NOT_VOUCHER_VERIFIED",
+          "not_the_same_2019_flower_sample_confirmed": true
+        },
+        {
+          "qpcr_source_taxon": "Erica_tetrathecoides",
+          "visible_colour": "pink",
+          "published_subspecies_rule": null,
+          "source_rule": "2019_SPECIES_LEVEL_PREFIX_CANDIDATES_ONLY",
+          "original_name_stem_tip_candidates": [
+            "tetrathecoides_MP1252"
+          ],
+          "remaining_tip_candidates": [
+            "tetrathecoides_MP1252"
+          ],
+          "remaining_count": 1,
+          "identity_classification": "UNIQUE_TREE_TIP_CANDIDATE_NOT_VOUCHER_VERIFIED",
+          "not_the_same_2019_flower_sample_confirmed": true
+        },
+        {
+          "qpcr_source_taxon": "Erica_cerenthoides",
+          "visible_colour": "red",
+          "published_subspecies_rule": null,
+          "source_rule": "2019_SPECIES_LEVEL_PREFIX_CANDIDATES_ONLY",
+          "original_name_stem_tip_candidates": [
+            "cerinthoides_ANA",
+            "cerinthoides_MP653"
+          ],
+          "remaining_tip_candidates": [
+            "cerinthoides_ANA",
+            "cerinthoides_MP653"
+          ],
+          "remaining_count": 2,
+          "identity_classification": "MULTIPLE_2025_VOUCHERS_STILL_UNRESOLVED",
+          "not_the_same_2019_flower_sample_confirmed": true
+        },
+        {
+          "qpcr_source_taxon": "Erica_sparmanii",
+          "visible_colour": "white",
+          "published_subspecies_rule": null,
+          "source_rule": "2019_SPECIES_LEVEL_PREFIX_CANDIDATES_ONLY",
+          "original_name_stem_tip_candidates": [],
+          "remaining_tip_candidates": [],
+          "remaining_count": 0,
+          "identity_classification": "NO_TREE_PREFIX_CANDIDATE",
+          "not_the_same_2019_flower_sample_confirmed": true
+        },
+        {
+          "qpcr_source_taxon": "Erica_discolor",
+          "visible_colour": "red",
+          "published_subspecies_rule": "discolor_spe_",
+          "source_rule": "PUBLISHED_2019_SUBSPECIFIC_PREFIX",
+          "original_name_stem_tip_candidates": [
+            "discolor_heb_MP1214",
+            "discolor_spe_MP1217"
+          ],
+          "remaining_tip_candidates": [
+            "discolor_spe_MP1217"
+          ],
+          "remaining_count": 1,
+          "identity_classification": "UNIQUE_TREE_TIP_CANDIDATE_NOT_VOUCHER_VERIFIED",
+          "not_the_same_2019_flower_sample_confirmed": true
+        },
+        {
+          "qpcr_source_taxon": "Erica_unicolor",
+          "visible_colour": "red",
+          "published_subspecies_rule": "unicolor_uni_",
+          "source_rule": "PUBLISHED_2019_SUBSPECIFIC_PREFIX",
+          "original_name_stem_tip_candidates": [
+            "unicolor_geo_JP273",
+            "unicolor_mut_MP1245",
+            "unicolor_uni_MP1249"
+          ],
+          "remaining_tip_candidates": [
+            "unicolor_uni_MP1249"
+          ],
+          "remaining_count": 1,
+          "identity_classification": "UNIQUE_TREE_TIP_CANDIDATE_NOT_VOUCHER_VERIFIED",
+          "not_the_same_2019_flower_sample_confirmed": true
+        },
+        {
+          "qpcr_source_taxon": "Erica_prolata",
+          "visible_colour": "pink",
+          "published_subspecies_rule": null,
+          "source_rule": "2019_SPECIES_LEVEL_PREFIX_CANDIDATES_ONLY",
+          "original_name_stem_tip_candidates": [
+            "prolata_EO11935",
+            "prolata_EO12748"
+          ],
+          "remaining_tip_candidates": [
+            "prolata_EO11935",
+            "prolata_EO12748"
+          ],
+          "remaining_count": 2,
+          "identity_classification": "MULTIPLE_2025_VOUCHERS_STILL_UNRESOLVED",
+          "not_the_same_2019_flower_sample_confirmed": true
+        },
+        {
+          "qpcr_source_taxon": "Erica_plukenetii_breviflora",
+          "visible_colour": "white",
+          "published_subspecies_rule": null,
+          "source_rule": "2019_SPECIES_LEVEL_PREFIX_CANDIDATES_ONLY",
+          "original_name_stem_tip_candidates": [],
+          "remaining_tip_candidates": [],
+          "remaining_count": 0,
+          "identity_classification": "NO_TREE_PREFIX_CANDIDATE",
+          "not_the_same_2019_flower_sample_confirmed": true
+        },
+        {
+          "qpcr_source_taxon": "Erica_monadelphia",
+          "visible_colour": "red",
+          "published_subspecies_rule": null,
+          "source_rule": "2019_SPECIES_LEVEL_PREFIX_CANDIDATES_ONLY",
+          "original_name_stem_tip_candidates": [
+            "monadelphia_FO",
+            "monadelphia_FO2_CP"
+          ],
+          "remaining_tip_candidates": [
+            "monadelphia_FO",
+            "monadelphia_FO2_CP"
+          ],
+          "remaining_count": 2,
+          "identity_classification": "MULTIPLE_2025_VOUCHERS_STILL_UNRESOLVED",
+          "not_the_same_2019_flower_sample_confirmed": true
+        },
+        {
+          "qpcr_source_taxon": "Erica_coccinea",
+          "visible_colour": "yellow",
+          "published_subspecies_rule": "coccinea_coc_",
+          "source_rule": "PUBLISHED_2019_SUBSPECIFIC_PREFIX",
+          "original_name_stem_tip_candidates": [
+            "coccinea_coc_MP1020",
+            "coccinea_coc_MP1053",
+            "coccinea_coc_MP598",
+            "coccinea_uni_EO12849"
+          ],
+          "remaining_tip_candidates": [
+            "coccinea_coc_MP1020",
+            "coccinea_coc_MP1053",
+            "coccinea_coc_MP598"
+          ],
+          "remaining_count": 3,
+          "identity_classification": "MULTIPLE_2025_VOUCHERS_STILL_UNRESOLVED",
+          "not_the_same_2019_flower_sample_confirmed": true
+        },
+        {
+          "qpcr_source_taxon": "Erica_mammosa",
+          "visible_colour": "red",
+          "published_subspecies_rule": null,
+          "source_rule": "2019_SPECIES_LEVEL_PREFIX_CANDIDATES_ONLY",
+          "original_name_stem_tip_candidates": [],
+          "remaining_tip_candidates": [],
+          "remaining_count": 0,
+          "identity_classification": "NO_TREE_PREFIX_CANDIDATE",
+          "not_the_same_2019_flower_sample_confirmed": true
+        },
+        {
+          "qpcr_source_taxon": "Erica_sessiliflora",
+          "visible_colour": "white",
+          "published_subspecies_rule": null,
+          "source_rule": "2019_SPECIES_LEVEL_PREFIX_CANDIDATES_ONLY",
+          "original_name_stem_tip_candidates": [
+            "sessiliflora_MP604"
+          ],
+          "remaining_tip_candidates": [
+            "sessiliflora_MP604"
+          ],
+          "remaining_count": 1,
+          "identity_classification": "UNIQUE_TREE_TIP_CANDIDATE_NOT_VOUCHER_VERIFIED",
+          "not_the_same_2019_flower_sample_confirmed": true
+        },
+        {
+          "qpcr_source_taxon": "Erica_filipendula",
+          "visible_colour": "white",
+          "published_subspecies_rule": null,
+          "source_rule": "2019_SPECIES_LEVEL_PREFIX_CANDIDATES_ONLY",
+          "original_name_stem_tip_candidates": [],
+          "remaining_tip_candidates": [],
+          "remaining_count": 0,
+          "identity_classification": "NO_TREE_PREFIX_CANDIDATE",
+          "not_the_same_2019_flower_sample_confirmed": true
+        },
+        {
+          "qpcr_source_taxon": "Erica_massonii",
+          "visible_colour": "red",
+          "published_subspecies_rule": null,
+          "source_rule": "2019_SPECIES_LEVEL_PREFIX_CANDIDATES_ONLY",
+          "original_name_stem_tip_candidates": [
+            "massonii_MP811"
+          ],
+          "remaining_tip_candidates": [
+            "massonii_MP811"
+          ],
+          "remaining_count": 1,
+          "identity_classification": "UNIQUE_TREE_TIP_CANDIDATE_NOT_VOUCHER_VERIFIED",
+          "not_the_same_2019_flower_sample_confirmed": true
+        },
+        {
+          "qpcr_source_taxon": "Erica_squarrosa",
+          "visible_colour": "pink",
+          "published_subspecies_rule": null,
+          "source_rule": "2019_SPECIES_LEVEL_PREFIX_CANDIDATES_ONLY",
+          "original_name_stem_tip_candidates": [
+            "squarrosa_EO11742"
+          ],
+          "remaining_tip_candidates": [
+            "squarrosa_EO11742"
+          ],
+          "remaining_count": 1,
+          "identity_classification": "UNIQUE_TREE_TIP_CANDIDATE_NOT_VOUCHER_VERIFIED",
+          "not_the_same_2019_flower_sample_confirmed": true
+        },
+        {
+          "qpcr_source_taxon": "Erica_regia",
+          "visible_colour": "red",
+          "published_subspecies_rule": "regia_reg_",
+          "source_rule": "PUBLISHED_2019_SUBSPECIFIC_PREFIX",
+          "original_name_stem_tip_candidates": [
+            "regia_mar_MP930",
+            "regia_reg_ANA",
+            "regia_reg_MP922"
+          ],
+          "remaining_tip_candidates": [
+            "regia_reg_ANA",
+            "regia_reg_MP922"
+          ],
+          "remaining_count": 2,
+          "identity_classification": "MULTIPLE_2025_VOUCHERS_STILL_UNRESOLVED",
+          "not_the_same_2019_flower_sample_confirmed": true
+        },
+        {
+          "qpcr_source_taxon": "Erica_abietina",
+          "visible_colour": "red",
+          "published_subspecies_rule": "abietina_abi_",
+          "source_rule": "PUBLISHED_2019_SUBSPECIFIC_PREFIX",
+          "original_name_stem_tip_candidates": [
+            "abietina_abi_ANA",
+            "abietina_abi_MP1013",
+            "abietina_atr_MP1029",
+            "abietina_aur_MP1320",
+            "abietina_aur_MP499",
+            "abietina_aur_MP514",
+            "abietina_aur_MP717",
+            "abietina_con_CM6",
+            "abietina_dia_CM11",
+            "abietina_dia_MP1015",
+            "abietina_per_MP1071",
+            "abietina_pet_EO"
+          ],
+          "remaining_tip_candidates": [
+            "abietina_abi_ANA",
+            "abietina_abi_MP1013"
+          ],
+          "remaining_count": 2,
+          "identity_classification": "MULTIPLE_2025_VOUCHERS_STILL_UNRESOLVED",
+          "not_the_same_2019_flower_sample_confirmed": true
+        },
+        {
+          "qpcr_source_taxon": "Erica_viscaria",
+          "visible_colour": "white",
+          "published_subspecies_rule": "viscaria_lon_",
+          "source_rule": "PUBLISHED_2019_SUBSPECIFIC_PREFIX",
+          "original_name_stem_tip_candidates": [
+            "viscaria_lon_ANA",
+            "viscaria_lon_MP1270",
+            "viscaria_lon_MP504",
+            "viscaria_lon_MP678",
+            "viscaria_mac_MP808",
+            "viscaria_pen_EO12466",
+            "viscaria_vis_MdV4"
+          ],
+          "remaining_tip_candidates": [
+            "viscaria_lon_ANA",
+            "viscaria_lon_MP1270",
+            "viscaria_lon_MP504",
+            "viscaria_lon_MP678"
+          ],
+          "remaining_count": 4,
+          "identity_classification": "MULTIPLE_2025_VOUCHERS_STILL_UNRESOLVED",
+          "not_the_same_2019_flower_sample_confirmed": true
+        },
+        {
+          "qpcr_source_taxon": "Erica_vestita",
+          "visible_colour": "red",
+          "published_subspecies_rule": null,
+          "source_rule": "2019_SPECIES_LEVEL_PREFIX_CANDIDATES_ONLY",
+          "original_name_stem_tip_candidates": [
+            "vestita_ANA",
+            "vestita_EO12702",
+            "vestita_MP1079"
+          ],
+          "remaining_tip_candidates": [
+            "vestita_ANA",
+            "vestita_EO12702",
+            "vestita_MP1079"
+          ],
+          "remaining_count": 3,
+          "identity_classification": "MULTIPLE_2025_VOUCHERS_STILL_UNRESOLVED",
+          "not_the_same_2019_flower_sample_confirmed": true
+        },
+        {
+          "qpcr_source_taxon": "Erica_hematocodon",
+          "visible_colour": "red",
+          "published_subspecies_rule": null,
+          "source_rule": "2019_SPECIES_LEVEL_PREFIX_CANDIDATES_ONLY",
+          "original_name_stem_tip_candidates": [
+            "haematocodon_MP1033"
+          ],
+          "remaining_tip_candidates": [
+            "haematocodon_MP1033"
+          ],
+          "remaining_count": 1,
+          "identity_classification": "UNIQUE_TREE_TIP_CANDIDATE_NOT_VOUCHER_VERIFIED",
+          "not_the_same_2019_flower_sample_confirmed": true
+        },
+        {
+          "qpcr_source_taxon": "Erica_hirtiflora",
+          "visible_colour": "pink",
+          "published_subspecies_rule": null,
+          "source_rule": "2019_SPECIES_LEVEL_PREFIX_CANDIDATES_ONLY",
+          "original_name_stem_tip_candidates": [
+            "hirtiflora_MP958"
+          ],
+          "remaining_tip_candidates": [
+            "hirtiflora_MP958"
+          ],
+          "remaining_count": 1,
+          "identity_classification": "UNIQUE_TREE_TIP_CANDIDATE_NOT_VOUCHER_VERIFIED",
+          "not_the_same_2019_flower_sample_confirmed": true
+        },
+        {
+          "qpcr_source_taxon": "Erica_stagnalis",
+          "visible_colour": "yellow",
+          "published_subspecies_rule": "stagnalis_sta_",
+          "source_rule": "PUBLISHED_2019_SUBSPECIFIC_PREFIX",
+          "original_name_stem_tip_candidates": [
+            "stagnalis_min_EO12740",
+            "stagnalis_sta_MP668"
+          ],
+          "remaining_tip_candidates": [
+            "stagnalis_sta_MP668"
+          ],
+          "remaining_count": 1,
+          "identity_classification": "UNIQUE_TREE_TIP_CANDIDATE_NOT_VOUCHER_VERIFIED",
+          "not_the_same_2019_flower_sample_confirmed": true
+        },
+        {
+          "qpcr_source_taxon": "Erica_leucotrachela",
+          "visible_colour": "red",
+          "published_subspecies_rule": null,
+          "source_rule": "2019_SPECIES_LEVEL_PREFIX_CANDIDATES_ONLY",
+          "original_name_stem_tip_candidates": [
+            "leucotrachela_ANA"
+          ],
+          "remaining_tip_candidates": [
+            "leucotrachela_ANA"
+          ],
+          "remaining_count": 1,
+          "identity_classification": "UNIQUE_TREE_TIP_CANDIDATE_NOT_VOUCHER_VERIFIED",
+          "not_the_same_2019_flower_sample_confirmed": true
+        },
+        {
+          "qpcr_source_taxon": "Erica_pillansii",
+          "visible_colour": "red",
+          "published_subspecies_rule": null,
+          "source_rule": "2019_SPECIES_LEVEL_PREFIX_CANDIDATES_ONLY",
+          "original_name_stem_tip_candidates": [
+            "pillansii_pil_MP813"
+          ],
+          "remaining_tip_candidates": [
+            "pillansii_pil_MP813"
+          ],
+          "remaining_count": 1,
+          "identity_classification": "UNIQUE_TREE_TIP_CANDIDATE_NOT_VOUCHER_VERIFIED",
+          "not_the_same_2019_flower_sample_confirmed": true
+        },
+        {
+          "qpcr_source_taxon": "Erica_parviflora",
+          "visible_colour": "pink",
+          "published_subspecies_rule": null,
+          "source_rule": "2019_SPECIES_LEVEL_PREFIX_CANDIDATES_ONLY",
+          "original_name_stem_tip_candidates": [
+            "parviflora_EO12492"
+          ],
+          "remaining_tip_candidates": [
+            "parviflora_EO12492"
+          ],
+          "remaining_count": 1,
+          "identity_classification": "UNIQUE_TREE_TIP_CANDIDATE_NOT_VOUCHER_VERIFIED",
+          "not_the_same_2019_flower_sample_confirmed": true
+        },
+        {
+          "qpcr_source_taxon": "Erica_verticiliata",
+          "visible_colour": "pink",
+          "published_subspecies_rule": null,
+          "source_rule": "2019_SPECIES_LEVEL_PREFIX_CANDIDATES_ONLY",
+          "original_name_stem_tip_candidates": [
+            "verticillata_ANA"
+          ],
+          "remaining_tip_candidates": [
+            "verticillata_ANA"
+          ],
+          "remaining_count": 1,
+          "identity_classification": "UNIQUE_TREE_TIP_CANDIDATE_NOT_VOUCHER_VERIFIED",
+          "not_the_same_2019_flower_sample_confirmed": true
+        },
+        {
+          "qpcr_source_taxon": "Erica_annectans",
+          "visible_colour": "red",
+          "published_subspecies_rule": null,
+          "source_rule": "2019_SPECIES_LEVEL_PREFIX_CANDIDATES_ONLY",
+          "original_name_stem_tip_candidates": [],
+          "remaining_tip_candidates": [],
+          "remaining_count": 0,
+          "identity_classification": "NO_TREE_PREFIX_CANDIDATE",
+          "not_the_same_2019_flower_sample_confirmed": true
+        }
+      ],
+      "no_expression_outcome_ever_calculated": true
+    }
+  ]
+}
