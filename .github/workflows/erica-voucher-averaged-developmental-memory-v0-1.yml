@@ -1,0 +1,101 @@
+name: Erica voucher-averaged developmental gene association v0.1 exploratory
+
+on:
+  pull_request:
+    paths:
+      - 'data/erica_voucher_averaged_developmental_memory_design_v0_1.json'
+      - 'scripts/analyze_erica_voucher_averaged_developmental_memory_v0_1.py'
+      - 'tests/test_erica_voucher_averaged_developmental_memory_v0_1.py'
+      - 'results/erica_voucher_averaged_developmental_memory_v0_1/**'
+      - '.github/workflows/erica-voucher-averaged-developmental-memory-v0-1.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  actions: read
+
+jobs:
+  analyze:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install pinned scientific and test dependencies
+        run: python -m pip install --disable-pip-version-check biopython==1.88 numpy==2.5.3 scipy==1.18.1 pytest==9.1.1
+      - name: Check source unit, full 21-gene-stage features and strict test firewall
+        run: pytest -q tests/test_erica_voucher_averaged_developmental_memory_v0_1.py
+      - name: Retrieve published and already-source-verified 2019 qPCR XLSX
+        uses: actions/download-artifact@v4
+        with:
+          name: erica-qPCR-source-only-v0-1
+          repository: zuizui0223/chun
+          run-id: 38046569468
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          path: build/erica2019_original
+      - name: Retrieve published and byte-verified original 2025 three-tree IQTREE archive
+        uses: actions/download-artifact@v4
+        with:
+          name: erica-hoekstra2025-supp3-source-v0-1
+          repository: zuizui0223/chun
+          run-id: 38062290346
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          path: build/erica2025_original
+      - name: Calculate new predeclared retrospective 22-taxon source-tip-mean species-level association
+        run: |
+          python scripts/analyze_erica_voucher_averaged_developmental_memory_v0_1.py \
+            --source-xlsx build/erica2019_original/erica_source_original.xlsx \
+            --source-phylogeny-zip build/erica2025_original/erica_hoekstra2025_original_sup3.zip \
+            --source-candidates results/erica_2019_subspecies_to_2025_voucher_prefix_gate_v0_1.json \
+            --design data/erica_voucher_averaged_developmental_memory_design_v0_1.json \
+            --out build/erica_voucher_averaged_developmental_memory_v0_1.json
+      - name: Enforce distinct inferential tier and leave original paper unchanged
+        run: |
+          python - <<'PY'
+          import json,math
+          from pathlib import Path
+          r=json.loads(Path('build/erica_voucher_averaged_developmental_memory_v0_1.json').read_text())
+          assert r['status'] in ['SUPPORTED_EXPLORATORY_TAXON_NAME_LEVEL',
+                                  'NOT_SUPPORTED_EXPLORATORY_TAXON_NAME_LEVEL']
+          assert r['n_taxa']==22 and r['n_source_same_visible_colour_pairs']==83
+          assert r['n_features']==21 and r['n_original_qpcr_measurements']==630
+          assert r['n_permutations']==9999 and r['seed']==20261011
+          assert math.isfinite(r['observed_rho']) and math.isfinite(r['null_mean_rho'])
+          assert 0<r['p_one_sided']<=1
+          assert r['voucher_uncertainty_integrated_uniformly']
+          assert r['qPCR_and_DNA_same_specimens'] is False
+          assert r['original_2016_Erica_primary_test_HOLD']
+          assert r['original_Petunieae_result_untouched']
+          assert r['independent_exact_pigment_chemical_memory_replication'] is False
+          assert r['no_causal_molecular_or_selection_claim']
+          assert r['original_AJB_EL_science_unchanged']
+          print('ERICA_DISTINCT_RETROSPECTIVE_SOURCE_ESTIMAND_GUARD_PASS',
+                r['status'],r['observed_rho'],r['p_one_sided'])
+          PY
+      - name: Replay recorded full result without changing the primary FAIL
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          current=json.loads(Path('build/erica_voucher_averaged_developmental_memory_v0_1.json').read_text())
+          frozen=json.loads(Path('results/erica_voucher_averaged_developmental_memory_v0_1/result_v0_1.json').read_text())
+          assert current.keys()==frozen.keys()
+          for k in current:
+              if isinstance(current[k],float):
+                  assert abs(current[k]-frozen[k])<1e-10,(k,current[k],frozen[k])
+              else:
+                  assert current[k]==frozen[k],k
+          assert current['status']==frozen['status']=='NOT_SUPPORTED_EXPLORATORY_TAXON_NAME_LEVEL'
+          assert current['p_one_sided']==frozen['p_one_sided']==0.4988
+          assert current['original_2016_Erica_primary_test_HOLD'] is True
+          assert current['independent_exact_pigment_chemical_memory_replication'] is False
+          print('ERICA_FROZEN_EXPLORATORY_NEGATIVE_OUTCOME_EXACT_SOURCE_REPLAY_PASS')
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: erica-voucher-averaged-developmental-memory-v0-1
+          path: build/erica_voucher_averaged_developmental_memory_v0_1.json
+          if-no-files-found: warn

@@ -1,0 +1,97 @@
+{
+  "version": "v0.1",
+  "status": "RETROSPECTIVE_NEW_SPECIES_LEVEL_ESTIMAND_DESIGN_COMMITTED_BEFORE_ITS_NUMERIC_OUTCOME",
+  "date": "2026-10-11",
+  "distinction_from_frozen_main_erica": "This analysis does not replace data/erica_predeclared_visible_colour_developmental_gene_memory_design_v0_1.json. Its exact specimen/tip admission HOLD remains unchanged.",
+  "question": "Among named Erica taxa with the same reported visible flower hue, is averaged molecular divergence across all published DNA vouchers associated with divergence in the 7-gene/3-age corolla expression profile?",
+  "source": {
+    "expression_paper_doi": "10.3389/fpls.2019.01565",
+    "original_qpcr_dataset_doi": "10.25413/sun.9980498",
+    "original_expression_artifact_run": 38046569468,
+    "tree_article_doi": "10.3897/phytokeys.257.139457",
+    "tree_supplement_doi": "10.3897/phytokeys.257.139457.suppl3",
+    "tree_artifact_run": 38062290346,
+    "original_tree_zip_md5": "d4363c6e604784b58c91d8a1d824a1f1",
+    "frozen_taxon_candidate_mapping": "results/erica_2019_subspecies_to_2025_voucher_prefix_gate_v0_1.json",
+    "read_only_original_2019_table2": "data/erica_table2_visible_colour_qpcr_taxon_crosswalk_v0_1.json",
+    "reference_source_already_public_and_outcome_exposed": true
+  },
+  "support": {
+    "source_taxa": 22,
+    "allowed_visible_colours": [
+      "red",
+      "pink",
+      "white",
+      "yellow"
+    ],
+    "expected_by_colour": {
+      "red": 12,
+      "pink": 6,
+      "white": 2,
+      "yellow": 2
+    },
+    "unordered_within_colour_taxon_pairs": 83,
+    "full_fixed_gene_panel": [
+      "ANS",
+      "CHI",
+      "CHS",
+      "DFR",
+      "F3'H",
+      "F3H",
+      "UDP3-O-GST"
+    ],
+    "three_developmental_stages": [
+      "juvenile",
+      "intermediate",
+      "adult"
+    ],
+    "fixed_features": 21,
+    "observed_publication_taxon_units_not_identical_DNA_flower_samples": true,
+    "original_multi_voucher_taxa": 8,
+    "source_filter_not_selected_on_expression_outcome": true
+  },
+  "operational_distance": {
+    "primary_tree_filename": "iqtree_allGenes_MF_MERGE_v2_20240810.treefile",
+    "one_tree_tip_per_species_not_selected": true,
+    "phylogenetic_metric": "For each pair of different named 2019 source taxa, average the original combined-tree patristic distances over the Cartesian product of all their frozen admissible 2025 DNA accession tip candidates (uniform source-tip weights). Never choose an accession based on expression.",
+    "branch_distance_units": "molecular substitution-scale original IQTREE tree lengths, not millions of years, not a reconstruction of event occurrence",
+    "ambiguous_species_nonmonophyly_acknowledged": true,
+    "dependency": "Taxon-name matched samples are not verified to be 2019 flower specimen or same population. Distance is an observational taxon-name-level proxy only.",
+    "keep_all_source_taxa_with_nonempty_candidates": true
+  },
+  "expression": {
+    "assay": "original Fold Change (2^-delta-delta Ct) from source, PTB1_REF excluded",
+    "unit": "one source taxon, not stages/genes/technical replicates",
+    "complete_panel_required": true,
+    "transform": "log1p of nonnegative source fold change, then within 22 taxa z-score each of 21 fixed gene-by-stage features (population sd); fail closed on any missing or invariant column",
+    "weights": "Equal weight of all 21 stage-gene coordinates in RMS Euclidean pair distance, not pathway endpoint or selected flower stage",
+    "primer_reference_caveat": "Published common reference-gene normalization and conserved primer assays; batch/sample-specific calibration may still confound cross-taxon expression",
+    "biological_interpretation_caveat": "Taxon mean fold-change difference is not direct mutational regulatory identity and not fitness."
+  },
+  "main_test": {
+    "type": "within-identical-visible-colour conditional association",
+    "predictor": "source-tip-uniform averaged tree patristic distance between 22 taxon labels",
+    "response": "21-feature RMS distance of log1p/z-scored fold changes",
+    "metric": "Spearman rho across 83 within-colour unordered taxon pairs; pair distances are dependent observations, taxon is permutation unit",
+    "permutation": "Within each of the four unchanged original visible-colour classes, shuffle entire 21-feature expression vectors among taxa (9,999 shuffles), keeping the averaged molecular tree distances fixed. This preserves gene-stage covariance.",
+    "seed": 20261011,
+    "n_permutations": 9999,
+    "p_value": "(1 + count permuted rho>=observed)/10000, one-sided positive",
+    "decision": "SUPPORTED_EXPLORATORY_TAXON_NAME_LEVEL only if observed>mean(permutation null) AND one-sided P<=0.05; otherwise NOT_SUPPORTED_EXPLORATORY_TAXON_NAME_LEVEL. If exact source/complete panel fails, SOURCE_HOLD.",
+    "inferential_boundary": "Retrospective exploratory taxon-name-level association, NOT preregistered independent prospective replication of the Petunieae exact-pigment-class estimand; no coevolution/selection or causal temporal decay."
+  },
+  "secondary": {
+    "nuclear_and_plastid": "Recompute the same 83 taxon-pair source-tip mean distances from original nuclear and plastid 2025 trees, report raw Spearman rho only and compare sign descriptively. These are not independent radiation replications.",
+    "leave_one_taxon": "All 22 deletion sensitivities on same analysis frame, no new P values, no threshold selection and no rescue using only positive groups.",
+    "voucher_choice_range": "Use previously measured min/max molecular pair distances as a source-quality diagnostic, not a CI, not a new significance test."
+  },
+  "governance": {
+    "original_2016_treebase_still_HOLD": true,
+    "original_Erica_2026_primary_HOLD": true,
+    "original_Petunieae_results_untouched": true,
+    "no_new_same_tip_exact_pigment_memory_replication": true,
+    "no_independent_radiation_validated_under_exact_original_estimand": true,
+    "do_not_upgrade_cross_radiation_universal_law": true,
+    "AJB_Camellia_and_EL_v03_artifacts_unchanged": true
+  }
+}

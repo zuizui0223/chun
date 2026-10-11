@@ -1,0 +1,79 @@
+{
+  "descriptive_tree_partition_results": {
+    "iqtree_allGenes_MF_MERGE_v2_20240810.treefile": {
+      "rho": 0.041496998446748666,
+      "role": "PRIMARY"
+    },
+    "iqtree_chloroplast_partitioned_MF_merge.treefile": {
+      "rho": 0.19442928508458923,
+      "role": "DESCRIPTIVE"
+    },
+    "iqtree_nuclear_MF_MERGE_v2_20240810.treefile": {
+      "rho": 0.06425003148482432,
+      "role": "DESCRIPTIVE"
+    }
+  },
+  "design_role": "RETROSPECTIVE_DISTINCT_FROM_FROZEN_2016_TREE_DIRECT_TIP_ERICA_HOLD",
+  "design_status": "RETROSPECTIVE_NEW_SPECIES_LEVEL_ESTIMAND_DESIGN_COMMITTED_BEFORE_ITS_NUMERIC_OUTCOME",
+  "independent_exact_pigment_chemical_memory_replication": false,
+  "leave_one_taxon_out_descriptive": {
+    "max_rho": 0.20348575471091387,
+    "median_rho": 0.03376363599669306,
+    "min_rho": -0.028554890989774262,
+    "n": 22,
+    "positive": 19
+  },
+  "n_features": 21,
+  "n_original_qpcr_measurements": 630,
+  "n_permutations": 9999,
+  "n_source_same_visible_colour_pairs": 83,
+  "n_taxa": 22,
+  "no_causal_molecular_or_selection_claim": true,
+  "null_centered_rho": -0.005128838730814857,
+  "null_mean_rho": 0.04662583717756352,
+  "null_q025": -0.19503904118215018,
+  "null_q975": 0.3306609714117794,
+  "observed_rho": 0.041496998446748666,
+  "original_2016_Erica_primary_test_HOLD": true,
+  "original_AJB_EL_science_unchanged": true,
+  "original_Petunieae_result_untouched": true,
+  "original_qpcr_workbook_sha256": "8255c52517a6ea7e8391d9d02a769decd6cba594f5ecc2e3527b22939426496e",
+  "p_one_sided": 0.4988,
+  "primary_combined_tree": "iqtree_allGenes_MF_MERGE_v2_20240810.treefile",
+  "qPCR_and_DNA_same_specimens": false,
+  "seed": 20261011,
+  "source_md5_verified": true,
+  "source_taxa": [
+    "Erica_abietina",
+    "Erica_cameronii",
+    "Erica_cerenthoides",
+    "Erica_coccinea",
+    "Erica_discolor",
+    "Erica_hematocodon",
+    "Erica_hirtiflora",
+    "Erica_leucotrachela",
+    "Erica_massonii",
+    "Erica_monadelphia",
+    "Erica_parviflora",
+    "Erica_pillansii",
+    "Erica_prolata",
+    "Erica_regia",
+    "Erica_sessiliflora",
+    "Erica_squarrosa",
+    "Erica_stagnalis",
+    "Erica_tetrathecoides",
+    "Erica_unicolor",
+    "Erica_verticiliata",
+    "Erica_vestita",
+    "Erica_viscaria"
+  ],
+  "status": "NOT_SUPPORTED_EXPLORATORY_TAXON_NAME_LEVEL",
+  "version": "v0.1",
+  "visible_colour_counts": {
+    "pink": 6,
+    "red": 12,
+    "white": 2,
+    "yellow": 2
+  },
+  "voucher_uncertainty_integrated_uniformly": true
+}
