@@ -17,7 +17,7 @@ import math
 from pathlib import Path
 import zipfile
 
-import numpy as np
+from statistics import mean
 from Bio import Phylo
 
 MD5="d4363c6e604784b58c91d8a1d824a1f1"
@@ -87,9 +87,9 @@ def source_only_distance_envelope(zip_bytes: bytes, support: dict) -> dict:
                         "right_taxon":right["qpcr_source_taxon"],
                         "candidate_voucher_pair_count":len(d),
                         "tip_distance_min":min(d),
-                        "tip_distance_mean":float(np.mean(d)),
+                        "tip_distance_mean":float(mean(d)),
                         "tip_distance_max":max(d),
-                        "relative_range_over_mean":(max(d)-min(d))/float(np.mean(d)),
+                        "relative_range_over_mean":(max(d)-min(d))/float(mean(d)),
                         "accession_choice_distance_variable":max(d)-min(d)>1e-12
                     })
             if len(pair_rows)!=83:raise ValueError("original 83 source candidate pairs changed")
@@ -121,7 +121,7 @@ def source_only_distance_envelope(zip_bytes: bytes, support: dict) -> dict:
                 "rank_interval_total_comparisons":rank_total,
                 "rank_interval_nonoverlapping_comparisons":confident_rank,
                 "rank_interval_nonoverlap_fraction":confident_rank/rank_total,
-                "mean_relative_distance_range":float(np.mean([r["relative_range_over_mean"] for r in pair_rows])),
+                "mean_relative_distance_range":float(mean([r["relative_range_over_mean"] for r in pair_rows])),
                 "max_relative_distance_range":max(r["relative_range_over_mean"] for r in pair_rows),
                 "subspecies_constrained_multivoucher_monophyly":clades,
                 "all_pair_distance_envelopes":pair_rows,
