@@ -46,7 +46,7 @@ def audit(crosswalk:dict,erica:dict,petunieae:dict,pet_adjusted:dict)->dict:
     if hue_counts!={"pink":6,"red":12,"white":2,"yellow":2}:
         raise ValueError("source hue frame changed")
     hue=pair_concentration(hue_counts)
-    if hue["total_within_state_pairs"]!=erica["n_source_same_visible_colour_pairs"]!=83:
+    if hue["total_within_state_pairs"]!=83 or erica["n_source_same_visible_colour_pairs"]!=83:
         raise ValueError("Erica pair count mismatch")
 
     within_source_group=0
