@@ -1,0 +1,212 @@
+{
+  "version": "v0.1",
+  "status": "QUALITATIVE_UPLC_TABLE2_AVAILABLE_EXACT_SIX_COMPOUND_PROFILE_NOT_ADMITTED",
+  "role": "SOURCE_ONLY_CHEMICAL_DATA_AVAILABILITY_AND_VISIBLE_COLOUR_CLASS_AUDIT",
+  "study_doi": "10.3389/fpls.2019.01565",
+  "original_qpcr_source_doi": "10.25413/sun.9980498",
+  "source_table": "2019 Table 2 author-reported qualitative UPLC-MS/MS interpretation",
+  "numeric_raw_HPLC_compound_matrix_verified": false,
+  "original_2019_reported_UPLC_supplement_format": "PDF figure, not a downloaded row-by-compound quantitative matrix",
+  "source_only_N_2019_measurement_labels": 30,
+  "source_only_N_examined_taxa": 22,
+  "source_taxa": [
+    {
+      "qpcr_label": "Erica_abietina",
+      "visible_colour": "red",
+      "original_table2_group": "H",
+      "published_qualitative_anthocyanin_category": "NORMAL_ANTHOCYANIN",
+      "original_qualitative_gene_expression_category": "NORMAL"
+    },
+    {
+      "qpcr_label": "Erica_cameronii",
+      "visible_colour": "red",
+      "original_table2_group": "A",
+      "published_qualitative_anthocyanin_category": "NORMAL_ANTHOCYANIN",
+      "original_qualitative_gene_expression_category": "NORMAL"
+    },
+    {
+      "qpcr_label": "Erica_cerenthoides",
+      "visible_colour": "red",
+      "original_table2_group": "B",
+      "published_qualitative_anthocyanin_category": "NORMAL_ANTHOCYANIN",
+      "original_qualitative_gene_expression_category": "NORMAL"
+    },
+    {
+      "qpcr_label": "Erica_coccinea",
+      "visible_colour": "yellow",
+      "original_table2_group": "E",
+      "published_qualitative_anthocyanin_category": "PELARGONIDIN_HEXOSE_NOT_CYANIDIN",
+      "original_qualitative_gene_expression_category": "F3PRIMEH_NOT_EXPRESSED"
+    },
+    {
+      "qpcr_label": "Erica_discolor",
+      "visible_colour": "red",
+      "original_table2_group": "C",
+      "published_qualitative_anthocyanin_category": "NORMAL_ANTHOCYANIN",
+      "original_qualitative_gene_expression_category": "NORMAL"
+    },
+    {
+      "qpcr_label": "Erica_hematocodon",
+      "visible_colour": "red",
+      "original_table2_group": "I",
+      "published_qualitative_anthocyanin_category": "NORMAL_ANTHOCYANIN",
+      "original_qualitative_gene_expression_category": "NORMAL"
+    },
+    {
+      "qpcr_label": "Erica_hirtiflora",
+      "visible_colour": "pink",
+      "original_table2_group": "I",
+      "published_qualitative_anthocyanin_category": "NORMAL_ANTHOCYANIN",
+      "original_qualitative_gene_expression_category": "NORMAL"
+    },
+    {
+      "qpcr_label": "Erica_leucotrachela",
+      "visible_colour": "red",
+      "original_table2_group": "J",
+      "published_qualitative_anthocyanin_category": "NORMAL_ANTHOCYANIN",
+      "original_qualitative_gene_expression_category": "NORMAL"
+    },
+    {
+      "qpcr_label": "Erica_massonii",
+      "visible_colour": "red",
+      "original_table2_group": "G",
+      "published_qualitative_anthocyanin_category": "NORMAL_ANTHOCYANIN",
+      "original_qualitative_gene_expression_category": "NORMAL"
+    },
+    {
+      "qpcr_label": "Erica_monadelphia",
+      "visible_colour": "red",
+      "original_table2_group": "E",
+      "published_qualitative_anthocyanin_category": "NORMAL_ANTHOCYANIN",
+      "original_qualitative_gene_expression_category": "NORMAL"
+    },
+    {
+      "qpcr_label": "Erica_parviflora",
+      "visible_colour": "pink",
+      "original_table2_group": "J",
+      "published_qualitative_anthocyanin_category": "NORMAL_ANTHOCYANIN",
+      "original_qualitative_gene_expression_category": "NORMAL"
+    },
+    {
+      "qpcr_label": "Erica_pillansii",
+      "visible_colour": "red",
+      "original_table2_group": "J",
+      "published_qualitative_anthocyanin_category": "NORMAL_ANTHOCYANIN",
+      "original_qualitative_gene_expression_category": "NORMAL"
+    },
+    {
+      "qpcr_label": "Erica_prolata",
+      "visible_colour": "pink",
+      "original_table2_group": "C",
+      "published_qualitative_anthocyanin_category": "NORMAL_ANTHOCYANIN",
+      "original_qualitative_gene_expression_category": "NORMAL"
+    },
+    {
+      "qpcr_label": "Erica_regia",
+      "visible_colour": "red",
+      "original_table2_group": "H",
+      "published_qualitative_anthocyanin_category": "NORMAL_ANTHOCYANIN",
+      "original_qualitative_gene_expression_category": "NORMAL"
+    },
+    {
+      "qpcr_label": "Erica_sessiliflora",
+      "visible_colour": "white",
+      "original_table2_group": "F",
+      "published_qualitative_anthocyanin_category": "NO_POST_DFR_INTERMEDIATES_KAEMPFEROL_QUERCETIN",
+      "original_qualitative_gene_expression_category": "DFR_NOT_EXPRESSED"
+    },
+    {
+      "qpcr_label": "Erica_squarrosa",
+      "visible_colour": "pink",
+      "original_table2_group": "G",
+      "published_qualitative_anthocyanin_category": "NORMAL_ANTHOCYANIN",
+      "original_qualitative_gene_expression_category": "NORMAL"
+    },
+    {
+      "qpcr_label": "Erica_stagnalis",
+      "visible_colour": "yellow",
+      "original_table2_group": "J",
+      "published_qualitative_anthocyanin_category": "PELARGONIDIN_HEXOSE_NOT_CYANIDIN",
+      "original_qualitative_gene_expression_category": "NORMAL"
+    },
+    {
+      "qpcr_label": "Erica_tetrathecoides",
+      "visible_colour": "pink",
+      "original_table2_group": "A",
+      "published_qualitative_anthocyanin_category": "NORMAL_ANTHOCYANIN",
+      "original_qualitative_gene_expression_category": "NORMAL"
+    },
+    {
+      "qpcr_label": "Erica_unicolor",
+      "visible_colour": "red",
+      "original_table2_group": "C",
+      "published_qualitative_anthocyanin_category": "NORMAL_ANTHOCYANIN",
+      "original_qualitative_gene_expression_category": "NORMAL"
+    },
+    {
+      "qpcr_label": "Erica_verticiliata",
+      "visible_colour": "pink",
+      "original_table2_group": "J",
+      "published_qualitative_anthocyanin_category": "NORMAL_ANTHOCYANIN",
+      "original_qualitative_gene_expression_category": "NORMAL"
+    },
+    {
+      "qpcr_label": "Erica_vestita",
+      "visible_colour": "red",
+      "original_table2_group": "H",
+      "published_qualitative_anthocyanin_category": "NORMAL_ANTHOCYANIN",
+      "original_qualitative_gene_expression_category": "NORMAL"
+    },
+    {
+      "qpcr_label": "Erica_viscaria",
+      "visible_colour": "white",
+      "original_table2_group": "H",
+      "published_qualitative_anthocyanin_category": "NO_INTERMEDIATES_EXCEPT_QUERCETINS",
+      "original_qualitative_gene_expression_category": "BHLH_NOT_EXPRESSED"
+    }
+  ],
+  "source_qualitative_production_counts": {
+    "NO_INTERMEDIATES_EXCEPT_QUERCETINS": 1,
+    "NO_POST_DFR_INTERMEDIATES_KAEMPFEROL_QUERCETIN": 1,
+    "NORMAL_ANTHOCYANIN": 18,
+    "PELARGONIDIN_HEXOSE_NOT_CYANIDIN": 2
+  },
+  "source_visible_colour_counts": {
+    "pink": 6,
+    "red": 12,
+    "white": 2,
+    "yellow": 2
+  },
+  "source_qualitative_chemistry_by_visible_colour": {
+    "pink": {
+      "NORMAL_ANTHOCYANIN": 6
+    },
+    "red": {
+      "NORMAL_ANTHOCYANIN": 12
+    },
+    "white": {
+      "NO_INTERMEDIATES_EXCEPT_QUERCETINS": 1,
+      "NO_POST_DFR_INTERMEDIATES_KAEMPFEROL_QUERCETIN": 1
+    },
+    "yellow": {
+      "PELARGONIDIN_HEXOSE_NOT_CYANIDIN": 2
+    }
+  },
+  "same_visible_hue_unordered_taxon_pairs": 83,
+  "same_visible_hue_and_same_qualitative_anthocyanin_label_pairs": 82,
+  "different_visible_hue_but_same_qualitative_anthocyanin_label_pairs": 72,
+  "different_hue_shared_qualitative_categories": {
+    "NORMAL_ANTHOCYANIN": 72
+  },
+  "normal_category_means_chemical_compounds_identical": false,
+  "reported_red_pink_no_detected_qualitative_anthocyanin_difference": true,
+  "published_UPLC_graph_is_not_an_exact_six_bit_pigment_profile": true,
+  "no_sexual_selection_pollinator_fitness_inference": true,
+  "no_new_expression_phylogenetic_memory_statistic": true,
+  "original_erica_NOT_SUPPORTED_retained": true,
+  "original_erica_observed_rho": 0.041496998446748666,
+  "original_erica_P": 0.4988,
+  "Petunieae_exact_biochemical_condition_is_not_met": true,
+  "Petunieae_pigment_adjusted_result_unchanged": true,
+  "original_Camellia_AJB_EL_unchanged": true
+}
