@@ -202,6 +202,7 @@ def analyze(xlsx:bytes, zip_bytes:bytes, support:dict, design:dict,
         "source_taxa":names,
         "visible_colour_counts":dict(sorted(collections.Counter(colours).items())),
         "n_original_qpcr_measurements":audit["quantitative_pathway_measurements"],
+        "original_qpcr_workbook_sha256":audit["xlsx_sha256"],
         "primary_combined_tree":primary,
         "observed_rho":observed,
         "null_mean_rho":mean,
@@ -251,6 +252,7 @@ def main():
             "observed_rho","null_mean_rho","null_centered_rho","p_one_sided",
             "n_permutations","descriptive_tree_partition_results",
             "leave_one_taxon_out_descriptive")},sort_keys=True))
+    print("ERICA_COMPLETE_RETROSPECTIVE_RESULT",json.dumps(report,sort_keys=True))
     print("DOES_NOT_OVERRIDE_FROZEN_ORIGINAL_ERICA_EVIDENCE_HOLD")
 
 if __name__=="__main__":
