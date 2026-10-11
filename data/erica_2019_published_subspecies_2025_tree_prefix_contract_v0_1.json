@@ -1,0 +1,67 @@
+{
+  "version": "v0.1",
+  "date": "2026-10-11",
+  "status": "PUBLISHED_SUBSPECIFIC_QPCR_NAME_INFORMATION_SOURCE_ONLY",
+  "source_study_doi": "10.3389/fpls.2019.01565",
+  "source_article_section": "Materials and Methods, list of 12 closely related taxon sets, and Figure 2 caption",
+  "source_url": "https://www.frontiersin.org/journals/plant-science/articles/10.3389/fpls.2019.01565/full",
+  "related_expression_data_doi": "10.25413/sun.9980498",
+  "target_tree_archive_doi": "10.3897/phytokeys.257.139457.suppl3",
+  "target_tree_source_note": "Distinct 2025 phylogeny: tree label prefixes encode names/subspecies and accession IDs. Correspondence of prefixes to 2019 taxon names is plausible but not voucher verified.",
+  "subspecies_from_published_methods": [
+    {
+      "qpcr_label": "Erica_discolor",
+      "published_taxon": "Erica discolor subsp. speciosa",
+      "tree_tip_prefix": "discolor_spe_",
+      "source_context": "2019 Methods floral-colour comparison set C"
+    },
+    {
+      "qpcr_label": "Erica_unicolor",
+      "published_taxon": "Erica unicolor subsp. unicolor",
+      "tree_tip_prefix": "unicolor_uni_",
+      "source_context": "2019 Methods floral-colour comparison set C"
+    },
+    {
+      "qpcr_label": "Erica_coccinea",
+      "published_taxon": "Erica coccinea subsp. coccinea",
+      "tree_tip_prefix": "coccinea_coc_",
+      "source_context": "2019 Methods floral-colour comparison set E"
+    },
+    {
+      "qpcr_label": "Erica_regia",
+      "published_taxon": "Erica regia subsp. regia",
+      "tree_tip_prefix": "regia_reg_",
+      "source_context": "2019 Methods floral-colour comparison set H"
+    },
+    {
+      "qpcr_label": "Erica_abietina",
+      "published_taxon": "Erica abietina subsp. abietina",
+      "tree_tip_prefix": "abietina_abi_",
+      "source_context": "2019 Methods floral-colour comparison set H"
+    },
+    {
+      "qpcr_label": "Erica_viscaria",
+      "published_taxon": "Erica viscaria subsp. longifolia",
+      "tree_tip_prefix": "viscaria_lon_",
+      "source_context": "2019 Methods floral-colour comparison set H"
+    },
+    {
+      "qpcr_label": "Erica_stagnalis",
+      "published_taxon": "Erica stagnalis subsp. stagnalis",
+      "tree_tip_prefix": "stagnalis_sta_",
+      "source_context": "2019 Methods floral-colour comparison set J"
+    }
+  ],
+  "other_single_colour_taxa": "For taxa without an explicit subspecies in original source list, use original source species-stem labels as tentative candidates only; do not infer subsp. autonyms.",
+  "restrictions": {
+    "original_2019_qpcr_voucher_ids_verified": false,
+    "source_2025_phylogenetic_voucher_ids_verified_against_2019": false,
+    "exact_same_individual_sample_unverified": true,
+    "automatic_synonym_merging_forbidden": true,
+    "subspecies_tag_not_equivalent_to_independent_evolutionary_origin": true,
+    "all_multi_accession_candidates_remain_ambiguous": true,
+    "do_not_use_expression_values_for_taxon_decisions": true,
+    "original_erica_21_feature_primary_test_unchanged": true,
+    "original_AJB_EL_science_unchanged": true
+  }
+}
