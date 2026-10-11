@@ -1,0 +1,59 @@
+name: Erica 2019 source-reported subspecies accession-gate v0.1
+
+on:
+  pull_request:
+    paths:
+      - 'data/erica_2019_published_subspecies_2025_tree_prefix_contract_v0_1.json'
+      - 'scripts/audit_erica_2019_subspecies_to_2025_voucher_prefix_v0_1.py'
+      - 'tests/test_erica_2019_subspecies_2025_voucher_prefix_v0_1.py'
+      - 'results/erica_2019_subspecies_to_2025_voucher_prefix_gate_v0_1.json'
+      - '.github/workflows/erica-2019-subspecies-voucher-gate-v0-1.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  source_only:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install pinned regression harness
+        run: python -m pip install --disable-pip-version-check pytest==9.1.1
+      - name: Test original subspecies identity without inference
+        run: pytest -q tests/test_erica_2019_subspecies_2025_voucher_prefix_v0_1.py
+      - name: Reproduce 2019 published subspecies information against three genuine 2025 IQTREE outputs
+        run: |
+          python scripts/audit_erica_2019_subspecies_to_2025_voucher_prefix_v0_1.py \
+            --source-crosswalk data/erica_table2_visible_colour_qpcr_taxon_crosswalk_v0_1.json \
+            --published-subspecies data/erica_2019_published_subspecies_2025_tree_prefix_contract_v0_1.json \
+            --tree-candidates results/erica_hoekstra2025_source_tree_lexical_and_voucher_support_v0_1.json \
+            --out build/erica_2019_subspecies_to_2025_voucher_prefix_gate_v0_1.json
+      - name: Require byte-identical summarized result and explicit source-only HOLD
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          current=json.loads(Path('build/erica_2019_subspecies_to_2025_voucher_prefix_gate_v0_1.json').read_text())
+          stored=json.loads(Path('results/erica_2019_subspecies_to_2025_voucher_prefix_gate_v0_1.json').read_text())
+          assert current==stored
+          assert current['current_one_tip_candidate_taxa']==14
+          assert current['current_one_tip_candidate_pairs']==31
+          assert current['original_design_min_taxa']==20
+          assert current['original_design_min_same_colour_pairs']==40
+          assert current['no_gene_expression_phylogenetic_rho']
+          assert current['no_permutation_p_value']
+          assert current['no_independent_replication_admitted']
+          assert current['frozen_AJB_EL_unchanged']
+          print('ERICA_ORIGINAL_SUBSPECIES_IDENTITY_SOURCE_REPLAY_PASS')
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: erica-published-subspecies-voucher-source-v0-1
+          path: build/erica_2019_subspecies_to_2025_voucher_prefix_gate_v0_1.json
+          if-no-files-found: warn
