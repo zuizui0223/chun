@@ -63,3 +63,28 @@ It **does not yet** bridge the original Flower-clades-51 cross-radiation tempora
 - Workflow: `.github/workflows/petunieae-functional-module-memory-v0-1.yml`.
 
 **Source-text novelty boundary:** Wheeler et al. (2023) already reported flavonol/anthocyanin gene co-expression modules and how the branching pathway shapes accessible floral pigment phenotypes. The *new* CHUN statistic is specifically **phylogenetic structure within identical measured pigment-presence states after pigment-abundance adjustment**, disaggregated by original biological functional subspaces. Do not relabel the previously published co-expression insight as this paper's first discovery.
+
+## Post-outcome influence audit: robust ordering, NOT a significant between-module difference
+
+A separately source-replayed descriptive diagnostic now recomputes all three fixed module correlations after deleting **each of 47 species** and re-fitting the original pigment/state nuisance projection, then after deleting **each of the six fine pigment presence codes** and refitting. No new permutations or P values were computed for these deletions.
+
+| Functional group | Leave-one-tip rho range (47) | Positive tip deletions | Leave-one-pigment-code rho range (6) | Positive code deletions |
+|---|---:|---:|---:|---:|
+| Late anthocyanin execution | +0.1066 to +0.2674 | 47/47 | +0.0533 to +0.3046 | 6/6 |
+| Flavonol branch | +0.2944 to +0.4683 | 47/47 | +0.2154 to +0.4307 | 6/6 |
+| Early/shared + regulators | +0.3674 to +0.5282 | 47/47 | +0.3425 to +0.4950 | 6/6 |
+
+In **46/47 single-tip deletions** and **6/6 whole-code deletions**, the descriptive rho ordering remains early/shared > flavonol > late anthocyanin execution. These repeated omissions are **not** 53 independent evolutionary experiments and are **not** formal evidence of a different phylogenetic effect size for the pathways.
+
+### Correction-method qualification: the late-pathway non-detection is NOT a robust "absence"
+
+The primary **raw-rho maxT** procedure was fixed before these module outcomes; it gives 3-module adjusted P values late 0.2709, flavonol 0.0162, early/shared 0.0007. However the late module's **nominal one-sided** source permutation P is 0.0108. If the **same already observed nominal P values** were subjected to the standard step-down **Holm** adjustment instead, the three arithmetic P values would be early/shared **0.0018**, flavonol **0.0072**, late **0.0108**. This sensitivity is **post-outcome and descriptive**, not an alternative predeclared primary decision or a newly calculated permutation P.
+
+The discrepancy reflects materially different module-specific permutation null locations/variances and conservativeness of using the raw maximum rho as the common maxT critical statistic. **Consequently the result does not establish that late anthocyanin expression lacks historical structure.** The defensible contribution is positive residual phylogenetic organization in upstream/shared and flavonol source axes, plus a stable descriptive ranking of rhos under original source omissions; NOT evidence that one group has proven less evolutionary memory or a faster memory-loss timescale.
+
+Source files:
+- `scripts/audit_petunieae_functional_module_influence_v0_1.py`
+- `results/petunieae_functional_module_influence_v0_1/summary_v0_1.json`
+- `tests/test_petunieae_functional_module_influence_v0_1.py`
+- `.github/workflows/petunieae-functional-module-influence-v0-1.yml`
+- Hosted source replay [run 39203476760](https://github.com/zuizui0223/chun/actions/runs/39203476760), three diagnostic tests passed. Full individual deletion rows are in the archived run artifact.
