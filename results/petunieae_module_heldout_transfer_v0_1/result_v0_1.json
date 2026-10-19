@@ -1,0 +1,241 @@
+{
+  "design_status": "RETROSPECTIVE_FIXED_MODULE_HELDOUT_TRANSFER_DESIGN_BEFORE_MODULE_PREDICTION_OUTCOME",
+  "fixed_k": 2,
+  "frozen_camellia_AJB_and_EL_unchanged": true,
+  "module_results": [
+    {
+      "baseline_class_mean_MSE": 0.833609089351658,
+      "exact_expected_random_two_MSE": 1.0617121361614648,
+      "genes": [
+        "F35H",
+        "DFR",
+        "ANS",
+        "UFGT",
+        "AAT",
+        "5GT",
+        "MTlike",
+        "GST",
+        "3RT"
+      ],
+      "holm_familywise_p": 0.1042,
+      "locality_p_one_sided": 0.0597,
+      "locality_permutation_null_mean_gain": -0.27304159830996927,
+      "locality_permutation_null_q025": -0.4165159097239924,
+      "locality_permutation_null_q975": -0.11795623781038836,
+      "module_id": "LATE_ANTHOCYANIN_EXECUTION",
+      "n_genes": 9,
+      "original_module_membership_not_reselected": true,
+      "per_original_pigment_class": [
+        {
+          "class_mean_MSE": 1.1756063991795864,
+          "fine_sixbit_code": "000000",
+          "gain_vs_class_mean": 0.328955593803858,
+          "n_species": 6,
+          "nearest_two_MSE": 0.7888840980578502
+        },
+        {
+          "class_mean_MSE": 1.4993037750891354,
+          "fine_sixbit_code": "000010",
+          "gain_vs_class_mean": -0.09780189197102539,
+          "n_species": 6,
+          "nearest_two_MSE": 1.6459385209321535
+        },
+        {
+          "class_mean_MSE": 0.3054018423974985,
+          "fine_sixbit_code": "000011",
+          "gain_vs_class_mean": -0.3497749937710938,
+          "n_species": 6,
+          "nearest_two_MSE": 0.4122237699197641
+        },
+        {
+          "class_mean_MSE": 0.6777586674701777,
+          "fine_sixbit_code": "000100",
+          "gain_vs_class_mean": -0.24726912305744175,
+          "n_species": 10,
+          "nearest_two_MSE": 0.8453474588201088
+        },
+        {
+          "class_mean_MSE": 1.1530358914808527,
+          "fine_sixbit_code": "000110",
+          "gain_vs_class_mean": -0.27876797852042373,
+          "n_species": 6,
+          "nearest_two_MSE": 1.4744653761104647
+        },
+        {
+          "class_mean_MSE": 0.5847656212264394,
+          "fine_sixbit_code": "000111",
+          "gain_vs_class_mean": -0.4119296247462749,
+          "n_species": 13,
+          "nearest_two_MSE": 0.8256479041427689
+        }
+      ],
+      "phylogeny_nearest_two_MSE": 0.9599142113229463,
+      "predictive_decision": "NOT_SUPPORTED_PRACTICAL_TRANSFER",
+      "relative_gain_over_class_mean": -0.1515160086240452,
+      "relative_gain_over_random_two": 0.09588090911964207
+    },
+    {
+      "baseline_class_mean_MSE": 0.975529721087243,
+      "exact_expected_random_two_MSE": 1.250515200843532,
+      "genes": [
+        "F3primeH",
+        "FLS",
+        "MYBFL",
+        "MYB12"
+      ],
+      "holm_familywise_p": 0.00030000000000000003,
+      "locality_p_one_sided": 0.0001,
+      "locality_permutation_null_mean_gain": -0.2811352187830636,
+      "locality_permutation_null_q025": -0.46402766800438333,
+      "locality_permutation_null_q975": -0.09344023038568532,
+      "module_id": "FLAVONOL_BRANCH_AND_ACTIVATION",
+      "n_genes": 4,
+      "original_module_membership_not_reselected": true,
+      "per_original_pigment_class": [
+        {
+          "class_mean_MSE": 1.6604436290024782,
+          "fine_sixbit_code": "000000",
+          "gain_vs_class_mean": 0.21496102664263814,
+          "n_species": 6,
+          "nearest_two_MSE": 1.3035129618298777
+        },
+        {
+          "class_mean_MSE": 1.0248795956956445,
+          "fine_sixbit_code": "000010",
+          "gain_vs_class_mean": -0.015560029983262884,
+          "n_species": 6,
+          "nearest_two_MSE": 1.040826752933903
+        },
+        {
+          "class_mean_MSE": 1.2875235729625252,
+          "fine_sixbit_code": "000011",
+          "gain_vs_class_mean": 0.05978051642283974,
+          "n_species": 6,
+          "nearest_two_MSE": 1.2105547488642456
+        },
+        {
+          "class_mean_MSE": 0.41350688114442125,
+          "fine_sixbit_code": "000100",
+          "gain_vs_class_mean": 0.0629690547532474,
+          "n_species": 10,
+          "nearest_two_MSE": 0.3874687437047936
+        },
+        {
+          "class_mean_MSE": 1.1722792447916837,
+          "fine_sixbit_code": "000110",
+          "gain_vs_class_mean": -0.05155899196040313,
+          "n_species": 6,
+          "nearest_two_MSE": 1.2327207809492455
+        },
+        {
+          "class_mean_MSE": 0.8341593711494016,
+          "fine_sixbit_code": "000111",
+          "gain_vs_class_mean": 0.0155309532879689,
+          "n_species": 13,
+          "nearest_two_MSE": 0.8212040809213588
+        }
+      ],
+      "phylogeny_nearest_two_MSE": 0.9207666373721116,
+      "predictive_decision": "SUPPORTED_EXPLORATORY_MODULE_PREDICTION",
+      "relative_gain_over_class_mean": 0.05613676603732491,
+      "relative_gain_over_random_two": 0.26369016805952405
+    },
+    {
+      "baseline_class_mean_MSE": 1.5626699365729713,
+      "exact_expected_random_two_MSE": 1.8709057582593656,
+      "genes": [
+        "CHS",
+        "CHI",
+        "F3H",
+        "MYB27",
+        "AN11",
+        "AN1",
+        "JAF13",
+        "MybsG6"
+      ],
+      "holm_familywise_p": 0.1042,
+      "locality_p_one_sided": 0.0521,
+      "locality_permutation_null_mean_gain": -0.1967089295515556,
+      "locality_permutation_null_q025": -0.2858404190144462,
+      "locality_permutation_null_q975": -0.0954948648616999,
+      "module_id": "EARLY_SHARED_AND_REGULATORY",
+      "n_genes": 8,
+      "original_module_membership_not_reselected": true,
+      "per_original_pigment_class": [
+        {
+          "class_mean_MSE": 4.137657447967277,
+          "fine_sixbit_code": "000000",
+          "gain_vs_class_mean": -0.25751786227185175,
+          "n_species": 6,
+          "nearest_two_MSE": 5.203178148781016
+        },
+        {
+          "class_mean_MSE": 1.02301340489634,
+          "fine_sixbit_code": "000010",
+          "gain_vs_class_mean": -0.20587631229859935,
+          "n_species": 6,
+          "nearest_two_MSE": 1.2336276321284323
+        },
+        {
+          "class_mean_MSE": 4.0465020418040005,
+          "fine_sixbit_code": "000011",
+          "gain_vs_class_mean": 0.04136823811512894,
+          "n_species": 6,
+          "nearest_two_MSE": 3.879105381805297
+        },
+        {
+          "class_mean_MSE": 0.4389547150944317,
+          "fine_sixbit_code": "000100",
+          "gain_vs_class_mean": -0.3543677255343627,
+          "n_species": 10,
+          "nearest_two_MSE": 0.5945060990950296
+        },
+        {
+          "class_mean_MSE": 0.8530103504567994,
+          "fine_sixbit_code": "000110",
+          "gain_vs_class_mean": -0.05828708584443786,
+          "n_species": 6,
+          "nearest_two_MSE": 0.9027298379800689
+        },
+        {
+          "class_mean_MSE": 0.6688338767106802,
+          "fine_sixbit_code": "000111",
+          "gain_vs_class_mean": -0.0020191814163548075,
+          "n_species": 13,
+          "nearest_two_MSE": 0.6701843736451629
+        }
+      ],
+      "phylogeny_nearest_two_MSE": 1.7440277415426866,
+      "predictive_decision": "NOT_SUPPORTED_PRACTICAL_TRANSFER",
+      "relative_gain_over_class_mean": -0.11605637295835092,
+      "relative_gain_over_random_two": 0.0678163590851965
+    }
+  ],
+  "n_module_tests": 3,
+  "n_original_fine_pigment_classes": 6,
+  "n_original_gene_axes": 21,
+  "n_taxa": 47,
+  "no_causal_ancestral_replay_or_selection_test": true,
+  "no_external_prospective_replication": true,
+  "no_module_effect_difference_test": true,
+  "no_optimization_of_k_genes_or_pigment_classes": true,
+  "original_fine_state_counts": {
+    "000000": 6,
+    "000010": 6,
+    "000011": 6,
+    "000100": 10,
+    "000110": 6,
+    "000111": 13
+  },
+  "original_full_21_gene_class_mean_MSE": 1.138379056242746,
+  "original_full_21_gene_gain": -0.0990780619015505,
+  "original_full_21_gene_k2_MSE": 1.2511674468445935,
+  "original_full_21_gene_prediction_still_FAIL": true,
+  "original_pigment_adjusted_module_correlations_untouched": true,
+  "permutations": 9999,
+  "scientific_tier": "ONE_RADIATION_SOURCE_EXPOSED_RETROSPECTIVE_TEST",
+  "seed": 20261019,
+  "source_shas_verified": true,
+  "status": "RETROSPECTIVE_MODULE_HELDOUT_EXPRESSION_TRANSFER_ON_ORIGINAL_SOURCE",
+  "version": "v0.1"
+}
