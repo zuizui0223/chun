@@ -1,0 +1,129 @@
+{
+  "version": "v0.1",
+  "date_frozen": "2026-10-19",
+  "status": "RETROSPECTIVE_MODULE_FUNCTION_MAPPING_FIXED_BEFORE_MODULE_OUTCOME_OPENING",
+  "question": "Within taxa sharing an identical six-anthocyanidin-presence state and after adjustment for measured pigment amounts, is historical structure in 21-gene expression limited to late anthocyanin execution, or also detectable in other functionally annotated parts of the flavonoid pathway?",
+  "source": {
+    "study_doi": "10.1098/rspb.2023.0275",
+    "original_source_osf_node": "zg9cu",
+    "source_artifact_run_id": 34182646549,
+    "source_artifact_name": "petunieae-prospective-osf-v0-1",
+    "source_table_sha256": "5843d4cd4eb253046f97349fa6bd285ca77e43e7a9c3aaa0e78fae3e8e391edd",
+    "source_tree_sha256": "95b4a688d3d71417b712b37a9431be3172d6509def4435f5fd8614",
+    "original_design_file": "data/petunieae_nested_regulatory_memory_preregistered_design_v0_1.json",
+    "original_adjusted_design_file": "data/petunieae_pigment_abundance_adjusted_regulatory_memory_design_v0_1.json",
+    "original_adjusted_result_file": "results/petunieae_pigment_adjusted_regulatory_memory_v0_1/result_v0_1.json",
+    "source_already_inspected_for_prior_analyses": true
+  },
+  "frame": {
+    "retained_species": 47,
+    "same_fine_state_pairs": 183,
+    "six_retained_states": 6,
+    "chemistry_varying_phenotypic_axis_only": [
+      "Del_mgg",
+      "Pet_mgg",
+      "Malv_mgg"
+    ],
+    "no_rare_state_reinclusion": true,
+    "all_21_source_genes": [
+      "CHS",
+      "CHI",
+      "F3H",
+      "F3primeH",
+      "F35H",
+      "DFR",
+      "FLS",
+      "ANS",
+      "UFGT",
+      "AAT",
+      "5GT",
+      "MTlike",
+      "GST",
+      "3RT",
+      "MYB27",
+      "AN11",
+      "MYBFL",
+      "MYB12",
+      "AN1",
+      "JAF13",
+      "MybsG6"
+    ],
+    "safeguard": "Preserve exact original same-tree taxa, six-bit pigment states, 183 same-state unordered taxon pairs and all 21 gene axes, no output-driven gene/taxon filtering"
+  },
+  "functionally_mapped_nonoverlapping_modules": [
+    {
+      "id": "LATE_ANTHOCYANIN_EXECUTION",
+      "role": "late anthocyanin hydroxylation, reduction, stabilization, modification, and transport; includes branch F3'5'H and anthocyanin enzymes",
+      "genes": [
+        "F35H",
+        "DFR",
+        "ANS",
+        "UFGT",
+        "AAT",
+        "5GT",
+        "MTlike",
+        "GST",
+        "3RT"
+      ],
+      "n": 9
+    },
+    {
+      "id": "FLAVONOL_BRANCH_AND_ACTIVATION",
+      "role": "flavonol branch biochemical reaction and documented flavonol-associated MYB activators; F3'H also acts at hydroxylation junction",
+      "genes": [
+        "F3primeH",
+        "FLS",
+        "MYBFL",
+        "MYB12"
+      ],
+      "n": 4
+    },
+    {
+      "id": "EARLY_SHARED_AND_REGULATORY",
+      "role": "early shared structural pathway together with positive/negative higher-level transcriptional regulatory factors, includes Antho regulator AN1 and MYB27; NOT an unrelated negative control",
+      "genes": [
+        "CHS",
+        "CHI",
+        "F3H",
+        "MYB27",
+        "AN11",
+        "AN1",
+        "JAF13",
+        "MybsG6"
+      ],
+      "n": 8
+    }
+  ],
+  "expression_and_chemistry_residualization": {
+    "expression": "For all 47 species, transform each of 21 raw source TPM10K features with log1p, z-standardize across species (population sd).",
+    "chemistry": "All nine original anthocyanidin and flavonol mg/g columns transformed log1p(100*x) and z-scaled; three fixed zero-variance anthocyanidins assigned zeros.",
+    "projector": "Exactly the previously checked full 47x47 projector M = I - D pinv(D) with six source fine-state dummy columns and all nine source measured pigment abundance columns; residualize whole 21-column expression matrix before extracting any module.",
+    "gene_module_vectors": "Select all fixed members of each non-overlapping module from M@full standardized expression matrix; recompute RMS across module genes for the same original 183 species pairs. This is not adjusted anew per module.",
+    "original_whole_gene_rho_required": 0.511199259788796,
+    "negative_control_inference_prohibited": true
+  },
+  "permutation": {
+    "source_study_type": "Post-outcome source-exposed, new module statistics fixed before opening this particular source-matched comparison. Retrospective exploratory only.",
+    "unit": "Whole 21-gene residual expression vector assigned to a species; permute species within original six-bit fine-class groups only; NEVER permute pair observations or independent gene columns.",
+    "iterations": 9999,
+    "seed": 20261019,
+    "procedure": "For each whole-vector shuffle within fine states, compute M @ permuted original residual vectors. For each of the 3 fixed modules compute the Spearman rho between source tree patristic ranks and within-exact-state module residual-expression RMS distances.",
+    "one_sided_p_formula": "(1 + number of permuted module rho>=observed module rho)/(10000)",
+    "familywise_maxT": "For each permutation, take max of all 3 module rho statistics; adjusted p per module=(1+number of permuted maximum rho >= that module's observed rho)/10000. Controls three positive-tail module tests under the complete no-signal permutation null, not a test of biological module-effect equality.",
+    "interpretation": "rho>0 and maxT-adjusted p<=0.05 is an exploratory signal for within-state phylogenetic organization of that group; otherwise NOT_SUPPORTED in this source. Statistical module-vs-module difference is NOT tested.",
+    "no_posthoc_selective_gene_reallocation": true
+  },
+  "report": {
+    "original_all_gene_rho_unchanged": true,
+    "original_all_gene_p_value_unchanged": 0.0002,
+    "per_module_show": "source gene names, gene count, full rho, null mean, centered rho, 2.5–97.5% null range, nominal P, maxT-adjusted P, number of source fixed species pairs",
+    "claim_scope": "We can establish which functional sets show detectable taxon-level phylogenetic conservation after pigment adjustment in this ONE radiation, not determine whether pigment-module specificity exceeds general transcriptome-wide phylogenetic conservation.",
+    "housekeeping_negative_control_available": false,
+    "not_an_independent_biological_radiation": true,
+    "cannot_assume_module_significance_differences_imply_significant_contrast": true,
+    "no_selective_relabel_after_result": true,
+    "no_pollinator_fitness_or_causal_time_decay_claim": true,
+    "no_relabel_of_frozen_Petunieae_k2_prediction_FAIL": true,
+    "no_change_to_AJB_Camellia_and_EL_frozen_first_submission": true
+  }
+}
