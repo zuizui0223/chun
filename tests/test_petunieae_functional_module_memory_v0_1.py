@@ -70,3 +70,36 @@ def test_synthetic_original_response_rankcorr_is_standard_spearman():
     from scipy.stats import spearmanr
     from analyze_petunieae_pigment_adjusted_regulatory_memory_v0_1 import rankcorr
     assert rankcorr(ranks,y)==pytest.approx(float(spearmanr(ranks,y).statistic),abs=1e-14)
+
+RESULT=ROOT/"results/petunieae_functional_module_memory_v0_1/result_v0_1.json"
+
+def test_real_frozen_three_module_results_and_original_pigment_adjusted_effect():
+    result=json.loads(RESULT.read_text(encoding="utf-8"))
+    d,_,prior=load()
+    assert result["design_status"]==d["status"]
+    assert result["n_tips"]==47 and result["n_same_fine_state_pairs"]==183
+    assert result["n_original_expression_genes"]==21
+    assert result["n_modules"]==3 and result["permutations"]==9999
+    assert result["seed"]==20261019
+    assert result["original_full_21_gene_adjusted_rho_reproduced"]==pytest.approx(
+        prior["abundance_adjusted_rho"],abs=1e-13)
+    assert result["original_full_21_gene_p_unchanged"]==0.0002
+    modules={x["module_id"]:x for x in result["module_results"]}
+    expected={
+        "LATE_ANTHOCYANIN_EXECUTION":(9,0.21514622388860405,0.2709,False),
+        "FLAVONOL_BRANCH_AND_ACTIVATION":(4,0.3725170195141295,0.0162,True),
+        "EARLY_SHARED_AND_REGULATORY":(8,0.45826046500459183,0.0007,True)
+    }
+    assert set(modules)==set(expected)
+    for name,(n,rho,p,pass_module) in expected.items():
+        obj=modules[name]
+        assert obj["n_genes"]==n
+        assert obj["observed_rho"]==pytest.approx(rho,abs=1e-13)
+        assert obj["p_maxT_familywise"]==p
+        assert obj["retrospective_fwer_signal"] is pass_module
+        assert obj["p_nominal"]<=obj["p_maxT_familywise"]
+    assert result["module_effect_difference_tested"] is False
+    assert result["negative_control_housekeeping_panel_available"] is False
+    assert result["original_nearest_two_predictor_still_FAIL"] is True
+    assert result["not_an_independent_radiation_replication"] is True
+    assert result["original_camellia_AJB_and_EL_science_unchanged"] is True
