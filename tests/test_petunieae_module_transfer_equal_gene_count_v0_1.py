@@ -44,7 +44,7 @@ def test_summary_reports_raw_overlapping_gene_panels_not_p_values():
     assert r["n_panels"]==4
     assert r["n_positive_gain"]==3
     assert r["median_gain"]==pytest.approx(.15)
-    assert r["panel_values_not_independent_tests"]
+    assert r["all_shared_gene_panels_not_independent_evidence"]
     with pytest.raises(ValueError):
         m.summarize([])
 
