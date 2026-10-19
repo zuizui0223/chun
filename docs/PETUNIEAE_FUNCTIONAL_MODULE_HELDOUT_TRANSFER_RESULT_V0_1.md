@@ -44,6 +44,22 @@ A strictly **post-outcome descriptive** recipient-loss influence calculation rem
 
 The 47 held-out taxa share the same single phylogeny and the training folds overlap; the permutation treats a taxon vector as the unit. The evaluation is a **source-internal cross-validation**, not validation in a new radiation or laboratory phenotype-prediction experiment. Importantly, the target's **exact biochemical class is assumed known**, so the method does **not** infer unknown flower colour or unknown metabolite presence from DNA alone.
 
+### Same-number-of-genes and single-gene-influence check (post-outcome only)
+
+The positive fixed four-gene flavonol source result might be an artifact of using fewer, correlated features than the nine late-output or eight upstream/regulatory genes. We therefore exhaustively computed the **same unchanged k=2 versus full-class-mean predictive gain** for *all* four-gene combinations within the two larger original functional modules, **without changing modules or calculating new permutation P values**:
+
+| Original gene group | Exhaustive four-gene panels | Panels with gain >0 | Median gain | Range |
+|---|---:|---:|---:|---|
+| Late anthocyanin output | 126 | **14/126** | **−14.97%** | −40.84% to +12.31% |
+| Early/shared and regulatory | 70 | **8/70** | **−11.61%** | −30.05% to +5.51% |
+| Flavonol/activators, the *original fixed module* | 1 | **1/1** | **+5.61%** | +5.61% |
+
+The fixed flavonol module exceeds **70/70** source early four-gene subpanels and **119/126** source late-output four-gene subpanels. However, seven *late* four-gene subpanels improve even more than flavonol. **These 197 heavily overlapping gene sets are not independent data replicates; none defines a confirmatory difference-of-module prediction effects**. Critically, one cannot now select those seven favourable late sets as a replacement for the original predefined nine-gene late module.
+
+We also separately dropped each one of the four original flavonol-related genes, yielding the original full-class-mean-relative heldout gains: remove `F3primeH`: **+8.11%**; remove `FLS`: **+5.22%**; remove `MYBFL`: **+1.97%**; remove `MYB12`: **+7.18%**. All 4 three-gene source diagnostics remain positive, but **their improvement is purely descriptive; the original Holm-adjusted P = 0.0003 belongs to the original four-gene panel only**. This suggests no *single* recorded member must be present for the practical gain in this dataset; it does not establish molecular redundancy causally.
+
+Original source replay: [GitHub Actions run 39208032410](https://github.com/zuizui0223/chun/actions/runs/39208032410), original ZIP artifact [12166353485](https://github.com/zuizui0223/chun/actions/runs/39208032410/artifacts/12166353485). Reproducibility: `scripts/audit_petunieae_module_transfer_equal_gene_count_v0_1.py`, all source panels archived in the original artifact and summary `results/petunieae_module_heldout_transfer_v0_1/gene_count_influence_v0_1.json`. Original 21-gene prediction, all three module decisions, and journal submission science unchanged.
+
 ### Context, biology, and negative controls
 
 A direct, source-bounded biological hypothesis is that a subset of flavonoid-branching capacity retains **operationally transferable phylogenetic local structure beneath shared terminal pigment presence**, even while broader regulatory expression (and late transport/output) suffers from high-dimensional or source-specific donor variance when only two relatives are used. This is plausible but **not causally identified**. Earlier functional modules differ in size (9/4/8 genes), and the source lacks matched genome-wide housekeeping genes, replicated perturbations, identical stage measurements across radiations, and verified external independent predictions. **Significance of one module and failure of another does not test the difference of their true prediction effects.**
