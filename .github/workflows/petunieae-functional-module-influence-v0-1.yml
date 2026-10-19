@@ -67,6 +67,28 @@ jobs:
           assert r['original_frozen_Camellia_AJB_and_EL_unchanged']
           print('PETUNIEAE_FIXED_MODULE_POST_OUTCOME_INFLUENCE_PASS')
           PY
+      - name: Confirm full 47-tip and six-pigment-code influence summary is unchanged
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          current=json.loads(Path('build/petunieae_functional_module_influence_v0_1.json').read_text())
+          prior=json.loads(Path('results/petunieae_functional_module_influence_v0_1/summary_v0_1.json').read_text())
+          def check(a,b,loc='root'):
+              if isinstance(a,dict):
+                  assert isinstance(b,dict) and a.keys()==b.keys(),loc
+                  for key in a: check(a[key],b[key],loc+'.'+str(key))
+              elif isinstance(a,float):
+                  assert abs(a-b)<1e-12,(loc,a,b)
+              else:
+                  assert type(a)==type(b) and a==b,(loc,a,b)
+          check(current['module_loo_summaries'],prior['module_loo_summaries'])
+          assert current["n_tips"]==prior["source_original_tips"]==47
+          assert current["new_p_values"]==prior["no_new_p_values"]==0
+          assert current["independent_validations"]==prior["no_independent_biological_replications"]==0
+          assert prior["original_output_module_maxT_p_unchanged"]==0.2709
+          print("PETUNIEAE_FIXED_MODULE_INFLUENCE_EXACT_SOURCE_REPLAY_PASS")
+          PY
       - uses: actions/upload-artifact@v4
         if: always()
         with:
