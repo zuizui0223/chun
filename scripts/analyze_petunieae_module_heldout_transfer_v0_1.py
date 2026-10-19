@@ -84,6 +84,26 @@ def modules_losses(x:np.ndarray,state_weights:np.ndarray,neighbor_weights:np.nda
     return out,per_class
 
 
+
+def gains_only(x:np.ndarray,state_weights:np.ndarray,neighbor_weights:np.ndarray,
+               indices:list[list[int]])->list[float]:
+    """Identical module relative gains without recomputing descriptive random-2 losses."""
+    X=np.asarray(x,dtype=float)
+    n=X.shape[0]
+    mu=(X.sum(axis=0)[None,:]-X)/(n-1)
+    var=(np.square(X).sum(axis=0)[None,:]-np.square(X))/(n-1)-np.square(mu)
+    var=np.where(var>1e-12,var,1.0)
+    e0=np.square(state_weights@X-X)/var
+    e1=np.square(neighbor_weights@X-X)/var
+    out=[]
+    for cols in indices:
+        base=float(e0[:,cols].mean())
+        near=float(e1[:,cols].mean())
+        if base<=0:raise ValueError("zero module mean held-out baseline loss")
+        out.append((base-near)/base)
+    return out
+
+
 def holm_adjust(ps:list[float])->list[float]:
     p=np.asarray(ps,dtype=float)
     if p.ndim!=1 or len(p)!=3 or not np.isfinite(p).all() or np.any((p<0)|(p>1)):
@@ -117,6 +137,12 @@ def predict(source:Path,original:dict,prediction_design:dict,
     if abs(full["state_only_mse"]-prior["baseline_loss"])>1e-10 or        abs(full["phylogenetic_neighbor_mse"]-prior["neighbor_loss"])>1e-10 or        abs(full["relative_gain"]-prior["observed_relative_prediction_gain"])>1e-10:
         raise ValueError("previous full 21-gene predictive FAIL does not reproduce")
     results,perclass=modules_losses(X,state,near,ids,fine)
+    if not np.allclose(
+        gains_only(X,state,near,ids),
+        [v["gain_vs_full_class_mean"] for v in results],
+        rtol=0,atol=1e-13
+    ):
+        raise ValueError("fast and descriptive modules gain calculators disagree")
     iterations=new_design["null"]["iterations"] if iterations_override is None else iterations_override
     if iterations<99:raise ValueError("insufficient within-state source permutations")
     seed=new_design["null"]["seed"]
@@ -127,8 +153,7 @@ def predict(source:Path,original:dict,prediction_design:dict,
         perm=np.arange(len(fine))
         for g in groups:
             perm[g]=rng.permutation(g)
-        m,_=modules_losses(X[perm],state,near,ids,fine)
-        null[k]=[row["gain_vs_full_class_mean"] for row in m]
+        null[k]=gains_only(X[perm],state,near,ids)
     if not np.isfinite(null).all():
         raise ValueError("permutation gain null undefined")
     ps=[float((1+int((null[:,i]>=results[i]["gain_vs_full_class_mean"]).sum()))/(iterations+1))
