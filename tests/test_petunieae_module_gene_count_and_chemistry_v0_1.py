@@ -77,3 +77,49 @@ def test_bad_unverified_original_source_cannot_create_gene_results():
     with pytest.raises((ValueError,FileNotFoundError)):
         m.audit(ROOT/"this_is_not_a_verified_phyloCCA_data_source",
                 design,modules,original,prior,adjusted)
+
+SUMMARY=ROOT/"results/petunieae_module_gene_count_and_chemistry_v0_1/summary_v0_1.json"
+
+
+def test_actual_exhaustive_equal_size_panels_are_complete_and_not_a_p_value():
+    x=json.loads(SUMMARY.read_text(encoding="utf-8"))
+    assert x["status"]=="POST_OUTCOME_DESCRIPTIVE_SOURCE_MODULE_SIZE_AND_CHEMISTRY_DIAGNOSTIC"
+    assert x["n_source_species"]==47
+    assert x["n_fine_pigment_states"]==6
+    assert x["n_source_within_state_pairs"]==183
+    f=x["four_gene_panel_adjusted_distribution"]
+    assert f["LATE_ANTHOCYANIN_EXECUTION__size4"]["n_gene_panels"]==126
+    assert f["EARLY_SHARED_AND_REGULATORY__size4"]["n_gene_panels"]==70
+    assert f["FLAVONOL_BRANCH_AND_ACTIVATION__size4"]["n_gene_panels"]==1
+    assert f["EARLY_SHARED_AND_REGULATORY__size4"]["median_rho"]==pytest.approx(
+        0.3666428422240001,abs=1e-13)
+    assert f["LATE_ANTHOCYANIN_EXECUTION__size4"]["median_rho"]==pytest.approx(
+        0.17093301051755713,abs=1e-13)
+    assert f["EARLY_SHARED_AND_REGULATORY__size4"]["positive_count"]==70
+    assert f["LATE_ANTHOCYANIN_EXECUTION__size4"]["positive_count"]==108
+    p=x["four_gene_pairwise_rank_comparison"]
+    assert p["early_4_gene_panels_above_late_4_gene_panels"]==6469
+    assert p["early_late_four_gene_panel_combinations"]==8820
+    assert x["early_vs_late_four_gene_rank_fraction"]==pytest.approx(6469/8820)
+    assert p["source_panel_orderings_not_probability_or_p_value"]
+    assert x["no_new_gene_module_p_values"]
+    assert x["original_module_fwer_decision_unaltered"]
+    assert x["original_Camellia_AJB_EL_submission_unchanged"]
+
+
+def test_pigment_covariate_adjustment_does_not_exhaust_upstream_source_variance():
+    result=json.loads(SUMMARY.read_text(encoding="utf-8"))
+    by={x["module_id"]:x for x in result["module_unadjusted_and_adjusted_effects"]}
+    assert len(by)==3
+    expected={
+        "LATE_ANTHOCYANIN_EXECUTION":(0.4403601167650617,0.21514622388860405),
+        "FLAVONOL_BRANCH_AND_ACTIVATION":(0.4150812251745631,0.3725170195141295),
+        "EARLY_SHARED_AND_REGULATORY":(0.561578784717361,0.45826046500459183)
+    }
+    for group,(fraction,rho) in expected.items():
+        assert by[group]["fraction_of_source_standardized_expression_sum_squares_left"]==pytest.approx(
+            fraction,abs=1e-13)
+        assert by[group]["pigment_adjusted_expression_rho"]==pytest.approx(rho,abs=1e-13)
+        assert by[group]["no_causal_trait_variance_interpretation"]
+    assert all(0<r["fraction_of_source_standardized_expression_sum_squares_left"]<1
+               for r in by.values())
