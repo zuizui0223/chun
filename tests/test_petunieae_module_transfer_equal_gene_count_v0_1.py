@@ -53,3 +53,34 @@ def test_unverified_source_cannot_generate_predictive_gene_count_outcomes():
     objects=[json.loads(x.read_text(encoding="utf-8")) for x in [O,D,M,P]]
     with pytest.raises((ValueError,FileNotFoundError)):
         m.analyze(ROOT/"no_verified_Petunieae_source_bytes",*objects)
+
+SUMMARY=ROOT/"results/petunieae_module_heldout_transfer_v0_1/gene_count_influence_v0_1.json"
+
+def test_actual_source_4gene_predictor_panels_not_a_new_significance_test():
+    x=json.loads(SUMMARY.read_text(encoding="utf-8"))
+    assert x["status"]=="POST_OUTCOME_EXHAUSTIVE_SOURCE_PREDICTIVE_GENE_COUNT_AUDIT"
+    assert x["original_same_source_analysis_run"]==39208032410
+    assert x["n_source_species"]==47 and x["n_chemically_matched_fine_states"]==6
+    groups=x["descriptive_module_four_gene_panel_summaries"]
+    assert groups["LATE_ANTHOCYANIN_EXECUTION"]["n_panels"]==126
+    assert groups["LATE_ANTHOCYANIN_EXECUTION"]["n_positive_gain"]==14
+    assert groups["EARLY_SHARED_AND_REGULATORY"]["n_panels"]==70
+    assert groups["EARLY_SHARED_AND_REGULATORY"]["n_positive_gain"]==8
+    assert groups["FLAVONOL_BRANCH_AND_ACTIVATION"]["n_panels"]==1
+    assert groups["FLAVONOL_BRANCH_AND_ACTIVATION"]["n_positive_gain"]==1
+    assert x["original_fixed_flavonol_four_gene_gain"]==pytest.approx(0.05613676603732491,abs=1e-13)
+    rank=x["flavonol_fixed_four_gene_relative_to_all_other_functional_source_panels"]
+    assert rank["EARLY_SHARED_AND_REGULATORY"]["n_other_panels_with_strictly_lower_gain_than_fixed_flavonol"]==70
+    assert rank["LATE_ANTHOCYANIN_EXECUTION"]["n_other_panels_with_strictly_lower_gain_than_fixed_flavonol"]==119
+    assert rank["LATE_ANTHOCYANIN_EXECUTION"]["n_other_panels_with_strictly_higher_gain_than_fixed_flavonol"]==7
+    drop=x["flavonol_fixed_module_each_one_gene_removed_descriptive"]
+    assert len(drop)==4
+    assert {a["excluded_original_flavonol_gene"] for a in drop}=={
+        "F3primeH","FLS","MYBFL","MYB12"}
+    assert all(a["positive_gain"] for a in drop)
+    assert min(a["relative_gain_vs_full_pigment_class_mean"] for a in drop)==pytest.approx(
+        0.019733863878010884,abs=1e-13)
+    assert x["no_new_p_values"] is True
+    assert x["no_posthoc_gene_subset_promotion"] is True
+    assert x["not_an_independent_gene_or_radiation_sample"] is True
+    assert x["first_submitted_AJB_Camellia_EL_v03_unchanged"] is True
