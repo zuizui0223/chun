@@ -1,0 +1,73 @@
+name: Petunieae module transfer equal-four-gene source diagnostic v0.1
+
+on:
+  pull_request:
+    paths:
+      - 'scripts/audit_petunieae_module_transfer_equal_gene_count_v0_1.py'
+      - 'tests/test_petunieae_module_transfer_equal_gene_count_v0_1.py'
+      - 'results/petunieae_module_heldout_transfer_v0_1/gene_count_influence_v0_1.json'
+      - '.github/workflows/petunieae-module-transfer-equal-gene-count-v0-1.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  actions: read
+
+jobs:
+  retrospective_gene_count:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install previously pinned scientific dependencies
+        run: python -m pip install --disable-pip-version-check -r requirements/requirements-repository-integrity.txt
+      - name: Reject gene-panel selection and unverified original source
+        run: python -m pytest -q tests/test_petunieae_module_transfer_equal_gene_count_v0_1.py
+      - name: Read original SHA verified Wheeler Petunieae source only
+        uses: actions/download-artifact@v4
+        with:
+          name: petunieae-prospective-osf-v0-1
+          repository: zuizui0223/chun
+          run-id: 34182646549
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          path: build/original_petunieae_osf
+      - name: Inspect all original late / flavonol / early module 4-gene k2 prediction panels
+        run: |
+          python scripts/audit_petunieae_module_transfer_equal_gene_count_v0_1.py \
+            --source build/original_petunieae_osf \
+            --original-design data/petunieae_nested_regulatory_memory_preregistered_design_v0_1.json \
+            --original-prediction-design data/petunieae_nested_regulatory_leaveoneout_prediction_design_v0_1.json \
+            --module-design data/petunieae_functional_module_memory_design_v0_1.json \
+            --frozen-transfer-result results/petunieae_module_heldout_transfer_v0_1/result_v0_1.json \
+            --out build/petunieae_module_transfer_equal_gene_count_v0_1.json
+      - name: Preserve original 21-gene and flavonol module predictive decisions
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          r=json.loads(Path('build/petunieae_module_transfer_equal_gene_count_v0_1.json').read_text())
+          assert r['status']=='POST_OUTCOME_EXHAUSTIVE_SOURCE_PREDICTIVE_GENE_COUNT_AUDIT'
+          assert r['n_source_species']==47 and r['n_original_source_genes']==21
+          assert r['fixed_heldout_k']==2
+          d=r['exhaustive_same_four_gene_count_module_panels']
+          assert [d[x]['summary']['n_panels'] for x in [
+              'LATE_ANTHOCYANIN_EXECUTION','FLAVONOL_BRANCH_AND_ACTIVATION',
+              'EARLY_SHARED_AND_REGULATORY']]==[126,1,70]
+          assert len(r['flavonol_drop_one_gene_descriptive'])==4
+          assert abs(r['fixed_flavonol_four_gene_gain']-0.05613676603732491)<1e-12
+          assert r['n_new_P_values']==0
+          assert r['no_gene_selection_or_new_null']
+          assert r['no_between_module_statistical_significance_test']
+          assert r['no_new_independent_radiation']
+          assert r['original_Camellia_AJB_and_EL_science_unchanged']
+          print('PETUNIEAE_EQUAL_FOUR_GENE_TRANSFER_SOURCE_DIAGNOSTIC_PASS')
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: petunieae-module-transfer-equal-gene-count-v0-1
+          path: build/petunieae_module_transfer_equal_gene_count_v0_1.json
+          if-no-files-found: warn
