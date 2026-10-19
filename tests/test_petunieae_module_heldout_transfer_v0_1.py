@@ -50,7 +50,8 @@ def test_frozen_module_prediction_frame_k2_and_fail_original():
     mods,inds=module_partition(mod,orig)
     assert [m["id"] for m in mods]==[x["module_id"] for x in des["fixed_cohort"]["modules"]]
     assert list(map(len,inds))==[9,4,8]
-    assert pred["predictor_2"]["k"]==2\n    assert des["heldout_prediction"]["no_k_optimization"]
+    assert pred["predictor_2"]["k"]==2
+    assert des["heldout_prediction"]["no_k_optimization"]
     assert des["fixed_cohort"]["n_species"]==47
     assert des["fixed_cohort"]["matched_species_pairs"]==183
     assert des["null"]["iterations"]==9999
