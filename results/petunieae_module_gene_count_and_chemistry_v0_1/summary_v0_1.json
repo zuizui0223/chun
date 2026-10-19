@@ -1,0 +1,117 @@
+{
+  "version": "v0.1",
+  "status": "POST_OUTCOME_DESCRIPTIVE_SOURCE_MODULE_SIZE_AND_CHEMISTRY_DIAGNOSTIC",
+  "original_source_archive_run": 34182646549,
+  "replay_workflow_run": 39204012833,
+  "n_source_species": 47,
+  "n_fine_pigment_states": 6,
+  "n_source_within_state_pairs": 183,
+  "original_full_21_gene_pigment_adjusted_rho": 0.511199259788796,
+  "original_module_fwer_decision_unaltered": true,
+  "module_unadjusted_and_adjusted_effects": [
+    {
+      "adjusted_minus_raw_rho_descriptive": -0.025897839892669583,
+      "fraction_of_source_standardized_expression_sum_squares_left": 0.4403601167650617,
+      "fraction_projected_away_by_pigment_and_sixbit_class": 0.5596398832349383,
+      "module_id": "LATE_ANTHOCYANIN_EXECUTION",
+      "n_genes": 9,
+      "no_causal_trait_variance_interpretation": true,
+      "original_genes": [
+        "F35H",
+        "DFR",
+        "ANS",
+        "UFGT",
+        "AAT",
+        "5GT",
+        "MTlike",
+        "GST",
+        "3RT"
+      ],
+      "pigment_adjusted_expression_rho": 0.21514622388860405,
+      "unadjusted_expression_rho": 0.24104406378127363
+    },
+    {
+      "adjusted_minus_raw_rho_descriptive": -0.10933541423421878,
+      "fraction_of_source_standardized_expression_sum_squares_left": 0.4150812251745631,
+      "fraction_projected_away_by_pigment_and_sixbit_class": 0.584918774825437,
+      "module_id": "FLAVONOL_BRANCH_AND_ACTIVATION",
+      "n_genes": 4,
+      "no_causal_trait_variance_interpretation": true,
+      "original_genes": [
+        "F3primeH",
+        "FLS",
+        "MYBFL",
+        "MYB12"
+      ],
+      "pigment_adjusted_expression_rho": 0.3725170195141295,
+      "unadjusted_expression_rho": 0.4818524337483483
+    },
+    {
+      "adjusted_minus_raw_rho_descriptive": -0.13822951173989262,
+      "fraction_of_source_standardized_expression_sum_squares_left": 0.561578784717361,
+      "fraction_projected_away_by_pigment_and_sixbit_class": 0.438421215282639,
+      "module_id": "EARLY_SHARED_AND_REGULATORY",
+      "n_genes": 8,
+      "no_causal_trait_variance_interpretation": true,
+      "original_genes": [
+        "CHS",
+        "CHI",
+        "F3H",
+        "MYB27",
+        "AN11",
+        "AN1",
+        "JAF13",
+        "MybsG6"
+      ],
+      "pigment_adjusted_expression_rho": 0.45826046500459183,
+      "unadjusted_expression_rho": 0.5964899767444845
+    }
+  ],
+  "four_gene_panel_adjusted_distribution": {
+    "EARLY_SHARED_AND_REGULATORY__size4": {
+      "max_rho": 0.5447257228010385,
+      "median_rho": 0.3666428422240001,
+      "min_rho": 0.08129668886257535,
+      "n_gene_panels": 70,
+      "p10_rho": 0.1670055659269552,
+      "p90_rho": 0.5065248622186952,
+      "panel_values_not_independent_tests": true,
+      "positive_count": 70
+    },
+    "FLAVONOL_BRANCH_AND_ACTIVATION__size4": {
+      "max_rho": 0.3725170195141295,
+      "median_rho": 0.3725170195141295,
+      "min_rho": 0.3725170195141295,
+      "n_gene_panels": 1,
+      "p10_rho": 0.3725170195141295,
+      "p90_rho": 0.3725170195141295,
+      "panel_values_not_independent_tests": true,
+      "positive_count": 1
+    },
+    "LATE_ANTHOCYANIN_EXECUTION__size4": {
+      "max_rho": 0.5605064057192178,
+      "median_rho": 0.17093301051755713,
+      "min_rho": -0.11074663094673506,
+      "n_gene_panels": 126,
+      "p10_rho": -0.03429197687960954,
+      "p90_rho": 0.47390169574937013,
+      "panel_values_not_independent_tests": true,
+      "positive_count": 108
+    }
+  },
+  "four_gene_pairwise_rank_comparison": {
+    "early_4_gene_panels_above_late_4_gene_panels": 6469,
+    "early_late_four_gene_panel_combinations": 8820,
+    "flavonol_above_early_4_gene_panels_count": 38,
+    "flavonol_above_late_4_gene_panels_count": 95,
+    "flavonol_fixed_4_gene_rho": 0.3725170195141295,
+    "source_panel_orderings_not_probability_or_p_value": true
+  },
+  "early_vs_late_four_gene_rank_fraction": 0.7334467120181406,
+  "interpretation": "Early/shared/regulatory 4-gene panels have higher source rho than late-output panels for 6469/8820 combinations and a higher median; these overlapping source panels are not independent experiments and the ranking fraction is not a P value. No gene/module effect difference significance is established.",
+  "status_note": "Actual source result recomputed on exact OSF-frozen 47-tip chemical-and-expression source. 3 original module maxT decisions, original 21-gene positive and frozen k2 donor prediction FAIL remain unchanged.",
+  "no_new_gene_module_p_values": true,
+  "no_panel_selection_for_promotion": true,
+  "original_Camellia_AJB_EL_submission_unchanged": true,
+  "full_unabridged_source_details_artifact_link": "https://github.com/zuizui0223/chun/actions/runs/39204012833/artifacts/12165170748"
+}
