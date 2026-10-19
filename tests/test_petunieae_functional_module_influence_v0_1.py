@@ -47,3 +47,34 @@ def test_no_access_to_source_does_not_create_synthetic_data():
     a=json.loads(ADJ.read_text())
     with pytest.raises((FileNotFoundError,ValueError)):
         audit.audit(ROOT/"an_impossible_unverified_Petunieae_source",d,o,f,a)
+
+INFLUENCE=ROOT/"results/petunieae_functional_module_influence_v0_1/summary_v0_1.json"
+
+def test_all_fortyseven_tip_and_six_chemical_code_deletion_summaries_are_frozen():
+    result=json.loads(INFLUENCE.read_text())
+    assert result["status"]=="POST_OUTCOME_DESCRIPTIVE_MODULE_INFLUENCE_CONFIRMED"
+    assert result["source_original_tips"]==47
+    assert result["source_original_sixbit_classes"]==6
+    assert result["full_source_same_state_pairs"]==183
+    summaries=result["module_loo_summaries"]
+    assert summaries["leave_one_tip"]["n_total"]==47
+    assert summaries["leave_one_tip"]["n_early_above_flavonol_above_late"]==46
+    assert summaries["leave_one_fine_state"]["n_total"]==6
+    assert summaries["leave_one_fine_state"]["n_early_above_flavonol_above_late"]==6
+    for n,module in [(47,summaries["leave_one_tip"]["modules"]),
+                     (6,summaries["leave_one_fine_state"]["modules"])]:
+        assert all(v["n"]==n and v["positive_count"]==n
+                   for v in module.values())
+        assert set(module)=={
+            "LATE_ANTHOCYANIN_EXECUTION",
+            "FLAVONOL_BRANCH_AND_ACTIVATION",
+            "EARLY_SHARED_AND_REGULATORY",
+        }
+    assert result["no_new_p_values"]==0
+    assert result["no_independent_biological_replications"]==0
+    assert result["cannot_claim_significant_between_module_differences"]
+    assert result["not_a_negative_housekeeping_control"]
+    assert result["original_output_module_maxT_p_unchanged"]==0.2709
+    assert result["original_flavonol_module_maxT_p_unchanged"]==0.0162
+    assert result["original_early_shared_module_maxT_p_unchanged"]==0.0007
+    assert result["original_frozen_AJB_EL_science_unchanged"]
