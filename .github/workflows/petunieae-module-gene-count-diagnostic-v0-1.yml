@@ -75,6 +75,39 @@ jobs:
           assert x['original_Camellia_AJB_and_EL_unchanged']
           print('PETUNIEAE_197_FOUR_GENE_PANELS_SOURCE_DIAGNOSTIC_PASS')
           PY
+      - name: Reproduce retained biological source summary without new hypothesis tests
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          a=json.loads(Path('build/petunieae_module_gene_count_chemistry_v0_1.json').read_text())
+          b=json.loads(Path('results/petunieae_module_gene_count_and_chemistry_v0_1/summary_v0_1.json').read_text())
+          assert a["status"]==b["status"]
+          assert a["fixed_frame_tips"]==b["n_source_species"]==47
+          assert a["same_sixbit_state_unordered_pairs"]==b["n_source_within_state_pairs"]==183
+          for left,right in zip(a["fixed_module_raw_and_residual_effects"],
+                                b["module_unadjusted_and_adjusted_effects"]):
+              assert left.keys()==right.keys()
+              for key in left:
+                  if isinstance(left[key],float):
+                      assert abs(left[key]-right[key])<1e-13,(key,left[key],right[key])
+                  else:
+                      assert left[key]==right[key],key
+          for name,subset in b["four_gene_panel_adjusted_distribution"].items():
+              actual=a["all_exhaustive_gene_count_panels"][name]["adjusted"]
+              assert actual.keys()==subset.keys()
+              for key in subset:
+                  if isinstance(subset[key],float):
+                      assert abs(actual[key]-subset[key])<1e-13,(name,key)
+                  else:
+                      assert actual[key]==subset[key],(name,key)
+          assert a["equal_4_gene_panel_rank_comparisons"]["adjusted_rho"]==b["four_gene_pairwise_rank_comparison"]
+          assert b["early_vs_late_four_gene_rank_fraction"]==6469/8820
+          assert a["n_new_significance_tests"]==0 and b["no_new_gene_module_p_values"]
+          assert a["original_three_module_maxT_decisions_unchanged"]
+          assert b["original_module_fwer_decision_unaltered"]
+          print('PETUNIEAE_EQUAL_SIZE_CHEMISTRY_DIAGNOSTIC_FROZEN_SOURCE_REPLAY_PASS')
+          PY
       - uses: actions/upload-artifact@v4
         if: always()
         with:
