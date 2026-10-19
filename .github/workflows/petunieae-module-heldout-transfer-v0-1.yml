@@ -92,21 +92,21 @@ jobs:
           from pathlib import Path
           actual=json.loads(Path('build/petunieae_module_heldout_transfer_result_v0_1.json').read_text())
           fixed=json.loads(Path('results/petunieae_module_heldout_transfer_v0_1/result_v0_1.json').read_text())
-          assert actual.keys()==fixed.keys()
-          for key in actual:
-              if key=='module_results':
-                  assert len(actual[key])==len(fixed[key])==3
-                  for a,b in zip(actual[key],fixed[key]):
-                      assert a.keys()==b.keys()
-                      for field in a:
-                          if isinstance(a[field],float):
-                              assert abs(a[field]-b[field])<1e-12,(key,field)
-                          else:
-                              assert a[field]==b[field],(key,field)
-              elif isinstance(actual[key],float):
-                  assert abs(actual[key]-fixed[key])<1e-12,key
+          def deep_equals(a,b,where='root'):
+              assert type(a)==type(b),(where,type(a),type(b))
+              if isinstance(a,dict):
+                  assert a.keys()==b.keys(),where
+                  for k in a:
+                      deep_equals(a[k],b[k],where+'.'+str(k))
+              elif isinstance(a,list):
+                  assert len(a)==len(b),where
+                  for n,(u,v) in enumerate(zip(a,b)):
+                      deep_equals(u,v,where+'['+str(n)+']')
+              elif isinstance(a,float):
+                  assert abs(a-b)<1e-12,(where,a,b)
               else:
-                  assert actual[key]==fixed[key],key
+                  assert a==b,(where,a,b)
+          deep_equals(actual,fixed)
           assert fixed['original_full_21_gene_prediction_still_FAIL']
           assert [m['predictive_decision'] for m in fixed['module_results']]==[
               'NOT_SUPPORTED_PRACTICAL_TRANSFER',
