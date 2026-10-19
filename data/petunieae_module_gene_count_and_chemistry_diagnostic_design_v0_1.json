@@ -1,0 +1,40 @@
+{
+  "version": "v0.1",
+  "date": "2026-10-19",
+  "status": "POST_OUTCOME_DESCRIPTIVE_MODULE_FEATURE_COUNT_AND_CHEMISTRY_DECOMPOSITION",
+  "biological_question": "Is the stronger observed conditional ancestry structure of early/regulatory and flavonol genes merely a consequence of unequal number of measured gene axes or of covariate residualization, rather than a biological trait of one flavonoid subnetwork?",
+  "observational_scope": "One outcome-exposed Petunieae radiation; 47 taxa, 183 same-source exact fine biochemical presence matches; 21 gene axes. Module result already opened before this diagnostic was specified.",
+  "inputs": {
+    "source_study_doi": "10.1098/rspb.2023.0275",
+    "original_source_artifact_run_id": 34182646549,
+    "source_hashes_file": "data/petunieae_nested_regulatory_memory_preregistered_design_v0_1.json",
+    "module_mapping": "data/petunieae_functional_module_memory_design_v0_1.json",
+    "frozen_module_result": "results/petunieae_functional_module_memory_v0_1/result_v0_1.json",
+    "frozen_adjusted_result": "results/petunieae_pigment_adjusted_regulatory_memory_v0_1/result_v0_1.json"
+  },
+  "calculation": {
+    "full_frame": "exact same 47 taxa, 6 retained presence codes, same 183 unordered within-exact-code tip pairs",
+    "original_expression": "same frozen 21 genes log1p(TPM10k), column population zscore across same 47 taxa",
+    "original_pigment_nuisance": "same six pigment-code class dummies and all nine mg/g pigment covariates, source 47x47 M projection",
+    "module_residual_fraction": "sum(residualized z scores squared)/sum(original standardized gene scores squared) within each of the 9/4/8 fixed modules; descriptive only",
+    "raw_vs_adjusted_module_rho": "source phylogeny patristic rank vs per-module RMS of unadjusted standardized expression vectors, and of source pigmented-nuisance-residualized expression vectors, within fixed 183 pairs",
+    "fixed_four_gene_panels": "enumerate all C(9,4)=126 late, C(8,4)=70 early+regulatory, and C(4,4)=1 flavonol; for each compute unadjusted/adjusted rho using original source, fixed 183 pair universe, no after-outcome selection or P value",
+    "fixed_eight_gene_panels": "enumerate all C(9,8)=9 late 8-gene panels and the one full early+regulatory 8-gene panel, no flavonol group at size eight",
+    "summary": "Panel rho min, median, max, 10th, 90th quantiles; descriptive cross-panel rank shares; same-gene-number comparisons are not independent biological samples, effect-difference tests, empirical P values, power estimates or confidence intervals",
+    "no_new_permutations": true,
+    "no_p_values": true,
+    "no_posthoc_relabel_of_functional_membership": true
+  },
+  "guardrails": {
+    "preserve_21_original_gene_results": true,
+    "preserve_late_output_maxT_not_supported": true,
+    "preserve_flavonol_and_early_original_maxT_positive": true,
+    "no_claim_true_hypothesis_early_module_more_than_late_module_from_significance_difference": true,
+    "no_transcriptome_housekeeping_negative_control": true,
+    "no_gene_sensitivity_selective_reporting": true,
+    "no_new_Petunieae_independent_radiation": true,
+    "no_pigment_mutation_causal_selection_claim": true,
+    "no_temporal_rate_or_half_life_inference": true,
+    "no_change_Camellia_AJB_or_EL_v03": true
+  }
+}

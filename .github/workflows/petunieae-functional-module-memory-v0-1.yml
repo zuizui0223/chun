@@ -1,0 +1,106 @@
+name: Petunieae functional-source module memory v0.1 (retrospective)
+
+on:
+  pull_request:
+    paths:
+      - 'data/petunieae_functional_module_memory_design_v0_1.json'
+      - 'scripts/analyze_petunieae_functional_module_memory_v0_1.py'
+      - 'tests/test_petunieae_functional_module_memory_v0_1.py'
+      - 'results/petunieae_functional_module_memory_v0_1/**'
+      - '.github/workflows/petunieae-functional-module-memory-v0-1.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  actions: read
+
+jobs:
+  one_radiation:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install frozen repository-science deps
+        run: python -m pip install --disable-pip-version-check -r requirements/requirements-repository-integrity.txt
+      - name: Test 21-gene function partition, whole-vector null and no posthoc gene selection
+        run: python -m pytest -q tests/test_petunieae_functional_module_memory_v0_1.py
+      - name: Retrieve exact OSF-verified original 2023 source and unchanged 47-tip tree
+        uses: actions/download-artifact@v4
+        with:
+          name: petunieae-prospective-osf-v0-1
+          repository: zuizui0223/chun
+          run-id: 34182646549
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          path: build/petunieae_original_osf_source
+      - name: Run three predeclared gene-function modules with 9999 taxon permutations
+        run: |
+          python scripts/analyze_petunieae_functional_module_memory_v0_1.py \
+            --source build/petunieae_original_osf_source \
+            --module-design data/petunieae_functional_module_memory_design_v0_1.json \
+            --original-design data/petunieae_nested_regulatory_memory_preregistered_design_v0_1.json \
+            --original-adjusted-result results/petunieae_pigment_adjusted_regulatory_memory_v0_1/result_v0_1.json \
+            --out build/petunieae_functional_module_memory_v0_1.json
+      - name: Retain exact original result and prevent causal or familywise error claims
+        run: |
+          python - <<'PY'
+          import json,math
+          from pathlib import Path
+          d=json.loads(Path('build/petunieae_functional_module_memory_v0_1.json').read_text())
+          assert d["status"]=="RETROSPECTIVE_MODULE_WIDE_SOURCE_OUTCOME_OPENED"
+          assert d["source_sha256_verified"]
+          assert d["n_tips"]==47 and d["n_exact_sixbit_chemical_states"]==6
+          assert d["n_same_fine_state_pairs"]==183 and d["n_original_expression_genes"]==21
+          assert d["n_modules"]==3 and d["permutations"]==9999 and d["seed"]==20261019
+          assert abs(d["original_full_21_gene_adjusted_rho_reproduced"]-0.511199259788796)<1e-10
+          assert d["original_full_21_gene_p_unchanged"]==0.0002
+          assert [x["n_genes"] for x in d["module_results"]]==[9,4,8]
+          for m in d["module_results"]:
+              assert math.isfinite(m["observed_rho"])
+              assert 0<m["p_nominal"]<=m["p_maxT_familywise"]<=1.0
+              assert m["not_a_housekeeping_or_neutral_gene_negative_control"]
+          assert d["module_effect_difference_tested"] is False
+          assert d["negative_control_housekeeping_panel_available"] is False
+          assert d["not_an_independent_radiation_replication"] is True
+          assert d["original_nearest_two_predictor_still_FAIL"] is True
+          assert d["original_camellia_AJB_and_EL_science_unchanged"] is True
+          print("PETUNIEAE_MODULE_RETROSPECTIVE_SOURCE_EVIDENCE_PASS")
+          for m in d["module_results"]:
+              print("PETUNIEAE_FUNCTIONAL_MODULE",m["module_id"],m["n_genes"],
+                    m["observed_rho"],m["permutation_null_mean_rho"],m["p_nominal"],
+                    m["p_maxT_familywise"],m["retrospective_fwer_signal"])
+          PY
+      - name: Reproduce original post-outcome frozen three-module result exactly
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          current=json.loads(Path('build/petunieae_functional_module_memory_v0_1.json').read_text())
+          frozen=json.loads(Path('results/petunieae_functional_module_memory_v0_1/result_v0_1.json').read_text())
+          def exact_with_floats(a,b,loc='root'):
+              assert type(a)==type(b),(loc,type(a),type(b))
+              if isinstance(a,dict):
+                  assert a.keys()==b.keys(),loc
+                  for key in a: exact_with_floats(a[key],b[key],loc+'.'+str(key))
+              elif isinstance(a,list):
+                  assert len(a)==len(b),loc
+                  for i,(x,y) in enumerate(zip(a,b)):
+                      exact_with_floats(x,y,loc+'['+str(i)+']')
+              elif isinstance(a,float):
+                  assert abs(a-b)<1e-13,(loc,a,b)
+              else:
+                  assert a==b,(loc,a,b)
+          exact_with_floats(current,frozen)
+          assert frozen["original_full_21_gene_adjusted_rho_reproduced"]==0.511199259788796
+          assert frozen["module_effect_difference_tested"] is False
+          assert frozen["not_an_independent_radiation_replication"] is True
+          print("PETUNIEAE_FROZEN_FUNCTIONAL_MODULE_SOURCE_OUTCOME_REPLAY_PASS")
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: petunieae-functional-module-memory-v0-1
+          path: build/petunieae_functional_module_memory_v0_1.json
+          if-no-files-found: warn

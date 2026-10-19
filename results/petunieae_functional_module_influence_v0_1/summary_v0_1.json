@@ -1,0 +1,77 @@
+{
+  "version": "v0.1",
+  "date": "2026-10-19",
+  "status": "POST_OUTCOME_DESCRIPTIVE_MODULE_INFLUENCE_CONFIRMED",
+  "prior_module_design": "data/petunieae_functional_module_memory_design_v0_1.json",
+  "prior_frozen_result": "results/petunieae_functional_module_memory_v0_1/result_v0_1.json",
+  "original_source_run_id": 34182646549,
+  "influence_source_run_id": 39203476760,
+  "source_original_tips": 47,
+  "source_original_sixbit_classes": 6,
+  "full_source_same_state_pairs": 183,
+  "module_loo_summaries": {
+    "leave_one_fine_state": {
+      "modules": {
+        "EARLY_SHARED_AND_REGULATORY": {
+          "max_rho": 0.494999095441698,
+          "median_rho": 0.45234224026767456,
+          "min_rho": 0.3425293755020617,
+          "n": 6,
+          "positive_count": 6
+        },
+        "FLAVONOL_BRANCH_AND_ACTIVATION": {
+          "max_rho": 0.4307302098643904,
+          "median_rho": 0.3590288932106555,
+          "min_rho": 0.21536889627072628,
+          "n": 6,
+          "positive_count": 6
+        },
+        "LATE_ANTHOCYANIN_EXECUTION": {
+          "max_rho": 0.3045539771074635,
+          "median_rho": 0.12766967253174952,
+          "min_rho": 0.053265619718083614,
+          "n": 6,
+          "positive_count": 6
+        }
+      },
+      "n_early_above_flavonol_above_late": 6,
+      "n_total": 6
+    },
+    "leave_one_tip": {
+      "modules": {
+        "EARLY_SHARED_AND_REGULATORY": {
+          "max_rho": 0.5282420718531876,
+          "median_rho": 0.4579389727000707,
+          "min_rho": 0.367389337873899,
+          "n": 47,
+          "positive_count": 47
+        },
+        "FLAVONOL_BRANCH_AND_ACTIVATION": {
+          "max_rho": 0.46832456529319944,
+          "median_rho": 0.36724981943380275,
+          "min_rho": 0.29441985652057756,
+          "n": 47,
+          "positive_count": 47
+        },
+        "LATE_ANTHOCYANIN_EXECUTION": {
+          "max_rho": 0.26738065672584455,
+          "median_rho": 0.21153014576282278,
+          "min_rho": 0.10662270568099382,
+          "n": 47,
+          "positive_count": 47
+        }
+      },
+      "n_early_above_flavonol_above_late": 46,
+      "n_total": 47
+    }
+  },
+  "no_new_p_values": 0,
+  "no_independent_biological_replications": 0,
+  "cannot_claim_significant_between_module_differences": true,
+  "not_a_negative_housekeeping_control": true,
+  "original_output_module_maxT_p_unchanged": 0.2709,
+  "original_flavonol_module_maxT_p_unchanged": 0.0162,
+  "original_early_shared_module_maxT_p_unchanged": 0.0007,
+  "no_causal_or_pollinator_fitness_inference": true,
+  "original_frozen_AJB_EL_science_unchanged": true
+}

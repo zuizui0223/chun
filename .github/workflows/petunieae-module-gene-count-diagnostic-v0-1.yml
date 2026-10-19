@@ -1,0 +1,116 @@
+name: Petunieae equal-gene-count and chemistry-removal diagnostic v0.1
+
+on:
+  pull_request:
+    paths:
+      - 'data/petunieae_module_gene_count_and_chemistry_diagnostic_design_v0_1.json'
+      - 'scripts/audit_petunieae_module_gene_count_and_chemistry_v0_1.py'
+      - 'tests/test_petunieae_module_gene_count_and_chemistry_v0_1.py'
+      - 'results/petunieae_module_gene_count_and_chemistry_v0_1/**'
+      - '.github/workflows/petunieae-module-gene-count-diagnostic-v0-1.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  actions: read
+
+jobs:
+  original_source_descriptive:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install identical frozen source science dependencies
+        run: python -m pip install --disable-pip-version-check -r requirements/requirements-repository-integrity.txt
+      - name: Test source module sizes and no new significance claims
+        run: python -m pytest -q tests/test_petunieae_module_gene_count_and_chemistry_v0_1.py
+      - name: Obtain byte-verified original Wheeler et al 2023 Petunieae data
+        uses: actions/download-artifact@v4
+        with:
+          name: petunieae-prospective-osf-v0-1
+          repository: zuizui0223/chun
+          run-id: 34182646549
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          path: build/petunieae_original_source
+      - name: Enumerate all 197 four-gene panels and all 10 eight-gene panels
+        run: |
+          python scripts/audit_petunieae_module_gene_count_and_chemistry_v0_1.py \
+            --source build/petunieae_original_source \
+            --design data/petunieae_module_gene_count_and_chemistry_diagnostic_design_v0_1.json \
+            --module-design data/petunieae_functional_module_memory_design_v0_1.json \
+            --original-design data/petunieae_nested_regulatory_memory_preregistered_design_v0_1.json \
+            --original-module-result results/petunieae_functional_module_memory_v0_1/result_v0_1.json \
+            --original-adjusted-result results/petunieae_pigment_adjusted_regulatory_memory_v0_1/result_v0_1.json \
+            --out build/petunieae_module_gene_count_chemistry_v0_1.json
+      - name: Check original 21 genes/47 taxa/183 pairs and no post-outcome significance rescue
+        run: |
+          python - <<'PY'
+          import json, math
+          from pathlib import Path
+          x=json.loads(Path('build/petunieae_module_gene_count_chemistry_v0_1.json').read_text())
+          assert x['status']=='POST_OUTCOME_DESCRIPTIVE_SOURCE_MODULE_SIZE_AND_CHEMISTRY_DIAGNOSTIC'
+          assert x['original_source_sha256_verified']
+          assert x['fixed_frame_tips']==47
+          assert x['source_chemical_states']==6
+          assert x['same_sixbit_state_unordered_pairs']==183
+          assert x['nuisance_rank']==12
+          assert abs(x['all_21_gene_adjusted_rho_recovered']-0.511199259788796)<1e-10
+          assert len(x['fixed_module_raw_and_residual_effects'])==3
+          counts={k:len(v['gene_panels']) for k,v in x['all_exhaustive_gene_count_panels'].items()}
+          assert counts=={
+            'LATE_ANTHOCYANIN_EXECUTION__size4':126,
+            'FLAVONOL_BRANCH_AND_ACTIVATION__size4':1,
+            'EARLY_SHARED_AND_REGULATORY__size4':70,
+            'LATE_ANTHOCYANIN_EXECUTION__size8':9,
+            'EARLY_SHARED_AND_REGULATORY__size8':1
+          }
+          assert x['n_new_significance_tests']==0
+          assert x['not_gene_panel_effect_difference_test']
+          assert x['no_housekeeping_background_available']
+          assert x['original_three_module_maxT_decisions_unchanged']
+          assert x['original_k2_predictor_remains_FAIL']
+          assert x['original_Camellia_AJB_and_EL_unchanged']
+          print('PETUNIEAE_197_FOUR_GENE_PANELS_SOURCE_DIAGNOSTIC_PASS')
+          PY
+      - name: Reproduce retained biological source summary without new hypothesis tests
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          a=json.loads(Path('build/petunieae_module_gene_count_chemistry_v0_1.json').read_text())
+          b=json.loads(Path('results/petunieae_module_gene_count_and_chemistry_v0_1/summary_v0_1.json').read_text())
+          assert a["status"]==b["status"]
+          assert a["fixed_frame_tips"]==b["n_source_species"]==47
+          assert a["same_sixbit_state_unordered_pairs"]==b["n_source_within_state_pairs"]==183
+          for left,right in zip(a["fixed_module_raw_and_residual_effects"],
+                                b["module_unadjusted_and_adjusted_effects"]):
+              assert left.keys()==right.keys()
+              for key in left:
+                  if isinstance(left[key],float):
+                      assert abs(left[key]-right[key])<1e-13,(key,left[key],right[key])
+                  else:
+                      assert left[key]==right[key],key
+          for name,subset in b["four_gene_panel_adjusted_distribution"].items():
+              actual=a["all_exhaustive_gene_count_panels"][name]["adjusted"]
+              assert actual.keys()==subset.keys()
+              for key in subset:
+                  if isinstance(subset[key],float):
+                      assert abs(actual[key]-subset[key])<1e-13,(name,key)
+                  else:
+                      assert actual[key]==subset[key],(name,key)
+          assert a["equal_4_gene_panel_rank_comparisons"]["adjusted_rho"]==b["four_gene_pairwise_rank_comparison"]
+          assert b["early_vs_late_four_gene_rank_fraction"]==6469/8820
+          assert a["n_new_significance_tests"]==0 and b["no_new_gene_module_p_values"]
+          assert a["original_three_module_maxT_decisions_unchanged"]
+          assert b["original_module_fwer_decision_unaltered"]
+          print('PETUNIEAE_EQUAL_SIZE_CHEMISTRY_DIAGNOSTIC_FROZEN_SOURCE_REPLAY_PASS')
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: petunieae-module-gene-count-chemistry-v0-1
+          path: build/petunieae_module_gene_count_chemistry_v0_1.json
+          if-no-files-found: warn
