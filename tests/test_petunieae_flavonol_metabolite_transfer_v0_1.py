@@ -125,3 +125,44 @@ def test_uninformative_exact_sixbit_code_with_all_three_anthocyanidins_zero_is_r
     # Even though its class gain is undefined, all 8 recipients remain
     # in the original aggregate prediction denominator.
     assert sum(x["n_taxa"] for x in anth["per_class"])==8
+
+RESULT=ROOT/"results/petunieae_flavonol_metabolite_transfer_v0_1/result_v0_1.json"
+
+
+def test_original_full_source_measured_chemistry_outcomes_are_frozen_and_negative():
+    data=json.loads(RESULT.read_text(encoding="utf-8"))
+    original=json.loads(DESIGN.read_text(encoding="utf-8"))
+    assert data["status"]=="RETROSPECTIVE_ORIGINAL_METABOLITE_TRANSFER_ON_47_TIPS"
+    assert data["design_status"]==original["status"]
+    assert data["n_original_taxa"]==47
+    assert data["n_original_sixbit_anthocyanidin_states"]==6
+    assert data["n_within_class_permutations"]==9999
+    assert data["seed"]==20261020
+    assert data["source_original_three_sha256_verified"] is True
+    assert data["source_original_full_21_gene_gain_recovered"]==pytest.approx(-0.0990780619015505,abs=1e-13)
+    assert data["original_fixed_flavonol_expression_gene_predictive_gain_unchanged"]==pytest.approx(0.05613676603732491,abs=1e-13)
+    a,b=data["target_results"]
+    assert a["target_id"]=="FLAVONOL_CONCENTRATION"
+    assert a["measured_compound_columns"]==["myr_mgg","quer_mgg","kaem_mgg"]
+    assert a["relative_practical_prediction_gain"]==pytest.approx(-0.2408027234935364,abs=1e-13)
+    assert a["class_mean_training_scaled_MSE"]==pytest.approx(1.2249248985737038,abs=1e-13)
+    assert a["phylogenetic_nearest_two_training_scaled_MSE"]==pytest.approx(1.5198901502252955,abs=1e-13)
+    assert a["holm_two_targets_p"]==0.3545
+    assert a["decision"]=="NOT_SUPPORTED_PRACTICAL_TRANSFER"
+    assert a["n_recipients_improved"]==20 and a["n_recipients_worse"]==27
+    assert all(z["gain"]<0 for z in a["per_original_sixbit_class"])
+    assert a["n_positive_one_class_recipient_omissions"]==0
+    assert b["target_id"]=="ANTHOCYANIDIN_AMOUNT_POSITIVE_VARYING"
+    assert b["measured_compound_columns"]==["Del_mgg","Pet_mgg","Malv_mgg"]
+    assert b["relative_practical_prediction_gain"]==pytest.approx(-0.07786352821992552,abs=1e-13)
+    assert b["source_locality_p"]==0.0378
+    assert b["holm_two_targets_p"]==0.0756
+    assert b["decision"]=="NOT_SUPPORTED_PRACTICAL_TRANSFER"
+    zeros=[row for row in b["per_original_sixbit_class"] if row["all_three_metabolites_zero_in_class"]]
+    assert len(zeros)==1
+    assert zeros[0]["source_sixbit_pigment_code"]=="000000"
+    assert zeros[0]["gain"] is None
+    assert zeros[0]["class_gain_status"]=="NONINFORMATIVE_ZERO_BASELINE"
+    assert data["not_prospective_independent_radiation_validation"] is True
+    assert data["not_a_pollinator_fitness_UV_phenotype_test"] is True
+    assert data["original_camellia_AJB_and_EL_science_unchanged"] is True
