@@ -228,6 +228,7 @@ def main():
             "original_class_plus_source_selected_phylogeny_plus_genes_MSE",
             "additional_gene_relative_gain","source_taxa_improved",
             "source_taxa_worse")},sort_keys=True))
+    print("PETUNIEAE_TRAIN_ONLY_PHYLOGENY_FULL_ORIGINAL_SOURCE_JSON",json.dumps(result,sort_keys=True))
     print("NO_NEW_PHYLOGENY_MODEL_P_OR_CAUSAL_EVOLUTIONARY_MEMORY_TEST")
 
 
