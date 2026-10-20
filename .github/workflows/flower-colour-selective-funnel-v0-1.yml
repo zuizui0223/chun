@@ -1,0 +1,32 @@
+name: Flower-colour selective funnel v0.1
+
+on:
+  pull_request:
+    paths:
+      - 'data/flower_colour_selective_funnel_evidence_v0_1.csv'
+      - 'data/flower_colour_molecular_target_ontology_v0_1.csv'
+      - 'docs/FLOWER_COLOUR_SELECTIVE_FUNNEL_HYPOTHESIS_V0_1.md'
+      - 'scripts/validate_flower_colour_selective_funnel_v0_1.py'
+      - '.github/workflows/flower-colour-selective-funnel-v0-1.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Validate cross-timescale evidence and ontology
+        run: |
+          mkdir -p build/flower_colour_selective_funnel_v0_1
+          python scripts/validate_flower_colour_selective_funnel_v0_1.py \
+            --evidence data/flower_colour_selective_funnel_evidence_v0_1.csv \
+            --ontology data/flower_colour_molecular_target_ontology_v0_1.csv \
+            --out build/flower_colour_selective_funnel_v0_1/summary.json
+      - name: Report
+        run: cat build/flower_colour_selective_funnel_v0_1/summary.json >> "$GITHUB_STEP_SUMMARY"
