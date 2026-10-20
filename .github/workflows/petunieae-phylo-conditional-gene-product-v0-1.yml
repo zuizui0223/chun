@@ -1,0 +1,88 @@
+name: Petunieae phylogeny-conditioned flavonol gene-product transfer v0.1
+
+on:
+  pull_request:
+    paths:
+      - 'data/petunieae_phylogenetic_conditional_gene_to_product_design_v0_1.json'
+      - 'scripts/analyze_petunieae_phylo_conditional_gene_product_v0_1.py'
+      - 'tests/test_petunieae_phylo_conditional_gene_product_v0_1.py'
+      - 'results/petunieae_phylo_conditional_gene_product_v0_1/**'
+      - '.github/workflows/petunieae-phylo-conditional-gene-product-v0-1.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  actions: read
+
+jobs:
+  original_source_phylogenetic:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    env:
+      OPENBLAS_NUM_THREADS: "1"
+      OMP_NUM_THREADS: "1"
+      MKL_NUM_THREADS: "1"
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install pinned existing Petunieae scientific dependencies
+        run: python -m pip install --disable-pip-version-check -r requirements/requirements-repository-integrity.txt
+      - name: Verify exact model identities using explicit 46-tax species GLS refits
+        run: python -m pytest -q tests/test_petunieae_phylo_conditional_gene_product_v0_1.py
+      - name: Fetch byte-verified 2023 original Wheeler Petunieae tree, expression and measured chemistry
+        uses: actions/download-artifact@v4
+        with:
+          name: petunieae-prospective-osf-v0-1
+          repository: zuizui0223/chun
+          run-id: 34182646549
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          path: build/petunieae_original_source
+      - name: Run source-specific phylogenetic working covariance λ=.5 and 9999 parametric nulls
+        run: |
+          python scripts/analyze_petunieae_phylo_conditional_gene_product_v0_1.py \
+            --source build/petunieae_original_source \
+            --design data/petunieae_phylogenetic_conditional_gene_to_product_design_v0_1.json \
+            --original-design data/petunieae_nested_regulatory_memory_preregistered_design_v0_1.json \
+            --original-prediction-design data/petunieae_nested_regulatory_leaveoneout_prediction_design_v0_1.json \
+            --out build/petunieae_phylo_conditional_gene_product_v0_1.json
+      - name: Fail closed on source tip drift and do not relabel original conditional result
+        run: |
+          python - <<'PY'
+          import json, math
+          from pathlib import Path
+          o=json.loads(Path('build/petunieae_phylo_conditional_gene_product_v0_1.json').read_text())
+          assert o['status'] in ['NOT_SUPPORTED_PHYLOGENY_CONDITIONAL_SOURCE_TRANSFER',
+                                 'SOURCE_MODEL_CONDITIONAL_POSITIVE']
+          assert o['source_47_tips_original_SHA_loader_passed']
+          assert o['original_n_species']==47
+          assert o['original_four_genes']==['F3primeH','FLS','MYBFL','MYB12']
+          assert o['original_three_measured_products']==['myr_mgg','quer_mgg','kaem_mgg']
+          assert o['fixed_working_Brownian_plus_nugget_lambda']==.5
+          assert o['fixed_gene_alpha']==10
+          assert o['source_model_permutations']==9999 and o['seed']==20261020
+          assert len(o['source_six_original_pigment_classes'])==6
+          assert set(o['observed_working_lambda_sensitivity'])=={'0','0.25','0.5','0.75','0.95'}
+          assert abs(o['original_lambda0_class_ridge_gain_reproduced']-.06420747753819912)<1e-10
+          assert math.isfinite(o['primary_additional_expression_gain_over_phylogeny'])
+          assert 0<o['source_model_conditional_p_one_sided']<=1
+          if o['status']=='SOURCE_MODEL_CONDITIONAL_POSITIVE':
+              assert o['primary_additional_expression_gain_over_phylogeny']>0
+              assert o['source_model_conditional_p_one_sided']<=.05
+          assert o['model_based_null_not_exact_phylogenetic_randomization']
+          assert o['no_causal_gene_to_product_conclusion']
+          assert o['no_environment_or_batch_adjustment']
+          assert o['no_external_radiation_replication']
+          assert o['original_unadjusted_source_positive_unchanged']
+          assert o['original_AJB_Camellia_EL_submission_unchanged']
+          print('PETUNIEAE_SOURCE_PHYLOGENY_BROWNIAN_PLUS_NUGGET_GATE_PASS',
+                o['status'],o['primary_additional_expression_gain_over_phylogeny'],
+                o['source_model_conditional_p_one_sided'])
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: petunieae-phylo-conditional-gene-product-v0-1
+          path: build/petunieae_phylo_conditional_gene_product_v0_1.json
+          if-no-files-found: warn
