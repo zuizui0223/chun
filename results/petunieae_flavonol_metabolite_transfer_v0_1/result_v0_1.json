@@ -1,0 +1,288 @@
+{
+  "biochemical_presence_known_at_prediction_time": true,
+  "class_counts": {
+    "000000": 6,
+    "000010": 6,
+    "000011": 6,
+    "000100": 10,
+    "000110": 6,
+    "000111": 13
+  },
+  "design_status": "SOURCE_EXPOSED_RETROSPECTIVE_METABOLITE_TRANSFER_HYPOTHESIS_FROZEN_BEFORE_NEW_TEST",
+  "fixed_nearest_k": 2,
+  "fixed_transform": "log1p(100 * original compound mg/g)",
+  "n_measurement_target_families": 2,
+  "n_original_sixbit_anthocyanidin_states": 6,
+  "n_original_taxa": 47,
+  "n_within_class_permutations": 9999,
+  "not_a_pollinator_fitness_UV_phenotype_test": true,
+  "not_formal_gene_expression_vs_metabolite_effect_difference_test": true,
+  "not_prospective_independent_radiation_validation": true,
+  "original_camellia_AJB_and_EL_science_unchanged": true,
+  "original_fixed_flavonol_expression_gene_predictive_gain_unchanged": 0.05613676603732491,
+  "seed": 20261020,
+  "source_original_full_21_gene_gain_recovered": -0.0990780619015505,
+  "source_original_three_sha256_verified": true,
+  "status": "RETROSPECTIVE_ORIGINAL_METABOLITE_TRANSFER_ON_47_TIPS",
+  "target_results": [
+    {
+      "class_mean_training_scaled_MSE": 1.2249248985737038,
+      "decision": "NOT_SUPPORTED_PRACTICAL_TRANSFER",
+      "holm_two_targets_p": 0.3545,
+      "measured_compound_columns": [
+        "myr_mgg",
+        "quer_mgg",
+        "kaem_mgg"
+      ],
+      "n_compounds": 3,
+      "n_positive_one_class_recipient_omissions": 0,
+      "n_recipients_improved": 20,
+      "n_recipients_worse": 27,
+      "n_uninformative_one_class_recipient_omissions": 0,
+      "not_an_external_phylogenetic_radiation": true,
+      "original_source_locality_permutation_null_mean_gain": -0.28284340720229245,
+      "original_source_locality_permutation_null_q025": -0.5125548589249717,
+      "original_source_locality_permutation_null_q975": -0.00798171710741981,
+      "per_original_sixbit_class": [
+        {
+          "all_three_metabolites_zero_in_class": false,
+          "class_gain_status": "SOURCE_CLASS_GAIN_DEFINED",
+          "class_mean_MSE": 3.059850289275244,
+          "gain": -0.1525363176340129,
+          "n_taxa": 6,
+          "phylogenetic_k2_MSE": 3.526588584912659,
+          "source_molecular_target_not_selection_test": true,
+          "source_sixbit_pigment_code": "000000"
+        },
+        {
+          "all_three_metabolites_zero_in_class": false,
+          "class_gain_status": "SOURCE_CLASS_GAIN_DEFINED",
+          "class_mean_MSE": 1.1283447942010136,
+          "gain": -0.3847876309625063,
+          "n_taxa": 6,
+          "phylogenetic_k2_MSE": 1.5625179144704984,
+          "source_molecular_target_not_selection_test": true,
+          "source_sixbit_pigment_code": "000010"
+        },
+        {
+          "all_three_metabolites_zero_in_class": false,
+          "class_gain_status": "SOURCE_CLASS_GAIN_DEFINED",
+          "class_mean_MSE": 0.5793170433990763,
+          "gain": -0.1559754401109167,
+          "n_taxa": 6,
+          "phylogenetic_k2_MSE": 0.6696762742070023,
+          "source_molecular_target_not_selection_test": true,
+          "source_sixbit_pigment_code": "000011"
+        },
+        {
+          "all_three_metabolites_zero_in_class": false,
+          "class_gain_status": "SOURCE_CLASS_GAIN_DEFINED",
+          "class_mean_MSE": 0.7002606464772202,
+          "gain": -0.6293013983226637,
+          "n_taxa": 10,
+          "phylogenetic_k2_MSE": 1.1409356504956674,
+          "source_molecular_target_not_selection_test": true,
+          "source_sixbit_pigment_code": "000100"
+        },
+        {
+          "all_three_metabolites_zero_in_class": false,
+          "class_gain_status": "SOURCE_CLASS_GAIN_DEFINED",
+          "class_mean_MSE": 0.31382010231218266,
+          "gain": -0.19960675879444162,
+          "n_taxa": 6,
+          "phylogenetic_k2_MSE": 0.3764607157792575,
+          "source_molecular_target_not_selection_test": true,
+          "source_sixbit_pigment_code": "000110"
+        },
+        {
+          "all_three_metabolites_zero_in_class": false,
+          "class_gain_status": "SOURCE_CLASS_GAIN_DEFINED",
+          "class_mean_MSE": 1.544682337928214,
+          "gain": -0.1560265648360886,
+          "n_taxa": 13,
+          "phylogenetic_k2_MSE": 1.7856938168781313,
+          "source_molecular_target_not_selection_test": true,
+          "source_sixbit_pigment_code": "000111"
+        }
+      ],
+      "phylogenetic_nearest_two_training_scaled_MSE": 1.5198901502252955,
+      "recipient_only_leave_one_class": [
+        {
+          "donors_not_reselected": true,
+          "gain_status": "SOURCE_RECIPIENT_ONLY_GAIN_DEFINED",
+          "omitted_original_sixbit_code": "000000",
+          "recipient_only_gain": -0.28212876390158664,
+          "remaining_original_recipients": 41
+        },
+        {
+          "donors_not_reselected": true,
+          "gain_status": "SOURCE_RECIPIENT_ONLY_GAIN_DEFINED",
+          "omitted_original_sixbit_code": "000010",
+          "recipient_only_gain": -0.22161451811822933,
+          "remaining_original_recipients": 41
+        },
+        {
+          "donors_not_reselected": true,
+          "gain_status": "SOURCE_RECIPIENT_ONLY_GAIN_DEFINED",
+          "omitted_original_sixbit_code": "000011",
+          "recipient_only_gain": -0.24625328732165397,
+          "remaining_original_recipients": 41
+        },
+        {
+          "donors_not_reselected": true,
+          "gain_status": "SOURCE_RECIPIENT_ONLY_GAIN_DEFINED",
+          "omitted_original_sixbit_code": "000100",
+          "recipient_only_gain": -0.18700473142504315,
+          "remaining_original_recipients": 37
+        },
+        {
+          "donors_not_reselected": true,
+          "gain_status": "SOURCE_RECIPIENT_ONLY_GAIN_DEFINED",
+          "omitted_original_sixbit_code": "000110",
+          "recipient_only_gain": -0.2421956261938375,
+          "remaining_original_recipients": 41
+        },
+        {
+          "donors_not_reselected": true,
+          "gain_status": "SOURCE_RECIPIENT_ONLY_GAIN_DEFINED",
+          "omitted_original_sixbit_code": "000111",
+          "recipient_only_gain": -0.28621088078342294,
+          "remaining_original_recipients": 34
+        }
+      ],
+      "relative_practical_prediction_gain": -0.2408027234935364,
+      "source_locality_p": 0.3545,
+      "target_id": "FLAVONOL_CONCENTRATION"
+    },
+    {
+      "class_mean_training_scaled_MSE": 0.4836468106553913,
+      "decision": "NOT_SUPPORTED_PRACTICAL_TRANSFER",
+      "holm_two_targets_p": 0.0756,
+      "measured_compound_columns": [
+        "Del_mgg",
+        "Pet_mgg",
+        "Malv_mgg"
+      ],
+      "n_compounds": 3,
+      "n_positive_one_class_recipient_omissions": 1,
+      "n_recipients_improved": 20,
+      "n_recipients_worse": 21,
+      "n_uninformative_one_class_recipient_omissions": 0,
+      "not_an_external_phylogenetic_radiation": true,
+      "original_source_locality_permutation_null_mean_gain": -0.325616963970213,
+      "original_source_locality_permutation_null_q025": -0.5754099673929122,
+      "original_source_locality_permutation_null_q975": -0.04915550581695547,
+      "per_original_sixbit_class": [
+        {
+          "all_three_metabolites_zero_in_class": true,
+          "class_gain_status": "NONINFORMATIVE_ZERO_BASELINE",
+          "class_mean_MSE": 0,
+          "gain": null,
+          "n_taxa": 6,
+          "phylogenetic_k2_MSE": 0,
+          "source_molecular_target_not_selection_test": true,
+          "source_sixbit_pigment_code": "000000"
+        },
+        {
+          "all_three_metabolites_zero_in_class": false,
+          "class_gain_status": "SOURCE_CLASS_GAIN_DEFINED",
+          "class_mean_MSE": 0.4923427198202006,
+          "gain": -0.5182117806441485,
+          "n_taxa": 6,
+          "phylogenetic_k2_MSE": 0.7474805173454099,
+          "source_molecular_target_not_selection_test": true,
+          "source_sixbit_pigment_code": "000010"
+        },
+        {
+          "all_three_metabolites_zero_in_class": false,
+          "class_gain_status": "SOURCE_CLASS_GAIN_DEFINED",
+          "class_mean_MSE": 0.21091638315189368,
+          "gain": 0.30652517215846786,
+          "n_taxa": 6,
+          "phylogenetic_k2_MSE": 0.1462652024952181,
+          "source_molecular_target_not_selection_test": true,
+          "source_sixbit_pigment_code": "000011"
+        },
+        {
+          "all_three_metabolites_zero_in_class": false,
+          "class_gain_status": "SOURCE_CLASS_GAIN_DEFINED",
+          "class_mean_MSE": 0.5290312259840989,
+          "gain": 0.6377535118016469,
+          "n_taxa": 10,
+          "phylogenetic_k2_MSE": 0.1916397037600092,
+          "source_molecular_target_not_selection_test": true,
+          "source_sixbit_pigment_code": "000100"
+        },
+        {
+          "all_three_metabolites_zero_in_class": false,
+          "class_gain_status": "SOURCE_CLASS_GAIN_DEFINED",
+          "class_mean_MSE": 0.6595316205073097,
+          "gain": 0.05088102083666549,
+          "n_taxa": 6,
+          "phylogenetic_k2_MSE": 0.6259739783818375,
+          "source_molecular_target_not_selection_test": true,
+          "source_sixbit_pigment_code": "000110"
+        },
+        {
+          "all_three_metabolites_zero_in_class": false,
+          "class_gain_status": "SOURCE_CLASS_GAIN_DEFINED",
+          "class_mean_MSE": 0.7126418076989213,
+          "gain": -0.45359807599651847,
+          "n_taxa": 13,
+          "phylogenetic_k2_MSE": 1.0358947605458328,
+          "source_molecular_target_not_selection_test": true,
+          "source_sixbit_pigment_code": "000111"
+        }
+      ],
+      "phylogenetic_nearest_two_training_scaled_MSE": 0.5213052577453343,
+      "recipient_only_leave_one_class": [
+        {
+          "donors_not_reselected": true,
+          "gain_status": "SOURCE_RECIPIENT_ONLY_GAIN_DEFINED",
+          "omitted_original_sixbit_code": "000000",
+          "recipient_only_gain": -0.07786352821992516,
+          "remaining_original_recipients": 41
+        },
+        {
+          "donors_not_reselected": true,
+          "gain_status": "SOURCE_RECIPIENT_ONLY_GAIN_DEFINED",
+          "omitted_original_sixbit_code": "000010",
+          "recipient_only_gain": -0.012090613922336525,
+          "remaining_original_recipients": 41
+        },
+        {
+          "donors_not_reselected": true,
+          "gain_status": "SOURCE_RECIPIENT_ONLY_GAIN_DEFINED",
+          "omitted_original_sixbit_code": "000011",
+          "recipient_only_gain": -0.10052473532591957,
+          "remaining_original_recipients": 41
+        },
+        {
+          "donors_not_reselected": true,
+          "gain_status": "SOURCE_RECIPIENT_ONLY_GAIN_DEFINED",
+          "omitted_original_sixbit_code": "000100",
+          "recipient_only_gain": -0.2949278326198935,
+          "remaining_original_recipients": 37
+        },
+        {
+          "donors_not_reselected": true,
+          "gain_status": "SOURCE_RECIPIENT_ONLY_GAIN_DEFINED",
+          "omitted_original_sixbit_code": "000110",
+          "recipient_only_gain": -0.1050000413500963,
+          "remaining_original_recipients": 41
+        },
+        {
+          "donors_not_reselected": true,
+          "gain_status": "SOURCE_RECIPIENT_ONLY_GAIN_DEFINED",
+          "omitted_original_sixbit_code": "000111",
+          "recipient_only_gain": 0.18061417917059566,
+          "remaining_original_recipients": 34
+        }
+      ],
+      "relative_practical_prediction_gain": -0.07786352821992552,
+      "source_locality_p": 0.0378,
+      "target_id": "ANTHOCYANIDIN_AMOUNT_POSITIVE_VARYING"
+    }
+  ],
+  "version": "v0.1"
+}
