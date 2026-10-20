@@ -112,6 +112,14 @@ def test_uninformative_exact_sixbit_code_with_all_three_anthocyanidins_zero_is_r
     assert zero["gain"] is None
     assert zero["class_gain_status"]=="NONINFORMATIVE_ZERO_BASELINE"
     assert zero["all_three_metabolites_zero_in_class"] is True
+    # Removing the only nonzero-chemistry class makes the recipient-only
+    # comparison 0/0; return null, never drop all-zero species from the
+    # original full-frame primary estimate.
+    omissions={row["omitted_original_sixbit_code"]:row
+               for row in anth["recipient_only_leave_one_class"]}
+    assert omissions["000111"]["remaining_original_recipients"]==4
+    assert omissions["000111"]["recipient_only_gain"] is None
+    assert omissions["000111"]["gain_status"]=="NONINFORMATIVE_ZERO_REMAINING_BASELINE"
     assert anth["relative_gain"] == pytest.approx(
         (anth["baseline_class_MSE"]-anth["nearest_two_MSE"])/anth["baseline_class_MSE"])
     # Even though its class gain is undefined, all 8 recipients remain
