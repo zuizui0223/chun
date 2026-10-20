@@ -85,3 +85,35 @@ def test_missing_source_fails_not_fabricating_P():
     with pytest.raises((ValueError,FileNotFoundError)):
         m.analyze(ROOT/"an_unverified_2023_source",
                   d,orig,pred,iterations_override=199)
+
+def test_uninformative_exact_sixbit_code_with_all_three_anthocyanidins_zero_is_retained():
+    from run_petunieae_nested_regulatory_leaveoneout_prediction_v0_1 import weights
+    X=np.array([
+        [1.,2.,3.,0.,0.,0.],
+        [2.,3.,4.,0.,0.,0.],
+        [3.,4.,5.,0.,0.,0.],
+        [4.,5.,6.,0.,0.,0.],
+        [5.,6.,7.,1.,2.,3.],
+        [6.,7.,8.,2.,4.,6.],
+        [7.,8.,9.,3.,6.,9.],
+        [8.,9.,10.,4.,8.,12.]
+    ],dtype=float)
+    labels=["000000"]*4+["000111"]*4
+    d=np.abs(np.arange(8)[:,None]-np.arange(8)[None,:]).astype(float)
+    w0,w2=weights(d,labels,[f"c{i}" for i in range(8)],k=2)
+    res=m.group_losses(X,w0,w2,[[0,1,2],[3,4,5]],labels)
+    anth=res[1]
+    assert anth["n_compounds"]==3
+    assert len(anth["per_class"])==2
+    zero=anth["per_class"][0]
+    assert zero["source_sixbit_pigment_code"]=="000000"
+    assert zero["class_mean_MSE"]==pytest.approx(0)
+    assert zero["phylogenetic_k2_MSE"]==pytest.approx(0)
+    assert zero["gain"] is None
+    assert zero["class_gain_status"]=="NONINFORMATIVE_ZERO_BASELINE"
+    assert zero["all_three_metabolites_zero_in_class"] is True
+    assert anth["relative_gain"] == pytest.approx(
+        (anth["baseline_class_MSE"]-anth["nearest_two_MSE"])/anth["baseline_class_MSE"])
+    # Even though its class gain is undefined, all 8 recipients remain
+    # in the original aggregate prediction denominator.
+    assert sum(x["n_taxa"] for x in anth["per_class"])==8
