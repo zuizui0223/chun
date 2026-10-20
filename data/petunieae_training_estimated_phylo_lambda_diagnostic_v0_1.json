@@ -1,0 +1,78 @@
+{
+  "version": "v0.1",
+  "date": "2026-10-21",
+  "status": "POST_OUTCOME_SOURCE_EXPOSED_TRAINING_ONLY_PHYLOGENETIC_COVARIANCE_SENSITIVITY",
+  "biological_question": "Does original four-gene flavonol expression still fail to improve prediction of three measured flavonol concentrations if the ancestry covariance weight is inferred only from the other 46 measured species rather than fixed arbitrarily at 0.5?",
+  "relationship_to_prior_work": "The original 47-species source and prior phylogeny conditional negative result were known before this sensitivity was formulated. Do NOT label this as preregistered, independent, prospective, or a new confirmatory P value.",
+  "original_source": {
+    "study_doi": "10.1098/rspb.2023.0275",
+    "osf_artifact_run": 34182646549,
+    "source_csv_sha256": "5843d4cd4eb253046f97349fa6bd285ca77e43e7a9c3aaa0e78fae3e8e391edd",
+    "source_tree_sha256": "95b4a688d3d71417b712b37a2b04cdc22a9431be3172d6509def4435f5fd8614",
+    "original_covariance_model": "data/petunieae_phylogenetic_conditional_gene_to_product_design_v0_1.json",
+    "prior_phylogeny_result": "results/petunieae_phylo_conditional_gene_product_v0_1/result_v0_1.json"
+  },
+  "frozen_source_frame": {
+    "species_count": 47,
+    "original_exact_anthocyanidin_sixbit_state_counts": {
+      "000000": 6,
+      "000010": 6,
+      "000011": 6,
+      "000100": 10,
+      "000110": 6,
+      "000111": 13
+    },
+    "four_expression_genes": [
+      "F3primeH",
+      "FLS",
+      "MYBFL",
+      "MYB12"
+    ],
+    "three_measured_flavonols": [
+      "myr_mgg",
+      "quer_mgg",
+      "kaem_mgg"
+    ],
+    "ridge_alpha": 10,
+    "tree_covariance": "Same original dated 60-tip tree; C_ij=root to MRCA original length normalized by 47-tip mean tree height; V_lambda=(1-lambda)I+lambda C",
+    "lambda_grid": [
+      0,
+      0.1,
+      0.25,
+      0.5,
+      0.75,
+      0.9,
+      0.95,
+      0.99
+    ],
+    "no_gene_or_taxon_source_selection": true
+  },
+  "lambda_training_selection": {
+    "folds": "Leave out one whole species, use remaining 46 only to select one covariance lambda from fixed grid using multivariate 3-product REML under six unpenalized original pigment-state class intercepts. Never use the omitted species' three product concentrations in choice of lambda.",
+    "training_REML": "For each lambda, V_TT is original 46x46 working covariance. Fit beta_GLS=(D_T' V_TT^-1 D_T)^-1 D_T' V_TT^-1 Y_T, Sigma_hat=E_T' V_TT^-1 E_T / (46-6), then maximize -0.5*[3 log|V_TT| +3 log|D_T' V_TT^-1 D_T| +(46-6)log|Sigma_hat|]. No fitted lambda interpolation after result.",
+    "baseline": "Given chosen training lambda_i, predict omitted Y_i with fixed original six-state GLS effects + tree kriging on training residuals using only other 46 source metabolite values.",
+    "candidate": "Exactly same chosen training lambda_i and kriging, plus four originally measured target gene expression predictors with pooled coefficient ridge alpha 10, each target gene foldwise scaled using only other 46 expression taxa. Do not reestimate lambda separately in the candidate.",
+    "relative_gain": "mean original 47x3 output error difference / baseline MSE, with each compound squared error scaled by other-46 population variance; no changed original target loss definition.",
+    "no_lambda_hyperparameter_choice_from_candidate_gain": true,
+    "no_phylogenetic_null_p_value_from_folds": true
+  },
+  "controls": {
+    "fixed_lambda_zero_source_gain_expected": 0.06420747753819912,
+    "fixed_lambda_half_source_gain_expected": -0.04208292517617994,
+    "fixed_lambda_half_model_p_unchanged": 0.3439,
+    "previous_class_only_exchangeability_p_unchanged": 0.0254,
+    "original_21_gene_nearest2_FAIL_unchanged": true,
+    "no_new_phylogenetic_parametric_null": true,
+    "all_lambda_candidate_score_results_to_be_shown": true
+  },
+  "interpretation": {
+    "source_specific_retrospective_post_outcome_sensitivity": true,
+    "model_dependence_of_Brownian_nugget_remains": true,
+    "no_inferential_effect_difference_or_new_p": true,
+    "source_comparative_prediction_not_causal_gene_to_product_mediation": true,
+    "no_plant_universality_or_pollinator_uv_adaptation": true,
+    "no_external_independent_radiation": true,
+    "original_camellia_AJB_EL_frozen": true,
+    "integrated_proposal_remains_draft": true
+  }
+}
