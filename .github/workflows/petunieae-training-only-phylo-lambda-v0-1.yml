@@ -74,6 +74,35 @@ jobs:
           print('PETUNIEAE_TRAINING_ONLY_PHYLOGENETIC_LAMBDA_SOURCE_PASS',
                 x['chosen_lambda_counts'],x['additional_gene_relative_gain'])
           PY
+      - name: Verify complete exact original 47-taxon REML results and the pre-existing model contrast
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          a=json.loads(Path('build/petunieae_training_only_lambda_source_v0_1.json').read_text())
+          b=json.loads(Path('results/petunieae_training_estimated_phylo_lambda_v0_1/result_v0_1.json').read_text())
+          def comparable(u,v,path='root'):
+              if isinstance(u,(float,int)) and isinstance(v,(float,int)) and not isinstance(u,bool) and not isinstance(v,bool):
+                  assert abs(u-v)<1e-12,(path,u,v)
+                  return
+              assert type(u)==type(v),(path,type(u),type(v))
+              if isinstance(u,dict):
+                  assert u.keys()==v.keys(),path
+                  for key in u: comparable(u[key],v[key],path+'.'+str(key))
+              elif isinstance(u,list):
+                  assert len(u)==len(v),path
+                  for i,(x,y) in enumerate(zip(u,v)): comparable(x,y,path+'['+str(i)+']')
+              else:
+                  assert u==v,(path,u,v)
+          comparable(a,b)
+          assert a['chosen_lambda_counts']=={'0.75':46,'0.9':1}
+          assert a['additional_gene_relative_gain']<0
+          assert a['source_taxa_improved']+a['source_taxa_worse']==47
+          assert a['prior_fixed_lambda_half_model_p']==0.3439
+          assert a['no_new_statistical_P_values']
+          assert a['original_AJB_Camellia_EL_frozen_and_integrated_draft']
+          print('PETUNIEAE_TRAIN_ONLY_REML_ORIGINAL_47_TAXA_NEGATIVE_GAIN_REPLAY_PASS')
+          PY
       - uses: actions/upload-artifact@v4
         if: always()
         with:
