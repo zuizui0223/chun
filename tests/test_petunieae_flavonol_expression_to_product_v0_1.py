@@ -86,7 +86,7 @@ def test_invalid_sources_or_alpha_fail_closed():
     x,y,codes=synthetic()
     with pytest.raises(ValueError,match="four-gene"):
         m.prepare_source(x[:,:3],y,codes)
-    with pytest.raises(ValueError,match="at least"):
+    with pytest.raises(ValueError,match="three or more"):
         m.prepare_source(x,y,["A"]*13+["B"])
     state=m.prepare_source(x,y,codes)
     with pytest.raises(ValueError,match="positive ridge"):
