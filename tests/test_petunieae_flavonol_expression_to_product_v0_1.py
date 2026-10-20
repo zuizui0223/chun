@@ -108,3 +108,34 @@ def test_fixed_biological_question_and_source_outcome_are_distinct():
     assert d["safeguards"]["original_flavonol_mg_g_ancestry_k2_prediction_negative_unchanged"]
     assert d["safeguards"]["no_claim_UV_reflectance_fitness_pollinator_link"]
     assert d["safeguards"]["original_camellia_AJB_EL_first_submission_unchanged"]
+
+
+SUMMARY=ROOT/"results/petunieae_flavonol_expression_to_product_v0_1/summary_v0_1.json"
+
+
+def test_actual_measured_product_predictability_is_source_frozen_and_limited():
+    s=json.loads(SUMMARY.read_text(encoding="utf-8"))
+    assert s["status"]=="SUPPORTED_RETROSPECTIVE_WITHIN_SOURCE_EXPRESSION_TO_PRODUCT_TRANSFER"
+    assert s["original_source_n_species"]==47
+    assert s["sixbit_retained_chemical_presence_states"]==6
+    assert s["fixed_expression_predictors"]==list(m.GENES)
+    assert s["fixed_measured_product_targets"]==list(m.METABOLITES)
+    assert s["ridge_alpha"]==10
+    assert s["n_permutations"]==9999 and s["seed"]==20261020
+    assert s["class_mean_scaled_MSE"]==pytest.approx(1.2249248985737036,abs=1e-13)
+    assert s["gene_plus_class_ridge_scaled_MSE"]==pytest.approx(1.1462755606625517,abs=1e-13)
+    assert s["original_relative_practical_gain"]==pytest.approx(0.06420747753819912,abs=1e-13)
+    assert s["p_one_sided"]==0.0254
+    assert s["source_species_prediction_improved"]==28
+    assert s["source_species_prediction_worsened"]==19
+    assert [z["relative_gain"] for z in s["per_metabolite_descriptive"]]==pytest.approx(
+        [-0.017160438107566074,0.15155935257897407,0.06772123617317771])
+    assert len(s["per_source_sixbit_state_descriptive"])==6
+    assert sum(z["relative_gain"]>0 for z in s["per_source_sixbit_state_descriptive"])==4
+    assert s["post_outcome_recipient_omission_descriptive"]["one_recipient_loss_omitted_positive"]==47
+    assert s["post_outcome_recipient_omission_descriptive"]["deleting_those_three_recipient_LOSSES_without_refitting_gain"]==pytest.approx(
+        0.0034240203776657596)
+    assert s["limitations"]["source_exposed_model_and_hypothesis_retrospective"]
+    assert s["limitations"]["null_exchangeability_does_not_account_for_phylogenetic_autocorrelation"]
+    assert s["limitations"]["no_formal_comparison_with_ancestry_only_predictor_effect"]
+    assert s["limitations"]["original_AJB_Camellia_EL_first_submission_unchanged"]
