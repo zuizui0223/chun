@@ -80,6 +80,35 @@ jobs:
                 o['status'],o['primary_additional_expression_gain_over_phylogeny'],
                 o['source_model_conditional_p_one_sided'])
           PY
+      - name: Replay fixed original phylogenetic-model negative and all source assumptions
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          source=json.loads(Path('build/petunieae_phylo_conditional_gene_product_v0_1.json').read_text())
+          frozen=json.loads(Path('results/petunieae_phylo_conditional_gene_product_v0_1/result_v0_1.json').read_text())
+          def equal(a,b,loc='root'):
+              if isinstance(a,(float,int)) and isinstance(b,(float,int)) and not isinstance(a,bool) and not isinstance(b,bool):
+                  assert abs(a-b)<1e-12,(loc,a,b)
+                  return
+              assert type(a)==type(b),(loc,type(a),type(b))
+              if isinstance(a,dict):
+                  assert a.keys()==b.keys(),loc
+                  for k in a: equal(a[k],b[k],loc+'.'+str(k))
+              elif isinstance(a,list):
+                  assert len(a)==len(b),loc
+                  for i,(u,v) in enumerate(zip(a,b)):equal(u,v,loc+'['+str(i)+']')
+              else:
+                  assert a==b,(loc,a,b)
+          equal(source,frozen)
+          assert source['status']=='NOT_SUPPORTED_PHYLOGENY_CONDITIONAL_SOURCE_TRANSFER'
+          assert source['primary_additional_expression_gain_over_phylogeny']<0
+          assert source['source_model_conditional_p_one_sided']==0.3439
+          assert source['model_based_null_not_exact_phylogenetic_randomization']
+          assert source['original_lambda0_class_ridge_gain_reproduced']>0
+          assert source['original_AJB_Camellia_EL_submission_unchanged']
+          print('PETUNIEAE_FIXED_PHYLOGENY_CONDITIONAL_MODEL_NULL_SOURCE_REPLAY_PASS')
+          PY
       - uses: actions/upload-artifact@v4
         if: always()
         with:
