@@ -79,15 +79,23 @@ def group_losses(x:np.ndarray,w0:np.ndarray,w2:np.ndarray,
             })
         omission=[]
         for row in perclass:
-            count=row["n_taxa"]
-            remaining=a.shape[0]-count
-            nbaseline=(a.shape[0]*b-count*row["class_mean_MSE"])/remaining
-            nnear=(a.shape[0]*n-count*row["phylogenetic_k2_MSE"])/remaining
-            if nbaseline<=0: raise ValueError("invalid recipient-only omitted-class denominator")
+            # Compute retained recipient loss directly, rather than
+            # subtraction of source group totals which is inaccurate for
+            # the structural all-zero anthocyanidin source class.
+            retained=labels!=row["source_sixbit_pigment_code"]
+            remaining=int(retained.sum())
+            if remaining<=0:
+                raise ValueError("no original source recipient taxa remain")
+            nbaseline=float(l0[retained].mean())
+            nnear=float(l2[retained].mean())
+            uninformative=nbaseline<=1e-14
             omission.append({
                 "omitted_original_sixbit_code":row["source_sixbit_pigment_code"],
                 "remaining_original_recipients":remaining,
-                "recipient_only_gain":float((nbaseline-nnear)/nbaseline),
+                "recipient_only_gain":(None if uninformative else
+                                       float((nbaseline-nnear)/nbaseline)),
+                "gain_status":("NONINFORMATIVE_ZERO_REMAINING_BASELINE"
+                               if uninformative else "SOURCE_RECIPIENT_ONLY_GAIN_DEFINED"),
                 "donors_not_reselected":True
             })
         out.append({
@@ -210,7 +218,11 @@ def analyze(source:Path,design:dict,original:dict,predictor:dict,
             "per_original_sixbit_class":obs["per_class"],
             "recipient_only_leave_one_class":obs["recipient_only_leave_one_class"],
             "n_positive_one_class_recipient_omissions":int(sum(
-                item["recipient_only_gain"]>0 for item in obs["recipient_only_leave_one_class"])),
+                item["recipient_only_gain"] is not None and item["recipient_only_gain"]>0
+                for item in obs["recipient_only_leave_one_class"])),
+            "n_uninformative_one_class_recipient_omissions":int(sum(
+                item["recipient_only_gain"] is None
+                for item in obs["recipient_only_leave_one_class"])),
             "not_an_external_phylogenetic_radiation":True
         })
     return {
