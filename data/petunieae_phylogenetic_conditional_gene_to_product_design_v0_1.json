@@ -1,0 +1,104 @@
+{
+  "version": "v0.1",
+  "frozen_on": "2026-10-20",
+  "status": "SOURCE_EXPOSED_NEW_PHYLOGENY_CONDITIONAL_PREDICTION_DESIGN_FROZEN_BEFORE_PHYLOGENETIC_BENCHMARK_OUTCOME",
+  "question": "In the original 47 Petunieae taxa with original fixed six-bit anthocyanidin-presence state, does the target taxon's measured four-gene flavonol expression improve out-of-species prediction of three measured flavonol amounts after its source phylogenetic covariance has already been used by the baseline?",
+  "source": {
+    "study_doi": "10.1098/rspb.2023.0275",
+    "original_osf_node": "zg9cu",
+    "archived_source_workflow_run": 34182646549,
+    "original_csv_sha256": "5843d4cd4eb253046f97349fa6bd285ca77e43e7a9c3aaa0e78fae3e8e391edd",
+    "original_tree_sha256": "95b4a688d3d71417b712b37a2b04cdc22a9431be3172d6509def4435f5fd8614",
+    "original_source_R_sha256": "abbb43dbec756ca34e9f501b7eb9aaecb7330009b79739b8c1171d9cccce13b8",
+    "original_gene_product_design": "data/petunieae_flavonol_expression_to_product_design_v0_1.json",
+    "original_gene_product_source_positive": "results/petunieae_flavonol_expression_to_product_v0_1/summary_v0_1.json",
+    "original_source_measured_flavonol_negative_k2": "results/petunieae_flavonol_metabolite_transfer_v0_1/result_v0_1.json"
+  },
+  "unchanged_frame": {
+    "n_source_taxa": 47,
+    "pigment_presence_codes": {
+      "000000": 6,
+      "000010": 6,
+      "000011": 6,
+      "000100": 10,
+      "000110": 6,
+      "000111": 13
+    },
+    "four_fixed_expression_predictors": [
+      "F3primeH",
+      "FLS",
+      "MYBFL",
+      "MYB12"
+    ],
+    "three_fixed_measured_products": [
+      "myr_mgg",
+      "quer_mgg",
+      "kaem_mgg"
+    ],
+    "X_transform": "log1p original source TPM10K",
+    "Y_transform": "log1p(100*original source flavonol mg/g)",
+    "source_tip_set_tree_and_outgroup_unchanged": true,
+    "target_gene_expression_known_at_prediction": true,
+    "target_six_bit_pigment_code_known_at_prediction": true,
+    "no_new_radiation_sampled": true
+  },
+  "phylogenetic_covariance": {
+    "original_tree": "original dated 11genestre pruned Newick with published root/branch lengths and original 47 retained tip labels; no rerooting",
+    "raw_Brownian_matrix": "C_ij=original tree distance(root, MRCA(tip_i,tip_j)) for i!=j and C_ii=original tree distance(root,tip_i); normalize by mean of original retained tip heights",
+    "model_covariance": "V(lambda)=(1-lambda)*I + lambda*C_normalized; same for all three original measured metabolite responses, with separate (estimated) 3x3 cross-compound Σ only in parametric null",
+    "primary_lambda": 0.5,
+    "sensitivity_lambdas": [
+      0.25,
+      0.75,
+      0.95
+    ],
+    "lambda_not_data_fitted": true,
+    "no_after_outcome_lambda_selection": true,
+    "require_positive_branch_lengths_and_SPD": true,
+    "phylogeny_covariance_is_Brownian_plus_nugget_working_assumption": true,
+    "no_explicit_environment_or_batch_covariates": true
+  },
+  "prediction": {
+    "baseline": "Six unpenalized fixed source pigment-class intercepts plus ancestral GP residual prediction (kriging BLUP) conditional only on original other 46 metabolite responses and dated source tree. The withheld tip's pigment class, tree position and branch lengths are known.",
+    "candidate": "The same six fixed pigment-class intercepts and same GP covariance/residual correction plus all four fixed target-tip measured source gene expressions, using a common fixed-gene coefficient matrix ridge regularized with alpha=10 in fold-training z-scored gene units. No target Y used to fit its fold.",
+    "alpha": 10,
+    "exact_LOO": "For each omitted tip, train other 46 with V_TT inverse and six source class effects; linear ridge in original log-expression coordinates with penalty alpha*Var_train46(X_gene) on four genes; predict heldout Y using fixed tree Gaussian conditioning V_iT V_TT^-1(Y_train-Z_train beta). The 47 LOOCV predictions can be calculated using the algebraically equivalent full-precision source projection rank-one formula; verify it numerically against explicit 46-species fits on synthetic trees.",
+    "loss": "Per fold, each of three original measured metabolite squared errors divided by other46 transformed Y target variance ddof0; equal average three products and 47 heldout species",
+    "practical_gain": "(phylo+pigment-baseline-MSE - phylo+pigment+4gene-MSE)/phylo+pigment-baseline-MSE. Positive means practical expression information after phylogeny and presence class.",
+    "baseline_must_be_better_than_pigment_only_not_required": true,
+    "no_source_gene_feature_or_alpha_selection": true
+  },
+  "inferential_null": {
+    "parametric_phylogeny_based": true,
+    "iterations": 9999,
+    "seed": 20261020,
+    "Y_null_mean": "Full source phylogenetic GLS fit of the six fixed original chemical-presence class intercepts (no genes), using primary V(lambda=0.5).",
+    "Y_null_residual_phylogenetic_covariance": "Estimate residual three-compound Σ=(Y-Dβ_GLS).T P (Y-Dβ_GLS)/(47-6) with precision P=V^-1; simulate each null Y matrix as Dβ+L_V @ N(0,1)_(47×3) @ L_Σ.T. X four-gene vectors and original classes/tree stay fixed.",
+    "zero_variance_control": "Require Σ SPD under fixed 3-compound transformed source; otherwise structural source HOLD rather than outcome-driven regularization.",
+    "statistic": "47-tip held-out improvement over the original phylogenetic class-baseline using identical per-fold scoring; all null source models refit their class intercept and gene coefficients.",
+    "p_value": "one-sided (1+#simulated null gains>=observed gain)/(1+iterations), not a nonparametric phylogenetically blocked exact randomization test",
+    "support_rule": "SOURCE_MODEL_CONDITIONAL_POSITIVE only if observed relative gain >0 and primary phylogenetic-parametric bootstrap P<=0.05; otherwise NOT_SUPPORTED_PHYLOGENY_CONDITIONAL_SOURCE_TRANSFER. Regardless, one source and parametric-model sensitivity mean no evolutionary causal claim.",
+    "no_joint_varying_biological_predictors_permutation": true,
+    "null_caveat": "Depends on specified Brownian+nugget V(lambda) and matrix-normal residual assumption; original λ=0.5 is fixed, not independently estimated. Does not test residual source environment, sample extraction, regulatory causation or species transfer into a second radiation.",
+    "no_backdoor_using_previous_unadjusted_P_as_phylo_P": true
+  },
+  "sensitivity": {
+    "lambda_variants": "Repeat only observed practical gain at fixed λ={0.25,0.75,0.95}; NO new null simulations or P values, and no choosing favourable λ.",
+    "original_previous_lambda0_unadjusted_gain": "Previous standard ridge+class source baseline gave relative gain +0.06420747753819912 with within-code taxon-shuffle P=.0254; λ=0 uses independent residual covariance and must algebraically reproduce its +6.42% with training-only gene scaling and unpenalized class intercepts.",
+    "per_metabolite": "Original myricetin/quercetin/kaempferol separate contributions descriptive only.",
+    "no_species_or_clade_dropping_based_on_results": true
+  },
+  "governance": {
+    "original_source_gene_product_ridge_positive_result_unchanged": true,
+    "original_flavonol_gene_expression_ancestry_predictor_positive_unchanged": true,
+    "original_flavonol_metabolite_ancestry_nearest2_negative_unchanged": true,
+    "original_21_gene_ancestry_prediction_FAIL_unchanged": true,
+    "source_prior_outcomes_public_and_exposed": true,
+    "no_gene_to_flavonol_causal_mediation": true,
+    "no_new_phenotype_UV_pollinator_fitness_link": true,
+    "no_physical_cross_radiation_replication": true,
+    "original_camellia_AJB_and_EL_scientific_submission_assets_unchanged": true,
+    "integrated_CHUN_PR414_stays_DRAFT": true,
+    "no_causal_inference": true
+  }
+}
