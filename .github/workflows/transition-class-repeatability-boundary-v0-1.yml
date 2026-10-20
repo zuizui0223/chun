@@ -1,0 +1,27 @@
+name: Transition-class repeatability boundary v0.1
+
+on:
+  pull_request:
+    paths:
+      - 'data/transition_class_repeatability_boundary_v0_1.csv'
+      - 'docs/TRANSITION_CLASS_REPEATABILITY_BOUNDARY_V0_1.md'
+      - 'scripts/validate_transition_class_repeatability_boundary_v0_1.py'
+      - '.github/workflows/transition-class-repeatability-boundary-v0-1.yml'
+  workflow_dispatch:
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Validate prior-art and hierarchy boundary
+        run: |
+          mkdir -p build/transition_class_repeatability_boundary_v0_1
+          python scripts/validate_transition_class_repeatability_boundary_v0_1.py \
+            --table data/transition_class_repeatability_boundary_v0_1.csv \
+            --out build/transition_class_repeatability_boundary_v0_1/summary.json
+      - name: Report
+        run: cat build/transition_class_repeatability_boundary_v0_1/summary.json >> "$GITHUB_STEP_SUMMARY"

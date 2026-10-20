@@ -1,0 +1,9 @@
+system,transition_type,unit_of_repeatability,observed_pattern,interpretive_role,claim_status,source
+CAMELLIA_ANTHOCYANIN_GAIN,GAIN,WHOLE_MULTIVARIATE_STATE,"candidate-free exact A/F/C/P recurrence 1/3; pairwise concordance 0.333-0.5",COMMON_OBSERVATION_RULE_CASE,EMPIRICAL_PROJECT_RESULT,"chun science v0.2.2"
+CAMELLIA_YELLOW_DEVELOPMENT,DEVELOPMENTAL_COLOUR_GAIN,CORE_MODULE,"A/C/P shared; F differs; exact full signature 1/2",TRANSITION_CLASS_CONTRAST,EMPIRICAL_PROJECT_RESULT,"chun science v0.2.2"
+PETUNIA_REGAIN,REGAIN,REGULATOR_CLASS,"2/2 regain systems use R2R3-MYB-class regulatory reactivation but exact implementation differs (AN2 frame resurrection vs DPL recruitment)",GAIN_ROUTE_CONSTRAINT_CONTROL,LITERATURE_BENCHMARK,"10.1093/plcell/koab114"
+IOCHROMINAE_LOSS,LOSS,LATE_PATHWAY_MODULE,"4 independent delphinidin losses converge on late-pathway expression loss",LOSS_PATHWAY_CONSTRAINT_CONTROL,LITERATURE_BENCHMARK,"10.1093/molbev/msy117"
+ERICA_WHITE_YELLOW_DERIVATION,LOSS_OR_HUE_SHIFT,FOCAL_CAUSAL_NODE,"8 derived white/yellow taxa span 5 focal causal-node classes; max exact-node recurrence 2/8",HETEROGENEITY_CONTROL,LITERATURE_BENCHMARK,"10.3389/fpls.2019.01565"
+IPOMOEA_RED_SHIFT,HUE_SHIFT,EXACT_REGULATORY_TARGET,"3 robust red origins repeatedly implicate floral F3'H regulation",HIGH_REPEATABILITY_CONTROL,LITERATURE_BENCHMARK,"10.1111/j.1469-8137.2009.02929.x"
+AQUILEGIA_ANTHOCYANIN_LOSS,LOSS,LATE_PATHWAY_EXPRESSION,"repeated anthocyanin-loss lineages show convergent late-pathway downregulation",LOSS_REPEATABILITY_CONTROL,LITERATURE_BENCHMARK,"10.1111/j.1365-294X.2006.03114.x"
+PRIOR_SOBEL_STREISFELD_2013,GENERAL_GAIN_VS_LOSS,MUTATIONAL_TARGET_SET,"review predicts a reduced mutation spectrum for gains relative to losses and often regulatory co-option for floral anthocyanin gain",PRIOR_ART_BOUNDARY,NOT_NOVEL,"10.3389/fpls.2013.00321"
