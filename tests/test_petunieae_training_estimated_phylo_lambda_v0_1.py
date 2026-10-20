@@ -85,3 +85,35 @@ def test_frozen_original_47_tip_source_assumptions_are_not_redefined():
         .06420747753819912)
     assert d["interpretation"]["source_specific_retrospective_post_outcome_sensitivity"]
     assert d["interpretation"]["original_camellia_AJB_EL_frozen"]
+
+
+SAVED=ROOT/"results/petunieae_training_estimated_phylo_lambda_v0_1/result_v0_1.json"
+
+
+def test_actual_source_training_only_lambda_refit_retains_negative_gene_product_gain():
+    x=json.loads(SAVED.read_text(encoding="utf-8"))
+    assert x["status"]=="POST_OUTCOME_TRAIN_ONLY_LAMBDA_GAIN_SOURCE_AUDIT_NO_NEW_P"
+    assert x["source_original_47_tips_sha_check_passed"]
+    assert x["n_original_species"]==47
+    assert x["chosen_lambda_counts"]=={"0.75":46,"0.9":1}
+    assert sum(x["chosen_lambda_counts"].values())==47
+    assert [row["source_species"] for row in x["selected_lambda_per_original_taxon"]
+            if row["selected_lambda_from_other_46"]==0.9]==["BOAN"]
+    assert x["original_four_gene_predictors"]==list(m.GENES)
+    assert x["original_three_flavonol_products"]==list(m.METABOLITES)
+    assert x["original_fixed_ridge_alpha"]==10
+    assert x["frozen_training_only_lambda_candidates"]==[0,.1,.25,.5,.75,.9,.95,.99]
+    assert x["original_class_plus_source_training_selected_phylogeny_MSE"]==pytest.approx(
+        1.2388799997322677,abs=1e-12)
+    assert x["original_class_plus_source_selected_phylogeny_plus_genes_MSE"]==pytest.approx(
+        1.3185161555311964,abs=1e-12)
+    assert x["additional_gene_relative_gain"]==pytest.approx(
+        -0.06428076635036381,abs=1e-12)
+    assert x["source_taxa_improved"]==21 and x["source_taxa_worse"]==26
+    assert x["prior_fixed_lambda_half_gain"]==pytest.approx(-0.04208292517617994)
+    assert x["prior_fixed_lambda_half_model_p"]==0.3439
+    assert x["prior_lambda0_gain"]==pytest.approx(0.06420747753819912)
+    assert x["all_fold_lambdas_selected_using_only_training_metabolite_Y"]
+    assert x["no_new_statistical_P_values"] is True
+    assert x["working_covariance_lambda_REML_not_causal_or_truth_proven"] is True
+    assert x["original_AJB_Camellia_EL_frozen_and_integrated_draft"] is True
