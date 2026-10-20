@@ -1,0 +1,148 @@
+name: Petunieae functional module held-out transfer v0.1 (retrospective)
+
+on:
+  pull_request:
+    paths:
+      - 'data/petunieae_module_heldout_transfer_design_v0_1.json'
+      - 'scripts/analyze_petunieae_module_heldout_transfer_v0_1.py'
+      - 'tests/test_petunieae_module_heldout_transfer_v0_1.py'
+      - 'scripts/audit_petunieae_module_heldout_class_influence_v0_1.py'
+      - 'tests/test_petunieae_module_heldout_class_influence_v0_1.py'
+      - 'results/petunieae_module_heldout_transfer_v0_1/**'
+      - '.github/workflows/petunieae-module-heldout-transfer-v0-1.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  actions: read
+
+jobs:
+  module_heldout_transfer:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install frozen Petunieae science and pytest requirements
+        run: python -m pip install --disable-pip-version-check -r requirements/requirements-repository-integrity.txt
+      - name: Prove original k2 rule, random-two formula and Holm family gate
+        run: python -m pytest -q tests/test_petunieae_module_heldout_transfer_v0_1.py tests/test_petunieae_module_heldout_class_influence_v0_1.py
+      - name: Restore exact verified original Wheeler 2023 Petunieae data
+        uses: actions/download-artifact@v4
+        with:
+          name: petunieae-prospective-osf-v0-1
+          repository: zuizui0223/chun
+          run-id: 34182646549
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          path: build/original_petunieae_osf
+      - name: Run fixed 9/4/8 module species-LOO with 9999 class-constrained whole-gene-vector nulls
+        run: |
+          python scripts/analyze_petunieae_module_heldout_transfer_v0_1.py \
+            --source build/original_petunieae_osf \
+            --design data/petunieae_module_heldout_transfer_design_v0_1.json \
+            --original-design data/petunieae_nested_regulatory_memory_preregistered_design_v0_1.json \
+            --original-prediction-design data/petunieae_nested_regulatory_leaveoneout_prediction_design_v0_1.json \
+            --module-design data/petunieae_functional_module_memory_design_v0_1.json \
+            --out build/petunieae_module_heldout_transfer_result_v0_1.json
+      - name: Enforce original 21-gene FAIL and report all fixed modules regardless of direction
+        run: |
+          python - <<'PY'
+          import json, math
+          from pathlib import Path
+          d=json.loads(Path('build/petunieae_module_heldout_transfer_result_v0_1.json').read_text())
+          assert d['status']=='RETROSPECTIVE_MODULE_HELDOUT_EXPRESSION_TRANSFER_ON_ORIGINAL_SOURCE'
+          assert d['source_shas_verified']
+          assert d['n_taxa']==47 and d['n_original_gene_axes']==21
+          assert d['n_original_fine_pigment_classes']==6
+          assert d['fixed_k']==2 and d['n_module_tests']==3
+          assert d['permutations']==9999 and d['seed']==20261019
+          assert [r['n_genes'] for r in d['module_results']]==[9,4,8]
+          assert abs(d['original_full_21_gene_class_mean_MSE']-1.138379056242746)<1e-10
+          assert abs(d['original_full_21_gene_k2_MSE']-1.2511674468445935)<1e-10
+          assert abs(d['original_full_21_gene_gain']-(-0.0990780619015505))<1e-10
+          assert d['original_full_21_gene_prediction_still_FAIL'] is True
+          assert d['original_pigment_adjusted_module_correlations_untouched'] is True
+          for m in d['module_results']:
+              assert math.isfinite(m['relative_gain_over_class_mean'])
+              assert 0<m['locality_p_one_sided']<=m['holm_familywise_p']<=1
+              assert m['original_module_membership_not_reselected']
+              if m['predictive_decision']=='SUPPORTED_EXPLORATORY_MODULE_PREDICTION':
+                  assert m['relative_gain_over_class_mean']>0 and m['holm_familywise_p']<=0.05
+              if m['relative_gain_over_class_mean']<=0:
+                  assert m['predictive_decision']=='NOT_SUPPORTED_PRACTICAL_TRANSFER'
+          assert d['no_module_effect_difference_test']
+          assert d['no_optimization_of_k_genes_or_pigment_classes']
+          assert d['no_external_prospective_replication']
+          assert d['no_causal_ancestral_replay_or_selection_test']
+          assert d['frozen_camellia_AJB_and_EL_unchanged']
+          for m in d['module_results']:
+              print('PETUNIEAE_HELDOUT_MODULE',m['module_id'],
+                    'GAIN',m['relative_gain_over_class_mean'],
+                    'RANDOM2_GAIN',m['relative_gain_over_random_two'],
+                    'P',m['locality_p_one_sided'],'HOLM',m['holm_familywise_p'],
+                    'DECISION',m['predictive_decision'])
+          print('PETUNIEAE_MODULE_HELDOUT_SOURCE_GOVERNANCE_PASS')
+          PY
+      - name: Reproduce frozen full module k2 predictions without changing original decisions
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          actual=json.loads(Path('build/petunieae_module_heldout_transfer_result_v0_1.json').read_text())
+          fixed=json.loads(Path('results/petunieae_module_heldout_transfer_v0_1/result_v0_1.json').read_text())
+          def deep_equals(a,b,where='root'):
+              assert type(a)==type(b),(where,type(a),type(b))
+              if isinstance(a,dict):
+                  assert a.keys()==b.keys(),where
+                  for k in a:
+                      deep_equals(a[k],b[k],where+'.'+str(k))
+              elif isinstance(a,list):
+                  assert len(a)==len(b),where
+                  for n,(u,v) in enumerate(zip(a,b)):
+                      deep_equals(u,v,where+'['+str(n)+']')
+              elif isinstance(a,float):
+                  assert abs(a-b)<1e-12,(where,a,b)
+              else:
+                  assert a==b,(where,a,b)
+          deep_equals(actual,fixed)
+          assert fixed['original_full_21_gene_prediction_still_FAIL']
+          assert [m['predictive_decision'] for m in fixed['module_results']]==[
+              'NOT_SUPPORTED_PRACTICAL_TRANSFER',
+              'SUPPORTED_EXPLORATORY_MODULE_PREDICTION',
+              'NOT_SUPPORTED_PRACTICAL_TRANSFER']
+          print('PETUNIEAE_ORIGINAL_FROZEN_MODULE_PREDICTION_OUTCOMES_REPLAY_PASS')
+          PY
+      - name: Audit original six-pigment-class predictive influence only
+        run: |
+          python scripts/audit_petunieae_module_heldout_class_influence_v0_1.py \
+            --frozen-module-result results/petunieae_module_heldout_transfer_v0_1/result_v0_1.json \
+            --out build/petunieae_module_transfer_class_influence_v0_1.json
+      - name: Guard preserved class-omission counts without new P values
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          a=json.loads(Path('build/petunieae_module_transfer_class_influence_v0_1.json').read_text())
+          b=json.loads(Path('results/petunieae_module_heldout_transfer_v0_1/class_influence_v0_1.json').read_text())
+          assert a["n_original_species"]==b["n_original_species"]==47
+          assert a["n_original_source_chemical_states"]==b["n_original_source_chemical_states"]==6
+          assert [x["n_positive_one_class_omissions"] for x in a["module_class_influence"]]==[0,6,0]
+          for u,v in zip(a["module_class_influence"],b["module_class_influence"]):
+              assert u["module_id"]==v["module_id"]
+              assert u["n_positive_one_class_omissions"]==v["n_positive_one_class_omissions"]
+              assert abs(u["min_original_group_omission_gain"]-v["min_original_group_omission_gain"])<1e-12
+              assert abs(u["max_original_group_omission_gain"]-v["max_original_group_omission_gain"])<1e-12
+          assert a["no_new_statistical_pvalues_or_unequal_gene_number_inference"]
+          assert a["no_retraining_or_reselecting_k2_donor_weights"]
+          print('PETUNIEAE_6CLASS_MODULE_TRANSFER_INFLUENCE_SOURCE_REPLAY_PASS')
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: petunieae-module-heldout-transfer-v0-1
+          path: |
+            build/petunieae_module_heldout_transfer_result_v0_1.json
+            build/petunieae_module_transfer_class_influence_v0_1.json
+          if-no-files-found: warn

@@ -1,0 +1,89 @@
+name: Petunieae recipient coverage and donor penalty audit v0.1
+
+on:
+  pull_request:
+    paths:
+      - 'scripts/audit_petunieae_recipient_transfer_v0_1.py'
+      - 'tests/test_petunieae_recipient_transfer_v0_1.py'
+      - 'data/petunieae_recipient_transfer_design_v0_1.json'
+      - 'results/petunieae_recipient_transfer_v0_1/**'
+      - 'docs/PETUNIEAE_RECIPIENT_TRANSFER_COVERAGE_V0_1.md'
+      - '.github/workflows/petunieae-recipient-transfer-v0-1.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  actions: read
+
+jobs:
+  recipient_source_audit:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install original repository science dependencies
+        run: python -m pip install --disable-pip-version-check -r requirements/requirements-repository-integrity.txt
+      - name: Check deterministic donors and exact recipient loss accounting
+        run: python -m pytest -q tests/test_petunieae_recipient_transfer_v0_1.py
+      - name: Restore original SHA-verified published Petunieae source
+        uses: actions/download-artifact@v4
+        with:
+          name: petunieae-prospective-osf-v0-1
+          repository: zuizui0223/chun
+          run-id: 34182646549
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          path: build/original_petunieae_source
+      - name: Replay all fixed module predictions and recipient diagnostics
+        run: python scripts/audit_petunieae_recipient_transfer_v0_1.py --source build/original_petunieae_source --out-dir build/petunieae_recipient_transfer_v0_1
+      - name: Match frozen summary and original per-class losses without new inference
+        run: |
+          python - <<'PY'
+          import csv, json, math
+          from pathlib import Path
+          p=Path('build/petunieae_recipient_transfer_v0_1')
+          actual=json.loads((p/'result_v0_1.json').read_text())
+          saved=json.loads(Path('results/petunieae_recipient_transfer_v0_1/summary_v0_1.json').read_text())
+          prior=json.loads(Path('results/petunieae_module_heldout_transfer_v0_1/result_v0_1.json').read_text())
+          assert actual['status']==saved['status']
+          assert actual['source_SHA256_verified']
+          assert actual['n_taxa']==saved['n_taxa']==47
+          assert actual['new_p_values']==0 and actual['fixed_k']==2
+          for a,b,old in zip(actual['modules'],saved['modules'],prior['module_results']):
+              assert a['module_id']==b['module_id']==old['module_id']
+              assert a['genes']==old['genes']
+              for k,v in b.items():
+                  if isinstance(v,float):
+                      assert math.isclose(a[k],v,rel_tol=0,abs_tol=1e-10),(k,a[k],v)
+                  else:
+                      assert a[k]==v,(k,a[k],v)
+              assert abs(a['pooled_relative_gain']-old['relative_gain_over_class_mean'])<1e-10
+              assert abs(a['locality_benefit_MSE']-a['donor_count_penalty_MSE']-a['mean_paired_loss_improvement'])<1e-10
+          f=actual['modules'][1]
+          assert f['n_improved_recipients']==27 and f['n_worse_recipients']==20
+          assert f['positive_after_omitting_one_recipient']==47
+          top=f['positive_contribution_leverage']['3']
+          assert top['source_taxa']==saved['flavonol_top_three_omission']['source_taxa']==['LESC','BOER','BRGR']
+          assert abs(top['gain_if_recipient_losses_omitted']-saved['flavonol_top_three_omission']['gain_if_recipient_losses_omitted'])<1e-10
+          assert top['gain_if_recipient_losses_omitted']<0
+          with (p/'recipients_v0_1.csv').open() as handle:
+              rows=list(csv.DictReader(handle))
+          assert len(rows)==141
+          for old in prior['module_results']:
+              for cls in old['per_original_pigment_class']:
+                  group=[x for x in rows if x['module_id']==old['module_id'] and x['fine_state']==cls['fine_sixbit_code']]
+                  assert len(group)==cls['n_species']
+                  assert abs(sum(float(x['baseline']) for x in group)/len(group)-cls['class_mean_MSE'])<1e-10
+                  assert abs(sum(float(x['nearest_two']) for x in group)/len(group)-cls['nearest_two_MSE'])<1e-10
+          assert actual['original_module_locality_P_and_primary_gains_unchanged']
+          assert actual['no_retraining_or_outcome_selected_source_subset']
+          print('RECIPIENT_SOURCE_REPLAY_PASS: 27/47 improved; 47/47 single omissions positive; top-three omission negative; no new P values')
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: petunieae-recipient-transfer-v0-1
+          path: build/petunieae_recipient_transfer_v0_1/
+          if-no-files-found: warn

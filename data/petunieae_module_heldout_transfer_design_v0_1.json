@@ -1,0 +1,122 @@
+{
+  "version": "v0.1",
+  "date_fixed": "2026-10-19",
+  "status": "RETROSPECTIVE_FIXED_MODULE_HELDOUT_TRANSFER_DESIGN_BEFORE_MODULE_PREDICTION_OUTCOME",
+  "biological_question": "Among same-fine-pigment-state Petunieae species, can ancestry improve out-of-species prediction of each preassigned functional gene module beyond the full pigment-class expression mean? Do modules with phylogenetic distance association have operational predictive utility?",
+  "prior_science": {
+    "original_module_design": "data/petunieae_functional_module_memory_design_v0_1.json",
+    "original_module_result": "results/petunieae_functional_module_memory_v0_1/result_v0_1.json",
+    "original_nested_prediction_design": "data/petunieae_nested_regulatory_leaveoneout_prediction_design_v0_1.json",
+    "original_nested_prediction_result": "results/petunieae_nested_regulatory_leaveoneout_prediction_v0_1/result_v0_1.json",
+    "original_all_21_gene_gain": -0.0990780619015505,
+    "original_all_21_gene_class_mse": 1.138379056242746,
+    "original_all_21_gene_nearest_two_mse": 1.2511674468445935,
+    "original_all_gene_predictive_status": "NOT_SUPPORTED",
+    "original_module_maxT_p_adjusted": [
+      0.2709,
+      0.0162,
+      0.0007
+    ],
+    "original_expression_pigment_source_already_outcome_exposed": true
+  },
+  "source": {
+    "study_doi": "10.1098/rspb.2023.0275",
+    "original_osf_node": "zg9cu",
+    "authoritative_archived_action_run": 34182646549,
+    "original_processed_csv_sha256": "5843d4cd4eb253046f97349fa6bd285ca77e43e7a9c3aaa0e78fae3e8e391edd",
+    "original_same_tree_sha256": "95b4a688d3d71417b712b37a2b04cdc22a9431be3172d6509def4435f5fd8614",
+    "original_source_design": "data/petunieae_nested_regulatory_memory_preregistered_design_v0_1.json"
+  },
+  "fixed_cohort": {
+    "n_species": 47,
+    "n_pigment_presence_codes": 6,
+    "fine_state_counts": {
+      "000000": 6,
+      "000010": 6,
+      "000011": 6,
+      "000100": 10,
+      "000110": 6,
+      "000111": 13
+    },
+    "matched_species_pairs": 183,
+    "full_fixed_21_genes": [
+      "CHS",
+      "CHI",
+      "F3H",
+      "F3primeH",
+      "F35H",
+      "DFR",
+      "FLS",
+      "ANS",
+      "UFGT",
+      "AAT",
+      "5GT",
+      "MTlike",
+      "GST",
+      "3RT",
+      "MYB27",
+      "AN11",
+      "MYBFL",
+      "MYB12",
+      "AN1",
+      "JAF13",
+      "MybsG6"
+    ],
+    "gene_module_definition_source": "data/petunieae_functional_module_memory_design_v0_1.json",
+    "modules": [
+      {
+        "module_id": "LATE_ANTHOCYANIN_EXECUTION",
+        "n_genes": 9
+      },
+      {
+        "module_id": "FLAVONOL_BRANCH_AND_ACTIVATION",
+        "n_genes": 4
+      },
+      {
+        "module_id": "EARLY_SHARED_AND_REGULATORY",
+        "n_genes": 8
+      }
+    ],
+    "no_new_gene_reallocation_based_on_module_p_values": true
+  },
+  "heldout_prediction": {
+    "target": "log1p raw expression TPM10K of each of the 21 published pathway-gene columns, for one withheld species; do NOT fit global per-gene z-scores including the withheld species",
+    "available_features_to_predict": "six-bit measured pigment-presence class is treated as already known at prediction time; avoid claims of unguided floral phenotype prediction",
+    "baseline": "For each held-out source species, average log1p gene expressions of ALL remaining species with the same exact six-bit source pigment class",
+    "ancestry_aware": "For each held-out species, select k=2 nearest other tips on original dated source tree STRICTLY within the same six-bit pigment class, break patristic ties by original source tip name, and predict mean log1p expression of those two donors",
+    "module_loss": "Per held-out taxon take mean squared prediction errors over ALL genes in each fixed module, scaling every gene error by the other 46 species' training-only log1p gene expression variance (same existing full 21-gene source fold standardization); then average equally over all 47 heldout taxa",
+    "module_gain": "(module baseline MSE - module k=2 nearest MSE)/module baseline MSE, relative gain > 0 means concrete improvement over class mean",
+    "no_k_optimization": true,
+    "no_feature_subset_optimization": true,
+    "no_one_clade_training_holdout_claim": true
+  },
+  "null": {
+    "iterations": 9999,
+    "seed": 20261019,
+    "whole_vector_within_class": "Permute intact original 21-gene expression vectors among the frozen 47 taxon labels only within their original six-bit pigment-presence code; hold source tree, six-bit labels and original k=2/class-mean donor weight matrices fixed. Each draw recomputes all 3 module fold-scaled gains from permuted training-only values, preserving multigene covariance.",
+    "nominal_upper_tail_p": "(1 + number of simulated module gains >= observed gain) / 10000",
+    "adjusted_p": "Apply Holm step-down correction to the three precommitted module locality null P values; this controls arbitrary dependence of the three family tests and does NOT make modules independent radiations.",
+    "success_rule": "SUPPORTED_MODULE_TRANSFER only when observed practical module gain > 0 and Holm-adjusted locality upper-tail p <=0.05. If gain <=0, label NOT_SUPPORTED_PRACTICAL_TRANSFER even when permutation P is small.",
+    "module_effect_difference_tested": false,
+    "pair_independence_assumed": false,
+    "hypothesis_direction": "practical transfer must improve over pigment-class mean, not merely outperform the null's expected k2 overfitting",
+    "null_interpretation": "Taxon-shuffle test asks whether the k=2 donor method beats an exchangeable within-pigment-class assignment. Because module prediction is computed after observing the whole-gene outcome in the same source, any apparently positive module would remain exploratory."
+  },
+  "additional_descriptive": {
+    "source_random_two_baseline": "Exact mean of all distinct random-two same-class donor pairs' losses for each heldout taxon (no sampling): report nearest-two vs random-two improvement for context, not as a substitute for pigment-class-mean baseline.",
+    "per_class_diagnostics": "Within each of six frozen classes, report species count and relative module losses/gains; no class-based rescue or P values.",
+    "module_effect_contrast": "Show raw difference in normalized held-out gains between modules, explicitly NO formal significant comparison, no transfer into nested-memory decay rates.",
+    "fixed_pair_frame": "Predictors and original 47 taxa are used unchanged; not new independent radiations."
+  },
+  "decision_governance": {
+    "original_full_21_gene_predictive_FAIL_unchanged": true,
+    "original_module_pigment_adjusted_maxT_unchanged": true,
+    "no_relabel_Erica_source_exploratory_negative": true,
+    "no_claim_causal_genetic_implementation": true,
+    "no_pollinator_selection_or_fitness_test": true,
+    "no_ancestral_transition_count_or_absolute_time_rate": true,
+    "no_outcome_selected_gene_sets_or_optimal_k": true,
+    "no_first_submission_Camellia_AJB_or_frozen_EL_changes": true,
+    "original_integrated_PR414_remains_DRAFT": true
+  }
+}

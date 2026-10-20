@@ -1,0 +1,210 @@
+{
+  "version": "v0.1",
+  "status": "POST_OUTCOME_SIX_CLASS_PREDICTIVE_LOSS_INFLUENCE_DESCRIPTIVE_ONLY",
+  "n_original_species": 47,
+  "n_original_source_chemical_states": 6,
+  "n_original_module_tests": 3,
+  "module_class_influence": [
+    {
+      "module_id": "LATE_ANTHOCYANIN_EXECUTION",
+      "original_module_gain": -0.1515160086240452,
+      "original_fixed_predictive_decision": "NOT_SUPPORTED_PRACTICAL_TRANSFER",
+      "n_positive_original_individual_classes": 1,
+      "n_positive_one_class_omissions": 0,
+      "min_original_group_omission_gain": -0.2570091955655906,
+      "max_original_group_omission_gain": -0.08882449808560818,
+      "omit_one_class_rows": [
+        {
+          "omitted_sixbit_code": "000000",
+          "omitted_species": 6,
+          "remaining_species": 41,
+          "same_original_training_and_donor_weights": true,
+          "remaining_recipients_class_mean_MSE": 0.7835607025475709,
+          "remaining_recipients_k2_MSE": 0.9849430083861311,
+          "remaining_recipients_gain": -0.2570091955655906
+        },
+        {
+          "omitted_sixbit_code": "000010",
+          "omitted_species": 6,
+          "remaining_species": 41,
+          "same_original_training_and_donor_weights": true,
+          "remaining_recipients_class_mean_MSE": 0.7361903548534906,
+          "remaining_recipients_k2_MSE": 0.859520409916721,
+          "remaining_recipients_gain": -0.16752468196594927
+        },
+        {
+          "omitted_sixbit_code": "000011",
+          "omitted_species": 6,
+          "remaining_species": 41,
+          "same_original_training_and_donor_weights": true,
+          "remaining_recipients_class_mean_MSE": 0.9109077108571448,
+          "remaining_recipients_k2_MSE": 1.040064032016095,
+          "remaining_recipients_gain": -0.14178859133535798
+        },
+        {
+          "omitted_sixbit_code": "000100",
+          "omitted_species": 10,
+          "remaining_species": 37,
+          "same_original_training_and_donor_weights": true,
+          "remaining_recipients_class_mean_MSE": 0.8757308249953013,
+          "remaining_recipients_k2_MSE": 0.9908781984858753,
+          "remaining_recipients_gain": -0.13148717642911775
+        },
+        {
+          "omitted_sixbit_code": "000110",
+          "omitted_species": 6,
+          "remaining_species": 41,
+          "same_original_training_and_donor_weights": true,
+          "remaining_recipients_class_mean_MSE": 0.786863703674215,
+          "remaining_recipients_k2_MSE": 0.8846140408662363,
+          "remaining_recipients_gain": -0.12422778778024925
+        },
+        {
+          "omitted_sixbit_code": "000111",
+          "omitted_species": 13,
+          "remaining_species": 34,
+          "same_original_training_and_donor_weights": true,
+          "remaining_recipients_class_mean_MSE": 0.9287551212818888,
+          "remaining_recipients_k2_MSE": 1.0112513287741907,
+          "remaining_recipients_gain": -0.08882449808560818
+        }
+      ]
+    },
+    {
+      "module_id": "FLAVONOL_BRANCH_AND_ACTIVATION",
+      "original_module_gain": 0.05613676603732491,
+      "original_fixed_predictive_decision": "SUPPORTED_EXPLORATORY_MODULE_PREDICTION",
+      "n_positive_original_individual_classes": 4,
+      "n_positive_one_class_omissions": 6,
+      "min_original_group_omission_gain": 0.012045534579780666,
+      "max_original_group_omission_gain": 0.07565172610710909,
+      "omit_one_class_rows": [
+        {
+          "omitted_sixbit_code": "000000",
+          "omitted_species": 6,
+          "remaining_species": 41,
+          "same_original_training_and_donor_weights": true,
+          "remaining_recipients_class_mean_MSE": 0.8752984174898916,
+          "remaining_recipients_k2_MSE": 0.8647549801343898,
+          "remaining_recipients_gain": 0.012045534579780666
+        },
+        {
+          "omitted_sixbit_code": "000010",
+          "omitted_species": 6,
+          "remaining_species": 41,
+          "same_original_training_and_donor_weights": true,
+          "remaining_recipients_class_mean_MSE": 0.9683077882177209,
+          "remaining_recipients_k2_MSE": 0.903196864363069,
+          "remaining_recipients_gain": 0.06724197062846705
+        },
+        {
+          "omitted_sixbit_code": "000011",
+          "omitted_species": 6,
+          "remaining_species": 41,
+          "same_original_training_and_donor_weights": true,
+          "remaining_recipients_class_mean_MSE": 0.9298720842274456,
+          "remaining_recipients_k2_MSE": 0.8783586210561896,
+          "remaining_recipients_gain": 0.055398440328547294
+        },
+        {
+          "omitted_sixbit_code": "000100",
+          "omitted_species": 10,
+          "remaining_species": 37,
+          "same_original_training_and_donor_weights": true,
+          "remaining_recipients_class_mean_MSE": 1.1274277859366542,
+          "remaining_recipients_k2_MSE": 1.0649012032281435,
+          "remaining_recipients_gain": 0.055459501254498764
+        },
+        {
+          "omitted_sixbit_code": "000110",
+          "omitted_species": 6,
+          "remaining_species": 41,
+          "same_original_training_and_donor_weights": true,
+          "remaining_recipients_class_mean_MSE": 0.9467371078622029,
+          "remaining_recipients_k2_MSE": 0.8751148114827749,
+          "remaining_recipients_gain": 0.07565172610710909
+        },
+        {
+          "omitted_sixbit_code": "000111",
+          "omitted_species": 13,
+          "remaining_species": 34,
+          "same_original_training_and_donor_weights": true,
+          "remaining_recipients_class_mean_MSE": 1.0295830901811236,
+          "remaining_recipients_k2_MSE": 0.9588346736621055,
+          "remaining_recipients_gain": 0.06871559682140085
+        }
+      ]
+    },
+    {
+      "module_id": "EARLY_SHARED_AND_REGULATORY",
+      "original_module_gain": -0.11605637295835092,
+      "original_fixed_predictive_decision": "NOT_SUPPORTED_PRACTICAL_TRANSFER",
+      "n_positive_original_individual_classes": 1,
+      "n_positive_one_class_omissions": 0,
+      "min_original_group_omission_gain": -0.19379458947400036,
+      "max_original_group_omission_gain": -0.0438237903224795,
+      "omit_one_class_rows": [
+        {
+          "omitted_sixbit_code": "000000",
+          "omitted_species": 6,
+          "remaining_species": 41,
+          "same_original_training_and_donor_weights": true,
+          "remaining_recipients_class_mean_MSE": 1.1858424958811218,
+          "remaining_recipients_k2_MSE": 1.2378106087761018,
+          "remaining_recipients_gain": -0.0438237903224795
+        },
+        {
+          "omitted_sixbit_code": "000010",
+          "omitted_species": 6,
+          "remaining_species": 41,
+          "same_original_training_and_donor_weights": true,
+          "remaining_recipients_class_mean_MSE": 1.6416440631597955,
+          "remaining_recipients_k2_MSE": 1.8187204404813582,
+          "remaining_recipients_gain": -0.10786526829739845
+        },
+        {
+          "omitted_sixbit_code": "000011",
+          "omitted_species": 6,
+          "remaining_species": 41,
+          "same_original_training_and_donor_weights": true,
+          "remaining_recipients_class_mean_MSE": 1.199182311417211,
+          "remaining_recipients_k2_MSE": 1.4315773551627924,
+          "remaining_recipients_gain": -0.19379458947400036
+        },
+        {
+          "omitted_sixbit_code": "000100",
+          "omitted_species": 10,
+          "remaining_species": 37,
+          "same_original_training_and_donor_weights": true,
+          "remaining_recipients_class_mean_MSE": 1.8663767531887927,
+          "remaining_recipients_k2_MSE": 2.05470926652854,
+          "remaining_recipients_gain": -0.10090808997592385
+        },
+        {
+          "omitted_sixbit_code": "000110",
+          "omitted_species": 6,
+          "remaining_species": 41,
+          "same_original_training_and_donor_weights": true,
+          "remaining_recipients_class_mean_MSE": 1.6665225589314356,
+          "remaining_recipients_k2_MSE": 1.867144507917704,
+          "remaining_recipients_gain": -0.120383578314659
+        },
+        {
+          "omitted_sixbit_code": "000111",
+          "omitted_species": 13,
+          "remaining_species": 34,
+          "same_original_training_and_donor_weights": true,
+          "remaining_recipients_class_mean_MSE": 1.904430782990906,
+          "remaining_recipients_k2_MSE": 2.1546149116211515,
+          "remaining_recipients_gain": -0.13136950466497485
+        }
+      ]
+    }
+  ],
+  "no_retraining_or_reselecting_k2_donor_weights": true,
+  "no_new_statistical_pvalues_or_unequal_gene_number_inference": true,
+  "no_external_or_prospective_replication": true,
+  "source_module_prediction_decisions_unchanged": true,
+  "original_full_21_gene_prediction_still_FAIL": true,
+  "original_Camellia_AJB_and_EL_unchanged": true
+}

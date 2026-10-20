@@ -1,0 +1,17 @@
+{
+  "version": "v0.1",
+  "date": "2026-10-20",
+  "status": "POST_OUTCOME_DESCRIPTIVE_RECIPIENT_COVERAGE_AND_DONOR_PENALTY_AUDIT",
+  "parent_commit": "499d4b9ca47822e9964e17ace48f9655ba22fb30",
+  "question": "Is the frozen positive flavonol pooled prediction gain broadly distributed among taxa or concentrated in a few recipients, and does phylogenetic locality overcome the exact random-two-donor variance penalty?",
+  "fixed_choices": "Same 47 species, 6 original pigment states, all original 21 genes, original 9/4/8 modules, k=2, same class-mean baseline and other-46 training variances.",
+  "diagnostics": ["All 47 recipient paired loss differences, win/loss/tie counts, median difference", "All 47 recipient-only omission gains with unchanged predictions; no retraining", "Top 1 and top 3 positive contribution leverage and all constituent recipient rows", "Exact random-two penalty R-B and locality benefit R-N, with net B-N=(R-N)-(R-B)", "Original per-class accounting reconciliation"],
+  "numerical_tie_tolerance": 1e-12,
+  "new_permutation_p_values": 0,
+  "recipient_trials_independent": false,
+  "omit_recipients_to_improve_primary_result": false,
+  "original_practical_gain_and_locality_p_are_different_claims": true,
+  "no_new_fit_or_adaptive_selection": true,
+  "no_external_radiation_validation": true,
+  "original_AJB_EL_frozen_artifacts_unchanged": true
+}

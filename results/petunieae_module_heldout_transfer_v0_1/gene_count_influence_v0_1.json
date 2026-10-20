@@ -1,0 +1,111 @@
+{
+  "version": "v0.1",
+  "status": "POST_OUTCOME_EXHAUSTIVE_SOURCE_PREDICTIVE_GENE_COUNT_AUDIT",
+  "original_data_study_doi": "10.1098/rspb.2023.0275",
+  "original_module_prediction_source": "results/petunieae_module_heldout_transfer_v0_1/result_v0_1.json",
+  "original_source_artifact_run": 34182646549,
+  "original_same_source_analysis_run": 39208032410,
+  "full_original_diagnostic_artifact_id": 12166353485,
+  "full_original_diagnostic_artifact_url": "https://github.com/zuizui0223/chun/actions/runs/39208032410/artifacts/12166353485",
+  "n_source_species": 47,
+  "n_chemically_matched_fine_states": 6,
+  "original_21_gene_k2_practical_gain": -0.0990780619015505,
+  "original_fixed_flavonol_four_gene_gain": 0.05613676603732491,
+  "descriptive_module_four_gene_panel_summaries": {
+    "EARLY_SHARED_AND_REGULATORY": {
+      "all_shared_gene_panels_not_independent_evidence": true,
+      "max_gain": 0.05506398088839302,
+      "median_gain": -0.11611637849523421,
+      "min_gain": -0.3004609012288412,
+      "n_panels": 70,
+      "n_positive_gain": 8,
+      "q10_gain": -0.23090294823401641,
+      "q90_gain": 0.005665011827748044
+    },
+    "FLAVONOL_BRANCH_AND_ACTIVATION": {
+      "all_shared_gene_panels_not_independent_evidence": true,
+      "max_gain": 0.05613676603732504,
+      "median_gain": 0.05613676603732504,
+      "min_gain": 0.05613676603732504,
+      "n_panels": 1,
+      "n_positive_gain": 1,
+      "q10_gain": 0.05613676603732504,
+      "q90_gain": 0.05613676603732504
+    },
+    "LATE_ANTHOCYANIN_EXECUTION": {
+      "all_shared_gene_panels_not_independent_evidence": true,
+      "max_gain": 0.12310227244668392,
+      "median_gain": -0.14966754396004744,
+      "min_gain": -0.40836934359904775,
+      "n_panels": 126,
+      "n_positive_gain": 14,
+      "q10_gain": -0.30806841487390163,
+      "q90_gain": 0.020364450130031835
+    }
+  },
+  "flavonol_fixed_four_gene_relative_to_all_other_functional_source_panels": {
+    "EARLY_SHARED_AND_REGULATORY": {
+      "gene_panels_overlap_not_empirical_P": true,
+      "n_other_four_gene_panels": 70,
+      "n_other_panels_with_strictly_higher_gain_than_fixed_flavonol": 0,
+      "n_other_panels_with_strictly_lower_gain_than_fixed_flavonol": 70
+    },
+    "LATE_ANTHOCYANIN_EXECUTION": {
+      "gene_panels_overlap_not_empirical_P": true,
+      "n_other_four_gene_panels": 126,
+      "n_other_panels_with_strictly_higher_gain_than_fixed_flavonol": 7,
+      "n_other_panels_with_strictly_lower_gain_than_fixed_flavonol": 119
+    }
+  },
+  "flavonol_fixed_module_each_one_gene_removed_descriptive": [
+    {
+      "excluded_original_flavonol_gene": "F3primeH",
+      "not_a_new_module_predictor_or_significance_test": true,
+      "positive_gain": true,
+      "relative_gain_vs_full_pigment_class_mean": 0.08108012930169849,
+      "remaining_three_genes": [
+        "FLS",
+        "MYBFL",
+        "MYB12"
+      ]
+    },
+    {
+      "excluded_original_flavonol_gene": "FLS",
+      "not_a_new_module_predictor_or_significance_test": true,
+      "positive_gain": true,
+      "relative_gain_vs_full_pigment_class_mean": 0.052183810960170246,
+      "remaining_three_genes": [
+        "F3primeH",
+        "MYBFL",
+        "MYB12"
+      ]
+    },
+    {
+      "excluded_original_flavonol_gene": "MYBFL",
+      "not_a_new_module_predictor_or_significance_test": true,
+      "positive_gain": true,
+      "relative_gain_vs_full_pigment_class_mean": 0.019733863878010884,
+      "remaining_three_genes": [
+        "F3primeH",
+        "FLS",
+        "MYB12"
+      ]
+    },
+    {
+      "excluded_original_flavonol_gene": "MYB12",
+      "not_a_new_module_predictor_or_significance_test": true,
+      "positive_gain": true,
+      "relative_gain_vs_full_pigment_class_mean": 0.07181579841046717,
+      "remaining_three_genes": [
+        "F3primeH",
+        "FLS",
+        "MYBFL"
+      ]
+    }
+  ],
+  "no_new_p_values": true,
+  "no_posthoc_gene_subset_promotion": true,
+  "not_an_independent_gene_or_radiation_sample": true,
+  "flavonol_original_predeclared_Holm_p_unchanged": 0.00030000000000000003,
+  "first_submitted_AJB_Camellia_EL_v03_unchanged": true
+}
