@@ -61,14 +61,20 @@ def group_losses(x:np.ndarray,w0:np.ndarray,w2:np.ndarray,
             group=labels==key
             baseline=float(l0[group].mean())
             neighbour=float(l2[group].mean())
-            if baseline<=0:
-                raise ValueError("zero source class predictive baseline")
+            # Exact zero-pigment presence states can contain no variation
+            # in all three target anthocyanidins. Keep these recipients in
+            # the original 47-tip pooled loss; only the within-class ratio
+            # (0/0) is undefined. Never drop that class after seeing outcome.
+            uninformative=baseline<=1e-14
             perclass.append({
                 "source_sixbit_pigment_code":key,
                 "n_taxa":int(group.sum()),
                 "class_mean_MSE":baseline,
                 "phylogenetic_k2_MSE":neighbour,
-                "gain":float((baseline-neighbour)/baseline),
+                "gain":None if uninformative else float((baseline-neighbour)/baseline),
+                "class_gain_status":("NONINFORMATIVE_ZERO_BASELINE" if uninformative
+                                     else "SOURCE_CLASS_GAIN_DEFINED"),
+                "all_three_metabolites_zero_in_class":bool(np.all(a[group][:,ids]==0)),
                 "source_molecular_target_not_selection_test":True
             })
         omission=[]
