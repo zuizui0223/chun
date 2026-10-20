@@ -1,0 +1,267 @@
+{
+  "additional_gene_relative_gain": -0.06428076635036242,
+  "all_fold_lambdas_selected_using_only_training_metabolite_Y": true,
+  "analysis_role": "POST_OUTCOME_SOURCE_EXPOSED_PREDICTION_SENSITIVITY_NO_NEW_P_VALUE",
+  "chosen_lambda_counts": {
+    "0.75": 46,
+    "0.9": 1
+  },
+  "chosen_lambda_mean": 0.7531914893617021,
+  "frozen_training_only_lambda_candidates": [
+    0,
+    0.1,
+    0.25,
+    0.5,
+    0.75,
+    0.9,
+    0.95,
+    0.99
+  ],
+  "n_original_species": 47,
+  "no_new_statistical_P_values": true,
+  "no_pollinator_UV_flower_fitness_interpretation": true,
+  "no_source_independent_radiation_replication": true,
+  "original_AJB_Camellia_EL_frozen_and_integrated_draft": true,
+  "original_class_plus_source_selected_phylogeny_plus_genes_MSE": 1.318516155531194,
+  "original_class_plus_source_training_selected_phylogeny_MSE": 1.238879999732267,
+  "original_fixed_ridge_alpha": 10,
+  "original_four_gene_predictors": [
+    "F3primeH",
+    "FLS",
+    "MYBFL",
+    "MYB12"
+  ],
+  "original_three_flavonol_products": [
+    "myr_mgg",
+    "quer_mgg",
+    "kaem_mgg"
+  ],
+  "prior_fixed_lambda_half_gain": -0.04208292517617994,
+  "prior_fixed_lambda_half_model_p": 0.3439,
+  "prior_lambda0_gain": 0.06420747753819947,
+  "selected_lambda_per_original_taxon": [
+    {
+      "selected_lambda_from_other_46": 0.75,
+      "source_species": "PEPA"
+    },
+    {
+      "selected_lambda_from_other_46": 0.75,
+      "source_species": "FAIM"
+    },
+    {
+      "selected_lambda_from_other_46": 0.75,
+      "source_species": "FADE"
+    },
+    {
+      "selected_lambda_from_other_46": 0.75,
+      "source_species": "FAPA"
+    },
+    {
+      "selected_lambda_from_other_46": 0.75,
+      "source_species": "FAFR"
+    },
+    {
+      "selected_lambda_from_other_46": 0.75,
+      "source_species": "FAPE"
+    },
+    {
+      "selected_lambda_from_other_46": 0.75,
+      "source_species": "FDEN"
+    },
+    {
+      "selected_lambda_from_other_46": 0.75,
+      "source_species": "FAPU"
+    },
+    {
+      "selected_lambda_from_other_46": 0.75,
+      "source_species": "FABR"
+    },
+    {
+      "selected_lambda_from_other_46": 0.75,
+      "source_species": "CATH"
+    },
+    {
+      "selected_lambda_from_other_46": 0.75,
+      "source_species": "CAHU"
+    },
+    {
+      "selected_lambda_from_other_46": 0.75,
+      "source_species": "CAPU"
+    },
+    {
+      "selected_lambda_from_other_46": 0.75,
+      "source_species": "CAOV"
+    },
+    {
+      "selected_lambda_from_other_46": 0.75,
+      "source_species": "CAIR"
+    },
+    {
+      "selected_lambda_from_other_46": 0.75,
+      "source_species": "CSEL"
+    },
+    {
+      "selected_lambda_from_other_46": 0.75,
+      "source_species": "CALI"
+    },
+    {
+      "selected_lambda_from_other_46": 0.75,
+      "source_species": "CAMI"
+    },
+    {
+      "selected_lambda_from_other_46": 0.75,
+      "source_species": "CAEL"
+    },
+    {
+      "selected_lambda_from_other_46": 0.75,
+      "source_species": "CAPY"
+    },
+    {
+      "selected_lambda_from_other_46": 0.75,
+      "source_species": "CPAR"
+    },
+    {
+      "selected_lambda_from_other_46": 0.75,
+      "source_species": "PAXI"
+    },
+    {
+      "selected_lambda_from_other_46": 0.75,
+      "source_species": "PBON"
+    },
+    {
+      "selected_lambda_from_other_46": 0.75,
+      "source_species": "PCOR"
+    },
+    {
+      "selected_lambda_from_other_46": 0.75,
+      "source_species": "BRGR"
+    },
+    {
+      "selected_lambda_from_other_46": 0.75,
+      "source_species": "BRCU"
+    },
+    {
+      "selected_lambda_from_other_46": 0.75,
+      "source_species": "BRAU"
+    },
+    {
+      "selected_lambda_from_other_46": 0.75,
+      "source_species": "BRJA"
+    },
+    {
+      "selected_lambda_from_other_46": 0.75,
+      "source_species": "BRDE"
+    },
+    {
+      "selected_lambda_from_other_46": 0.75,
+      "source_species": "BRLA"
+    },
+    {
+      "selected_lambda_from_other_46": 0.75,
+      "source_species": "BRAM"
+    },
+    {
+      "selected_lambda_from_other_46": 0.9,
+      "source_species": "BOAN"
+    },
+    {
+      "selected_lambda_from_other_46": 0.75,
+      "source_species": "BOER"
+    },
+    {
+      "selected_lambda_from_other_46": 0.75,
+      "source_species": "HUTE"
+    },
+    {
+      "selected_lambda_from_other_46": 0.75,
+      "source_species": "NIVE"
+    },
+    {
+      "selected_lambda_from_other_46": 0.75,
+      "source_species": "NIRI"
+    },
+    {
+      "selected_lambda_from_other_46": 0.75,
+      "source_species": "NRIG"
+    },
+    {
+      "selected_lambda_from_other_46": 0.75,
+      "source_species": "NGRA"
+    },
+    {
+      "selected_lambda_from_other_46": 0.75,
+      "source_species": "NISC"
+    },
+    {
+      "selected_lambda_from_other_46": 0.75,
+      "source_species": "NILI"
+    },
+    {
+      "selected_lambda_from_other_46": 0.75,
+      "source_species": "NITU"
+    },
+    {
+      "selected_lambda_from_other_46": 0.75,
+      "source_species": "NIPU"
+    },
+    {
+      "selected_lambda_from_other_46": 0.75,
+      "source_species": "NIBR"
+    },
+    {
+      "selected_lambda_from_other_46": 0.75,
+      "source_species": "NICA"
+    },
+    {
+      "selected_lambda_from_other_46": 0.75,
+      "source_species": "LEAC"
+    },
+    {
+      "selected_lambda_from_other_46": 0.75,
+      "source_species": "LEAL"
+    },
+    {
+      "selected_lambda_from_other_46": 0.75,
+      "source_species": "LESC"
+    },
+    {
+      "selected_lambda_from_other_46": 0.75,
+      "source_species": "LELI"
+    }
+  ],
+  "source_fixed_six_pigment_classes": {
+    "000000": 6,
+    "000010": 6,
+    "000011": 6,
+    "000100": 10,
+    "000110": 6,
+    "000111": 13
+  },
+  "source_measured_product_gain_by_compound_descriptive": [
+    {
+      "base_mse": 1.8279800482503572,
+      "compound": "myr_mgg",
+      "gene_mse": 1.8480926123705952,
+      "relative_gain": -0.011002616871824522
+    },
+    {
+      "base_mse": 0.928338618303648,
+      "compound": "quer_mgg",
+      "gene_mse": 1.0103783755323215,
+      "relative_gain": -0.08837266446868768
+    },
+    {
+      "base_mse": 0.9603213326427957,
+      "compound": "kaem_mgg",
+      "gene_mse": 1.0970774786906645,
+      "relative_gain": -0.1424066522312038
+    }
+  ],
+  "source_original_47_tips_sha_check_passed": true,
+  "source_original_tree_class_gene_cohort_unmodified": true,
+  "source_taxa_improved": 21,
+  "source_taxa_worse": 26,
+  "status": "POST_OUTCOME_TRAIN_ONLY_LAMBDA_GAIN_SOURCE_AUDIT_NO_NEW_P",
+  "version": "v0.1",
+  "working_covariance_lambda_REML_not_causal_or_truth_proven": true
+}
