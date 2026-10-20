@@ -1,0 +1,99 @@
+{
+  "version": "v0.1",
+  "fixed_before_new_target_metabolite_outcomes": "2026-10-20",
+  "status": "SOURCE_EXPOSED_RETROSPECTIVE_METABOLITE_TRANSFER_HYPOTHESIS_FROZEN_BEFORE_NEW_TEST",
+  "core_question": "Does the source-internal nearest-two-phylogenetic-neighbour predictive benefit seen for four flavonol-related genes also extend to measured flavonol metabolite concentrations when six-bit anthocyanidin-presence identity is already known?",
+  "original_source": {
+    "study_doi": "10.1098/rspb.2023.0275",
+    "osf_node": "zg9cu",
+    "authoritative_sha_pinned_artifact_run_id": 34182646549,
+    "source_csv_path": "processed/phyloCCA__tpm10k-mgg-combined-with-flavs.csv",
+    "source_csv_sha256": "5843d4cd4eb253046f97349fa6bd285ca77e43e7a9c3aaa0e78fae3e8e391edd",
+    "source_phylogeny_path": "processed/phyloCCA__11genestre_dated_pruned.tre",
+    "source_tree_sha256": "95b4a688d3d71417b712b37a2b04cdc22a9431be3172d6509def4435f5fd8614",
+    "source_qc_loader": "scripts/run_petunieae_nested_regulatory_leaveoneout_prediction_v0_1.py:load_source",
+    "whole_21_gene_fixed_predictive_fail": "results/petunieae_nested_regulatory_leaveoneout_prediction_v0_1/result_v0_1.json",
+    "flavonol_expression_4_gene_prediction": "results/petunieae_module_heldout_transfer_v0_1/result_v0_1.json",
+    "existing_metabolite_values_public_outcome_exposed": true
+  },
+  "original_cohort": {
+    "n_tips": 47,
+    "n_exact_anthocyanidin_presence_classes": 6,
+    "known_class_counts": {
+      "000000": 6,
+      "000010": 6,
+      "000011": 6,
+      "000100": 10,
+      "000110": 6,
+      "000111": 13
+    },
+    "within_class_ancestry_same_specimen_tree": true,
+    "stage_or_gene_selection_based_on_new_outcome": false,
+    "original_rare_state_filter_unchanged": true,
+    "use_same_source_outgroup_exclusion": true
+  },
+  "two_fixed_biochemical_response_groups": [
+    {
+      "id": "FLAVONOL_CONCENTRATION",
+      "chemical_role": "measured flavonol production branch, functional readout for source fixed flavonol-related gene expression",
+      "columns": [
+        "myr_mgg",
+        "quer_mgg",
+        "kaem_mgg"
+      ],
+      "n": 3
+    },
+    {
+      "id": "ANTHOCYANIDIN_AMOUNT_POSITIVE_VARYING",
+      "chemical_role": "measured terminal anthocyanidin amount within known presence/absence identities, not an independent phenotype class",
+      "columns": [
+        "Del_mgg",
+        "Pet_mgg",
+        "Malv_mgg"
+      ],
+      "n": 3
+    }
+  ],
+  "transformation": {
+    "source_units": "original mg/g, nonnegative finite source compound values",
+    "per_compound_feature_transform": "log1p(100*x) with x measured source mg/g, not log(x) or data-selected binarization",
+    "training_scaling": "for each withheld tip, variance of transformed concentration across other 46 source taxa, denominator n=46 (ddof=0); if zero, replace denominator with 1, never remove an outcome-opened compound",
+    "multiresponse_loss": "mean squared scaled prediction error across all exactly three preregistered metabolites in each response group, then equal weight across all 47 withheld species",
+    "prior_expression_prediction": "do NOT predict module gene expression again in the new test; source original flavonol 4-gene module practical gain +0.05613676603732491 and Holm p 0.0003 remain fixed"
+  },
+  "prediction": {
+    "source_tree": "same original 11genestre dated source, use exact original patristic distances and lexical-tie ordering",
+    "known_target_data": "the target's six-bit anthocyanidin presence class is assumed already known; prediction does not infer class identity",
+    "baseline": "mean log1p(100*compound mg/g) among all other same-presence-class tips, same as existing gene prediction source donor eligibility",
+    "nearest_two": "arithmetic mean transformed compound concentrations of two nearest original-tree neighbours *within same source six-bit class*, frozen k=2",
+    "gain": "(source class-wide mean scaled MSE - source nearest-two scaled MSE) / source class-wide mean scaled MSE",
+    "positive_practical_requirement": "observed relative gain > 0; a positive permutation-locality P with negative net gain is NOT practical transfer",
+    "no_phenotype_threshold_optimization": true,
+    "no_alternative_k_search": true,
+    "no_nonzero_only_taxon_subset": true
+  },
+  "null": {
+    "iterations": 9999,
+    "seed": 20261020,
+    "exchangeability": "For each permutation, shuffle intact SIX-compound (3 flavonol + 3 anthocyanidin) measured concentration vectors only among taxa with identical original six-bit anthocyanidin-presence codes, preserving within-taxon metabolite covariance, zeros, and source phylogeny/taxon membership. Recompute both group losses.",
+    "p_value": "upper-tail (1 + number of permuted gains >= observed gain)/10000",
+    "holm_familywise": "Holm adjustment for the two original independent biochemical target families; report adjusted locality P for both.",
+    "decision": "SUPPORTED_RETROSPECTIVE_METABOLITE_TRANSFER only if observed gain>0 AND Holm P<=0.05; else NOT_SUPPORTED_PRACTICAL_TRANSFER or NOT_SUPPORTED_LOCALITY_AFTER_MULTIPLICITY",
+    "unit_of_permutation": "whole species chemical vector, not 47×3 features, individual pair events or nearest neighbour donor sets",
+    "effect_difference_tested": false
+  },
+  "secondary_descriptive": {
+    "source_original_6_state_perclass_gain": "report six per-class gain/MSE values for each biochemical group; do not select positive-only classes",
+    "one_class_recipient_omissions": "using original fixed neighbour donor weights and variance, omit only evaluation recipients from one class; no independent tests or refits"
+  },
+  "caveats": {
+    "retrospective_single_radiation": true,
+    "source_metabolite_measures_not_experimental_flavonol_function": true,
+    "pigment_code_based_on_anthocyanidin_presence_and_comparator_amounts": true,
+    "no_direct_UV_reflectance_pollinator_fitness_measured": true,
+    "no_causal_gene_to_metabolite_mediation_claim": true,
+    "no_universal_phylogenetic_memory_law": true,
+    "previous_flavonol_gene_source_prediction_unchanged": true,
+    "previous_Camellia_AJB_EL_science_untouched": true
+  }
+}
