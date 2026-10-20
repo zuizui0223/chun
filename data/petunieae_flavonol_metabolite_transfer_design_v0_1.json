@@ -84,7 +84,9 @@
   },
   "secondary_descriptive": {
     "source_original_6_state_perclass_gain": "report six per-class gain/MSE values for each biochemical group; do not select positive-only classes",
-    "one_class_recipient_omissions": "using original fixed neighbour donor weights and variance, omit only evaluation recipients from one class; no independent tests or refits"
+    "one_class_recipient_omissions": "using original fixed neighbour donor weights and variance, omit only evaluation recipients from one class; no independent tests or refits",
+    "zero_denominator_original_state": "If an original six-bit code contains all-zero measured analytes and its class-mean MSE is exactly zero, retain all its taxa in pooled 47-tip prediction/null and record only the within-class relative gain as null (0/0); never drop or relabel zero-state taxa. This is a structural implementation clarification before any complete source biochemical outcome, not new source selection.",
+    "zero_state_protocol_amendment_date": "2026-10-20"
   },
   "caveats": {
     "retrospective_single_radiation": true,
