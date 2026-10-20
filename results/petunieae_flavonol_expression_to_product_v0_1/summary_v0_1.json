@@ -1,0 +1,133 @@
+{
+  "version": "v0.1",
+  "date": "2026-10-20",
+  "status": "SUPPORTED_RETROSPECTIVE_WITHIN_SOURCE_EXPRESSION_TO_PRODUCT_TRANSFER",
+  "scope": "ONE_RADIATION_SOURCE_EXPOSED_CONDITIONAL_PREDICTIVE_ASSOCIATION_NOT_CAUSAL",
+  "authoritative_source_doi": "10.1098/rspb.2023.0275",
+  "original_source_artifact_run": 34182646549,
+  "original_new_outcome_ci_run": 39407372990,
+  "full_result_original_ci_artifact_id": 12258141863,
+  "full_result_original_ci_artifact_url": "https://github.com/zuizui0223/chun/actions/runs/39407372990/artifacts/12258141863",
+  "original_source_sha_verification": "PASS_ORIGINAL_CSV_TREE_R_SCRIPT_BY_existing_load_source",
+  "original_source_n_species": 47,
+  "sixbit_retained_chemical_presence_states": 6,
+  "fixed_expression_predictors": [
+    "F3primeH",
+    "FLS",
+    "MYBFL",
+    "MYB12"
+  ],
+  "fixed_measured_product_targets": [
+    "myr_mgg",
+    "quer_mgg",
+    "kaem_mgg"
+  ],
+  "original_transforms": "log1p(TPM10K gene), log1p(100*original measured flavonol mg/g)",
+  "original_predictive_baseline": "other original same-anthocyanidin-sixbit-class taxa mean Y",
+  "original_predictor": "other 46 training-only standardized gene expression class-intercept ridge alpha=10; target measured gene expression assumed known",
+  "ridge_alpha": 10,
+  "class_mean_scaled_MSE": 1.2249248985737036,
+  "gene_plus_class_ridge_scaled_MSE": 1.1462755606625517,
+  "original_relative_practical_gain": 0.06420747753819912,
+  "source_species_prediction_improved": 28,
+  "source_species_prediction_worsened": 19,
+  "permutation_method": "9999 within original sixbit-pigment-state intact four-gene taxon vector shuffles; no phylogenetic covariance correction",
+  "n_permutations": 9999,
+  "seed": 20261020,
+  "null_mean_gain": -0.05519976326214884,
+  "null_q025": -0.1459802620790975,
+  "null_q975": 0.06471032475544626,
+  "p_one_sided": 0.0254,
+  "per_metabolite_descriptive": [
+    {
+      "metabolite": "myr_mgg",
+      "class_mean_MSE": 1.332881160891702,
+      "ridge_MSE": 1.3557539855579248,
+      "relative_gain": -0.017160438107566074
+    },
+    {
+      "metabolite": "quer_mgg",
+      "class_mean_MSE": 1.1954575977106465,
+      "ridge_MSE": 1.0142748181660053,
+      "relative_gain": 0.15155935257897407
+    },
+    {
+      "metabolite": "kaem_mgg",
+      "class_mean_MSE": 1.146435937118763,
+      "ridge_MSE": 1.0687978782637249,
+      "relative_gain": 0.06772123617317771
+    }
+  ],
+  "per_source_sixbit_state_descriptive": [
+    {
+      "sixbit_state": "000000",
+      "n_taxa": 6,
+      "relative_gain": 0.07536297761045199
+    },
+    {
+      "sixbit_state": "000010",
+      "n_taxa": 6,
+      "relative_gain": -0.06967661430127449
+    },
+    {
+      "sixbit_state": "000011",
+      "n_taxa": 6,
+      "relative_gain": 0.23047227575655682
+    },
+    {
+      "sixbit_state": "000100",
+      "n_taxa": 10,
+      "relative_gain": -0.08225485877248717
+    },
+    {
+      "sixbit_state": "000110",
+      "n_taxa": 6,
+      "relative_gain": 0.017682655293839354
+    },
+    {
+      "sixbit_state": "000111",
+      "n_taxa": 13,
+      "relative_gain": 0.12580341363931763
+    }
+  ],
+  "original_fixed_alpha_sensitivity_descriptive": [
+    {
+      "alpha": 1,
+      "gain": 0.035837273502688526,
+      "new_p_value": null
+    },
+    {
+      "alpha": 100,
+      "gain": 0.05436980788326907,
+      "new_p_value": null
+    }
+  ],
+  "post_outcome_recipient_omission_descriptive": {
+    "one_recipient_loss_omitted_positive": 47,
+    "one_recipient_loss_omitted_total": 47,
+    "min_gain": 0.040918867764456524,
+    "median_gain": 0.0644429551707737,
+    "max_gain": 0.08708719799095699,
+    "highest_three_positive_recipients_original_source_ids": [
+      "BRJA",
+      "LEAL",
+      "PBON"
+    ],
+    "highest_three_positive_recipients_share_of_positive_contributions": 0.36858016852157716,
+    "deleting_those_three_recipient_LOSSES_without_refitting_gain": 0.0034240203776657596,
+    "explicitly_post_outcome_topthree_selection": true,
+    "no_new_p_value": true
+  },
+  "unmodified_prior_gene_expression_nearest2_gain": 0.05613676603732491,
+  "unmodified_prior_metabolite_nearest2_gain": -0.2408027234935364,
+  "limitations": {
+    "no_causal_gene_to_metabolite_inference": true,
+    "null_exchangeability_does_not_account_for_phylogenetic_autocorrelation": true,
+    "source_exposed_model_and_hypothesis_retrospective": true,
+    "no_housekeeping_or_unrelated_metabolic_control": true,
+    "per_compound_and_per_class_values_no_individual_P": true,
+    "no_formal_comparison_with_ancestry_only_predictor_effect": true,
+    "no_external_independent_radiation": true,
+    "original_AJB_Camellia_EL_first_submission_unchanged": true
+  }
+}

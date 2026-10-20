@@ -1,0 +1,90 @@
+{
+  "version": "v0.1",
+  "date": "2026-10-20",
+  "status": "RETROSPECTIVE_FIXED_FLAVONOL_EXPRESSION_TO_MEASURED_PRODUCT_TEST_PRE_OUTCOME",
+  "biological_question": "Within original Petunieae taxa sharing an identical anthocyanidin six-bit presence class, does the original fixed four-gene flavonol-related expression profile improve out-of-species prediction of the *three measured flavonol concentrations* beyond the pigment-class mean?",
+  "previously_exposed_biology": "Original gene-module source-prediction outcome +5.6137% for F3primeH/FLS/MYBFL/MYB12, measured flavonol amount k2-from-tree practical FAIL -24.0803%. This is a new target-vs-expression association and is source-exposed retrospective, not external blind validation.",
+  "source": {
+    "publication_doi": "10.1098/rspb.2023.0275",
+    "original_OSF": "zg9cu",
+    "authoritative_GitHub_artifact_run": 34182646549,
+    "published_CSV": "processed/phyloCCA__tpm10k-mgg-combined-with-flavs.csv",
+    "original_CSV_SHA256": "5843d4cd4eb253046f97349fa6bd285ca77e43e7a9c3aaa0e78fae3e8e391edd",
+    "original_tree": "processed/phyloCCA__11genestre_dated_pruned.tre",
+    "original_tree_SHA256": "95b4a688d3d71417b712b37a2b04cdc22a9431be3172d6509def4435f5fd8614",
+    "original_source_loader": "scripts/run_petunieae_nested_regulatory_leaveoneout_prediction_v0_1.py:load_source",
+    "original_gene_function_partition": "data/petunieae_functional_module_memory_design_v0_1.json",
+    "prior_measured_metabolite_product_result": "results/petunieae_flavonol_metabolite_transfer_v0_1/result_v0_1.json"
+  },
+  "fixed_frame": {
+    "n_original_species": 47,
+    "sixbit_class_counts": {
+      "000000": 6,
+      "000010": 6,
+      "000011": 6,
+      "000100": 10,
+      "000110": 6,
+      "000111": 13
+    },
+    "class_fixed_before_outcome": true,
+    "old_rare_state_filter_remains": true,
+    "original_data_study_one_radiation": true,
+    "biological_predictors": [
+      "F3primeH",
+      "FLS",
+      "MYBFL",
+      "MYB12"
+    ],
+    "measured_targets": [
+      "myr_mgg",
+      "quer_mgg",
+      "kaem_mgg"
+    ],
+    "source_units": "expression log1p(original TPM10K), metabolites log1p(100 * original mg/g)",
+    "no_interaction_screening": true,
+    "no_single_gene_or_metabolite_subset_primary": true
+  },
+  "primary_model": {
+    "test": "47 species leave-one-out crossvalidated prediction within original source",
+    "baseline": "For each omitted species i, take mean of measured flavonol transformed target vector Y among the other original species carrying the same fixed anthocyanidin-presence class",
+    "candidate": "Add the four fixed measured expression predictors through a shared-slope ridge regression, with unpenalized fixed intercept per six-bit pigment class. In each heldout fold, z-standardize each gene using only other 46 tips, centre standardized gene features and Y within training pigment class, and fit B=solve(X_center.T@X_center + alpha I, X_center.T@Y_center). Predict heldout Y as training-only class mean of Y plus target deviation from the training-only same-class predictor mean times B.",
+    "fixed_ridge_alpha": 10,
+    "alpha_scale": "Ridge alpha in coordinates z-scored using only the 46 training gene values, applied to all four gene coefficient columns, no penalty on six fixed source class intercepts",
+    "donor_condition": "Measured expression of held-out taxon is available; exact pigment state of target already known; not a prediction from DNA or a mechanistic perturbation",
+    "loss": "mean of 3 compound per species squared errors / corresponding target variance from its other 46 source taxa (population ddof0); then equal average over 47 heldout species",
+    "gain": "(class-mean LOOCV MSE - gene+class ridge LOOCV MSE)/class-mean LOOCV MSE. Positive means additional predictive information in gene expression beyond source class",
+    "rule": "SUPPORTED_RETROSPECTIVE_WITHIN_SOURCE_EXPRESSION_TO_PRODUCT_TRANSFER if observed gain > 0 AND positive-tail within-class whole-vector permutation P<=0.05; otherwise NOT_SUPPORTED. This is NOT a causal gene-to-metabolite statement.",
+    "model_is_ancestry_adjusted": false,
+    "phylogeny_robustness_caveat": "Same-tree taxa and source class fixed, but correlations due to shared ancestry/environment may drive outcome. This model only tests conditional predictive association; no causal or phylogenetic mixed-effect proof."
+  },
+  "permutation": {
+    "iterations": 9999,
+    "seed": 20261020,
+    "exchangeability": "Randomly permute the intact *four-gene source vector* among the 47 taxa strictly within the six original fine anthocyanidin-presence classes while holding measured Y values and class assignments fixed. Redo all leave-one-species-out train-standardized ridge predictions. This retains within-gene correlation and source class effects but is NOT a null that preserves within-class phylogenetic expression autocorrelation.",
+    "p_value": "one-sided upper-tail (1 + number null gains >= observed gain)/10000",
+    "no_pvalue_from_47_nonindependent_folds": true,
+    "no_posthoc_k_alpha_gene_selection": true
+  },
+  "secondary_descriptive": {
+    "per_original_class": "Report per-class baseline and ridge error/gain for all six fixed original class labels; no class rescues",
+    "per_target": "Report myricetin, quercetin and kaempferol individual prediction gains as descriptive only without extra P values",
+    "training_scaling_and_expression": "Compute training-only gene means, gene variances, and measured-product variances in each held-out fold",
+    "fixed_alpha_sensitivity": [
+      1,
+      100
+    ],
+    "alpha_sensitivity_note": "Alpha 1 and 100 are post-result descriptive robustness; no new p values or selection of best alpha",
+    "paired_tip_breadth": "Count 47 recipients improved or worse; source descriptive only",
+    "housekeeping_negative_control_available": false
+  },
+  "safeguards": {
+    "original_flavonol_gene_module_prediction_positive_unchanged": true,
+    "original_flavonol_mg_g_ancestry_k2_prediction_negative_unchanged": true,
+    "no_claim_UV_reflectance_fitness_pollinator_link": true,
+    "gene_product_effect_difference_not_tested": true,
+    "source_was_outcome_exposed_before_this_new_question": true,
+    "independent_second_radiation_not_admitted": true,
+    "original_camellia_AJB_EL_first_submission_unchanged": true,
+    "no_new_temporal_memory_decay_inference": true
+  }
+}
