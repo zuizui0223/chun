@@ -76,6 +76,33 @@ jobs:
           assert a['original_camellia_AJB_and_EL_science_unchanged'] is True
           print('PETUNIEAE_TWO_BIOCHEMICAL_FAMILIES_SOURCE_GATE_PASS')
           PY
+      - name: Replay frozen original source biochemical predictions with numeric tolerance
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          current=json.loads(Path('build/petunieae_flavonol_metabolite_transfer_v0_1.json').read_text())
+          frozen=json.loads(Path('results/petunieae_flavonol_metabolite_transfer_v0_1/result_v0_1.json').read_text())
+          def equal(a,b,location='root'):
+              assert type(a)==type(b),(location,type(a),type(b))
+              if isinstance(a,dict):
+                  assert a.keys()==b.keys(),location
+                  for k in a:equal(a[k],b[k],location+'.'+str(k))
+              elif isinstance(a,list):
+                  assert len(a)==len(b),location
+                  for i,(u,v) in enumerate(zip(a,b)):equal(u,v,location+'['+str(i)+']')
+              elif isinstance(a,float):
+                  assert abs(a-b)<1e-12,(location,a,b)
+              else:
+                  assert a==b,(location,a,b)
+          equal(current,frozen)
+          assert frozen['target_results'][0]['decision']=='NOT_SUPPORTED_PRACTICAL_TRANSFER'
+          assert frozen['target_results'][1]['decision']=='NOT_SUPPORTED_PRACTICAL_TRANSFER'
+          assert frozen['target_results'][0]['n_positive_one_class_recipient_omissions']==0
+          assert frozen['original_fixed_flavonol_expression_gene_predictive_gain_unchanged']>0
+          assert frozen['original_camellia_AJB_and_EL_science_unchanged'] is True
+          print('PETUNIEAE_SOURCE_METABOLITE_TRANSFER_NEGATIVE_OUTCOME_REPRODUCED')
+          PY
       - uses: actions/upload-artifact@v4
         if: always()
         with:
