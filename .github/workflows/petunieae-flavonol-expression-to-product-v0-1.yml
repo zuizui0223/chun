@@ -82,6 +82,52 @@ jobs:
                 a["status"],a["original_relative_prediction_gain"],
                 a["source_conditional_permutation_p_one_sided"])
           PY
+      - name: Reproduce permanent source summary and validate recipient leverage without new test
+        run: |
+          python - <<'PY'
+          import json, numpy as np
+          from pathlib import Path
+          d=json.loads(Path('build/petunieae_flavonol_gene_to_product_result_v0_1.json').read_text())
+          frozen=json.loads(Path('results/petunieae_flavonol_expression_to_product_v0_1/summary_v0_1.json').read_text())
+          def eq(a,b,label):
+              assert abs(a-b)<1e-12,(label,a,b)
+          assert d['status']==frozen['status']
+          assert d['fixed_predictor_genes']==frozen['fixed_expression_predictors']
+          assert d['fixed_measured_flavonols']==frozen['fixed_measured_product_targets']
+          assert d['n_original_species']==frozen['original_source_n_species']==47
+          assert d['n_taxon_label_permutations']==frozen['n_permutations']==9999
+          assert d['seed']==frozen['seed']
+          eq(d['original_class_mean_MSE'],frozen['class_mean_scaled_MSE'],'baseline')
+          eq(d['original_four_gene_ridge_MSE'],frozen['gene_plus_class_ridge_scaled_MSE'],'ridge')
+          eq(d['original_relative_prediction_gain'],frozen['original_relative_practical_gain'],'gain')
+          eq(d['source_conditional_permutation_p_one_sided'],frozen['p_one_sided'],'P')
+          for a,b in zip(d['per_measured_flavonol_descriptive'],
+                         frozen['per_metabolite_descriptive']):
+              assert a['metabolite']==b['metabolite']
+              eq(a['relative_gain'],b['relative_gain'],a['metabolite'])
+          for a,b in zip(d['per_class_descriptive'],frozen['per_source_sixbit_state_descriptive']):
+              assert a['sixbit_state']==b['sixbit_state'] and a['n_taxa']==b['n_taxa']
+              eq(a['relative_gain'],b['relative_gain'],a['sixbit_state'])
+          raw=d['per_original_species_recipient_source']
+          b=np.asarray(raw['per_tip_class_mean_loss']);ridge=np.asarray(raw['per_tip_ridge_loss'])
+          assert len(b)==len(ridge)==47
+          omissions=[1-(ridge.sum()-ridge[i])/(b.sum()-b[i]) for i in range(47)]
+          checks=frozen['post_outcome_recipient_omission_descriptive']
+          assert sum(v>0 for v in omissions)==checks['one_recipient_loss_omitted_positive']==47
+          eq(min(omissions),checks['min_gain'],'leaveone min')
+          eq(max(omissions),checks['max_gain'],'leaveone max')
+          dif=b-ridge
+          top=np.argsort(-dif)[:3]
+          assert [raw['source_tip_identifiers'][i] for i in top]==checks['highest_three_positive_recipients_original_source_ids']
+          kept=np.ones(47,dtype=bool);kept[top]=False
+          eq(1-ridge[kept].mean()/b[kept].mean(),
+             checks['deleting_those_three_recipient_LOSSES_without_refitting_gain'],
+             'post-outcome top3 recipient leverage')
+          assert frozen['limitations']['null_exchangeability_does_not_account_for_phylogenetic_autocorrelation']
+          assert frozen['limitations']['original_AJB_Camellia_EL_first_submission_unchanged']
+          print('PETUNIEAE_FLAVONOL_GENE_PRODUCT_FROZEN_REPLAY_PASS',
+                frozen['original_relative_practical_gain'],frozen['p_one_sided'])
+          PY
       - uses: actions/upload-artifact@v4
         if: always()
         with:
