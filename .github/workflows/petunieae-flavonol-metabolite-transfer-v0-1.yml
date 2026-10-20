@@ -1,0 +1,117 @@
+name: Petunieae measured flavonol and anthocyanidin transfer v0.1
+
+on:
+  pull_request:
+    paths:
+      - 'data/petunieae_flavonol_metabolite_transfer_design_v0_1.json'
+      - 'scripts/analyze_petunieae_flavonol_metabolite_transfer_v0_1.py'
+      - 'tests/test_petunieae_flavonol_metabolite_transfer_v0_1.py'
+      - 'results/petunieae_flavonol_metabolite_transfer_v0_1/**'
+      - '.github/workflows/petunieae-flavonol-metabolite-transfer-v0-1.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  actions: read
+
+jobs:
+  original_source_metabolite_transfer:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install pinned Petunieae source science dependencies
+        run: python -m pip install --disable-pip-version-check -r requirements/requirements-repository-integrity.txt
+      - name: Verify only two original compound targets and unchanged nearest-two/source constraints
+        run: python -m pytest -q tests/test_petunieae_flavonol_metabolite_transfer_v0_1.py
+      - name: Retrieve original byte-verified 47-tip Wheeler Petunieae molecular and metabolite data
+        uses: actions/download-artifact@v4
+        with:
+          name: petunieae-prospective-osf-v0-1
+          repository: zuizui0223/chun
+          run-id: 34182646549
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          path: build/source_original_osf
+      - name: Measure full-gene-prediction-preserving biochemical outputs under 9999 species permutation nulls
+        run: |
+          python scripts/analyze_petunieae_flavonol_metabolite_transfer_v0_1.py \
+            --source build/source_original_osf \
+            --design data/petunieae_flavonol_metabolite_transfer_design_v0_1.json \
+            --original-design data/petunieae_nested_regulatory_memory_preregistered_design_v0_1.json \
+            --original-prediction-design data/petunieae_nested_regulatory_leaveoneout_prediction_design_v0_1.json \
+            --out build/petunieae_flavonol_metabolite_transfer_v0_1.json
+      - name: Preserve class-conditioned original biological question and statistical decision rules
+        run: |
+          python - <<'PY'
+          import json,math
+          from pathlib import Path
+          a=json.loads(Path('build/petunieae_flavonol_metabolite_transfer_v0_1.json').read_text())
+          assert a['status']=='RETROSPECTIVE_ORIGINAL_METABOLITE_TRANSFER_ON_47_TIPS'
+          assert a['n_original_taxa']==47 and a['n_original_sixbit_anthocyanidin_states']==6
+          assert a['fixed_nearest_k']==2 and a['n_measurement_target_families']==2
+          assert a['n_within_class_permutations']==9999 and a['seed']==20261020
+          assert a['source_original_three_sha256_verified'] is True
+          assert abs(a['source_original_full_21_gene_gain_recovered']-(-0.0990780619015505))<1e-10
+          assert abs(a['original_fixed_flavonol_expression_gene_predictive_gain_unchanged']-0.05613676603732491)<1e-13
+          assert [r['target_id'] for r in a['target_results']]==[
+            'FLAVONOL_CONCENTRATION','ANTHOCYANIDIN_AMOUNT_POSITIVE_VARYING']
+          for r in a['target_results']:
+              assert r['n_compounds']==3
+              assert len(r['measured_compound_columns'])==3
+              assert len(r['per_original_sixbit_class'])==6
+              assert len(r['recipient_only_leave_one_class'])==6
+              assert math.isfinite(r['relative_practical_prediction_gain'])
+              assert 0<r['source_locality_p']<=r['holm_two_targets_p']<=1
+              if r['decision']=='SUPPORTED_RETROSPECTIVE_METABOLITE_TRANSFER':
+                  assert r['relative_practical_prediction_gain']>0 and r['holm_two_targets_p']<=.05
+              if r['relative_practical_prediction_gain']<=0:
+                  assert r['decision']=='NOT_SUPPORTED_PRACTICAL_TRANSFER'
+          assert a['biochemical_presence_known_at_prediction_time'] is True
+          assert a['not_formal_gene_expression_vs_metabolite_effect_difference_test'] is True
+          assert a['not_a_pollinator_fitness_UV_phenotype_test'] is True
+          assert a['not_prospective_independent_radiation_validation'] is True
+          assert a['original_camellia_AJB_and_EL_science_unchanged'] is True
+          print('PETUNIEAE_TWO_BIOCHEMICAL_FAMILIES_SOURCE_GATE_PASS')
+          PY
+      - name: Replay frozen original source biochemical predictions with numeric tolerance
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          current=json.loads(Path('build/petunieae_flavonol_metabolite_transfer_v0_1.json').read_text())
+          frozen=json.loads(Path('results/petunieae_flavonol_metabolite_transfer_v0_1/result_v0_1.json').read_text())
+          def equal(a,b,location='root'):
+              # JSON serializers may emit the same exact original numeric
+              # zero as 0 or 0.0. Keep object keys, arrays, strings, booleans
+              # and biological decisions strict; tolerate only numeric repr.
+              if isinstance(a,(float,int)) and isinstance(b,(float,int)) and not isinstance(a,bool) and not isinstance(b,bool):
+                  assert abs(a-b)<1e-12,(location,a,b)
+                  return
+              assert type(a)==type(b),(location,type(a),type(b))
+              if isinstance(a,dict):
+                  assert a.keys()==b.keys(),location
+                  for k in a:equal(a[k],b[k],location+'.'+str(k))
+              elif isinstance(a,list):
+                  assert len(a)==len(b),location
+                  for i,(u,v) in enumerate(zip(a,b)):equal(u,v,location+'['+str(i)+']')
+              elif isinstance(a,float):
+                  assert abs(a-b)<1e-12,(location,a,b)
+              else:
+                  assert a==b,(location,a,b)
+          equal(current,frozen)
+          assert frozen['target_results'][0]['decision']=='NOT_SUPPORTED_PRACTICAL_TRANSFER'
+          assert frozen['target_results'][1]['decision']=='NOT_SUPPORTED_PRACTICAL_TRANSFER'
+          assert frozen['target_results'][0]['n_positive_one_class_recipient_omissions']==0
+          assert frozen['original_fixed_flavonol_expression_gene_predictive_gain_unchanged']>0
+          assert frozen['original_camellia_AJB_and_EL_science_unchanged'] is True
+          print('PETUNIEAE_SOURCE_METABOLITE_TRANSFER_NEGATIVE_OUTCOME_REPRODUCED')
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: petunieae-flavonol-metabolite-transfer-v0-1
+          path: build/petunieae_flavonol_metabolite_transfer_v0_1.json
+          if-no-files-found: warn
