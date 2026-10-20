@@ -1,0 +1,111 @@
+name: Petunieae training-only phylogenetic lambda sensitivity v0.1
+
+on:
+  pull_request:
+    paths:
+      - 'data/petunieae_training_estimated_phylo_lambda_diagnostic_v0_1.json'
+      - 'scripts/audit_petunieae_training_estimated_phylo_lambda_v0_1.py'
+      - 'tests/test_petunieae_training_estimated_phylo_lambda_v0_1.py'
+      - 'results/petunieae_training_estimated_phylo_lambda_v0_1/**'
+      - '.github/workflows/petunieae-training-only-phylo-lambda-v0-1.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  actions: read
+
+jobs:
+  source_training_lambda:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 12
+    env:
+      OPENBLAS_NUM_THREADS: "1"
+      MKL_NUM_THREADS: "1"
+      OMP_NUM_THREADS: "1"
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install prior original Petunieae pinned science requirements
+        run: python -m pip install --disable-pip-version-check -r requirements/requirements-repository-integrity.txt
+      - name: Verify 46-training-species REML never sees held-out measured flavonol and original source preserved
+        run: python -m pytest -q tests/test_petunieae_training_estimated_phylo_lambda_v0_1.py
+      - name: Download original authoritative original OSF Petunieae 47-tip source
+        uses: actions/download-artifact@v4
+        with:
+          name: petunieae-prospective-osf-v0-1
+          repository: zuizui0223/chun
+          run-id: 34182646549
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          path: build/verified_source_osf
+      - name: Refit baseline-only working phylogenetic covariance from 46 training taxon products per fold
+        run: |
+          python scripts/audit_petunieae_training_estimated_phylo_lambda_v0_1.py \
+            --source build/verified_source_osf \
+            --design data/petunieae_training_estimated_phylo_lambda_diagnostic_v0_1.json \
+            --original-design data/petunieae_nested_regulatory_memory_preregistered_design_v0_1.json \
+            --original-prediction-design data/petunieae_nested_regulatory_leaveoneout_prediction_design_v0_1.json \
+            --original-phylo-result results/petunieae_phylo_conditional_gene_product_v0_1/result_v0_1.json \
+            --out build/petunieae_training_only_lambda_source_v0_1.json
+      - name: Preserve original 47-source cohort and no new hypothesis P values
+        run: |
+          python - <<'PY'
+          import json, math
+          from pathlib import Path
+          x=json.loads(Path('build/petunieae_training_only_lambda_source_v0_1.json').read_text())
+          assert x['status']=='POST_OUTCOME_TRAIN_ONLY_LAMBDA_GAIN_SOURCE_AUDIT_NO_NEW_P'
+          assert x['source_original_47_tips_sha_check_passed']
+          assert x['n_original_species']==47
+          assert x['original_four_gene_predictors']==['F3primeH','FLS','MYBFL','MYB12']
+          assert x['original_three_flavonol_products']==['myr_mgg','quer_mgg','kaem_mgg']
+          assert x['original_fixed_ridge_alpha']==10
+          assert x['frozen_training_only_lambda_candidates']==[0,.1,.25,.5,.75,.9,.95,.99]
+          assert len(x['selected_lambda_per_original_taxon'])==47
+          assert sum(x['chosen_lambda_counts'].values())==47
+          assert x['all_fold_lambdas_selected_using_only_training_metabolite_Y']
+          assert abs(x['prior_fixed_lambda_half_gain']-(-.04208292517617994))<1e-12
+          assert x['prior_fixed_lambda_half_model_p']==.3439
+          assert abs(x['prior_lambda0_gain']-.06420747753819912)<1e-12
+          assert math.isfinite(x['additional_gene_relative_gain'])
+          assert x['no_new_statistical_P_values']
+          assert x['working_covariance_lambda_REML_not_causal_or_truth_proven']
+          assert x['original_AJB_Camellia_EL_frozen_and_integrated_draft']
+          print('PETUNIEAE_TRAINING_ONLY_PHYLOGENETIC_LAMBDA_SOURCE_PASS',
+                x['chosen_lambda_counts'],x['additional_gene_relative_gain'])
+          PY
+      - name: Verify complete exact original 47-taxon REML results and the pre-existing model contrast
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          a=json.loads(Path('build/petunieae_training_only_lambda_source_v0_1.json').read_text())
+          b=json.loads(Path('results/petunieae_training_estimated_phylo_lambda_v0_1/result_v0_1.json').read_text())
+          def comparable(u,v,path='root'):
+              if isinstance(u,(float,int)) and isinstance(v,(float,int)) and not isinstance(u,bool) and not isinstance(v,bool):
+                  assert abs(u-v)<1e-12,(path,u,v)
+                  return
+              assert type(u)==type(v),(path,type(u),type(v))
+              if isinstance(u,dict):
+                  assert u.keys()==v.keys(),path
+                  for key in u: comparable(u[key],v[key],path+'.'+str(key))
+              elif isinstance(u,list):
+                  assert len(u)==len(v),path
+                  for i,(x,y) in enumerate(zip(u,v)): comparable(x,y,path+'['+str(i)+']')
+              else:
+                  assert u==v,(path,u,v)
+          comparable(a,b)
+          assert a['chosen_lambda_counts']=={'0.75':46,'0.9':1}
+          assert a['additional_gene_relative_gain']<0
+          assert a['source_taxa_improved']+a['source_taxa_worse']==47
+          assert a['prior_fixed_lambda_half_model_p']==0.3439
+          assert a['no_new_statistical_P_values']
+          assert a['original_AJB_Camellia_EL_frozen_and_integrated_draft']
+          print('PETUNIEAE_TRAIN_ONLY_REML_ORIGINAL_47_TAXA_NEGATIVE_GAIN_REPLAY_PASS')
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: petunieae-training-estimated-phylo-lambda-v0-1
+          path: build/petunieae_training_only_lambda_source_v0_1.json
+          if-no-files-found: warn
