@@ -1,0 +1,110 @@
+{
+  "fixed_gene_alpha": 10,
+  "fixed_working_Brownian_plus_nugget_lambda": 0.5,
+  "model_based_null_not_exact_phylogenetic_randomization": true,
+  "no_causal_gene_to_product_conclusion": true,
+  "no_environment_or_batch_adjustment": true,
+  "no_external_radiation_replication": true,
+  "null_residual_compound_covariance_eigenvalues": [
+    0.5016233673170951,
+    1.5297810431317485,
+    7.474584642654586
+  ],
+  "observed_working_lambda_sensitivity": {
+    "0": {
+      "baseline_MSE": 1.224924898573704,
+      "four_gene_MSE": 1.1462755606625517,
+      "gain": 0.06420747753819947,
+      "role": "ORIGINAL_UNADJUSTED_SOURCE"
+    },
+    "0.25": {
+      "baseline_MSE": 1.159142063420272,
+      "four_gene_MSE": 1.1626198785659565,
+      "gain": -0.0030003355545760247,
+      "role": "DESCRIPTIVE_LAMBDA_SENSITIVITY_NO_EXTRA_P"
+    },
+    "0.5": {
+      "baseline_MSE": 1.1624803237585595,
+      "four_gene_MSE": 1.2114008962420724,
+      "gain": -0.04208292517617994,
+      "role": "FIXED_PHYLOGENY_WORKING_MODEL"
+    },
+    "0.75": {
+      "baseline_MSE": 1.2175918734078366,
+      "four_gene_MSE": 1.301964379611177,
+      "gain": -0.069294570739205,
+      "role": "DESCRIPTIVE_LAMBDA_SENSITIVITY_NO_EXTRA_P"
+    },
+    "0.95": {
+      "baseline_MSE": 1.3337563509689905,
+      "four_gene_MSE": 1.458538905034235,
+      "gain": -0.0935572332792181,
+      "role": "DESCRIPTIVE_LAMBDA_SENSITIVITY_NO_EXTRA_P"
+    }
+  },
+  "original_AJB_Camellia_EL_submission_unchanged": true,
+  "original_four_genes": [
+    "F3primeH",
+    "FLS",
+    "MYBFL",
+    "MYB12"
+  ],
+  "original_lambda0_class_ridge_gain_reproduced": 0.06420747753819947,
+  "original_n_species": 47,
+  "original_source_exposed_retrospective_study": true,
+  "original_three_measured_products": [
+    "myr_mgg",
+    "quer_mgg",
+    "kaem_mgg"
+  ],
+  "original_tree_covariance_summary": {
+    "max_original_tip_height": 40.494838,
+    "mean_tip_height": 40.49483638297873,
+    "min_original_tip_height": 40.494835,
+    "minimum_normalized_tree_cov_eigenvalue": 0.07965877351602026,
+    "n_tips": 47
+  },
+  "original_unadjusted_source_positive_unchanged": true,
+  "primary_additional_expression_gain_over_phylogeny": -0.04208292517617994,
+  "primary_phylogeny_plus_pigment_baseline_MSE": 1.1624803237585595,
+  "primary_phylogeny_plus_pigment_plus_four_gene_MSE": 1.2114008962420724,
+  "primary_source_per_compound_descriptive": [
+    {
+      "base_mse": 1.5512292295724257,
+      "compound": "myr_mgg",
+      "gene_mse": 1.583578544842011,
+      "relative_gain": -0.02085398769755126
+    },
+    {
+      "base_mse": 0.9445639167894871,
+      "compound": "quer_mgg",
+      "gene_mse": 0.9649730703061803,
+      "relative_gain": -0.0216069586757692
+    },
+    {
+      "base_mse": 0.9916478249137656,
+      "compound": "kaem_mgg",
+      "gene_mse": 1.0856510735780256,
+      "relative_gain": -0.09479499304345734
+    }
+  ],
+  "primary_source_recipient_improved": 20,
+  "primary_source_recipient_worsened": 27,
+  "seed": 20261020,
+  "source_47_tips_original_SHA_loader_passed": true,
+  "source_model_conditional_p_one_sided": 0.3439,
+  "source_model_permutations": 9999,
+  "source_phylogenetic_parametric_null_mean_gain": -0.059078348142512095,
+  "source_phylogenetic_parametric_null_q025": -0.1580759009528839,
+  "source_phylogenetic_parametric_null_q975": 0.07727633268566257,
+  "source_six_original_pigment_classes": {
+    "000000": 6,
+    "000010": 6,
+    "000011": 6,
+    "000100": 10,
+    "000110": 6,
+    "000111": 13
+  },
+  "status": "NOT_SUPPORTED_PHYLOGENY_CONDITIONAL_SOURCE_TRANSFER",
+  "version": "v0.1"
+}
