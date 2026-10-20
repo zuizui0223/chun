@@ -121,3 +121,35 @@ def test_design_committed_before_original_phylogenetic_gain_and_no_causes():
     assert d["governance"]["no_new_phenotype_UV_pollinator_fitness_link"]
     assert d["governance"]["integrated_CHUN_PR414_stays_DRAFT"]
     assert d["governance"]["original_camellia_AJB_and_EL_scientific_submission_assets_unchanged"]
+
+
+RESULT=ROOT/"results/petunieae_phylo_conditional_gene_product_v0_1/result_v0_1.json"
+
+
+def test_actual_working_phylogenetic_source_does_not_support_extra_gene_prediction():
+    x=json.loads(RESULT.read_text(encoding="utf-8"))
+    assert x["status"]=="NOT_SUPPORTED_PHYLOGENY_CONDITIONAL_SOURCE_TRANSFER"
+    assert x["source_47_tips_original_SHA_loader_passed"]
+    assert x["original_n_species"]==47
+    assert x["fixed_working_Brownian_plus_nugget_lambda"]==0.5
+    assert x["fixed_gene_alpha"]==10
+    assert x["source_model_permutations"]==9999
+    assert x["seed"]==20261020
+    assert x["primary_phylogeny_plus_pigment_baseline_MSE"]==pytest.approx(
+        1.1624803237585595,abs=1e-12)
+    assert x["primary_phylogeny_plus_pigment_plus_four_gene_MSE"]==pytest.approx(
+        1.2114008962420724,abs=1e-12)
+    assert x["primary_additional_expression_gain_over_phylogeny"]==pytest.approx(
+        -0.04208292517617994,abs=1e-12)
+    assert x["source_model_conditional_p_one_sided"]==0.3439
+    assert x["original_lambda0_class_ridge_gain_reproduced"]==pytest.approx(
+        0.06420747753819912,abs=1e-12)
+    gains=x["observed_working_lambda_sensitivity"]
+    assert [gains[str(lam)]["gain"]<0 for lam in (0.25,0.5,0.75,0.95)]==[True]*4
+    assert gains["0"]["gain"]>0
+    assert x["model_based_null_not_exact_phylogenetic_randomization"]
+    assert x["no_causal_gene_to_product_conclusion"]
+    assert x["no_environment_or_batch_adjustment"]
+    assert x["no_external_radiation_replication"]
+    assert x["original_unadjusted_source_positive_unchanged"]
+    assert x["original_AJB_Camellia_EL_submission_unchanged"]
