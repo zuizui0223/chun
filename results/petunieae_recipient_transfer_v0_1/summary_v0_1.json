@@ -1,0 +1,71 @@
+{
+  "version": "v0.1",
+  "date": "2026-10-20",
+  "status": "POST_OUTCOME_RECIPIENT_COVERAGE_DIAGNOSTIC",
+  "source_SHA256_verified": true,
+  "n_taxa": 47,
+  "fixed_k": 2,
+  "new_p_values": 0,
+  "modules": [
+    {
+      "module_id": "LATE_ANTHOCYANIN_EXECUTION",
+      "n_recipients": 47,
+      "pooled_relative_gain": -0.1515160086240452,
+      "n_improved_recipients": 17,
+      "n_worse_recipients": 30,
+      "n_tied_recipients": 0,
+      "median_paired_loss_improvement": -0.11164119858440974,
+      "positive_after_omitting_one_recipient": 0,
+      "recipient_omission_gain_min": -0.18384817140635118,
+      "recipient_omission_gain_max": -0.12315269890335225,
+      "donor_count_penalty_MSE": 0.22810304680980686,
+      "locality_benefit_MSE": 0.1017979248385185,
+      "mean_paired_loss_improvement": -0.12630512197128832
+    },
+    {
+      "module_id": "FLAVONOL_BRANCH_AND_ACTIVATION",
+      "n_recipients": 47,
+      "pooled_relative_gain": 0.05613676603732521,
+      "n_improved_recipients": 27,
+      "n_worse_recipients": 20,
+      "n_tied_recipients": 0,
+      "median_paired_loss_improvement": 0.0840727423543588,
+      "positive_after_omitting_one_recipient": 47,
+      "recipient_omission_gain_min": 0.036002064617824535,
+      "recipient_omission_gain_max": 0.08967742127151444,
+      "donor_count_penalty_MSE": 0.2749854797562893,
+      "locality_benefit_MSE": 0.32974856347142095,
+      "mean_paired_loss_improvement": 0.05476308371513168
+    },
+    {
+      "module_id": "EARLY_SHARED_AND_REGULATORY",
+      "n_recipients": 47,
+      "pooled_relative_gain": -0.1160563729583513,
+      "n_improved_recipients": 19,
+      "n_worse_recipients": 28,
+      "n_tied_recipients": 0,
+      "median_paired_loss_improvement": -0.08520403783957753,
+      "positive_after_omitting_one_recipient": 0,
+      "recipient_omission_gain_min": -0.1528215821392417,
+      "recipient_omission_gain_max": -0.09414859935104863,
+      "donor_count_penalty_MSE": 0.3082358216863942,
+      "locality_benefit_MSE": 0.1268780167166782,
+      "mean_paired_loss_improvement": -0.18135780496971596
+    }
+  ],
+  "flavonol_top_three_positive_contributions": [
+    {"baseline_loss": 1.3955120037730386, "fine_state": "000000", "nearest_two_loss": 0.42209670642106223, "paired_loss_improvement": 0.9734152973519764, "source_taxon": "LESC"},
+    {"baseline_loss": 1.8656738982349887, "fine_state": "000000", "nearest_two_loss": 0.9154759979356051, "paired_loss_improvement": 0.9501979002993837, "source_taxon": "BOER"},
+    {"baseline_loss": 1.406901266738279, "fine_state": "000011", "nearest_two_loss": 0.459734359005522, "paired_loss_improvement": 0.9471669077327569, "source_taxon": "BRGR"}
+  ],
+  "flavonol_top_three_omission": {
+    "gain_if_recipient_losses_omitted": -0.007209862139976778,
+    "not_a_revised_primary_result": true,
+    "share_of_all_positive_improvements": 0.32986104510365677,
+    "source_taxa": ["LESC", "BOER", "BRGR"]
+  },
+  "original_full_cohort_gain_not_replaced": true,
+  "recipient_omission_does_not_refit": true,
+  "no_confidence_interval_for_positive_population_mean_gain": true,
+  "no_independent_radiation_validation": true
+}
