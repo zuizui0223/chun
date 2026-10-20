@@ -83,7 +83,7 @@ def test_brownian_plus_nugget_covariance_and_model_physical_controls():
     for bad in (-.1,1.0,float("nan")):
         with pytest.raises(ValueError):
             m.source_working_V(np.eye(5),bad)
-    with pytest.raises(ValueError,match="four"):
+    with pytest.raises(ValueError,match="4 gene"):
         m.loo_linear_kriging_operator(P,D,X[:,:3],10.)
 
 
