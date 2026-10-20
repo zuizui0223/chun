@@ -1,0 +1,90 @@
+name: Petunieae measured flavonol gene-to-product predictability v0.1
+
+on:
+  pull_request:
+    paths:
+      - 'data/petunieae_flavonol_expression_to_product_design_v0_1.json'
+      - 'scripts/analyze_petunieae_flavonol_expression_to_product_v0_1.py'
+      - 'tests/test_petunieae_flavonol_expression_to_product_v0_1.py'
+      - 'results/petunieae_flavonol_expression_to_product_v0_1/**'
+      - '.github/workflows/petunieae-flavonol-expression-to-product-v0-1.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  actions: read
+
+jobs:
+  original_source_test:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install pinned original-source analysis packages
+        run: python -m pip install --disable-pip-version-check -r requirements/requirements-repository-integrity.txt
+      - name: Test exact 46-species training-only ridge and original class permutation units
+        run: python -m pytest -q tests/test_petunieae_flavonol_expression_to_product_v0_1.py
+      - name: Download original 2023 Petunieae quantitative gene, metabolite and tree source
+        uses: actions/download-artifact@v4
+        with:
+          name: petunieae-prospective-osf-v0-1
+          repository: zuizui0223/chun
+          run-id: 34182646549
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          path: build/verified_source
+      - name: Run fixed 47-tip flavonol four-expression-gene to 3-chemical prediction
+        run: |
+          python scripts/analyze_petunieae_flavonol_expression_to_product_v0_1.py \
+            --source build/verified_source \
+            --design data/petunieae_flavonol_expression_to_product_design_v0_1.json \
+            --original-design data/petunieae_nested_regulatory_memory_preregistered_design_v0_1.json \
+            --original-prediction-design data/petunieae_nested_regulatory_leaveoneout_prediction_design_v0_1.json \
+            --out build/petunieae_flavonol_gene_to_product_result_v0_1.json
+      - name: Validate original target data identity, fixed ridge, exact-null response and governance
+        run: |
+          python - <<'PY'
+          import json,math
+          from pathlib import Path
+          a=json.loads(Path('build/petunieae_flavonol_gene_to_product_result_v0_1.json').read_text())
+          assert a["status"] in (
+              "SUPPORTED_RETROSPECTIVE_WITHIN_SOURCE_EXPRESSION_TO_PRODUCT_TRANSFER",
+              "NOT_SUPPORTED_RETROSPECTIVE_EXPRESSION_TO_PRODUCT_TRANSFER")
+          assert a["source_exposed_retrospective_analysis"]
+          assert a["n_original_species"]==47
+          assert a["n_original_sixbit_chemical_states"]==6
+          assert a["fixed_predictor_genes"]==["F3primeH","FLS","MYBFL","MYB12"]
+          assert a["fixed_measured_flavonols"]==["myr_mgg","quer_mgg","kaem_mgg"]
+          assert a["fixed_ridge_alpha"]==10
+          assert a["n_taxon_label_permutations"]==9999
+          assert a["seed"]==20261020
+          assert math.isfinite(a["original_relative_prediction_gain"])
+          assert 0<a["source_conditional_permutation_p_one_sided"]<=1
+          assert abs(a["original_class_mean_MSE"]-1.2249248985737038)<1e-10
+          assert abs(a["previous_flavonol_amount_original_k2_gain_unchanged"]+0.2408027234935364)<1e-11
+          assert abs(a["original_flavonol_expression_gene_k2_gain_unchanged"]-0.05613676603732491)<1e-11
+          assert a["n_species_with_improved_prediction"]+a["n_species_with_worse_prediction"]<=47
+          assert len(a["per_class_descriptive"])==6
+          assert len(a["per_measured_flavonol_descriptive"])==3
+          assert list(a["alpha_sensitivity_descriptive_only"])==["1","100"]
+          if a["status"].startswith("SUPPORTED_"):
+              assert a["original_relative_prediction_gain"]>0
+              assert a["source_conditional_permutation_p_one_sided"]<=.05
+          assert a["source_original_CSV_tree_R_sha256_checked"]
+          assert a["not_phylogeny_or_environment_adjusted_for_causality"]
+          assert a["permutation_exchangeability_may_be_restricted_by_phylogeny"]
+          assert a["no_measured_pollinator_fitness_or_UV_reflectance"]
+          assert a["no_external_prospective_second_radiation"]
+          assert a["original_camellia_AJB_EL_science_unchanged"]
+          print('PETUNIEAE_WITHIN_FINE_STATE_FLAVONOL_GENE_PRODUCT_SOURCE_QA_PASS',
+                a["status"],a["original_relative_prediction_gain"],
+                a["source_conditional_permutation_p_one_sided"])
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: petunieae-flavonol-expression-to-product-v0-1
+          path: build/petunieae_flavonol_gene_to_product_result_v0_1.json
+          if-no-files-found: warn
