@@ -1,0 +1,132 @@
+{
+  "version": "v0.1",
+  "status": "SOURCE_DOCUMENTED_REPRESENTATION_ADMISSION_NOT_NEW_EMPIRICAL_RESULT",
+  "basis": [
+    "docs/TEMPORAL_PROGRAM_COVERAGE_AND_FCP_SISTER_V0_1.md",
+    "docs/FLOWER_COLOUR_VARIATION_TEMPORAL_PROGRAM.md",
+    "manuscript/INTEGRATED_TEMPORAL_MEMORY_MECHANISMS_V0_1_DRAFT.md",
+    "results/petunieae_training_estimated_phylo_lambda_v0_1/result_v0_1.json"
+  ],
+  "n_system_entries": 10,
+  "admission_rule": "Only label a radiation multilayer when identical verified taxon IDs have source-authoritative tree, pigment concentrations and measured gene expression; distinguish cross-source developmental clusters from matched species",
+  "confirmed_multilayer_systems": [
+    "Petunieae"
+  ],
+  "n_confirmed_independent_multilayer_radiations": 1,
+  "rows": [
+    {
+      "system": "Flower-clades-51",
+      "unit": "51 predefined source clades",
+      "visible": "YES_STANDARDIZED",
+      "biochemistry": "NOT_HARMONIZED",
+      "expression": "NOT_HARMONIZED",
+      "tree": "YES_SOURCE_SPECIFIC",
+      "evidence": "32 temporal slopes, 28 profiles, 21 hidden memory eligible",
+      "decision": "ADMIT_VISIBLE_ONLY",
+      "reason": "Common ontology visible-color analyses do not supply aligned per-tip compound and transcript measurements"
+    },
+    {
+      "system": "Schistanthe",
+      "unit": "129 retained tips",
+      "visible": "YES_PROSPECTIVE",
+      "biochemistry": "NOT_ESTABLISHED_MATCHED",
+      "expression": "NOT_ESTABLISHED_MATCHED",
+      "tree": "YES",
+      "evidence": "Prospective hidden visible-state effect +0.06416 AUC P=.0033",
+      "decision": "ADMIT_VISIBLE_ONLY",
+      "reason": "Independent prospective visible-color validation; no established matched biochemical/transcript panel"
+    },
+    {
+      "system": "Petunieae",
+      "unit": "47 retained taxa",
+      "visible": "SOURCE_CONTEXT",
+      "biochemistry": "YES_3_FLAVONOLS_AND_ANTHOCYANIDINS",
+      "expression": "YES_21_GENES",
+      "tree": "YES_DATED_SOURCE",
+      "evidence": "Matched 47-tip chemical and 21-gene source; 4-gene gene-product gain +6.42% class-only but -4.21% fixed phylogeny and -6.43% training-estimated phylogeny",
+      "decision": "ADMIT_SINGLE_RADIATION_MULTILAYER_EXPLORATORY",
+      "reason": "Only currently confirmed aligned 47-tip tree, chemical quantities and measured transcripts"
+    },
+    {
+      "system": "Gesnerioideae",
+      "unit": "prospective biochemical source",
+      "visible": "SOURCE_CONTEXT",
+      "biochemistry": "YES_SOURCE_SPECIFIC",
+      "expression": "NOT_ESTABLISHED_MATCHED",
+      "tree": "YES",
+      "evidence": "Prospective biochemical hidden-memory -0.00779 AUC P=.5005",
+      "decision": "ADMIT_BIOCHEMICAL_ONLY_NEGATIVE",
+      "reason": "No source-verified corresponding four-gene expression panel"
+    },
+    {
+      "system": "Ruellia",
+      "unit": "source-specific radiation",
+      "visible": "SOURCE_CONTEXT",
+      "biochemistry": "SOURCE_IDENTIFIED",
+      "expression": "NOT_ESTABLISHED_MATCHED",
+      "tree": "AUTHOR_USED_TREE_MISSING",
+      "evidence": "Authoritative tree unavailable; outcome unopened",
+      "decision": "HOLD_SOURCE_TREE",
+      "reason": "Do not replace tree post hoc to admit source"
+    },
+    {
+      "system": "Iris",
+      "unit": "preregistered source",
+      "visible": "YES",
+      "biochemistry": "NOT_ESTABLISHED_MATCHED",
+      "expression": "NOT_ESTABLISHED_MATCHED",
+      "tree": "YES",
+      "evidence": "Prospective universal intermediate-resolution optimum FAIL",
+      "decision": "ADMIT_VISIBLE_ONLY_NEGATIVE",
+      "reason": "Failed visible resolution hypothesis does not measure transcript-metabolite transfer"
+    },
+    {
+      "system": "Camellia",
+      "unit": "molecular atlas case",
+      "visible": "YES_SOURCE_SPECIFIC",
+      "biochemistry": "SOURCE_SPECIFIC_MODULES",
+      "expression": "SOURCE_SPECIFIC_DEVELOPMENTAL",
+      "tree": "NOT_ESTABLISHED_FULLY_MATCHED_TIPS",
+      "evidence": "One of seven heterogeneous mechanistic source systems; repeated colour does not imply one complete molecular package",
+      "decision": "HOLD_JOINT_TIP_LEVEL_COMPARISON",
+      "reason": "Developmental modules and transition clusters are not same-tip 47-species quantitative expression+metabolite source"
+    },
+    {
+      "system": "Linoideae",
+      "unit": "external radiation",
+      "visible": "SOURCE_SPECIFIC",
+      "biochemistry": "NOT_ESTABLISHED_MATCHED",
+      "expression": "NOT_ESTABLISHED_MATCHED",
+      "tree": "YES_SOURCE_SPECIFIC",
+      "evidence": "Independent qualitative nested organization",
+      "decision": "ADMIT_QUALITATIVE_ONLY",
+      "reason": "No common molecular/chemical outcome scale"
+    },
+    {
+      "system": "Angraecinae",
+      "unit": "external radiation",
+      "visible": "SOURCE_SPECIFIC",
+      "biochemistry": "NOT_ESTABLISHED_MATCHED",
+      "expression": "NOT_ESTABLISHED_MATCHED",
+      "tree": "YES_SOURCE_SPECIFIC",
+      "evidence": "Independent qualitative nested organization",
+      "decision": "ADMIT_QUALITATIVE_ONLY",
+      "reason": "No common molecular/chemical outcome scale"
+    },
+    {
+      "system": "Antirrhineae",
+      "unit": "external radiation",
+      "visible": "SOURCE_SPECIFIC",
+      "biochemistry": "NOT_ESTABLISHED_MATCHED",
+      "expression": "NOT_ESTABLISHED_MATCHED",
+      "tree": "YES_SOURCE_SPECIFIC",
+      "evidence": "Independent qualitative nested organization",
+      "decision": "ADMIT_QUALITATIVE_ONLY",
+      "reason": "No common molecular/chemical outcome scale"
+    }
+  ],
+  "conclusion": "Current evidence supports cross-radiation visible-colour hidden memory but does not support cross-radiation joint transcript-metabolite predictability. Do not pool across unmatched representations.",
+  "next_required_evidence": "A second independent radiation with verified same-tip dated phylogeny, quantitative pigment compounds, matched flower expression and pre-outcome frozen transfer contrast",
+  "no_new_source_downloads_or_claimed_independent_replications": true,
+  "original_Camellia_AJB_EL_frozen": true
+}
