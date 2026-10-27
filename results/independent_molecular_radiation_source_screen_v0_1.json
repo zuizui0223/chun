@@ -1,0 +1,59 @@
+{
+  "version": "v0.1",
+  "status": "PUBLICATION_LEVEL_SOURCE_SCREEN_NOT_RAW_DATA_ADMISSION",
+  "date": "2026-10-28",
+  "required_match": "Independent radiation, same-tip phylogeny + quantitative floral pigments + quantitative gene expression, reusable raw matrix, taxon IDs and verified author-used tree",
+  "candidates": [
+    {
+      "system": "Iochrominae",
+      "priority": 1,
+      "reference": "Convergent Evolution at the Pathway Level: Predictable Regulatory Changes during Flower Color Transitions",
+      "url": "https://academic.oup.com/mbe/article/35/9/2159/5034462",
+      "reported": "28 species pigment profiling, seven pathway gene expression measurements and comparative phylogenetic analysis",
+      "gate": "PROMISING_NEEDS_RAW_MATRIX_AND_TREE_RECONCILIATION",
+      "next": "Verify actual overlapping 28 species with gene expression, exact original pigment concentrations, tree and species ID mappings"
+    },
+    {
+      "system": "Iochroma six species",
+      "priority": 2,
+      "reference": "MYB regulator of colorless flavonols underlies evolution of red flowers in Iochroma",
+      "url": "https://academic.oup.com/g3journal/article/15/12/jkaf230/8269314",
+      "data_url": "https://osf.io/j5m8f/",
+      "reported": "SRA PRJNA1102413 for six species, OSF code and data, functional flavonol-regulator study",
+      "gate": "PROMISING_NEEDS_QUANTITATIVE_MATCHED_FLAVONOL_CONCENTRATIONS_AND_TREE",
+      "next": "Check OSF downloadable original species×metabolite matrix, expression values and original author-used phylogeny"
+    },
+    {
+      "system": "Lysimachia arvensis and L. monelli",
+      "priority": 3,
+      "reference": "A multiscale approach to understanding shared blue-orange flower color polymorphism",
+      "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC11441164/",
+      "reported": "Two species, reflectance, biochemistry and petal transcriptomes",
+      "gate": "TWO_SPECIES_NOT_COMPARABLE_MACRORADIATION",
+      "next": "Retain as population-scale functional contrast only, not a second phylogenetic cross-species radiation"
+    },
+    {
+      "system": "Achimenes",
+      "priority": 4,
+      "reference": "Comparative transcriptome analyses of flower development in four species of Achimenes",
+      "url": "https://pubmed.ncbi.nlm.nih.gov/28320315/",
+      "reported": "Four floral transcriptomes, floral development and pigment-related genes",
+      "gate": "NEEDS_MATCHED_QUANTITATIVE_PIGMENTS_AND_TREE",
+      "next": "Check if original four tips have measured pigment concentrations; otherwise do not admit"
+    },
+    {
+      "system": "Ruellia",
+      "priority": 5,
+      "reference": "Flowers occupy color-space extremes: an anthocyanin-derived theoretical floral color-space approach",
+      "url": "https://doi.org/10.1002/ajb2.70149",
+      "reported": "51 species floral colour, anthocyanin concentration, phylogeny and biogeography",
+      "gate": "HOLD_AUTHOR_USED_TREE_AND_NO_VERIFIED_GENE_EXPRESSION",
+      "next": "Preserve original hold and avoid treating chemical data alone as transcript-metabolite replication"
+    }
+  ],
+  "screen_only": true,
+  "n_independent_matched_radiations_admitted_from_this_screen": 0,
+  "no_new_empirical_gene_product_test": true,
+  "priority_decision": "Iochrominae 2018 28-species study is the strongest next raw-data admission target; verify actual same-tip overlap before predeclaring transfer outcomes",
+  "original_first_shot_AJB_EL_unchanged": true
+}
