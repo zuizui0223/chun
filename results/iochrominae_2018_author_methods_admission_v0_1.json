@@ -1,0 +1,42 @@
+{
+  "version": "v0.1",
+  "date": "2026-10-28",
+  "status": "AUTHOR_METHODS_VERIFIED_RAW_NUMERIC_MATRIX_AND_TREE_NOT_YET_ADMITTED",
+  "study": "Larter et al. 2018 Molecular Biology and Evolution",
+  "doi": "10.1093/molbev/msy117",
+  "source_url": "https://academic.oup.com/mbe/article/35/9/2159/5034462",
+  "reported_species": 28,
+  "measurements": {
+    "HPLC": "Anthocyanidins plus flavonols and flavones quantified by chromatogram peaks relative to standards, concentrations normalized by tissue weight",
+    "qPCR": "Seven anthocyanin-pathway genes CHS CHI F3H F3'H F3'5'H DFR ANS; normalized against EF1-alpha; log10 fold change relative to Iochroma cyaneum reference",
+    "tissue": "Floral tissue chemistry; floral buds for qPCR approximately Petunia stage 5",
+    "tree": "Previously published time-calibrated maximum-clade-credibility Iochrominae tree (Smith and Goldberg 2015)"
+  },
+  "sampling": {
+    "minimum_three_individuals_except": [
+      "Iochroma ellipticum (one individual)",
+      "Vassobia breviflora (two individuals)"
+    ],
+    "source_phylo_ANOVA_excluded": [
+      "Iochroma ellipticum",
+      "Iochroma edule"
+    ],
+    "reason": "one individual for ellipticum; one cyanidin-primary tip for edule"
+  },
+  "primary_evidence_limit": "Original article confirms measurement programmes but not downloadable per-species numeric join nor identical analysis subset across assays",
+  "independent_radiation_admitted": false,
+  "verified_complete_species_gene_metabolite_tree_intersection": null,
+  "source_numeric_matrix_sha256": null,
+  "source_author_tree_sha256": null,
+  "source_original_supplement_link": "https://academic.oup.com/mbe/article/35/9/2159/5034462",
+  "original_supplement_fetch_status": "LINK_IDENTIFIED_FETCH_NOT_COMPLETED",
+  "requirements": [
+    "retrieve machine-readable quantitative per-tip HPLC concentrations",
+    "retrieve per-tip seven-gene log10 fold-change source matrix",
+    "retrieve Smith and Goldberg 2015 author-used dated tree and original tip names",
+    "join source IDs and audit 28 candidate taxa, missingness and replicates",
+    "freeze independent source model before outcome"
+  ],
+  "not_a_second_independent_empirical_prediction": true,
+  "first_shot_AJB_EL_unchanged": true
+}
