@@ -1,0 +1,68 @@
+{
+  "version": "v0.1",
+  "checked_at": "2026-11-14",
+  "status": "PUBLICATION_LEVEL_SUPPORT_FOUND_RAW_2018_MATCHED_DATA_STILL_HOLD",
+  "original_2018": {
+    "doi": "10.1093/molbev/msy117",
+    "reported_species": 28,
+    "reported_qpcr_genes": 7,
+    "original_supplement_url": "https://oup.silverchair-cdn.com/oup/backfile/Content_public/Journal/mbe/35/9/10.1093_molbev_msy117/1/msy117_supp.pdf",
+    "supplement_bytes_retrieved": false,
+    "supplement_fetch_error": "Web cache miss; local DNS unavailable",
+    "original_author_tree_dryad_doi": "10.5061/dryad.0732g",
+    "author_tree_bytes_retrieved": false,
+    "published_research_conclusions_confirmed": true,
+    "original_tree_Dryad_DOI": "10.5061/dryad.0732g",
+    "existing_Dryad_file_access_blocked": true
+  },
+  "crossrepo_anto": {
+    "repository": "zuizui0223/anto",
+    "published_2019_table": "docs/IOCHROMINAE_V25_ENDPOINT_SPECIFIC_FLORAL_CHEMISTRY.md",
+    "published_2019_DOI": "10.1002/dvdy.82",
+    "published_2019_best_printed_CHI_AIC": {
+      "anthocyanidin": 66.2,
+      "flavonol": 65
+    },
+    "published_2019_next_F3H_AIC": {
+      "anthocyanidin": 78.4,
+      "flavonol": 74.9
+    },
+    "published_2019_evidence_tier": "PUBLISHED_FIVE_MODEL_AIC_TABLE_NOT_ORIGINAL_INDIVIDUAL_HPLC_QPCR",
+    "original_2016_accessions": "results/iochrominae_2016_trait_KT_source_join_20261019.json",
+    "original_2016_n_species": 22,
+    "original_2016_CHI_accessions": 22,
+    "original_2016_F3H_accessions": 22,
+    "original_2016_tier": "GENE_ACCESSION_METADATA_NOT_2018_QPCR_HPLC",
+    "original_2025_backcross": "docs/IOCHROMA_2025_PHENOTYPE_CONDITIONED_COEXPRESSION_V2.md",
+    "original_2025_n_individuals": 24,
+    "original_2025_tier": "ONE_WITHIN_SPECIES_BACKCROSS_NOT_A_SECOND_RADIATION"
+  },
+  "admission": {
+    "complete_2018_matched_taxa": null,
+    "original_2018_HPLC_sha256": null,
+    "original_2018_qPCR_sha256": null,
+    "author_used_2015_tree_sha256": null,
+    "second_independent_matched_radiation_admitted": false,
+    "no_crossyear_substitution": true
+  },
+  "interpretation": "Published Iochrominae source distinguishes pigment amount from fixed-white developmental mechanism, but it does not provide a new raw source-level second radiation replication.",
+  "next_action": "Retrieve 2018 original numeric HPLC and qPCR supplementary tables and 2015 author-used dated tree; join original tip names and source-check before predicting.",
+  "no_new_P": true,
+  "first_shot_AJB_EL_unchanged": true,
+  "preexisting_CHUN_source_bridge": {
+    "path": "docs/IOCHROMINAE_CROSS_LEVEL_BRIDGE_V0_1.md",
+    "status": "ALREADY_DOCUMENTED_AUTHOR_PUBLISHED_PHENOTYPE_MODULE_ASSOCIATIONS_NOT_RAW_REANALYSIS",
+    "biological_patterns": [
+      "four independent delphinidin losses and F3prime5H/DFR/ANS downregulation",
+      "anthocyanidin hue transitions and F3primeH/F3prime5H branch expression",
+      "upstream CHS/CHI/F3H expression relatively conserved"
+    ],
+    "original_Dryad_blocked_download_attempts": 3,
+    "original_Dryad_blocked_file_id": 21811,
+    "download_HTTP_codes": [
+      401,
+      403
+    ],
+    "implication": "Do not duplicate this existing publication-derived evidence as a new empirical test or independent 2018 raw dataset"
+  }
+}
