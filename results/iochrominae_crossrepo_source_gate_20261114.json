@@ -10,7 +10,10 @@
     "supplement_bytes_retrieved": false,
     "supplement_fetch_error": "Web cache miss; local DNS unavailable",
     "original_author_tree_dryad_doi": "10.5061/dryad.0732g",
-    "author_tree_bytes_retrieved": false
+    "author_tree_bytes_retrieved": false,
+    "published_research_conclusions_confirmed": true,
+    "original_tree_Dryad_DOI": "10.5061/dryad.0732g",
+    "existing_Dryad_file_access_blocked": true
   },
   "crossrepo_anto": {
     "repository": "zuizui0223/anto",
@@ -45,5 +48,21 @@
   "interpretation": "Published Iochrominae source distinguishes pigment amount from fixed-white developmental mechanism, but it does not provide a new raw source-level second radiation replication.",
   "next_action": "Retrieve 2018 original numeric HPLC and qPCR supplementary tables and 2015 author-used dated tree; join original tip names and source-check before predicting.",
   "no_new_P": true,
-  "first_shot_AJB_EL_unchanged": true
+  "first_shot_AJB_EL_unchanged": true,
+  "preexisting_CHUN_source_bridge": {
+    "path": "docs/IOCHROMINAE_CROSS_LEVEL_BRIDGE_V0_1.md",
+    "status": "ALREADY_DOCUMENTED_AUTHOR_PUBLISHED_PHENOTYPE_MODULE_ASSOCIATIONS_NOT_RAW_REANALYSIS",
+    "biological_patterns": [
+      "four independent delphinidin losses and F3prime5H/DFR/ANS downregulation",
+      "anthocyanidin hue transitions and F3primeH/F3prime5H branch expression",
+      "upstream CHS/CHI/F3H expression relatively conserved"
+    ],
+    "original_Dryad_blocked_download_attempts": 3,
+    "original_Dryad_blocked_file_id": 21811,
+    "download_HTTP_codes": [
+      401,
+      403
+    ],
+    "implication": "Do not duplicate this existing publication-derived evidence as a new empirical test or independent 2018 raw dataset"
+  }
 }
