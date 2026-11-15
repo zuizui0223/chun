@@ -1,0 +1,38 @@
+{
+  "version": "v0.1",
+  "date": "2026-11-15",
+  "status": "NEW_VERIFIED_PUBLICATION_ARCHIVE_ROUTE_NOT_ORIGINAL_MATCHED_SOURCE_ADMITTED",
+  "prior_block": "Original 2018 Larter HPLC/qPCR raw archive unavailable after three 401/403 Dryad attempts; 2015 author-used dated phylogeny unavailable",
+  "newly_identified_source": {
+    "study": "Convergent evolution of floral shape tied to pollinator shifts in Iochrominae (Solanaceae)",
+    "journal": "Evolution",
+    "year": 2018,
+    "article_url": "https://academic.oup.com/evolut/article/72/3/688/6726779",
+    "independent_dryad_doi": "10.5061/dryad.5jn7b",
+    "archive_claim_from_publisher": "All input shape outlines, sequence alignments, phylogenetic trees and analysis scripts are archived",
+    "published_supplement": "evo13416-sup-0001-SuppMat Figure S1. Timetree of Iochrominae. Maximum clade credibility BEAST tree",
+    "biological_relation": "Iochrominae source-specific pollinator shifts and floral shape; not a gene-to-metabolite dataset",
+    "original_2015_tree_equivalence": "UNVERIFIED",
+    "bytes_retrieved": false,
+    "tree_SHA256": null,
+    "tree_tip_names_verified": false,
+    "exact_2018_Larter_tree_substitution_authorized": false
+  },
+  "separate_authoritative_2015_source": {
+    "doi": "10.5061/dryad.0732g",
+    "study": "Tempo and mode of flower color evolution",
+    "authors": "Smith and Goldberg",
+    "archive_record": "NLM Dataset Catalog confirms 2015 original dataset identifier and CC0 metadata",
+    "dataset_url": "https://doi.org/10.5061/dryad.0732g",
+    "original_dated_tree_bytes_retrieved": false
+  },
+  "next_source_gate": [
+    "Retrieve actual 2018 floral-shape source Dryad 5jn7b phylogenetic tree and verify whether it is the original same 2015 dated tree used in Larter 2018, not merely same taxonomic clade",
+    "If not identical to original author-used tree, retain as separately labeled alternative-tree sensitivity only, not primary source substitute",
+    "Retrieve original Larter 2018 supplementary per-species HPLC/qPCR numerical matrices and join same tip IDs before testing any molecular trait outcome"
+  ],
+  "no_new_gene_product_test": true,
+  "no_cross_radiation_replication": true,
+  "no_2015_original_tree_claim": true,
+  "original_AJB_Camellia_EL_unchanged": true
+}
