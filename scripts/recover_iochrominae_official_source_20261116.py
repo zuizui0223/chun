@@ -34,6 +34,8 @@ URLS = {
     "dryad_2018_shape_landing":"https://datadryad.org/dataset/doi%3A10.5061/dryad.5jn7b",
     "dryad_2015_tree_api":"https://api.datadryad.org/api/v2/datasets/doi%3A10.5061%2Fdryad.0732g",
     "dryad_2018_shape_api":"https://api.datadryad.org/api/v2/datasets/doi%3A10.5061%2Fdryad.5jn7b",
+    "dryad_2015_tree_samehost_api":"https://datadryad.org/api/v2/datasets/doi%3A10.5061%2Fdryad.0732g",
+    "dryad_2018_shape_samehost_api":"https://datadryad.org/api/v2/datasets/doi%3A10.5061%2Fdryad.5jn7b",
 }
 VALID_HOSTS={"academic.oup.com","oup.silverchair-cdn.com","scholar.colorado.edu",
              "datadryad.org","api.datadryad.org","www.colorado.edu"}
@@ -125,6 +127,29 @@ def inspect(payload:bytes,tag:str)->dict:
         if b"<html" in payload[:1000].lower() or b"<!doctype html" in payload[:1000].lower():
             rec["format"]="HTML"
         rec["contains_relevant_supplement_url"]=b"msy117_supp.pdf" in payload
+        # Dryad landing pages sometimes serve index HTML while the separate
+        # api.datadryad.org domain fails DNS. Extract original file IDs/links
+        # from the *official page bytes*, not from guessed filenames.
+        text=html.unescape(payload.decode("utf-8",errors="replace"))
+        rawlinks=re.findall(r"""(?is)href=["']([^"']{1,800})["']""",text)
+        candidates=[]
+        for h in rawlinks:
+            u=urllib.parse.urljoin("https://datadryad.org/",h)
+            path=urllib.parse.urlparse(u).path
+            if supported_url(u) and re.search(
+                r"(?i)(download|file.stream|/api/v2/|\\.(?:zip|rar|nex|nwk|tre|csv|tsv)$)",path):
+                name=sanitized(u)
+                if name not in candidates:
+                    candidates.append(name)
+        rec["html_official_file_links"]=candidates[:35]
+        ids=re.findall(r"""(?i)(?:file[_-]?id|fileId|file_id)["'\\s:=]+(\\d{3,12})""",text)
+        rec["html_file_id_candidates"]=sorted(set(ids))[:30]
+        rec["html_has_2015_tempo_title"]="Tempo and mode of flower color evolution" in text
+        rec["html_has_2018_shape_title"]="Convergent evolution of floral shape" in text
+        rec["html_original_archived_filenames"]=[
+            f for f in sorted(set(re.findall(
+                r"(?i)\\b[a-z0-9_\\-]{3,100}\\.(?:zip|rar|nex|nwk|tre|csv|tsv|txt)\\b",text)))
+            if not f.startswith(("http","www"))][:50]
     return rec
 
 
