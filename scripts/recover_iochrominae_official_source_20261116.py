@@ -13,6 +13,7 @@ from __future__ import annotations
 
 import argparse
 import hashlib
+import os
 import html
 import io
 import json
@@ -132,6 +133,29 @@ def inspect(payload:bytes,tag:str)->dict:
             with zipfile.ZipFile(io.BytesIO(payload)) as zf:
                 rec["zip_file_list"]=[{"name":f.filename,"uncompressed_bytes":f.file_size}
                                       for f in zf.infolist()[:120]]
+                # Original deposited zip files can contain the actual
+                # author-used source trees. Record inner checksums and
+                # nested filenames, not unpublished user-provided values.
+                nested=[]
+                for f in zf.infolist():
+                    if f.filename in ("ModeandTempoFlColor.zip","Smith_and_Kriebel_2018.zip"):
+                        inner=zf.read(f)
+                        detail={"provider_file_name":f.filename,
+                                "provider_file_md5":hashlib.md5(inner).hexdigest(),
+                                "provider_file_sha256":hashlib.sha256(inner).hexdigest(),
+                                "provider_file_bytes":len(inner)}
+                        try:
+                            with zipfile.ZipFile(io.BytesIO(inner)) as nested_zip:
+                                paths=[n.filename for n in nested_zip.infolist()]
+                                detail["nested_paths"]=paths[:260]
+                                detail["nested_tree_paths"]=[
+                                    p for p in paths if p.lower().endswith(
+                                        (".nex",".nexus",".newick",".nwk",".tre",".tree"))][:120]
+                        except Exception as exc:
+                            detail["nested_open_error"]=type(exc).__name__
+                        nested.append(detail)
+                if nested:
+                    rec["original_deposited_file_inventory"]=nested
         except Exception as exc:
             rec["zip_parse_error"]=type(exc).__name__
     elif payload.startswith(b"{") or payload.startswith(b"["):
@@ -140,6 +164,8 @@ def inspect(payload:bytes,tag:str)->dict:
             item=json.loads(payload)
             if isinstance(item,dict):
                 rec["json_top_keys"]=sorted(item.keys())[:45]
+                if "license" in item:
+                    rec["original_provider_license"]=item["license"]
                 rec["json_links_or_identifier"]={
                     k:str(v)[:260] for k,v in item.items()
                     if k in ("id","identifier","doi","_links","title")}
@@ -211,6 +237,23 @@ def run()->dict:
             rec.update(inspect(data,name))
             if name=="publisher_article":
                 signed=signed_publisher_url(data)
+            # Preserve exact CC0 Dryad archives for reproducible source
+            # inspection. No author/publisher supplemental PDF is republished.
+            providers={
+                "dryad_2015_tree_version_archive":"dryad_2015_tree_samehost_api",
+                "dryad_2018_shape_version_archive":"dryad_2018_shape_samehost_api"}
+            if name in providers and rec.get("format")=="ZIP":
+                licence=str(records.get(providers[name],{}).get(
+                    "original_provider_license","")).lower()
+                if "cc0" in licence or "publicdomain/zero" in licence:
+                    dest=Path("build/dryad_cc0_original_sources")/(name+".zip")
+                    dest.parent.mkdir(parents=True,exist_ok=True)
+                    dest.write_bytes(data)
+                    rec["cc0_original_archive_saved_to_GitHub_artifact_path"]=str(dest)
+                    rec["licence_verified_against_official_dataset_api"]=True
+                else:
+                    rec["cc0_original_archive_saved_to_GitHub_artifact_path"]=None
+                    rec["licence_verified_against_official_dataset_api"]=False
         records[name]=rec
         print("IOCHROMINAE_SOURCE_PROBE",name,json.dumps(rec,sort_keys=True),flush=True)
     if signed:
