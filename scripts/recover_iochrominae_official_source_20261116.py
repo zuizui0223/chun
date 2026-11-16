@@ -23,7 +23,6 @@ import urllib.request
 import zipfile
 from pathlib import Path
 
-from pypdf import PdfReader
 
 
 URLS = {
@@ -98,6 +97,7 @@ def inspect(payload:bytes,tag:str)->dict:
     if payload.startswith(b"%PDF"):
         rec["format"]="PDF"
         try:
+            from pypdf import PdfReader  # optional; only source-recovery job installs it
             reader=PdfReader(io.BytesIO(payload))
             rec["pdf_pages"]=len(reader.pages)
             txt="\n".join(page.extract_text() or "" for page in reader.pages)
