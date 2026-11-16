@@ -1,6 +1,12 @@
 name: Iochrominae 2018 original publisher and archived tree recovery 2026-11-16
 
 on:
+  push:
+    branches:
+      - research/iochrominae-official-source-recovery-20261116
+    paths:
+      - 'scripts/recover_iochrominae_official_source_20261116.py'
+      - '.github/workflows/iochrominae-official-source-recovery-20261116.yml'
   pull_request:
     paths:
       - 'scripts/recover_iochrominae_official_source_20261116.py'
