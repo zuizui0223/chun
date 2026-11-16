@@ -23,7 +23,7 @@ jobs:
         with:
           python-version: '3.12'
       - name: Install original phylogenetic tree parsing and regression test packages
-        run: python -m pip install biopython pytest pypdf==5.5.0
+        run: python -m pip install biopython==1.88 pytest==9.1.1 pypdf==5.5.0
       - name: Verify original source receipt and species-intersection admission tests
         run: python -m pytest -q tests/test_iochrominae_original_matched_source_gate_v0_1.py
       - name: Report true original-source status
