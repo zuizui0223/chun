@@ -79,6 +79,20 @@ def audit(manifest:dict)->dict:
             raise ValueError(f"{key}: authoritative original provenance required")
         source[key]={"sha256":digest,"original_source_url":item["original_source_url"],
                      "source_publication":item["source_publication"]}
+    # A manifest-supplied SHA256 proves byte integrity relative to the
+    # manifest, NOT independent provider authenticity. The user can hash a
+    # fabricated file and set a boolean. Require a separately evidenced
+    # curator review before a source can be marked admitted.
+    review=manifest.get("independent_provenance_review")
+    if not isinstance(review,dict) or review.get("status")!="VERIFIED":
+        raise ValueError("independent original-source provenance review required")
+    if not review.get("reviewer") or not review.get("evidence_url"):
+        raise ValueError("independent review requires reviewer and inspectable evidence URL")
+    if not str(review["evidence_url"]).startswith(("https://","http://")):
+        raise ValueError("independent review evidence URL must be web-accessible")
+    for key in required:
+        if review.get("sha256_by_source",{}).get(key)!=source[key]["sha256"]:
+            raise ValueError(f"{key}: independent review hash does not match source")
     if manifest["dated_tree"].get("original_author_used_tree_verified") is not True:
         raise ValueError("different study tree is not the 2018 author-used original")
     h=numeric_table(Path(manifest["hplc"]["path"]),
