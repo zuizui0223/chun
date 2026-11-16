@@ -6,6 +6,8 @@ on:
       - 'scripts/audit_iochrominae_original_matched_source_gate_v0_1.py'
       - 'tests/test_iochrominae_original_matched_source_gate_v0_1.py'
       - '.github/workflows/iochrominae-original-source-admission-v0-1.yml'
+      - 'scripts/recover_iochrominae_official_source_20261116.py'
+      - 'tests/test_recover_iochrominae_official_source_20261116.py'
   workflow_dispatch:
 
 permissions:
@@ -14,14 +16,14 @@ permissions:
 jobs:
   fail_closed_source_gate:
     runs-on: ubuntu-24.04
-    timeout-minutes: 6
+    timeout-minutes: 10
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
       - name: Install original phylogenetic tree parsing and regression test packages
-        run: python -m pip install biopython pytest
+        run: python -m pip install biopython pytest pypdf==5.5.0
       - name: Verify original source receipt and species-intersection admission tests
         run: python -m pytest -q tests/test_iochrominae_original_matched_source_gate_v0_1.py
       - name: Report true original-source status
@@ -36,3 +38,30 @@ jobs:
           assert x['no_cross_radiation_replication']
           print('IOCHROMINAE_RAW_SOURCE_HOLD_ORIGINAL_TREE_AND_2018_QUANTITATIVE_MATRIX_NOT_ADMITTED')
           PY
+      - name: Verify official publisher/Dryad read-only source recovery safeguards
+        run: python -m pytest -q tests/test_recover_iochrominae_official_source_20261116.py
+      - name: Actually try publisher supplement, author preprint, and two distinct official tree archives
+        run: |
+          python scripts/recover_iochrominae_official_source_20261116.py \
+            --out build/iochrominae_official_source_recovery_20261116.json
+      - name: Check file-access outcome without changing raw source admission
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          p=Path('build/iochrominae_official_source_recovery_20261116.json')
+          x=json.loads(p.read_text())
+          assert not x['original_2018_HPLC_species_matrix_admitted']
+          assert not x['original_2018_seven_qPCR_gene_species_matrix_admitted']
+          assert not x['original_2015_author_used_dated_tree_admitted']
+          assert not x['independent_radiation_source_join_admitted']
+          assert not x['original_pdf_bytes_republished']
+          print('ORIGINAL_IOCHROMINAE_SOURCE_ACCESS_DIAGNOSTIC',x['status'])
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: iochrominae-original-source-probe-receipts-20261116
+          path: build/iochrominae_official_source_recovery_20261116.json
+          retention-days: 60
+          if-no-files-found: warn
