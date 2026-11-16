@@ -43,6 +43,10 @@ URLS = {
     "dryad_2015_original_file_21811_samehost_download":"https://datadryad.org/api/v2/files/21811/download",
     "dryad_2018_shape_file_76310_samehost_download":"https://datadryad.org/api/v2/files/76310/download",
     "dryad_2018_shape_file_76311_samehost_download":"https://datadryad.org/api/v2/files/76311/download",
+    "dryad_2015_tree_version_archive":"https://datadryad.org/api/v2/versions/3567/download",
+    "dryad_2018_shape_version_archive":"https://datadryad.org/api/v2/versions/22139/download",
+    "dryad_2015_tree_dataset_archive":"https://datadryad.org/api/v2/datasets/doi%3A10.5061%2Fdryad.0732g/download",
+    "dryad_2018_shape_dataset_archive":"https://datadryad.org/api/v2/datasets/doi%3A10.5061%2Fdryad.5jn7b/download",
 }
 VALID_HOSTS={"academic.oup.com","oup.silverchair-cdn.com","scholar.colorado.edu",
              "datadryad.org","api.datadryad.org","www.colorado.edu"}
@@ -127,6 +131,21 @@ def inspect(payload:bytes,tag:str)->dict:
                 rec["json_links_or_identifier"]={
                     k:str(v)[:260] for k,v in item.items()
                     if k in ("id","identifier","doi","_links","title")}
+                embedded=item.get("_embedded",{})
+                if isinstance(embedded,dict):
+                    inventory=[]
+                    for embedded_key,values in embedded.items():
+                        if isinstance(values,list):
+                            for row in values[:40]:
+                                if isinstance(row,dict):
+                                    inventory.append({
+                                        "group":embedded_key,
+                                        **{k:v for k,v in row.items()
+                                           if k in ("id","path","filename","size","md5",
+                                                    "digest","mimeType","status","description",
+                                                    "fileSize","fileName","checksum")}
+                                    })
+                    rec["json_original_provider_file_inventory"]=inventory
         except Exception:
             rec["json_parse_error"]=True
     else:
