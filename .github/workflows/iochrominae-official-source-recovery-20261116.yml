@@ -28,7 +28,7 @@ jobs:
         with:
           python-version: '3.12'
       - name: Install PDF structural reader and test framework
-        run: python -m pip install --disable-pip-version-check pypdf==5.5.0 pytest
+        run: python -m pip install --disable-pip-version-check pypdf==5.5.0 pytest==9.1.1
       - name: Verify original-source host restrictions, signed publisher link and source tree hold
         run: python -m pytest -q tests/test_recover_iochrominae_official_source_20261116.py
       - name: Probe source official publisher, institutional preprint, and two Dryad tree archive metadata endpoints
