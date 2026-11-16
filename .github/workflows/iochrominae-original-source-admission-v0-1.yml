@@ -1,0 +1,38 @@
+name: Iochrominae original matched-source admission fail-closed v0.1
+
+on:
+  pull_request:
+    paths:
+      - 'scripts/audit_iochrominae_original_matched_source_gate_v0_1.py'
+      - 'tests/test_iochrominae_original_matched_source_gate_v0_1.py'
+      - '.github/workflows/iochrominae-original-source-admission-v0-1.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  fail_closed_source_gate:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 6
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install original phylogenetic tree parsing and regression test packages
+        run: python -m pip install biopython pytest
+      - name: Verify original source receipt and species-intersection admission tests
+        run: python -m pytest -q tests/test_iochrominae_original_matched_source_gate_v0_1.py
+      - name: Report true original-source status
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          x=json.loads(Path('results/iochrominae_alternative_tree_archive_route_20261115.json').read_text())
+          assert not x['newly_identified_source']['bytes_retrieved']
+          assert not x['separate_authoritative_2015_source']['original_dated_tree_bytes_retrieved']
+          assert not x['newly_identified_source']['exact_2018_Larter_tree_substitution_authorized']
+          assert x['no_cross_radiation_replication']
+          print('IOCHROMINAE_RAW_SOURCE_HOLD_ORIGINAL_TREE_AND_2018_QUANTITATIVE_MATRIX_NOT_ADMITTED')
+          PY
