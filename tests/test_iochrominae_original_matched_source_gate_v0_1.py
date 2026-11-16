@@ -29,9 +29,16 @@ def fixture(tmp_path):
                 "original_source_url":"https://example.org/original",
                 "source_publication":"source published study",
                 "species_column":"species","numeric_columns":cols}
-    return {"hplc":row(h,["anthocyanidin_mgg","flavonol_mgg"]),
-            "qpcr":row(q,["CHI","DFR"]),
-            "dated_tree":{**row(t),"original_author_used_tree_verified":True}}
+    manifest={"hplc":row(h,["anthocyanidin_mgg","flavonol_mgg"]),
+              "qpcr":row(q,["CHI","DFR"]),
+              "dated_tree":{**row(t),"original_author_used_tree_verified":True}}
+    # Synthetic reviewer fixture; this is NOT a real provider attestation.
+    manifest["independent_provenance_review"]={
+        "status":"VERIFIED","reviewer":"synthetic-test-only",
+        "evidence_url":"https://example.org/synthetic-review",
+        "sha256_by_source":{key:manifest[key]["original_sha256"]
+                            for key in ("hplc","qpcr","dated_tree")}}
+    return manifest
 
 
 def test_same_original_source_all_three_layers_admitted(tmp_path):
@@ -66,6 +73,7 @@ def test_duplicate_replicate_taxa_not_silently_averaged(tmp_path):
     q=Path(d["qpcr"]["path"])
     q.write_text(q.read_text()+"A,2.5,1.2\n")
     d["qpcr"]["original_sha256"]=hashlib.sha256(q.read_bytes()).hexdigest()
+    d["independent_provenance_review"]["sha256_by_source"]["qpcr"]=d["qpcr"]["original_sha256"]
     with pytest.raises(ValueError,match="replicate rows"):
         m.audit(d)
 
@@ -75,6 +83,7 @@ def test_non_numeric_measurements_do_not_create_complete_tip(tmp_path):
     q=Path(d["qpcr"]["path"])
     q.write_text(q.read_text().replace("F,2.5,1.2","F,NA,1.2"))
     d["qpcr"]["original_sha256"]=hashlib.sha256(q.read_bytes()).hexdigest()
+    d["independent_provenance_review"]["sha256_by_source"]["qpcr"]=d["qpcr"]["original_sha256"]
     result=m.audit(d)
     assert result["n_shared_tips"]==6
     assert result["n_complete_tips"]==5
@@ -86,9 +95,25 @@ def test_missing_branch_lengths_and_missing_source_rejected(tmp_path):
     tree=Path(d["dated_tree"]["path"])
     tree.write_text("((A,B),(C,D),(E,F));\n")
     d["dated_tree"]["original_sha256"]=hashlib.sha256(tree.read_bytes()).hexdigest()
+    d["independent_provenance_review"]["sha256_by_source"]["dated_tree"]=d["dated_tree"]["original_sha256"]
     with pytest.raises(ValueError,match="branch lengths absent"):
         m.audit(d)
     d=fixture(tmp_path)
     d["dated_tree"]["path"]=str(tmp_path/"no.nwk")
     with pytest.raises(ValueError,match="missing"):
+        m.audit(d)
+
+
+def test_self_attested_original_source_is_not_admitted_without_external_review(tmp_path):
+    d=fixture(tmp_path)
+    del d["independent_provenance_review"]
+    with pytest.raises(ValueError,match="independent original-source provenance"):
+        m.audit(d)
+    d=fixture(tmp_path)
+    d["independent_provenance_review"]["sha256_by_source"]["hplc"]="0"*64
+    with pytest.raises(ValueError,match="independent review hash"):
+        m.audit(d)
+    d=fixture(tmp_path)
+    d["independent_provenance_review"]["evidence_url"]="unverifiable-local-note"
+    with pytest.raises(ValueError,match="web-accessible"):
         m.audit(d)
