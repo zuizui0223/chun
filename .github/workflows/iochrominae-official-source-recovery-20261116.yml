@@ -55,3 +55,10 @@ jobs:
           path: build/iochrominae_official_source_recovery_20261116.json
           if-no-files-found: warn
           retention-days: 60
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: iochrominae-verified-original-dryad-cc0-archives-20261116
+          path: build/dryad_cc0_original_sources/*.zip
+          if-no-files-found: warn
+          retention-days: 60
