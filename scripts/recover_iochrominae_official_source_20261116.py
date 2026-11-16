@@ -36,6 +36,13 @@ URLS = {
     "dryad_2018_shape_api":"https://api.datadryad.org/api/v2/datasets/doi%3A10.5061%2Fdryad.5jn7b",
     "dryad_2015_tree_samehost_api":"https://datadryad.org/api/v2/datasets/doi%3A10.5061%2Fdryad.0732g",
     "dryad_2018_shape_samehost_api":"https://datadryad.org/api/v2/datasets/doi%3A10.5061%2Fdryad.5jn7b",
+    "dryad_2015_tree_version":"https://datadryad.org/api/v2/versions/3567",
+    "dryad_2018_shape_version":"https://datadryad.org/api/v2/versions/22139",
+    "dryad_2015_tree_files":"https://datadryad.org/api/v2/versions/3567/files",
+    "dryad_2018_shape_files":"https://datadryad.org/api/v2/versions/22139/files",
+    "dryad_2015_original_file_21811_samehost_download":"https://datadryad.org/api/v2/files/21811/download",
+    "dryad_2018_shape_file_76310_samehost_download":"https://datadryad.org/api/v2/files/76310/download",
+    "dryad_2018_shape_file_76311_samehost_download":"https://datadryad.org/api/v2/files/76311/download",
 }
 VALID_HOSTS={"academic.oup.com","oup.silverchair-cdn.com","scholar.colorado.edu",
              "datadryad.org","api.datadryad.org","www.colorado.edu"}
@@ -198,6 +205,8 @@ def run()->dict:
         "original_2018_HPLC_species_matrix_admitted":False,
         "original_2018_seven_qPCR_gene_species_matrix_admitted":False,
         "original_2015_author_used_dated_tree_admitted":False,
+        "original_2015_tree_binary_archive_recovered":False,
+        "original_2018_shape_tree_binary_archive_recovered":False,
         "independent_radiation_source_join_admitted":False,
         "original_pdf_bytes_republished":False,
         "source_absence_or_http_failure_not_biological_result":True,
