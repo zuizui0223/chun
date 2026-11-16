@@ -75,8 +75,20 @@ def download(url:str)->tuple[bytes,dict]:
             status=int(response.status)
             mime=response.headers.get("Content-Type","").split(";")[0]
             final=response.geturl()
-            # Do not follow redirects to nonauthoritative, unknown hosts.
-            if not supported_url(final):
+            # The version-specific CC0 archive comes from a documented Dryad
+            # API 302 to its own archive Lambda service. Trust the exact
+            # source-observed host only for these two explicit original Dryad
+            # version endpoints; do not weaken the general source allowlist.
+            original_dryad_version_archive=url in (
+                URLS["dryad_2015_tree_version_archive"],
+                URLS["dryad_2018_shape_version_archive"])
+            observed_dryad_lambda=(
+                urllib.parse.urlparse(final).scheme=="https" and
+                urllib.parse.urlparse(final).hostname==
+                "w27i4vubmmwkssdf6xpszafmhq0rffog.lambda-url.us-west-2.on.aws")
+            valid_redirect=supported_url(final) or (
+                original_dryad_version_archive and observed_dryad_lambda)
+            if not valid_redirect:
                 return b"",{"status":"HOLD_UNTRUSTED_REDIRECT","http_status":status,
                              "redirect_host":urllib.parse.urlparse(final).hostname}
             payload=response.read(MAX_BYTES+1)
@@ -224,8 +236,10 @@ def run()->dict:
         "original_2018_HPLC_species_matrix_admitted":False,
         "original_2018_seven_qPCR_gene_species_matrix_admitted":False,
         "original_2015_author_used_dated_tree_admitted":False,
-        "original_2015_tree_binary_archive_recovered":False,
-        "original_2018_shape_tree_binary_archive_recovered":False,
+        "original_2015_tree_binary_archive_recovered":records.get(
+            "dryad_2015_tree_version_archive",{}).get("format")=="ZIP",
+        "original_2018_shape_tree_binary_archive_recovered":records.get(
+            "dryad_2018_shape_version_archive",{}).get("format")=="ZIP",
         "independent_radiation_source_join_admitted":False,
         "original_pdf_bytes_republished":False,
         "source_absence_or_http_failure_not_biological_result":True,
