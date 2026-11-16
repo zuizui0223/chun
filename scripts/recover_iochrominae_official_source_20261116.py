@@ -137,18 +137,18 @@ def inspect(payload:bytes,tag:str)->dict:
             u=urllib.parse.urljoin("https://datadryad.org/",h)
             path=urllib.parse.urlparse(u).path
             if supported_url(u) and re.search(
-                r"(?i)(download|file.stream|/api/v2/|\\.(?:zip|rar|nex|nwk|tre|csv|tsv)$)",path):
+                r"(?i)(download|file.stream|/api/v2/|\.(?:zip|rar|nex|nwk|tre|csv|tsv)$)",path):
                 name=sanitized(u)
                 if name not in candidates:
                     candidates.append(name)
         rec["html_official_file_links"]=candidates[:35]
-        ids=re.findall(r"""(?i)(?:file[_-]?id|fileId|file_id)["'\\s:=]+(\\d{3,12})""",text)
+        ids=re.findall(r"""(?i)(?:file[_-]?id|fileId|file_id)["'\s:=]+(\d{3,12})""",text)
         rec["html_file_id_candidates"]=sorted(set(ids))[:30]
         rec["html_has_2015_tempo_title"]="Tempo and mode of flower color evolution" in text
         rec["html_has_2018_shape_title"]="Convergent evolution of floral shape" in text
         rec["html_original_archived_filenames"]=[
             f for f in sorted(set(re.findall(
-                r"(?i)\\b[a-z0-9_\\-]{3,100}\\.(?:zip|rar|nex|nwk|tre|csv|tsv|txt)\\b",text)))
+                r"(?i)\b[a-z0-9_\-]{3,100}\.(?:zip|rar|nex|nwk|tre|csv|tsv|txt)\b",text)))
             if not f.startswith(("http","www"))][:50]
     return rec
 
