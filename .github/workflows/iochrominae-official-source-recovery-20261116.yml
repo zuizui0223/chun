@@ -28,13 +28,35 @@ jobs:
         with:
           python-version: '3.12'
       - name: Install PDF structural reader and test framework
-        run: python -m pip install --disable-pip-version-check pypdf==5.5.0 pytest==9.1.1
+        run: python -m pip install --disable-pip-version-check pypdf==5.5.0 pytest==9.1.1 biopython==1.88
       - name: Verify original-source host restrictions, signed publisher link and source tree hold
         run: python -m pytest -q tests/test_recover_iochrominae_official_source_20261116.py
       - name: Probe source official publisher, institutional preprint, and two Dryad tree archive metadata endpoints
         run: |
           python scripts/recover_iochrominae_official_source_20261116.py \
             --out build/iochrominae_official_source_recovery_20261116.json
+      - name: Verify original Dryad source inner MD5 SHA256 and distinct 2015/2018 phylogenetic data frames
+        run: |
+          python scripts/audit_iochrominae_recovered_original_archives_v0_1.py \
+            --source-2015 build/dryad_cc0_original_sources/dryad_2015_tree_version_archive.zip \
+            --source-2018 build/dryad_cc0_original_sources/dryad_2018_shape_version_archive.zip \
+            --out build/iochrominae_original_cc0_source_inventory_20261116.json
+      - name: Replay exact original verified source specimen counts, data types, and no invented mappings
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          observed=json.loads(Path("build/iochrominae_original_cc0_source_inventory_20261116.json").read_text())
+          frozen=json.loads(Path("results/iochrominae_original_cc0_archive_source_inventory_20261116.json").read_text())
+          assert observed==frozen, (observed.keys(),frozen.keys())
+          assert observed["2015_original_posterior_trees"]==100
+          assert observed["2015_original_chemical_anthocyanin_state_rows"]==33
+          assert observed["2018_shape_original_posterior_trees"]==126
+          assert observed["2018_visible_colour_data_species"]==36
+          assert observed["same_literal_ID_count"]==1
+          assert observed["no_independent_measured_expression_to_metabolite_test"]
+          print("IOCHROMINAE_TWO_ORIGINAL_CC0_SOURCE_FRAMES_REPLAY_PASS",observed["same_literal_species_ID_in_both_original_phenotype_CSVs"])
+          PY
       - name: Do not admit missing raw matrices or substitute alternative phylogeny
         run: |
           python - <<'PY'
@@ -60,5 +82,12 @@ jobs:
         with:
           name: iochrominae-verified-original-dryad-cc0-archives-20261116
           path: build/dryad_cc0_original_sources/*.zip
+          if-no-files-found: warn
+          retention-days: 60
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: iochrominae-original-phylo-and-trait-source-inventory-20261116
+          path: build/iochrominae_original_cc0_source_inventory_20261116.json
           if-no-files-found: warn
           retention-days: 60
