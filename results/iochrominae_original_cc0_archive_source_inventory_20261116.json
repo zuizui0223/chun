@@ -1,0 +1,69 @@
+{
+  "status": "RECOVERED_TWO_ORIGINAL_CC0_PHYLOGENETIC_ARCHIVES_NOT_2018_HPLC_QPCR_ADMISSION",
+  "version": "v0.1",
+  "analysis_date": "2026-11-16",
+  "2015_published_original": {
+    "source_doi": "10.5061/dryad.0732g",
+    "original_provider_nested_file": "ModeandTempoFlColor.zip",
+    "original_provider_md5": "78957f5320749f5c022de78e8ad1ab32",
+    "original_provider_sha256": "2a7a92f600b0d92f874d636e90f5e2fcc3314876a7c4affc21b51e3c81701e5b",
+    "exact_member_sha256": {
+      "IochBeast100.nex": "c2690a2b27d712684baab36be251e016904b98f60dd95156917a77a5a866c671",
+      "ioch_data.csv": "6aacfaee4b5ef65afddf96e4e9d886d490d9bec59deafd70cc63440c26c06480"
+    },
+    "primary_provider_md5_sha256_verified": true,
+    "original_member_sha256_verified": true
+  },
+  "2018_shape_study_original": {
+    "source_doi": "10.5061/dryad.5jn7b",
+    "original_provider_nested_file": "Smith_and_Kriebel_2018.zip",
+    "original_provider_md5": "a4318f07ddd7e2dd1ce8297c057ead6b",
+    "original_provider_sha256": "2a7f70c1e1db8e8308851b8317b90c112732661d288ec584219dd2d001a5bfe9",
+    "exact_member_sha256": {
+      "phylogenies/MCC_tree.nex": "80d4f39a9e7dba3f6337e0698473b1bcdd9027f853e82a072026204018076cec",
+      "phylogenies/126_trees.nex": "dac440674e8018e3a71b8147e46cb5c047486d7a8009725ce45d2165614c8e4d",
+      "data/data.csv": "318637026410ef0c714ed225f4add7615aca3fe1e1d0908aa91295f777edff47"
+    },
+    "primary_provider_md5_sha256_verified": true,
+    "original_member_sha256_verified": true
+  },
+  "2015_original_posterior_trees": 100,
+  "2015_original_posterior_tips_each": 42,
+  "2015_original_chemical_anthocyanin_state_rows": 33,
+  "2015_source_chemical_presence_codes": {
+    "0": 9,
+    "1": 24
+  },
+  "2015_original_chemical_state_rows_all_on_tree": true,
+  "2018_shape_author_used_MCC_count": 1,
+  "2018_shape_MCC_tips": 44,
+  "2018_shape_original_posterior_trees": 126,
+  "2018_visible_colour_data_species": 36,
+  "2018_visible_colour_counts": {
+    "orange": 5,
+    "purple": 19,
+    "red": 2,
+    "white": 3,
+    "yellow": 7
+  },
+  "2018_source_pollinator_labels": {
+    "SOURCE_UNKNOWN": 14,
+    "hummingbird": 12,
+    "insect": 5,
+    "mixed": 5
+  },
+  "2018_visible_colour_data_all_exact_MCC_tips": true,
+  "unmapped_2015_source_codes_vs_2018_binomials": true,
+  "same_literal_species_ID_in_both_original_phenotype_CSVs": [
+    "Iochroma_tupayachianum"
+  ],
+  "same_literal_ID_count": 1,
+  "2015_tree_is_posterior_sample_not_author_used_MCC": true,
+  "2018_shape_MCC_not_proven_2018_Larter_author_tree": true,
+  "no_2018_Larter_7_gene_source_matrix": true,
+  "no_2018_Larter_quantitative_HPLC_source_matrix": true,
+  "no_independent_measured_expression_to_metabolite_test": true,
+  "source_taxon_mapping_hold": true,
+  "no_new_statistical_P_value": true,
+  "frozen_AJB_and_EL_unchanged": true
+}
