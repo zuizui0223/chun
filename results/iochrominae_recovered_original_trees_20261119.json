@@ -1,0 +1,81 @@
+{
+  "version": "v0.1",
+  "date": "2026-11-19",
+  "status": "ORIGINAL_DRYAD_TREE_ARCHIVES_RECOVERED_AND_PARSED_HPLC_QPCR_HOLD",
+  "source_GitHub_run_id": 43895705048,
+  "source_artifact_id": 14239795231,
+  "source_artifact_name": "iochrominae-verified-original-dryad-cc0-archives-20261116",
+  "parsing_method": "Nested official Dryad CC0 ZIP bytes; Bio.Phylo.parse(..., nexus) and csv.DictReader; source zip SHA256",
+  "sources": [
+    {
+      "source": "Smith and Goldberg 2015",
+      "doi": "10.5061/dryad.0732g",
+      "provider_archive": "ModeandTempoFlColor.zip",
+      "provider_archive_sha256": "2a7a92f600b0d92f874d636e90f5e2fcc3314876a7c4affc21b51e3c81701e5b",
+      "original_tree": "IochBeast100.nex",
+      "tree_sha256": "c2690a2b27d712684baab36be251e016904b98f60dd95156917a77a5a866c671",
+      "n_original_trees": 100,
+      "n_original_tips_per_tree": 42,
+      "original_trait": "ioch_data.csv",
+      "original_trait_sha256": "6aacfaee4b5ef65afddf96e4e9d886d490d9bec59deafd70cc63440c26c06480",
+      "n_original_trait_rows": 33,
+      "trait_definition": "binary visible flower colour source, not HPLC or qPCR"
+    },
+    {
+      "source": "Smith and Kriebel 2018",
+      "doi": "10.5061/dryad.5jn7b",
+      "provider_archive": "Smith_and_Kriebel_2018.zip",
+      "provider_archive_sha256": "2a7f70c1e1db8e8308851b8317b90c112732661d288ec584219dd2d001a5bfe9",
+      "trees": [
+        {
+          "path": "phylogenies/MCC_tree.nex",
+          "sha256": "80d4f39a9e7dba3f6337e0698473b1bcdd9027f853e82a072026204018076cec",
+          "n_trees": 1,
+          "n_tips": 44
+        },
+        {
+          "path": "phylogenies/126_trees.nex",
+          "sha256": "dac440674e8018e3a71b8147e46cb5c047486d7a8009725ce45d2165614c8e4d",
+          "n_trees": 126,
+          "n_tips": 44
+        }
+      ],
+      "trait": "data/data.csv",
+      "trait_sha256": "318637026410ef0c714ed225f4add7615aca3fe1e1d0908aa91295f777edff47",
+      "n_trait_rows": 36,
+      "colour_counts": {
+        "purple": 19,
+        "yellow": 7,
+        "orange": 5,
+        "white": 3,
+        "red": 2
+      },
+      "trait_columns": [
+        "image",
+        "genus",
+        "color",
+        "length",
+        "Humm_Imp",
+        "Hym_Imp",
+        "Lep_Imp",
+        "Dip_Imp",
+        "Corolla_L",
+        "RewardPerFlower",
+        "Display",
+        "main_pollinator",
+        "area"
+      ],
+      "original_HPLC_qPCR": false
+    }
+  ],
+  "evidence_limit": {
+    "source_2015_100_trees_is_original_archive": true,
+    "source_2018_MCC_is_distinct_publication": true,
+    "Larter_2018_author_used_tree_identity_verified": false,
+    "Larter_2018_28_species_quantitative_HPLC_matrix_verified": false,
+    "Larter_2018_7_gene_qPCR_matrix_verified": false,
+    "independent_multilayer_prediction_run": false
+  },
+  "next": "Compare Larter 2018 methods tree identity to the recovered 2015 posterior and recover 2018 HPLC/qPCR numeric supplementary source; then audit exact species overlap.",
+  "original_AJB_EL_frozen": true
+}
